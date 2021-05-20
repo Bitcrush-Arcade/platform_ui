@@ -6,6 +6,8 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Container from '@material-ui/core/Container'
+// Bitcrush Components
+import Menu from 'components/Menu'
 
 export default function Home() {
   return (
@@ -17,8 +19,9 @@ export default function Home() {
           </Button>
         </Toolbar>
       </AppBar>
-      <Container style={{ marginTop: 60 }}>
-        <Typography>
+      <Menu/>
+      <Container style={{ marginTop: 64 }}>
+        <Typography variant="h1">
           BITCRUSH
         </Typography>
       </Container>

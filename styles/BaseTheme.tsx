@@ -8,6 +8,9 @@ const theme = createMuiTheme({
     secondary: {
       main: 'rgb(43,216,180)', // Specified Black
     },
+    background: {
+      default: 'rgb(23,24,54)'
+    }
   },
 });
 
