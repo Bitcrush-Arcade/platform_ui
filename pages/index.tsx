@@ -10,11 +10,13 @@ import Container from '@material-ui/core/Container'
 import Menu from 'components/Menu'
 
 export default function Home() {
+
+
   return (
     <div>
       <AppBar>
         <Toolbar>
-          <Button>
+          <Button onClick={() => console.log('connect to wallet')}>
             Connect Wallet
           </Button>
         </Toolbar>

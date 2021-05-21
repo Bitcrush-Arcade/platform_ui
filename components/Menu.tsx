@@ -2,6 +2,7 @@
 import { useState, Fragment } from 'react'
 // Next
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 // Material imports
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
@@ -13,15 +14,14 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 // Icons
-import HomeIcon from '@material-ui/icons/Home';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import GameIcon from '@material-ui/icons/VideogameAsset';
+import HomeIcon from '@material-ui/icons/Home';
 
-
-const Menu = () => {
-    
+const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
+    const { open, toggleOpen } = props
     const router = useRouter()
-    const [open, setOpen] = useState<boolean>(true)
     const css = useStyles({ open })
 
     const linkArray = [
@@ -38,12 +38,23 @@ const Menu = () => {
         const [ openSubMenu, setOpenSubMenu ] = useState<boolean>(false)
         const click = () =>  subMenu && setOpenSubMenu( p => !p )
         const selected = url_link == router.pathname
-        return(<Fragment key={`nav-menu-item-${name}`} >
-            <ListItem button={subMenu ? true: undefined} onClick={ click }>
-                <ListItemIcon className={ selected && css.selectedIcon }>
+        const listItem = <Fragment key={`nav-menu-item-${name}`} >
+            <ListItem 
+                button={subMenu || url_link ? true: undefined}
+                onClick={ click } component={url_link ? 'a' : 'button'}  href={url_link}
+                className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
+            >
+                <ListItemIcon className={ `${selected ? css.selectedIcon : ''}` }>
                     {icon}
                 </ListItemIcon>
-                <ListItemText primary={name} primaryTypographyProps={{ noWrap: true, color: selected ? 'primary' : 'textPrimary' }}/>
+                <ListItemText
+                    primary={subMenu
+                        ? <>
+                            {name} {<ExpandMoreIcon fontSize="inherit" style={{transform: openSubMenu ? 'rotate( 180deg )' : undefined}}/>}
+                          </> 
+                        : name}
+                    primaryTypographyProps={{ noWrap: true, color: selected ? 'primary' : 'textPrimary' }}
+                />
             </ListItem>
             {subMenu && <Collapse in={openSubMenu}>
                 <List dense className={css.subList}>
@@ -58,7 +69,13 @@ const Menu = () => {
                     })}
                 </List>
             </Collapse>}
-        </Fragment>)
+        </Fragment>
+
+        return url_link 
+            ? <Link href={url_link} key={`nav-link-menu-item-${name}`} passHref>
+                {listItem}
+            </Link>
+            : listItem
     })
 
     return <>
@@ -67,7 +84,7 @@ const Menu = () => {
             <List>
                 {linkItems}
             </List>
-            <Button onClick={ () => setOpen(p => !p)}>OPEN</Button>
+            <Button onClick={ toggleOpen }>OPEN</Button>
         </Paper>
       </Drawer>
     </>
@@ -77,7 +94,7 @@ export default Menu
 
 const useStyles = makeStyles( (theme: Theme) => createStyles({
     drawerContainer:{
-        width: (props: { open: boolean}) => props.open ? 240 : theme.spacing(7)
+        width: (props: { open: boolean}) => props.open ? theme.spacing(30) : theme.spacing(8)
     },
     drawer:{
         backgroundColor: 'transparent',
@@ -102,9 +119,19 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
         borderLeftStyle: 'none',
     },
     subList: {
-        backgroundColor: 'rgba(23,24,54, 0.5)'
+        backgroundColor: 'rgba(255,255,255,0.1)'
     },
     selectedIcon:{
         color: theme.palette.primary.main
+    },
+    selectedItem:{
+        borderRightStyle: 'solid',
+        borderColor: theme.palette.primary.main,
+        borderWidth: 4,
+        background: 'linear-gradient(90deg, rgba(13,12,44,1) 67%, rgba(0,0,0,0) 95%)'
+    },
+    baseItem:{
+        borderTopLeftRadius: theme.spacing(2),
+        borderBottomLeftRadius: theme.spacing(2),
     }
 }))
