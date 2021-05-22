@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import ButtonBase from '@material-ui/core/ButtonBase'
 import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
+import Menu from '@material-ui/core/Menu'
+import MenuItem from '@material-ui/core/MenuItem'
 import Typography from '@material-ui/core/Typography'
 // Icons
 import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
@@ -12,7 +13,7 @@ type TokenDisplayProps ={
   color: 'primary' | 'secondary',
   amount: number,
   icon: JSX.Element,
-  actions: Array< { name: string, onClick: () => void } >
+  actions: Array< { name: string, onClick?: () => void, url?: string } >
 }
 
 const TokenDisplay = ( props: TokenDisplayProps ) => {
@@ -23,9 +24,15 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
   const css = useStyles({ showActions, ...props })
   const toggleActions = () => setShowActions( p => !p )
 
+  const btnRef = useRef<HTMLButtonElement>(null)
+
   return <>
-    <ButtonBase onClick={toggleActions} className={ css.button }>
-      <Grid container alignItems="center" spacing={1}>
+    <ButtonBase 
+      onClick={toggleActions}
+      className={ css.button }
+      ref={btnRef}
+    >
+      <Grid container alignItems="center" spacing={1} aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color}>
             $&nbsp;{amount}
@@ -39,6 +46,27 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
         </Grid>
       </Grid>
     </ButtonBase>
+    <Menu
+      id={`token-menu`}
+      open={showActions}
+      anchorEl={btnRef.current}
+      onClose={toggleActions}
+      anchorOrigin={ { horizontal: 'center', vertical: "bottom" }}
+      anchorReference="anchorEl"
+      getContentAnchorEl={null}
+    >
+      {actions?.map( action => {
+        
+        const actionFn = () => {
+          action?.onClick && action.onClick()
+          toggleActions()
+        }
+
+        return <MenuItem onClick={ actionFn }>
+          {action.name}
+        </MenuItem>
+      })}
+    </Menu>
   </>
 }
 
