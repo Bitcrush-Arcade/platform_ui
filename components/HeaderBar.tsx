@@ -61,7 +61,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               <TokenDisplay amount={15785946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
             </Grid>
             <Grid item>
-              <GeneralButton/>
+              <GeneralButton color="secondary" >
+                Connect
+              </GeneralButton>
             </Grid>
             <Grid item>
           PROFILE (?)
