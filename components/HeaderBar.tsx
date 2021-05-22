@@ -13,6 +13,7 @@ import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/GeneralUseButton'
+import ProfileAvatar from 'components/ProfileAvatar'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const css = useStyles({})
@@ -52,7 +53,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         </Grid>
         {/* RIGHT SIDE OF HEADER */}
         <Grid item>
-          <Grid container alignItems="center" spacing={1}>
+          <Grid container alignItems="center" spacing={2}>
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             <Grid item> 
               <TokenDisplay amount={33554} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
@@ -61,12 +62,12 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               <TokenDisplay amount={15785946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
             </Grid>
             <Grid item>
-              <GeneralButton color="secondary" >
+              <GeneralButton >
                 Connect
               </GeneralButton>
             </Grid>
             <Grid item>
-          PROFILE (?)
+              <ProfileAvatar/>
             </Grid>
           </Grid>
         </Grid>
