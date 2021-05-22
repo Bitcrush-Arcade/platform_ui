@@ -55,14 +55,14 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       anchorReference="anchorEl"
       getContentAnchorEl={null}
     >
-      {actions?.map( action => {
+      {actions?.map( (action, idx) => {
         
         const actionFn = () => {
           action?.onClick && action.onClick()
           toggleActions()
         }
 
-        return <MenuItem onClick={ actionFn }>
+        return <MenuItem onClick={ actionFn } key={`action-key-${idx}`}>
           {action.name}
         </MenuItem>
       })}
