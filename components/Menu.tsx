@@ -36,7 +36,10 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const linkItems = linkArray.map( link => {
         const { name, icon, url_link, subMenu } = link
         const [ openSubMenu, setOpenSubMenu ] = useState<boolean>(false)
-        const click = () =>  subMenu && setOpenSubMenu( p => !p )
+        const click = () => {
+            subMenu && setOpenSubMenu( p => !p )
+            !open && toggleOpen()
+        }
         const selected = url_link == router.pathname
         const listItem = <Fragment key={`nav-menu-item-${name}`} >
             <ListItem 
@@ -84,7 +87,6 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             <List>
                 {linkItems}
             </List>
-            <Button onClick={ toggleOpen }>OPEN</Button>
         </Paper>
       </Drawer>
     </>
@@ -101,7 +103,7 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
         borderRight: 'none'
     },
     paper:{
-        marginTop: 64,
+        marginTop: 96,
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
