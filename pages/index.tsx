@@ -7,26 +7,18 @@ import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Container from '@material-ui/core/Container'
 // Bitcrush Components
-import Menu from 'components/Menu'
+import PageContainer from 'components/PageContainer'
 
 export default function Home() {
 
 
   return (
     <div>
-      <AppBar>
-        <Toolbar>
-          <Button onClick={() => console.log('connect to wallet')}>
-            Connect Wallet
-          </Button>
-        </Toolbar>
-      </AppBar>
-      <Menu/>
-      <Container style={{ marginTop: 64 }}>
-        <Typography variant="h1">
-          BITCRUSH
-        </Typography>
-      </Container>
+      <PageContainer >
+          <Typography variant="h1">
+            BITCRUSH
+          </Typography>
+      </PageContainer>
     </div>
   )
 }
