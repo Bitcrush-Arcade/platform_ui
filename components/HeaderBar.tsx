@@ -7,14 +7,24 @@ import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
 // Icons
-import MenuIcon from '@material-ui/icons/Menu';
-import MenuOpenIcon from '@material-ui/icons/MenuOpen';
+import MenuIcon from '@material-ui/icons/Menu'
+import MenuOpenIcon from '@material-ui/icons/MenuOpen'
+import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet'
+// BitCrush
+import TokenDisplay from 'components/TokenDisplay'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const css = useStyles({})
   const { open, toggleOpen } = props
 
   const imgReducer = 18
+
+  const token1Actions = [
+    {name:'Action1', onClick: ()=>console.log('action 1')},
+    {name:'Action2', onClick: ()=>console.log('action 2')},
+    {name:'Action3', onClick: ()=>console.log('action 3')},
+    {name:'Action4', onClick: ()=>console.log('action 4')},
+  ]
 
   return <AppBar color="transparent" className={css.appBar} variant="outlined">
     <Toolbar>
@@ -41,10 +51,20 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         </Grid>
         {/* RIGHT SIDE OF HEADER */}
         <Grid item>
-          LIVE WALLET
-          CRUSH TOKEN (FROM COIN)
+          <Grid container alignItems="center" spacing={1}>
+            <Grid item>
+              <TokenDisplay amount={33554} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
+            </Grid>
+            <Grid item>
+              <TokenDisplay amount={15785946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
+            </Grid>
+            <Grid item>
           CONNECT WALLET INDICATOR
+            </Grid>
+            <Grid item>
           PROFILE (?)
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Toolbar>
