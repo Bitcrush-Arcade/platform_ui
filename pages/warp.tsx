@@ -2,12 +2,12 @@ import Typography from '@material-ui/core/Typography'
 // Bitcrush
 import PageContainer from 'components/PageContainer'
 
-const Games = () => {
+const Warp = () => {
   return <PageContainer>
     <Typography>
-      GAMES PAGE
+      Warp PAGE
     </Typography>
   </PageContainer>
 }
 
-export default Games
+export default Warp

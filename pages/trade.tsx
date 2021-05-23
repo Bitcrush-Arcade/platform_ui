@@ -2,12 +2,12 @@ import Typography from '@material-ui/core/Typography'
 // Bitcrush
 import PageContainer from 'components/PageContainer'
 
-const Games = () => {
+const Trade = () => {
   return <PageContainer>
     <Typography>
-      GAMES PAGE
+      Trade PAGE
     </Typography>
   </PageContainer>
 }
 
-export default Games
+export default Trade
