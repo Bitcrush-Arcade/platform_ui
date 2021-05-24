@@ -42,14 +42,14 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         }
         const selected = url_link == router.pathname
         const mainColor = selected ? 'primary' :
-            subMenu ? 'secondary' : 'textPrimary'
+            subMenu ? 'secondary' : 'textSecondary'
         const listItem = <Fragment key={`nav-menu-item-${name}`} >
             <ListItem 
                 button={subMenu || url_link ? true: undefined}
                 onClick={ click } component={url_link ? 'a' : 'button'}  href={url_link}
                 className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
             >
-                <ListItemIcon className={ `${selected ? css.selectedIcon : ''}` }>
+                <ListItemIcon className={ `${selected ? css.selectedIcon : css.baseIcon } ${css.listIcon}` }>
                     {icon}
                 </ListItemIcon>
                 <ListItemText
@@ -58,18 +58,24 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                             {name} {<ExpandMoreIcon fontSize="inherit" style={{transform: openSubMenu ? 'rotate( 180deg )' : undefined}}/>}
                           </> 
                         : name}
-                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body2' }}
+                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: css.menuTextPrimary  }}
                 />
             </ListItem>
             {subMenu && <Collapse in={openSubMenu}>
                 <List dense className={css.subList}>
                     {subMenu.map( sub => {
                         const isLink = sub.url_link ? true: undefined
-                        return <ListItem button={isLink} component={ isLink ? "a" : 'button'} href={sub.url_link} key={`sub-menu-${link.name}-${sub.name}`} target="_blank">
-                            <ListItemIcon>
+                        return <ListItem
+                            key={`sub-menu-${link.name}-${sub.name}`}
+                            button={isLink}
+                            component={ isLink ? "a" : 'button'}
+                            href={sub.url_link}
+                            target="_blank"
+                        >
+                            <ListItemIcon className={ `${css.listIcon} ${css.baseIcon}` }>
                                 {sub.icon}
                             </ListItemIcon>
-                            <ListItemText primary={sub.name} primaryTypographyProps={{ variant: 'body2' }}/>
+                            <ListItemText primary={sub.name} primaryTypographyProps={{ variant: 'body1', className: css.menuTextSecondary }}/>
                         </ListItem>
                     })}
                 </List>
@@ -98,7 +104,7 @@ export default Menu
 
 const useStyles = makeStyles( (theme: Theme) => createStyles({
     drawerContainer:{
-        width: (props: { open: boolean}) => props.open ? theme.spacing(40) : theme.spacing(8)
+        width: (props: { open: boolean}) => props.open ? theme.spacing(30) : theme.spacing(8)
     },
     drawer:{
         backgroundColor: 'transparent',
@@ -128,6 +134,9 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
     selectedIcon:{
         color: theme.palette.primary.main
     },
+    baseIcon:{
+        color: theme.palette.text.secondary,
+    },
     selectedItem:{
         borderRightStyle: 'solid',
         borderColor: theme.palette.primary.main,
@@ -137,5 +146,14 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
     baseItem:{
         borderTopLeftRadius: theme.spacing(2),
         borderBottomLeftRadius: theme.spacing(2),
+    },
+    listIcon:{
+        minWidth: theme.spacing(6),
+    },
+    menuTextPrimary:{
+        fontSize: 10,
+    },
+    menuTextSecondary:{
+        fontSize: 10,
     }
 }))
