@@ -9,7 +9,7 @@ import Menu from 'components/Menu'
 
 const PageContainer = ( props: { children?: ReactNode, fullPage?: boolean }) => {
   const { children, fullPage } = props
-  const [menuToggle, setMenuToggle] = useState<boolean>(false)
+  const [menuToggle, setMenuToggle] = useState<boolean>(true)
   const css = useStyles({ menuToggle })
 
   const toggleMenu = () => setMenuToggle( p => !p )
