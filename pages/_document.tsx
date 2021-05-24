@@ -9,6 +9,7 @@ class MyDocument extends Document {
       <Html>
         <Head>
           {/* Add external scripts here */}
+          <link rel="stylesheet" href="/fonts/fonts.css"/>
         </Head>
         <body style={{margin: 0}}>
           <Main />

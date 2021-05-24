@@ -17,8 +17,49 @@ const theme = createMuiTheme({
       paper: 'rgb(23,24,54)',
     },
     type: 'dark'
-
   },
+  typography:{
+    fontFamily:[
+      'Zebulon-Condensed',
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    h1:{
+      letterSpacing: 5,
+    },
+    h2:{
+      letterSpacing: 5,
+    },
+    h3:{
+      letterSpacing: 5,
+    },
+    h4:{
+      letterSpacing: 3,
+    },
+    h5:{
+      letterSpacing: 3,
+    },
+    h6:{
+      letterSpacing: 3,
+    },
+    body1:{
+      letterSpacing: 3,
+    },
+    body2:{
+      letterSpacing: 2,
+    },
+    button: {
+      letterSpacing: 2,
+    }
+  }
 });
 
 export default responsiveFontSizes(theme)
