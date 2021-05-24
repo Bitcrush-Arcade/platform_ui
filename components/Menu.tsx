@@ -41,6 +41,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             !open && toggleOpen()
         }
         const selected = url_link == router.pathname
+        const mainColor = selected ? 'primary' :
+            subMenu ? 'secondary' : 'textPrimary'
         const listItem = <Fragment key={`nav-menu-item-${name}`} >
             <ListItem 
                 button={subMenu || url_link ? true: undefined}
@@ -56,7 +58,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                             {name} {<ExpandMoreIcon fontSize="inherit" style={{transform: openSubMenu ? 'rotate( 180deg )' : undefined}}/>}
                           </> 
                         : name}
-                    primaryTypographyProps={{ noWrap: true, color: selected ? 'primary' : 'textPrimary' }}
+                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body2' }}
                 />
             </ListItem>
             {subMenu && <Collapse in={openSubMenu}>
@@ -67,7 +69,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                             <ListItemIcon>
                                 {sub.icon}
                             </ListItemIcon>
-                            <ListItemText primary={sub.name}/>
+                            <ListItemText primary={sub.name} primaryTypographyProps={{ variant: 'body2' }}/>
                         </ListItem>
                     })}
                 </List>
@@ -96,7 +98,7 @@ export default Menu
 
 const useStyles = makeStyles( (theme: Theme) => createStyles({
     drawerContainer:{
-        width: (props: { open: boolean}) => props.open ? theme.spacing(30) : theme.spacing(8)
+        width: (props: { open: boolean}) => props.open ? theme.spacing(40) : theme.spacing(8)
     },
     drawer:{
         backgroundColor: 'transparent',
