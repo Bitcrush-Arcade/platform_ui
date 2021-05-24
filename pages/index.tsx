@@ -1,11 +1,5 @@
-import Head from 'next/head'
-import Image from 'next/image'
 // Material
-import AppBar from '@material-ui/core/AppBar'
-import Toolbar from '@material-ui/core/Toolbar'
-import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
-import Container from '@material-ui/core/Container'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
 
@@ -15,8 +9,14 @@ export default function Home() {
   return (
     <div>
       <PageContainer >
-          <Typography variant="h1">
-            BITCRUSH
+          <Typography variant="h3" align="center" component="h1">
+            <Typography variant="caption" component="p">
+              THE FIRST
+            </Typography>
+            HYBRID CASINO
+            <Typography variant="caption" component="p">
+              ON BSC
+            </Typography>
           </Typography>
       </PageContainer>
     </div>
