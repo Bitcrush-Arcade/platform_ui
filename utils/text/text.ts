@@ -18,11 +18,12 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
       intGroups[0] = splitIntegers.pop() + intGroups[0]
   }
   const joinIntegers = intGroups.join(',')
-  const allDecimals = isNaN(decimalsToShow) 
+  const allDecimals = !isNaN(decimalsToShow) 
     ? decimals.slice(0, decimalsToShow)
     : decimals
 
   const decimalString = decimalsToShow === 0 ? '' : `.${allDecimals || '00'}`
+
   
   return `${joinIntegers || '0'}${decimalString}`
 }
