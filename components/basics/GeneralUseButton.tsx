@@ -42,6 +42,6 @@ const useStyles = makeStyles<Theme, GeneralBtnProps>( (theme:Theme) => createSty
     borderWidth: 1,
     borderStyle: 'solid',
     boxShadow: props => `inset 0 0 15px ${theme.palette[props.color || 'primary'].main}`,
-    color: 'white'
+    color: theme.palette.grey[200],
   }
 }))
