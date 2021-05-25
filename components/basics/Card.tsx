@@ -12,7 +12,7 @@ const styles = (theme:Theme) => createStyles({
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
         transparent: `rgba(0,0,0,${props.opacity || '0'})`,
-        light: `linear-gradient(45deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 33%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
+        light: `linear-gradient(45deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 10%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
         dark: `${theme.palette.background.paper}`,
         default: theme.palette.background.default
       }
