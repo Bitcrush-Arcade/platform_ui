@@ -8,6 +8,8 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Typography from '@material-ui/core/Typography'
 // Icons
 import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
+// utils
+import { currencyFormat } from 'utils/text/text'
 
 type TokenDisplayProps ={
   color: 'primary' | 'secondary',
@@ -35,7 +37,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" spacing={1} aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color}>
-            $&nbsp;{amount}
+            $&nbsp;{currencyFormat(amount)}
           </Typography>
         </Grid>
         <Grid item>
