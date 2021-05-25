@@ -76,6 +76,7 @@ export default function Home() {
                   subtitle: "-$ 0.00",
                   currency: "$",
                 }}
+                action1Title="Harvest All"
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -92,6 +93,9 @@ export default function Home() {
                   subtitle: "-$ 0.00",
                   currency: "CRUSH",
                 }}
+                action1Title="Collect Winnings"
+                action2Title="On Sale Soon"
+                action2Color="primary"
               />
             </Grid>
           </Grid>
