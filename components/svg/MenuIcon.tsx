@@ -20,8 +20,8 @@ export const gradient2 = ():[JSX.Element, string] => {
   const id = "menu_gradient_icon_close"
   const svg = <svg width="1" height="1" >
     <linearGradient id={id} x1="-8.09" y1="-7.1" x2="35.48" y2="34.64" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ad43ef"/>
-      <stop offset="0.92" stop-color="#0c0e22"/>
+      <stop offset="0" stopColor="#ad43ef"/>
+      <stop offset="0.92" stopColor="#0c0e22"/>
     </linearGradient>
   </svg>
   return [svg, id]
