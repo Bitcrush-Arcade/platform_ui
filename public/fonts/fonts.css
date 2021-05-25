@@ -4,3 +4,46 @@
   font-style: normal;
   src: url('./Zebulon-Condensed.ttf');
 }
+
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: lighter;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-VariableFont_wght.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 400;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-Light.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 400;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-Regular.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 500;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-Medium.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 600;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-SemiBold.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 700;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-Bold.ttf');
+}
+@font-face {
+  font-family: 'Oxanium';
+  font-weight: 800;
+  font-style: normal;
+  src: url('./Oxanium/Oxanium-ExtraBold.ttf');
+}
