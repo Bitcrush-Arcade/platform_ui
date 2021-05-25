@@ -16,7 +16,7 @@ const PageContainer = ( props: { children?: ReactNode, fullPage?: boolean }) => 
   return<>
     <Header open={menuToggle} toggleOpen={toggleMenu}/>
     <Menu open={menuToggle} toggleOpen={toggleMenu}/>
-    <Container maxWidth="lg" className={css.container}>
+    <Container maxWidth="xl" className={css.container}>
       {children}
     </Container>
   </>
