@@ -22,6 +22,9 @@ const theme = createMuiTheme({
     fontFamily:[
       'Oxanium',
       'Zebulon-Condensed',
+      'Zebulon-Hollow',
+      'Zebulon-Condensed-Hollow',
+      'Zebulon',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
@@ -33,6 +36,7 @@ const theme = createMuiTheme({
       '"Segoe UI Emoji"',
       '"Segoe UI Symbol"',
     ].join(','),
+    
   }
 });
 

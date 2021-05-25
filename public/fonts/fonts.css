@@ -1,10 +1,63 @@
+/* ZEBULON CONDENSED */
 @font-face {
   font-family: 'Zebulon-Condensed';
   font-weight: normal;
   font-style: normal;
-  src: url('./Zebulon-Condensed.ttf');
+  src: url('./Zebulon/Zebulon-Condensed.ttf');
+}
+@font-face {
+  font-family: 'Zebulon-Condensed';
+  font-weight: bold;
+  font-style: normal;
+  src: url('./Zebulon/Zebulon-Condensed-Bold.ttf');
+}
+@font-face {
+  font-family: 'Zebulon-Condensed';
+  font-weight: bold;
+  font-style: italic;
+  src: url('./Zebulon/Zebulon-Condensed-Bold-Italic.ttf');
+}
+@font-face {
+  font-family: 'Zebulon-Condensed';
+  font-weight: normal;
+  font-style: italic;
+  src: url('./Zebulon/Zebulon-Condensed-Italic.ttf');
+}
+/* ZEBULON CONDENSED HOLLOW */
+@font-face {
+  font-family: 'Zebulon-Condensed-Hollow';
+  font-weight: normal;
+  font-style: normal;
+  src: url('./Zebulon/Zebulon-Condensed-Hollow.ttf');
+}
+@font-face {
+  font-family: 'Zebulon-Condensed-Hollow';
+  font-weight: bold;
+  font-style: normal;
+  src: url('./Zebulon/Zebulon-Condensed-Hollow-Bold.ttf');
+}
+/* ZEBULON HOLLOW */
+@font-face {
+  font-family: 'Zebulon-Hollow';
+  font-weight: bold;
+  font-style: italic;
+  src: url('./Zebulon/Zebulon-Hollow-Bold-Italic.ttf');
+}
+@font-face {
+  font-family: 'Zebulon-Hollow';
+  font-weight: normal;
+  font-style: italic;
+  src: url('./Zebulon/Zebulon-Hollow-Italic.ttf');
 }
 
+/* ZEBULON */
+@font-face {
+  font-family: 'Zebulon';
+  font-weight: bold;
+  font-style: italic;
+  src: url('./Zebulon/Zebulon\ Bold\ Italic.ttf');
+}
+/* OXANIUM */
 @font-face {
   font-family: 'Oxanium';
   font-weight: lighter;
