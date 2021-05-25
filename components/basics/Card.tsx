@@ -6,13 +6,13 @@ import { styledBy } from 'utils/styles/styling'
 const styles = (theme:Theme) => createStyles({
   root:{
     boxShadow: styledBy( 'shadow', {
-      default: `inset 0 0 10px ${theme.palette.primary.main}`,
-      primary: `inset 0 0 10px ${theme.palette.primary.main}`,
-      secondary: `inset 0 0 10px ${theme.palette.secondary.main}`
+      default: `inset 0 0 20px ${theme.palette.primary.main}`,
+      primary: `inset 0 0 20px ${theme.palette.primary.main}`,
+      secondary: `inset 0 0 20px ${theme.palette.secondary.main}`
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
         transparent: `rgba(0,0,0,${props.opacity || '0'})`,
-        light: `linear-gradient(90deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 42%, ${theme.palette.background.paper} 58%, ${theme.palette.background.paper} 100%)`,
+        light: `linear-gradient(45deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 33%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
         dark: `${theme.palette.background.paper}`,
         default: theme.palette.background.default
       }
