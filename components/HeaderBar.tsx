@@ -13,7 +13,7 @@ import MenuOpenIcon from '@material-ui/icons/MenuOpen'
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
-import GeneralButton from 'components/GeneralUseButton'
+import GeneralButton from 'components/basics/GeneralUseButton'
 import ProfileAvatar from 'components/ProfileAvatar'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
