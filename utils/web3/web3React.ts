@@ -20,11 +20,11 @@ const walletconnect = new WalletConnectConnector({
 
 const bscConnector = new BscConnector({ supportedChainIds: [chainId] })
 
-export const connectorsByName: { [connectorName in ConnectorNames]: any } = {
-  [ConnectorNames.Injected]: injected,
-  [ConnectorNames.WalletConnect]: walletconnect,
-  [ConnectorNames.BSC]: bscConnector,
-}
+// export const connectorsByName: { [connectorName in ConnectorNames]: any } = {
+//   [ConnectorNames.Injected]: injected,
+//   [ConnectorNames.WalletConnect]: walletconnect,
+//   [ConnectorNames.BSC]: bscConnector,
+// }
 
 export const getLibrary = (provider): Web3 => {
   return provider
