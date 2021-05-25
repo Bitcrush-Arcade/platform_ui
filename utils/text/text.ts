@@ -1,6 +1,8 @@
 
 // Receives a number as Eth (normal) or gwei and transforms it into human readable currency
-export const currencyFormat = ( amount: number, isGwei?: boolean ) => {
+export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, decimalsToShow?: number } ) => {
+  const { isGwei = false, decimalsToShow } = options || {}
+
   const numberAsString = (isGwei
     ? amount/( 10 ** 18 )
     : amount ).toString()
@@ -16,6 +18,11 @@ export const currencyFormat = ( amount: number, isGwei?: boolean ) => {
       intGroups[0] = splitIntegers.pop() + intGroups[0]
   }
   const joinIntegers = intGroups.join(',')
+  const allDecimals = isNaN(decimalsToShow) 
+    ? decimals.slice(0, decimalsToShow)
+    : decimals
+
+  const decimalString = decimalsToShow === 0 ? '' : `.${allDecimals || '00'}`
   
-  return `${joinIntegers || '0'}.${decimals || '00'}`
+  return `${joinIntegers || '0'}${decimalString}`
 }
