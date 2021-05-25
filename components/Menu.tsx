@@ -18,6 +18,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import GameIcon from '@material-ui/icons/VideogameAsset';
 import HomeIcon from '@material-ui/icons/Home';
+// BitCrush
+import ArcadeIcon from 'components/svg/ArcadeIcon'
+import RocketIcon from 'components/svg/RocketIcon'
 
 const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
@@ -29,7 +32,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         { name: 'Intergalactic Trade', icon: null, url_link: '/trade' },
         { name: 'Warp Speed', icon: null, url_link: '/warp' },
         { name: 'Galactic Mining', icon: null, url_link: '/mining' },
-        { name: 'GAMES', icon: <GameIcon/>, url_link: '/games' },
+        { name: 'GAMES', icon: <ArcadeIcon/>, url_link: '/games' },
+        { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/games' },
         { name: 'MORE', icon: null, subMenu: [ { name: 'GitHub', icon: <GitHubIcon color="inherit"/>, url_link: 'https://www.github.com'} ] },
     ]
 
