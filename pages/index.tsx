@@ -6,6 +6,7 @@ import Divider from '@material-ui/core/Divider'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
+import PoolCard from 'components/pools/PoolCard'
 // utils
 import { currencyFormat } from 'utils/text/text'
 
@@ -18,7 +19,7 @@ export default function Home() {
   return (
     <div>
       <PageContainer >
-          <Typography variant="h3" align="center" component="h1">
+          <Typography variant="h3" align="center" component="h1" style={{ marginBottom: 64 , paddingTop: 32}}>
             <Typography variant="caption" component="p">
               THE FIRST
             </Typography>
@@ -27,6 +28,7 @@ export default function Home() {
               ON BSC
             </Typography>
           </Typography>
+          {/* BITCRUSH TVL INFO */}
           <Card style={{ width: '100%'}} background="transparent" shadow="primary">
             <CardContent style={{paddingBottom: 16}}>
               <Grid container justify="space-between">
@@ -59,6 +61,40 @@ export default function Home() {
               </Grid>
             </CardContent>
           </Card>
+          <Grid container justify="center" spacing={3} style={{marginTop: 32}}>
+            <Grid item xs={12} md={6}>
+              <PoolCard title="Staking Pool" color="primary"
+                stakedInfo={{
+                  title: "CRUSH to Harvest",
+                  amount: 547.2140070078,
+                  subtitle: "-$ 0.00",
+                  currency: "$",
+                }}
+                rewardInfo={{
+                  title: "CRUSH in Wallet",
+                  amount: 547.2140070078,
+                  subtitle: "-$ 0.00",
+                  currency: "$",
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <PoolCard title="Live Wallet" color="secondary"
+                stakedInfo={{
+                  title: "LIVE Wallet Balance",
+                  amount: 547.2140070078,
+                  subtitle: "-$ 0.00",
+                  currency: "CRUSH",
+                }}
+                rewardInfo={{
+                  title: "HOUSE Profit Earned",
+                  amount: 547.2140070078,
+                  subtitle: "-$ 0.00",
+                  currency: "CRUSH",
+                }}
+              />
+            </Grid>
+          </Grid>
       </PageContainer>
     </div>
   )
