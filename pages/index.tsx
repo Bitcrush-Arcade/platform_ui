@@ -31,9 +31,9 @@ export default function Home() {
           {/* BITCRUSH TVL INFO */}
           <Card style={{ width: '100%'}} background="transparent" shadow="primary">
             <CardContent style={{paddingBottom: 16}}>
-              <Grid container justify="space-between">
+              <Grid container justify="space-around">
                 <Grid item>
-                  <Typography variant="caption" component="div" align="left" color="primary" style={{fontSize: 10, opacity: 0.7}}>
+                  <Typography variant="caption" component="div" align="left" color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                     Total Value Locked
                   </Typography>
                   <Typography variant="h4" component="div" align="left">
@@ -42,7 +42,7 @@ export default function Home() {
                 </Grid>
                 <Divider orientation="vertical" flexItem/>
                 <Grid item>
-                  <Typography variant="caption" component="div" align="center" color="secondary" style={{fontSize: 10, opacity: 0.7}}>
+                  <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                     Max Win
                   </Typography>
                   <Typography variant="h4" component="div" align="center">
@@ -51,7 +51,7 @@ export default function Home() {
                 </Grid>
                 <Divider orientation="vertical" flexItem/>
                 <Grid item>
-                  <Typography variant="caption" component="div" align="right" color="primary" style={{fontSize: 10, opacity: 0.7}}>
+                  <Typography variant="caption" component="div" align="right" color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                     Total Value Shared
                   </Typography>
                   <Typography variant="h4" component="div" align="right">
@@ -80,23 +80,25 @@ export default function Home() {
               />
             </Grid>
             <Grid item xs={12} md={6}>
-              <PoolCard title="Live Wallet" color="secondary"
-                stakedInfo={{
-                  title: "LIVE Wallet Balance",
-                  amount: 547.2140070078,
-                  subtitle: "-$ 0.00",
-                  currency: "CRUSH",
-                }}
-                rewardInfo={{
-                  title: "HOUSE Profit Earned",
-                  amount: 547.2140070078,
-                  subtitle: "-$ 0.00",
-                  currency: "CRUSH",
-                }}
-                action1Title="Collect Winnings"
-                action2Title="On Sale Soon"
-                action2Color="primary"
-              />
+              <Grid container justify="flex-end">
+                <PoolCard title="Live Wallet" color="secondary"
+                  stakedInfo={{
+                    title: "LIVE Wallet Balance",
+                    amount: 547.2140070078,
+                    subtitle: "-$ 0.00",
+                    currency: "CRUSH",
+                  }}
+                  rewardInfo={{
+                    title: "HOUSE Profit Earned",
+                    amount: 547.2140070078,
+                    subtitle: "-$ 0.00",
+                    currency: "CRUSH",
+                  }}
+                  action1Title="Collect Winnings"
+                  action2Title="On Sale Soon"
+                  action2Color="primary"
+                />
+              </Grid>
             </Grid>
           </Grid>
       </PageContainer>
