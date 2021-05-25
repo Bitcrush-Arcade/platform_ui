@@ -1,7 +1,9 @@
 // Material
 import Typography from '@material-ui/core/Typography'
+import CardContent from '@material-ui/core/CardContent'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
+import Card from 'components/basics/Card'
 
 export default function Home() {
 
@@ -18,6 +20,14 @@ export default function Home() {
               ON BSC
             </Typography>
           </Typography>
+          <Card style={{ width: '100%'}}>
+            <CardContent>
+
+              <Typography>
+                card here
+              </Typography>
+            </CardContent>
+          </Card>
       </PageContainer>
     </div>
   )
