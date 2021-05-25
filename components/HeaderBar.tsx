@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
+import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
 // Icons
@@ -33,7 +34,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
       <Grid container justify="space-between" alignItems="center" style={{ paddingTop: 32}}>
         {/* LEFT SIDE OF HEADER */}
         <Grid item>
-          <Grid container alignItems="center" spacing={2}>
+          <Grid container alignItems="center" spacing={1}>
             <Grid item>
               <Button onClick={toggleOpen} color="primary">
                 { open
@@ -42,6 +43,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 }
               </Button>
             </Grid>
+            <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
             <Grid item>
               <Link href="/" passHref>
                 <a>
@@ -82,5 +84,8 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
   appBar:{
     zIndex: 1900,
     border: 'none'
+  },
+  menuLogoDivider:{
+    marginRight: theme.spacing(2)
   }
 }))
