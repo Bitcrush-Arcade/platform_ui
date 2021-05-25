@@ -58,10 +58,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
           <Grid container alignItems="center" spacing={2}>
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             <Grid item> 
-              <TokenDisplay amount={33554} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
+              <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
             </Grid>
             <Grid item>
-              <TokenDisplay amount={15785946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
+              <TokenDisplay amount={1578.100015580000005946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
             </Grid>
             <Grid item>
               <GeneralButton >
