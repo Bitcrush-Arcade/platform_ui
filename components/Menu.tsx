@@ -21,6 +21,12 @@ import HomeIcon from '@material-ui/icons/Home';
 // BitCrush
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
+import UfoIcon from 'components/svg/UfoIcon'
+import Ufo2Icon from 'components/svg/Ufo2Icon'
+import RechargeIcon from 'components/svg/RechargeIcon'
+import BlackHoleIcon from 'components/svg/BlackHoleIcon'
+import TradeIcon from 'components/svg/TradeIcon'
+import WarpIcon from 'components/svg/WarpIcon'
 
 const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
@@ -29,11 +35,14 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
 
     const linkArray = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
-        { name: 'Intergalactic Trade', icon: null, url_link: '/trade' },
-        { name: 'Warp Speed', icon: null, url_link: '/warp' },
-        { name: 'Galactic Mining', icon: null, url_link: '/mining' },
+        { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade' },
+        { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp' },
+        { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'GAMES', icon: <ArcadeIcon/>, url_link: '/games' },
+        { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/games' },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/games' },
+        { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/games' },
+        { name: `Black Hole Referral`, icon: <BlackHoleIcon/>, url_link: '/games' },
         { name: 'MORE', icon: null, subMenu: [ { name: 'GitHub', icon: <GitHubIcon color="inherit"/>, url_link: 'https://www.github.com'} ] },
     ]
 
