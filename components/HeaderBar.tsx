@@ -8,18 +8,18 @@ import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
 // Icons
-import MenuIcon from '@material-ui/icons/Menu'
-import MenuOpenIcon from '@material-ui/icons/MenuOpen'
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
 import ProfileAvatar from 'components/ProfileAvatar'
+import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
-  const css = useStyles({})
   const { open, toggleOpen } = props
-
+  const [ svgGradient, gradientId] = gradient()
+  const [ svgGradient2, gradientId2] = gradient2()
+  const css = useStyles({ open, gradientId, gradientId2 })
   const imgReducer = 18
 
   const token1Actions = [
@@ -36,11 +36,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         <Grid item>
           <Grid container alignItems="center" spacing={1}>
             <Grid item>
-              <Button onClick={toggleOpen} color="primary">
-                { open
-                    ? <MenuOpenIcon fontSize="large" />
-                    : <MenuIcon fontSize="large"/>
-                }
+              <Button onClick={toggleOpen} className={css.menuOpen}>
+                {svgGradient}{svgGradient2}
+                <MenuIcon fontSize="large" className={ css.gradient } />
               </Button>
             </Grid>
             <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
@@ -80,12 +78,15 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
 
 export default HeaderBar
 
-const useStyles = makeStyles( (theme: Theme) => createStyles({
+const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradientId2: string}>( (theme: Theme) => createStyles({
   appBar:{
     zIndex: 1900,
     border: 'none'
   },
   menuLogoDivider:{
     marginRight: theme.spacing(2)
+  },
+  gradient:{
+    fill: props =>  `url(#${ props.open ? props.gradientId : props.gradientId2})`,
   }
 }))
