@@ -6,11 +6,15 @@ import Container from '@material-ui/core/Container'
 // Components
 import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
+// Hooks
+import { useEagerConnect } from 'hooks/web3Hooks'
 
 const PageContainer = ( props: { children?: ReactNode, fullPage?: boolean }) => {
   const { children, fullPage } = props
   const [menuToggle, setMenuToggle] = useState<boolean>(true)
   const css = useStyles({ menuToggle })
+
+  useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
   return<>

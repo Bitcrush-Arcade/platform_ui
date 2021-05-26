@@ -3,6 +3,9 @@ import { useEffect } from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import baseTheme from '../styles/BaseTheme'
+// BlockChain
+import Web3 from 'web3'
+import { Web3ReactProvider } from '@web3-react/core'
 
 function MyApp({ Component, pageProps }) {
 
@@ -13,10 +16,15 @@ function MyApp({ Component, pageProps }) {
     }
   }, [])
 
-  return <ThemeProvider theme={baseTheme}>
-    <CssBaseline/>
-    <Component {...pageProps} />
-  </ThemeProvider>
+  const getLibrary = ( provider ): Web3 => provider
+
+  return (<Web3ReactProvider getLibrary={ getLibrary }>
+    <ThemeProvider theme={baseTheme}>
+      <CssBaseline/>
+      <Component {...pageProps} />
+    </ThemeProvider>
+  </Web3ReactProvider>
+  )
 }
 
 export default MyApp

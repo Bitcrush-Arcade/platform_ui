@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { useMemo } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
@@ -14,6 +15,8 @@ import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
 import ProfileAvatar from 'components/ProfileAvatar'
 import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
+// Hooks
+import { useAuth } from 'hooks/web3Hooks'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -62,9 +65,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               <TokenDisplay amount={1578.100015580000005946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
             </Grid>
             <Grid item>
-              <GeneralButton >
-                Connect
-              </GeneralButton>
+              <ConnectButton/>
             </Grid>
             <Grid item>
               <ProfileAvatar/>
@@ -90,3 +91,22 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
     fill: props =>  `url(#${ props.open ? props.gradientId : props.gradientId2})`,
   }
 }))
+
+const ConnectButton = () => {
+  const { login, account } = useAuth()
+
+  const displayAccount = useMemo( () => {
+    const accountChars = (account || '').split('')
+    const accountLength = accountChars.length - 8
+    accountLength > 0 && accountChars.splice(4,accountLength,'...')
+    return accountChars.join('')
+  },[account])
+  
+  
+  return <GeneralButton disabled={!!account } onClick={login}>
+    {account 
+      ? displayAccount
+      : "Connect"
+    }
+  </GeneralButton>
+}
