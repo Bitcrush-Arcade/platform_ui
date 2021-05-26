@@ -84,12 +84,14 @@ const InfoMoney = ( props: InfoStakeProps ) => {
     <Typography variant="body2" color="textSecondary" className={ css.general }>
       {title}
     </Typography>
-    <Typography color={color || 'primary'} display="inline" className={ css.currency }>
-      {currency}
-      <Typography className={ css.value } display="inline">
-        {currencyFormat(amount, { decimalsToShow: 4})}
+    <div>
+      <Typography color={color || 'primary'} display="inline" className={ css.currency }>
+        {currency}
+        <Typography className={ css.value } display="inline">
+          {currencyFormat(amount, { decimalsToShow: 4})}
+        </Typography>
       </Typography>
-    </Typography>
+    </div>
     <Typography variant="body2" color="textSecondary" display="block" className={ css.general }>
       {subtitle}
     </Typography>
