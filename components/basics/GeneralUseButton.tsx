@@ -18,6 +18,12 @@ const styles = (theme:Theme) => createStyles({
     borderStyle: 'solid',
     boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].main}`,
     color: theme.palette.grey[200],
+  },
+  disabled:{
+    backgroundColor: 'transparent !important',
+    color: `${theme.palette.grey[200]} !important`,
+    boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
+    borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
   }
 })
 
