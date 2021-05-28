@@ -8,6 +8,7 @@ const styles = (theme:Theme) => createStyles({
     boxShadow: styledBy( 'shadow', {
       default: `inset 0 0 20px ${theme.palette.primary.main}`,
       primary: `inset 0 0 20px ${theme.palette.primary.main}`,
+      dark: `inset 0 0 15px ${theme.palette.primary.dark}`,
       secondary: `inset 0 0 20px ${theme.palette.secondary.main}`
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
@@ -18,7 +19,7 @@ const styles = (theme:Theme) => createStyles({
       }
     )(props),
     borderRadius: theme.spacing(4),
-    borderColor: props => theme.palette[props.shadow ||'primary'].main,
+    borderColor: props => theme.palette[props.shadow !== 'dark' && props.shadow ||'primary'][props.shadow == 'dark' ? 'dark': 'main'],
     borderStyle: 'solid',
     borderWidth: 1,
   }
@@ -27,7 +28,7 @@ const styles = (theme:Theme) => createStyles({
 type CardStyles ={
   background?: 'transparent' | 'light' | 'dark',
   opacity?: number,
-  shadow?: 'primary' | 'secondary'
+  shadow?: 'primary' | 'secondary' | 'dark'
 } & WithStyles< typeof styles > & CardProps
 
 interface BackgroundMapping {
