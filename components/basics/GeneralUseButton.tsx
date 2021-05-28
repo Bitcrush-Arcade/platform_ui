@@ -24,6 +24,9 @@ const styles = (theme:Theme) => createStyles({
     color: `${theme.palette.grey[200]} !important`,
     boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
     borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
+  },
+  sizeSmall:{
+    width: (props : FabStyles) => props.width && (typeof(props.width) == 'string' ? props.width : `${props.width}px`) + ' !important' || null,
   }
 })
 
