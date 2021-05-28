@@ -71,7 +71,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: openSubMenu ? 'rotate( 180deg )' : undefined}}/>}
                         {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
                     </>}
-                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: css.menuTextPrimary  }}
+                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''}`  }}
                 />
             </ListItem>
             {subMenu && <Collapse in={openSubMenu}>
@@ -166,6 +166,8 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
     },
     menuTextPrimary:{
         fontSize: 10,
+    },
+    menuTextPrimaryNotSelected:{
         color: theme.palette.grey[200],
     },
     menuTextSecondary:{
