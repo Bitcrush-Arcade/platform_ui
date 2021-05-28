@@ -19,7 +19,7 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
   }
   const joinIntegers = intGroups.join(',')
   const allDecimals = !isNaN(decimalsToShow) 
-    ? decimals.slice(0, decimalsToShow)
+    ? (decimals || new Array(decimalsToShow).fill(0).join('')).slice(0, decimalsToShow)
     : decimals
 
   const decimalString = decimalsToShow === 0 ? '' : `.${allDecimals || '00'}`
