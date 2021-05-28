@@ -36,7 +36,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
         { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
-        { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining', disabled: true },
+        { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games' },
         { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
