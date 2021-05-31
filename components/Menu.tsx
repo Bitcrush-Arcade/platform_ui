@@ -1,5 +1,5 @@
 // React imports
-import { useState, Fragment } from 'react'
+import React, { useState, Fragment } from 'react'
 // Next
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -57,7 +57,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const linkItems = linkArray.map( link => {
         const { name, icon, url_link, subMenu, disabled } = link
         const [ openSubMenu, setOpenSubMenu ] = useState<boolean>(false)
-        const click = () => {
+        const click = (e : any) => {
+            e.stopPropagation()
             subMenu && setOpenSubMenu( p => !p )
             !open && toggleOpen()
         }
@@ -113,7 +114,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
 
     return <>
       <Drawer open={open} variant="permanent" className={ `${css.drawerContainer}` } PaperProps={{ className: css.drawer}}>
-        <Paper className={ `${css.drawerContainer} ${css.paper}` } square>
+        <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
             <List>
                 {linkItems}
             </List>
