@@ -56,6 +56,9 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       anchorOrigin={ { horizontal: 'center', vertical: "bottom" }}
       anchorReference="anchorEl"
       getContentAnchorEl={null}
+      PaperProps={{
+        className: css.menu
+      }}
     >
       {actions?.map( (action, idx) => {
         
@@ -82,5 +85,8 @@ const useStyles = makeStyles<Theme, { showActions : boolean } & TokenDisplayProp
   button:{
     borderRadius: theme.spacing(5),
     padding: theme.spacing(1)
+  },
+  menu:{
+    boxShadow: ` 0px 10px 60px ${theme.palette.primary.main}`
   }
 }))
