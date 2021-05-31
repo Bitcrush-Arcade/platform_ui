@@ -20,18 +20,18 @@ export default function Home() {
   return (
     <div>
       <PageContainer >
-          <Typography variant="h3" align="center" component="h1" style={{ marginBottom: 64 , paddingTop: 32}}>
-            <Typography variant="caption" component="p">
+          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 64 * 2 , paddingTop: 32, fontWeight: 500 }}>
+            <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
               THE FIRST
             </Typography>
             HYBRID CASINO
-            <Typography variant="caption" component="p">
+            <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
               ON BSC
             </Typography>
           </Typography>
           {/* BITCRUSH TVL INFO */}
           <Container maxWidth="lg">
-            <Card style={{ width: '100%'}} background="transparent" shadow="primary">
+            <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7}>
               <CardContent style={{paddingBottom: 16}}>
                 <Grid container justify="space-around">
                   <Grid item>
