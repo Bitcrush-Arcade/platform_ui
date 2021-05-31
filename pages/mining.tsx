@@ -15,7 +15,7 @@ const Mining = () => {
 
   const distributionAmount = 0
 
-  return <PageContainer>
+  return <PageContainer background="galactic">
     <Grid container justify="space-evenly">
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
