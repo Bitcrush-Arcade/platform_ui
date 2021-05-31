@@ -8,33 +8,51 @@ import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
+// Utils
+import { styledBy } from 'utils/styles/styling'
 
-const PageContainer = ( props: { children?: ReactNode, fullPage?: boolean }) => {
-  const { children, fullPage } = props
+const PageContainer = ( props: ContainerProps ) => {
+  const { children } = props
   const [menuToggle, setMenuToggle] = useState<boolean>(true)
-  const css = useStyles({ menuToggle })
+  const css = useStyles({ menuToggle, ...props })
 
   useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
-  return<>
+  return <div className={ css.fullContainer }>
     <Header open={menuToggle} toggleOpen={toggleMenu}/>
     <Menu open={menuToggle} toggleOpen={toggleMenu}/>
-    <Container maxWidth="xl" className={css.container}>
+    <Container maxWidth="xl" className={css.contentContainer}>
       {children}
     </Container>
-  </>
+  </div>
 }
 
 export default PageContainer
 
-const useStyles = makeStyles<Theme, { menuToggle: boolean, fullPage?: boolean }>( (theme: Theme) => createStyles({
-  container:{
-    marginTop: props => props.fullPage ? 0 : 96,
+type ContainerProps ={
+  children?: ReactNode,
+  fullPage?: boolean,
+  background?: 'default' | 'galactic'
+}
+
+const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
+  contentContainer:{
+    paddingTop: props => props.fullPage ? 0 : 96,
     paddingLeft: props => props.menuToggle ? theme.spacing(33) : theme.spacing(12),
     transition: theme.transitions.create('padding', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+  fullContainer:{
+    backgroundImage: styledBy( 'background', {
+      default: 'url("/backgrounds/BaseBackground.jpg")',
+      galactic: 'url("/backgrounds/Galactic.jpg")',
+    }),
+    backgroundPosition: 'top',
+    backgroundAttachment: 'fixed',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
   }
 }))
