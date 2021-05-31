@@ -15,6 +15,7 @@ import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
 import ProfileAvatar from 'components/ProfileAvatar'
 import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
+import Coin from 'components/tokens/Token2'
 // Hooks
 import { useAuth } from 'hooks/web3Hooks'
 
@@ -26,10 +27,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const imgReducer = 18
 
   const token1Actions = [
-    {name:'Action1', onClick: ()=>console.log('action 1')},
-    {name:'Action2', onClick: ()=>console.log('action 2')},
-    {name:'Action3', onClick: ()=>console.log('action 3')},
-    {name:'Action4', onClick: ()=>console.log('action 4')},
+    {name:'Deposit', onClick: ()=>console.log('action 1')},
+    {name:'Widthdraw', onClick: ()=>console.log('action 2')},
+    {name:'View on BSC', onClick: ()=>console.log('action 3')},
+    {name:'History', onClick: ()=>console.log('action 4')},
   ]
 
   return <AppBar color="transparent" className={css.appBar} variant="outlined">
@@ -58,11 +59,11 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         <Grid item>
           <Grid container alignItems="center" spacing={2}>
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            <Grid item> 
+            {/* <Grid item> 
               <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
-            </Grid>
+            </Grid> */}
             <Grid item>
-              <TokenDisplay amount={1578.100015580000005946} icon={<AccountBalanceWalletIcon/>} color="primary" actions={token1Actions} />
+              <TokenDisplay amount={1578.100015580000005946} icon={<Coin scale={0.25}/>} color="primary" actions={token1Actions} />
             </Grid>
             <Grid item>
               <ConnectButton/>
