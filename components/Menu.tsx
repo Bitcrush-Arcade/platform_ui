@@ -7,17 +7,26 @@ import Link from 'next/link'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Collapse from '@material-ui/core/Collapse'
 import Drawer from '@material-ui/core/Drawer'
-import Paper from '@material-ui/core/Paper'
+import Grid from "@material-ui/core/Grid"
+import IconButton from "@material-ui/core/IconButton"
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
+import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 // Icons
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import GitHubIcon from '@material-ui/icons/GitHub';
-import HomeIcon from '@material-ui/icons/Home';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+import GitHubIcon from '@material-ui/icons/GitHub'
+import HomeIcon from '@material-ui/icons/Home'
+import TwitterIcon from '@material-ui/icons/Twitter'
+import TelegramIcon from '@material-ui/icons/Telegram'
 // BitCrush
+// Components
+import Coin from 'components/tokens/Token2'
+// Utils
+import { currencyFormat } from 'utils/text/text'
+// Icons
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
 import UfoIcon from 'components/svg/UfoIcon'
@@ -108,6 +117,28 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             <List>
                 {linkItems}
             </List>
+            <Grid container className={ css.footer } alignItems="center" justify="space-between">
+                <Grid item>
+                    <Grid container alignItems="center" spacing={1}>
+                        <Grid item>
+                            <Coin scale={0.35}/>
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="body2" color="textPrimary">
+                                $ {currencyFormat(114.256, { decimalsToShow: 2 })}
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </Grid>
+                <Grid item>
+                    <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
+                        <TelegramIcon color="disabled"/>
+                    </IconButton>
+                    <IconButton size="small" component="a" href="https://twitter.com/bitcrusharcade" target="_blank">
+                        <TwitterIcon color="disabled"/>
+                    </IconButton>
+                </Grid>
+            </Grid>
         </Paper>
       </Drawer>
     </>
@@ -115,15 +146,16 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
 
 export default Menu
 
-const useStyles = makeStyles( (theme: Theme) => createStyles({
+const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     drawerContainer:{
-        width: (props: { open: boolean}) => props.open ? theme.spacing(30) : theme.spacing(8)
+        width: props => props.open ? theme.spacing(30) : theme.spacing(8),
     },
     drawer:{
         backgroundColor: 'transparent',
         borderRight: 'none'
     },
     paper:{
+        position: 'relative',
         marginTop: 96,
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
@@ -140,6 +172,15 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
         borderWidth: 1,
         borderStyle: 'solid',
         borderLeftStyle: 'none',
+        height: `calc( 100vh - 96px - ${theme.spacing(3)}px )`
+    },
+    footer:{
+        position:'absolute',
+        bottom: 0,
+        overflowX: 'hidden',
+        padding: theme.spacing(2),
+        paddingTop: 0,
+        width: theme.spacing(28)
     },
     subList: {
         backgroundColor: 'rgba(255,255,255,0.1)'
@@ -165,7 +206,7 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
         minWidth: theme.spacing(6),
     },
     menuTextPrimary:{
-        fontSize: 10,
+        fontSize: 12,
     },
     menuTextPrimaryNotSelected:{
         color: theme.palette.grey[200],
