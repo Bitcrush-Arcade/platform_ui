@@ -60,13 +60,13 @@
 /* OXANIUM */
 @font-face {
   font-family: 'Oxanium';
-  font-weight: lighter;
+  font-weight: 200;
   font-style: normal;
   src: url('./Oxanium/Oxanium-VariableFont_wght.ttf');
 }
 @font-face {
   font-family: 'Oxanium';
-  font-weight: 400;
+  font-weight: 300;
   font-style: normal;
   src: url('./Oxanium/Oxanium-Light.ttf');
 }

@@ -37,7 +37,7 @@ const theme = createMuiTheme({
       '"Segoe UI Symbol"',
     ].join(','),
     button:{
-      fontWeight: 'lighter',
+      fontWeight: 200,
       textTransform: 'none',
     }
   }
