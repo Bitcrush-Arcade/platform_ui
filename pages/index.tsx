@@ -1,4 +1,5 @@
 // Material
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
 import Divider from '@material-ui/core/Divider'
@@ -8,11 +9,15 @@ import Typography from '@material-ui/core/Typography'
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import PoolCard from 'components/pools/PoolCard'
+// Icons
+import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
 
 export default function Home() {
 
+  const [ gradient, gradientId ] = invaderGradient()
+  const css = useStyles({ gradientId })
   const totalValueLocked = 9526774.00154119
   const maxWin = totalValueLocked * 0.01
   const totalValueShared = 65010004.115487
@@ -20,7 +25,7 @@ export default function Home() {
   return (
     <div>
       <PageContainer >
-          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 64 * 2 , paddingTop: 32, fontWeight: 500 }}>
+          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500 }}>
             <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
               THE FIRST
             </Typography>
@@ -29,6 +34,12 @@ export default function Home() {
               ON BSC
             </Typography>
           </Typography>
+          <Grid container justify="center">
+              <Grid item className={css.gradientContainer}>
+                {gradient}
+                <InvaderIcon style={{fontSize: 120}} className={ css.gradient }/>
+              </Grid>
+          </Grid>
           {/* BITCRUSH TVL INFO */}
           <Container maxWidth="lg">
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7}>
@@ -108,3 +119,14 @@ export default function Home() {
     </div>
   )
 }
+
+const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyles({
+  gradient: {
+    fill: props => `url(#${ props.gradientId })`,
+    stroke: theme.palette.common.white,
+    strokeWidth: 0.3,
+  },
+  gradientContainer:{
+    background: `radial-gradient(${theme.palette.common.black} 0%, transparent 80%)`
+  }
+}))
