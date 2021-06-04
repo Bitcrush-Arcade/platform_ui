@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
@@ -8,8 +9,6 @@ import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
-// Icons
-import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
@@ -24,6 +23,8 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const [ svgGradient, gradientId] = gradient()
   const [ svgGradient2, gradientId2] = gradient2()
   const css = useStyles({ open, gradientId, gradientId2 })
+  const { pathname } = useRouter()
+  const isGame = pathname.indexOf('/games') > -1
   const imgReducer = 18
 
   const token1Actions = [
@@ -49,7 +50,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
             <Grid item>
               <Link href="/" passHref>
                 <a>
-                  <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" />
+                  { isGame 
+                    ? <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" />
+                    : <Image src={'/bitcrush_logo.png'} width={3895/imgReducer} height={656/imgReducer} title="Bitcrush logo" />
+                  }
                 </a>
               </Link>
             </Grid>
