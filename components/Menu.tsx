@@ -44,12 +44,12 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
-        { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
+        // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games' },
-        { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
+        // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
-        { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
+        // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ { name: 'GitHub', icon: <GitHubIcon color="inherit"/>, url_link: 'https://www.github.com'} ] },
     ]
