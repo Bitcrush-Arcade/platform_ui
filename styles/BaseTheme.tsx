@@ -11,6 +11,8 @@ const theme = createMuiTheme({
     },
     secondary: {
       main: teal['A400'],
+      light: 'rgb(27,168,139)', // This is slightly darker than main
+      dark: 'rgb(9,130,105)'
     },
     background: {
       default: 'rgb(12,15,32)',
