@@ -29,7 +29,7 @@ export default function Home() {
             <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
               THE FIRST
             </Typography>
-            HYBRID CASINO
+            HYBRID DEFI CASINO
             <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
               ON BSC
             </Typography>
@@ -123,8 +123,6 @@ export default function Home() {
 const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyles({
   gradient: {
     fill: props => `url(#${ props.gradientId })`,
-    stroke: theme.palette.common.white,
-    strokeWidth: 0.3,
   },
   gradientContainer:{
     background: `radial-gradient(${theme.palette.common.black} 0%, transparent 80%)`
