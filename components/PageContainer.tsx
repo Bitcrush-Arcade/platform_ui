@@ -50,6 +50,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       default: 'url("/backgrounds/BaseBackground.jpg")',
       galactic: 'url("/backgrounds/Galactic.jpg")',
     }),
+    minHeight: '100vh',
     backgroundPosition: 'top left',
     backgroundAttachment: 'fixed',
     backgroundSize: 'cover',
