@@ -18,7 +18,6 @@ const PageContainer = ( props: ContainerProps ) => {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
   const css = useStyles({ menuToggle, ...props })
-  console.log(isSm, 'isSm')
   useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
