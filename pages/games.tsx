@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Container from "@material-ui/core/Container"
 import Typography from '@material-ui/core/Typography'
 import Grid from "@material-ui/core/Grid"
 // Icons
@@ -77,9 +76,10 @@ const Games = () => {
         otherScroll
         items={games.map( (game, gameIdx) => <GameCard key={`other-game-card-${gameIdx}`} imgSrc={game.src}/>)}
         xs={1}
-        sm={2}
-        md={4}
+        sm={1}
+        md={2}
         lg={6}
+        spacing={3}
       />
     </div>
   </PageContainer>
