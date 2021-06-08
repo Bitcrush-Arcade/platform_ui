@@ -25,12 +25,15 @@ export default function Home() {
   return (
     <div>
       <PageContainer >
-          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500 }}>
-            <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
+          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500, whiteSpace: 'pre-line' }}>
+            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
               THE FIRST
             </Typography>
-            HYBRID DEFI CASINO
-            <Typography variant="h5" component="p" style={{ fontWeight: 200}}>
+            <Typography variant="h3" component="p" style={{ fontWeight: 500 }}>
+              HYBRID
+            </Typography>
+            DEFI CASINO
+            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
               ON BSC
             </Typography>
           </Typography>
