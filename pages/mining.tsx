@@ -26,7 +26,7 @@ const Mining = () => {
         />
       </Grid>
       <Grid item>
-        <Card background="light" shadow="dark" style={{width: 280}}>
+        <Card background="light" shadow="dark" className={ css.claimCard } >
           <CardContent className={ css.cardContent }>
             <Typography className={ css.cardTitle } paragraph>
               House Profit Distribution
@@ -75,6 +75,12 @@ const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   },
   section:{
     marginTop: theme.spacing(4)
+  },
+  claimCard:{
+    [theme.breakpoints.down('sm')]:{
+      marginTop: theme.spacing(4)
+    },
+    width: 280,
   },
 }))
 
