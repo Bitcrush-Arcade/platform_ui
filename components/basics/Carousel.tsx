@@ -56,16 +56,16 @@ const useGridStyle = makeStyles<Theme, PartialBy<CarouselPropsType, 'items'> & {
   },
   showItem:{
     [theme.breakpoints.only('xs')]:{
-      width: props => `calc( 100vw / ${props.xs})`
+      width: props => `calc( (100vw - ${theme.spacing(12)}) / ${props.xs})`
     },
     [theme.breakpoints.only('sm')]:{
-      width: props => `calc( 100vw / ${props.sm})`
+      width: props => `calc( (100vw - ${theme.spacing(12)}) / ${props.sm})`
     },
     [theme.breakpoints.only('md')]:{
-      width: props => `calc( 100vw / ${props.md})`
+      width: props => `calc( (100vw - ${theme.spacing(33)}) / ${props.md})`
     },
     [theme.breakpoints.up('lg')]:{
-      width: props => `calc( 100vw / ${props.lg})`
+      width: props => `calc( (100vw - ${theme.spacing(33)}) / ${props.lg})`
     },
   }
 }))
