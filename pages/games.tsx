@@ -55,7 +55,7 @@ const Games = () => {
       <Grid container justify="space-between" alignItems="center" className={ css.otherGamesTitle } >
         <Grid item>
           <Typography variant="h6">
-            Other Games
+            Featured Partner :: Dragon Gaming
           </Typography>
         </Grid>
         <Grid item>
