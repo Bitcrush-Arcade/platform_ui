@@ -1,7 +1,8 @@
 // React
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useEffect } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Container from '@material-ui/core/Container'
 // Components
 import Header from 'components/HeaderBar'
@@ -13,12 +14,19 @@ import { styledBy } from 'utils/styles/styling'
 
 const PageContainer = ( props: ContainerProps ) => {
   const { children } = props
-  const [menuToggle, setMenuToggle] = useState<boolean>(true)
+  const theme = useTheme()
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
+  const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
   const css = useStyles({ menuToggle, ...props })
-
+  console.log(isSm, 'isSm')
   useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
+
+  useEffect(()=>{
+    setMenuToggle(!isSm)
+  },[isSm])
+
   return <div className={ css.fullContainer }>
     <Header open={menuToggle} toggleOpen={toggleMenu}/>
     <Menu open={menuToggle} toggleOpen={toggleMenu}/>
