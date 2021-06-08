@@ -17,8 +17,19 @@ import PageContainer from 'components/PageContainer'
 const Games = () => {
 
   const css = useStyles({})
-  const gameScrollerRef = useRef<CarouselHandles>(null)
 
+  const LeftScroll = (props: {disabled: boolean, onClick: () => void}) => {
+    const {disabled, onClick} = props
+    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    <ChevronLeft/>
+  </Button>
+  }
+  const RightScroll = (props: {disabled: boolean, onClick: () => void}) => {
+    const {disabled, onClick} = props
+    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    <ChevronRight/>
+  </Button>
+  }
   return <PageContainer>
     <Grid container justify="center" className={ css.featuredContainer } >
       <Grid item className={ css.cardContainer } >
@@ -51,34 +62,21 @@ const Games = () => {
       </Grid>
     </Grid>
     <div className={ css.otherGamesContainer }>
-      <Grid container justify="space-between" alignItems="center" className={ css.otherGamesTitle } >
+      <Grid container alignItems="center" className={ css.otherGamesTitle } >
         <Grid item>
           <Typography variant="h6">
             Featured Partner :: Dragon Gaming
           </Typography>
         </Grid>
-        <Grid item>
-          <Grid container spacing={2}>
-            <Grid item>
-              <Button variant="round" size="small" color="primary" onClick={ gameScrollerRef.current?.scrollPrev }>
-                <ChevronLeft/>
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button variant="round" size="small" color="primary" onClick={ gameScrollerRef.current?.scrollNext }>
-                <ChevronRight/>
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
       </Grid>
-      <Carousel ref={gameScrollerRef}
-        otherScroll
+      <Carousel
+        LeftScroll={LeftScroll}
+        RightScroll={RightScroll}
         items={games.map( (game, gameIdx) => <GameCard key={`other-game-card-${gameIdx}`} imgSrc={game.src}/>)}
         xs={1}
         sm={1}
         md={2}
-        lg={6}
+        lg={2}
         spacing={3}
       />
     </div>

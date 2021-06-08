@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, ReactNode, forwardRef, useImperativeHandle } from 'react'
+import { useState, useRef, useEffect, ReactNode, forwardRef, useImperativeHandle, useLayoutEffect } from 'react'
 
 // Material
 import {makeStyles, Theme, createStyles} from '@material-ui/core/styles'
@@ -11,9 +11,11 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight'
 const useStyles = makeStyles((theme: Theme) => createStyles({
   leftArrow:{
     left: 0,
+    zIndex: 1200,
   },
   rightArrow:{
     right: 0,
+    zIndex:1200,
   },
   arrows:{
     position: 'absolute',
@@ -50,22 +52,22 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   }
 }))
 
-const useGridStyle = makeStyles<Theme, PartialBy<CarouselPropsType, 'items'> & { itemIndex: number }>( theme => createStyles({
+const useGridStyle = makeStyles<Theme, PartialBy<CarouselPropsType, 'items'> & { itemIndex: number, containerWidth: number }>( theme => createStyles({
   itemContainer:{
     // scrollSnapAlign: 'start'
   },
   showItem:{
     [theme.breakpoints.only('xs')]:{
-      width: props => `calc( (100vw - ${theme.spacing(12)}) / ${props.xs})`
+      minWidth: props => `calc( ${props.containerWidth} / ${props.xs})`
     },
     [theme.breakpoints.only('sm')]:{
-      width: props => `calc( (100vw - ${theme.spacing(12)}) / ${props.sm})`
+      minWidth: props => `calc( ${props.containerWidth} / ${props.sm})`
     },
     [theme.breakpoints.only('md')]:{
-      width: props => `calc( (100vw - ${theme.spacing(33)}) / ${props.md})`
+      minWidth: props => `calc( ${props.containerWidth} / ${props.md})`
     },
     [theme.breakpoints.up('lg')]:{
-      width: props => `calc( (100vw - ${theme.spacing(33)}) / ${props.lg})`
+      minWidth: props => `calc( ${props.containerWidth} / ${props.lg})`
     },
   }
 }))
@@ -80,7 +82,8 @@ type CarouselPropsType = {
   notInfinite?: boolean, //NOT IMPLEMENTED
   centerMode?: boolean, // NOT IMPLEMENTED
   spacing?: 1|2|3|4|5,
-  otherScroll?: boolean
+  LeftScroll?: any,
+  RightScroll?: any,
 }
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T,K>>
@@ -92,7 +95,7 @@ export type CarouselHandles = {
 
 const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) => {
 
-  const { items, xs = 1, sm, md, lg, spacing, otherScroll } = props
+  const { items, xs = 1, sm, md, lg, spacing, LeftScroll, RightScroll } = props
 
   const smVal = sm ?? xs
   const mdVal = md ?? sm ?? xs
@@ -102,16 +105,18 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   const [shown, setShown] = useState<number>(0)
   const [scrollPos, setScrollPos] = useState<number>(0)
   const [maxScroll, setMaxScroll] = useState<boolean>(false)
+  const [containerWidth, setContainerWidth] = useState<number>(0)
   const carouselRef = useRef<HTMLDivElement>(null)
-
+  useEffect(()=>{
+    setContainerWidth(document.getElementById('carousel-id').clientWidth)
+  },[])
   // On resize, reset State
-  useEffect(() => {
+  useLayoutEffect(() => {
     const snapToGrid = () => {
       if(!carouselRef.current) return
       const currentPos = carouselRef.current?.scrollLeft || 0
       const carouselWidth = carouselRef.current?.scrollWidth || 0
-      const screenWidth = window.innerWidth
-      const maxRightScroll = currentPos + screenWidth >= carouselWidth
+      const maxRightScroll = currentPos + containerWidth >= carouselWidth
       setScrollPos(currentPos)
       setMaxScroll(maxRightScroll)
     }
@@ -122,7 +127,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
       window.removeEventListener('resize', resetShown )
       carouselRef.current?.removeEventListener('scroll', snapToGrid)
     };
-  }, [])
+  }, [containerWidth])
 
   useEffect(()=>{
     const timeout = setTimeout(() => {
@@ -157,7 +162,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
 
   const shownItems = items.map( (item, itemIndex) => {
     const shownIndex = itemIndex - shown + 1
-    return( <CarouselItem {...props} item={item} shownIndex={shownIndex} key={`carousel-item-${itemIndex}`} />
+    return( <CarouselItem {...props} item={item} shownIndex={shownIndex} key={`carousel-item-${itemIndex}`} containerWidth={containerWidth} />
     )
   })
 
@@ -167,34 +172,37 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   }))
 
   
-  return (<div className={ css.carouselContainer } >
-    {!otherScroll && <div className={ `${css.arrows} ${css.leftArrow}` } >
-      <IconButton disabled={scrollPos <= 0} onClick={ scrollPrev }>
+  return (<div className={ css.carouselContainer } id={'carousel-id'}>
+    <div className={ `${css.arrows} ${css.leftArrow}` } >
+      {LeftScroll && <LeftScroll disabled={scrollPos <= 0} onClick={scrollPrev}/> 
+      || <IconButton disabled={scrollPos <= 0} onClick={ scrollPrev }>
         <ChevronLeftIcon/>
-      </IconButton>
-    </div>}
+      </IconButton>}
+    </div>
     <Grid container justify="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
       innerRef={carouselRef}
     >
       {shownItems}
     </Grid>
-    {!otherScroll && <div className={ `${css.arrows} ${css.rightArrow}` } >
-      <IconButton disabled={ maxScroll } onClick={ scrollNext }>
+    <div className={ `${css.arrows} ${css.rightArrow}` } >
+      {RightScroll 
+      && <RightScroll disabled={maxScroll} onClick={scrollNext}/>
+      ||<IconButton disabled={ maxScroll } onClick={ scrollNext }>
         <ChevronRightIcon/>
-      </IconButton>
-    </div>}
+      </IconButton>}
+    </div>
   </div>
   )
 })
 
 export default Carousel
 
-function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: any, shownIndex: number}) {
-  const { item, shownIndex, xs, sm, md, lg } = props
+function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: any, shownIndex: number, containerWidth: number}) {
+  const { item, shownIndex, xs, sm, md, lg, containerWidth } = props
   const smVal = sm ?? xs
   const mdVal = md ?? sm ?? xs
   const lgVal = lg ?? md ?? sm ?? xs
-  const gridCss = useGridStyle( { xs, sm: smVal, md: mdVal, lg: lgVal, itemIndex: shownIndex})
+  const gridCss = useGridStyle( { xs, sm: smVal, md: mdVal, lg: lgVal, itemIndex: shownIndex, containerWidth: containerWidth})
   return (<Grid item className={ gridCss.itemContainer }>
     <Grid container justify="center" className={gridCss.showItem}>
       <Grid item>

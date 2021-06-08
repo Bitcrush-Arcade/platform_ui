@@ -1,18 +1,25 @@
 // Material
 import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles'
 import Fab, {FabProps} from '@material-ui/core/Fab'
+// Libs
+import { styledBy } from 'utils/styles/styling'
 
 type FabStyles ={
   width?: string | number,
   href?: string,
   target?: string,
+  background?: 'default' | 'primary' | 'secondary'
 } & WithStyles< typeof styles > & FabProps
 
 
 const styles = (theme:Theme) => createStyles({
   root:{
     width: (props : FabStyles) => props.width || null,
-    backgroundColor: 'transparent',
+    backgroundColor: styledBy('background',{
+      default: 'transparent',
+      primary: theme.palette.primary.dark,
+      secondary: theme.palette.secondary.dark
+    }),
     borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].main,
     borderWidth: 1,
     borderStyle: 'solid',
