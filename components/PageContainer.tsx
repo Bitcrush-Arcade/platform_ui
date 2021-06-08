@@ -39,7 +39,10 @@ type ContainerProps ={
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
   contentContainer:{
     paddingTop: props => props.fullPage ? 0 : 96,
-    paddingLeft: props => props.menuToggle ? theme.spacing(33) : theme.spacing(12),
+    paddingLeft: theme.spacing(12),
+    [theme.breakpoints.up('md')]:{
+      paddingLeft: props => props.menuToggle ? theme.spacing(33) : theme.spacing(12),
+    },
     transition: theme.transitions.create('padding', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
