@@ -1,17 +1,24 @@
+import { useRef } from 'react'
 import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Container from "@material-ui/core/Container"
 import Typography from '@material-ui/core/Typography'
 import Grid from "@material-ui/core/Grid"
+// Icons
+import ChevronLeft from "@material-ui/icons/ChevronLeft"
+import ChevronRight from "@material-ui/icons/ChevronRight"
 // Bitcrush
 import Card from 'components/basics/Card'
+import Carousel, { CarouselHandles } from 'components/basics/Carousel'
+import GameCard from 'components/basics/GameCard'
 import Button from 'components/basics/GeneralUseButton'
 import PageContainer from 'components/PageContainer'
 
 const Games = () => {
 
   const css = useStyles({})
+  const gameScrollerRef = useRef<CarouselHandles>(null)
 
   return <PageContainer>
     <Grid container justify="center" className={ css.featuredContainer } >
@@ -44,8 +51,36 @@ const Games = () => {
         </div>
       </Grid>
     </Grid>
-    <div>
-      SCROLLER GOES HERE
+    <div className={ css.otherGamesContainer }>
+      <Grid container justify="space-between" alignItems="center" className={ css.otherGamesTitle } >
+        <Grid item>
+          <Typography variant="h6">
+            Other Games
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Grid container spacing={2}>
+            <Grid item>
+              <Button variant="round" size="small" color="primary" onClick={ gameScrollerRef.current?.scrollPrev }>
+                <ChevronLeft/>
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button variant="round" size="small" color="primary" onClick={ gameScrollerRef.current?.scrollNext }>
+                <ChevronRight/>
+              </Button>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Carousel ref={gameScrollerRef}
+        otherScroll
+        items={games.map( (game, gameIdx) => <GameCard key={`other-game-card-${gameIdx}`} imgSrc={game.src}/>)}
+        xs={1}
+        sm={2}
+        md={4}
+        lg={6}
+      />
     </div>
   </PageContainer>
 }
@@ -92,5 +127,38 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   tagText:{
     textTransform:'uppercase',
     fontWeight: 600,
-  }
+  },
+  otherGamesTitle:{
+    marginBottom: theme.spacing(2),
+  },
+  otherGamesContainer:{
+    padding: theme.spacing(4),
+  },
 }))
+// TEST GAMES
+const games = [
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+  {src: '/games/dragon/lucky_macau.png'},
+  {src: '/games/dragon/mythical_creatures.png'},
+  {src: '/games/dragon/scream.png'},
+  {src: '/games/dragon/the_defenders.png'},
+]
