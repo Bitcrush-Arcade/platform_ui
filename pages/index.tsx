@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
-import PoolCard from 'components/pools/PoolCard'
+import HarvestCard from 'components/pools/HarvestCard'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // utils
@@ -79,7 +79,7 @@ export default function Home() {
             </Card>
             <Grid container justify="center" spacing={3} style={{marginTop: 32}}>
               <Grid item xs={12} md={6}>
-                <PoolCard title="Staking Pool" color="primary"
+                <HarvestCard title="Staking Pool" color="primary"
                   stakedInfo={{
                     title: "CRUSH to Harvest",
                     amount: 547.2140070078,
