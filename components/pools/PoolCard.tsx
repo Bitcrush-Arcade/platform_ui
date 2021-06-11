@@ -1,54 +1,110 @@
+import { useState } from 'react'
+// web3
+import { useWeb3React } from '@web3-react/core'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
+import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import Avatar from "@material-ui/core/Avatar"
+import ButtonBase from "@material-ui/core/ButtonBase"
+import CardHeader from "@material-ui/core/CardHeader"
+import CardContent from "@material-ui/core/CardContent"
+import CardActions from "@material-ui/core/CardActions"
+import Collapse from "@material-ui/core/Collapse"
+import Divider from "@material-ui/core/Divider"
+import Grid from "@material-ui/core/Grid"
+import Typography from "@material-ui/core/Typography"
 // Bitcrush
-import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
+// Icons
+import CalculationIcon from 'components/svg/CalculationIcon'
+import InvaderIcon from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
+import Button from 'components/basics/GeneralUseButton'
 
-const PoolCard = (props: PoolCardProps) => {
+const PoolCard = (props: PoolProps) => {
 
-  const { color, stakedInfo, rewardInfo, action1Title, action2Title, firstAction, secondAction, action2Color } = props
+  const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
+
+
   const css = useStyles({})
-  const action1Width = action2Title ? 200 : '100%'
-  const action1Grid = action2Title ? 'auto' : 12
-  return <Card background="light" className={ css.main } >
-    <CardContent className={ css.content } >
-      <Grid container justify="space-between" direction="row-reverse" >
+
+  const amount = 0.00025423
+
+  return <Card background="light" className={ css.card } >
+    <CardHeader classes={{ action: css.headerAction }}
+      title="Auto Bitcrush"
+      titleTypographyProps={{ className: css.headerTitle }}
+      subheader="Automatic restaking"
+      subheaderTypographyProps={{ variant: 'body2' }}
+      action={
+        <Avatar className={css.avatar}>
+          <InvaderIcon className={ css.avatarIcon }/>
+        </Avatar>
+      }
+    />
+    <CardContent>
+      {/* APR */}
+      <Grid container justify="space-between" alignItems="center">
         <Grid item>
-          {props.icon || 'ICON'}
+          <Typography color="textSecondary" variant="body2" >
+            APR:
+          </Typography>
         </Grid>
         <Grid item>
-          <Typography variant="h4" component="h2" className={css.title} >
-            {props.title}
-          </Typography>
-          <InfoMoney color={rewardInfo?.color || color}
-            {...rewardInfo}
-          />
+          <ButtonBase>
+            <Grid container alignItems="center" spacing={1}>
+              <Grid item>
+                <Typography color="primary" variant="body2" className={ css.percent }>
+                  150%
+                </Typography>
+              </Grid>
+              <Grid item>
+                <CalculationIcon className={ css.aprAction }/>
+              </Grid>
+            </Grid>
+          </ButtonBase>
         </Grid>
       </Grid>
-      <Divider orientation="horizontal" style={{marginBottom: 8, marginTop: 8}}/>
-      <InfoMoney color={stakedInfo?.color || color}
-        {...stakedInfo}
-      />
-    </CardContent>
-    <CardActions className={ css.actions } >
-      <Grid container spacing={1} justify="space-between">
-        <Grid item xs={action1Grid}>
-          <Button color={color} width={action1Width} onClick={firstAction}>
-            {action1Title}
+      <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
+        <Grid item>
+          <Typography variant="body2" color="textSecondary">
+            CRUSH EARNED
+          </Typography>
+          <Typography variant="h5" component="div" color="primary">
+            {currencyFormat(amount, { decimalsToShow: 8 })}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            $&nbsp;{currencyFormat(amount, { decimalsToShow: 2 })} USD
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
+            Harvest
           </Button>
         </Grid>
-        {action2Title && <Grid item >
-          <Button color={action2Color || color} width={200} onClick={secondAction}>
-            {action2Title}
-          </Button>
-        </Grid>}
+      </Grid>
+      <Button width="100%" color="primary">
+        STAKE
+      </Button>
+    </CardContent>
+    <CardActions>
+      <Grid container justify="space-between">
+        <Grid item xs={12}>
+          <Divider style={{marginBottom: 24}}/>
+        </Grid>
+        <Grid item>
+          manual info
+        </Grid>
+        <Grid item>
+          <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
+            Details
+          </ButtonBase>
+        </Grid>
+        <Grid item xs={12}>
+          <Collapse in={detailOpen}>
+            COLLAPSED INFO
+          </Collapse>
+        </Grid>
       </Grid>
     </CardActions>
   </Card>
@@ -56,82 +112,43 @@ const PoolCard = (props: PoolCardProps) => {
 
 export default PoolCard
 
-type PoolCardProps ={
-  title: string,
-  icon?: JSX.Element,
-  action1Title: string,
-  action2Title?: string,
-  firstAction?: () => void,
-  secondAction?: () => void,
-  color?: 'primary' | 'secondary',
-  action2Color?: 'primary' | 'secondary',
-  stakedInfo: InfoStakeProps,
-  rewardInfo: InfoStakeProps,
+type PoolProps = {
+  abi: any,
+  contract: string, // address
+  tokenAddress ?: string //address
 }
 
-type InfoStakeProps = {
-  title: string,
-  amount: number,
-  currency:string,
-  subtitle: string,
-  color?: 'primary' | 'secondary'
-}
-
-const InfoMoney = ( props: InfoStakeProps ) => {
-  const { title, subtitle, currency, amount, color } = props
-  const css = useMoneyStyles({})
-  return <>
-    <Typography variant="body2" color="textSecondary" className={ css.general }>
-      {title}
-    </Typography>
-    <div>
-      <Typography color={color || 'primary'} display="inline" className={ css.currency }>
-        {currency}
-        <Typography className={ css.value } display="inline">
-          {currencyFormat(amount, { decimalsToShow: 4})}
-        </Typography>
-      </Typography>
-    </div>
-    <Typography variant="body2" color="textSecondary" display="block" className={ css.general }>
-      {subtitle}
-    </Typography>
-  </>
-}
-
-const useStyles = makeStyles( (theme: Theme) => createStyles({
-  actions:{
-    padding: theme.spacing(4),
-    paddingTop: 0,
+const useStyles = makeStyles<Theme>( theme => createStyles({
+  card:{
+    width: 385,
+    padding: theme.spacing(2),
+    paddingTop: theme.spacing(1),
   },
-  content:{
-    padding: theme.spacing(4),
+  avatar:{
+    width: theme.spacing(6),
+    height: theme.spacing(6),
+    backgroundColor: theme.palette.primary.main
   },
-  main:{
-    minWidth: 250,
-    width: '100%',
-    maxWidth: 560,
+  avatarIcon:{
+    fontSize: 30,
+    color: theme.palette.common.white
   },
-  title:{
-    fontWeight: 600,
+  headerTitle:{
     textTransform: 'uppercase',
-    marginBottom: theme.spacing(4),
-    [theme.breakpoints.down('sm')]:{
-      marginBottom: theme.spacing(2),
-      fontSize: theme.typography.h5.fontSize
-    }
-  }
-}))
-const useMoneyStyles = makeStyles( (theme: Theme) => createStyles({
-  currency:{
-    fontWeight: 500,
-    fontSize: theme.typography.h5.fontSize,
+    fontWeight: 600,
   },
-  value:{
-    fontSize: theme.typography.h4.fontSize,
-    fontWeight: 500,
-    paddingLeft: theme.spacing(1)
+  headerAction:{
+    alignSelf: 'center'
   },
-  general:{
-    opacity: 0.75,
+  percent:{
+    fontWeight: 600
+  },
+  aprAction:{
+    fontSize: theme.typography.body2.fontSize,
+    color: theme.palette.primary.main
+  },
+  earnings:{
+    marginTop: theme.spacing(3),
+    marginBottom: theme.spacing(3),
   },
 }))

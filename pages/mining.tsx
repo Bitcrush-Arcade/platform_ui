@@ -4,9 +4,11 @@ import CardContent from "@material-ui/core/CardContent"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
-import PageContainer from 'components/PageContainer'
-import Card from 'components/basics/Card'
 import Button from 'components/basics/GeneralUseButton'
+import Card from 'components/basics/Card'
+import PageContainer from 'components/PageContainer'
+import PoolCard from 'components/pools/PoolCard'
+// libs
 import { currencyFormat } from "utils/text/text"
 
 const Mining = () => {
@@ -60,6 +62,11 @@ const Mining = () => {
         />
       </Grid>
       <Grid item style={{ width: 280}} />
+    </Grid>
+    <Grid container className={ css.section }>
+      <Grid item>
+        <PoolCard abi={"pending"} contract={"pending"}/>
+      </Grid>
     </Grid>
   </PageContainer>
 }
