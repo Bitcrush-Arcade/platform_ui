@@ -44,8 +44,7 @@ const Games = () => {
                   Dice Invaders
                 </Typography>
                 <Typography variant="body2">
-                  Stake Crush Coins to earn APY as well as a portion of the house edge.
-                  Staking not only helps stabilize the Crush Economy, it also provides Bankroll for the games. Because of the nature of gambling, this is more resky, but restuls in higher rewards than traditional staking.
+                 Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. 
                 </Typography>
                 <Button width="100%" color="primary" style={{ marginTop: 32 }}>
                   Play
