@@ -97,7 +97,7 @@ export default function Home() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid container justify="flex-end">
-                  <PoolCard title="Live Wallet" color="secondary"
+                  <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
                       amount: 547.2140070078,
