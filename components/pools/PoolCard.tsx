@@ -12,6 +12,10 @@ import Collapse from "@material-ui/core/Collapse"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
+// Material Icons
+import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import RefreshIcon from '@material-ui/icons/Refresh'
 // Bitcrush
 import Card from 'components/basics/Card'
 // Icons
@@ -20,6 +24,7 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
 import Button from 'components/basics/GeneralUseButton'
+import SmallButton from 'components/basics/SmallButton'
 
 const PoolCard = (props: PoolProps) => {
 
@@ -88,16 +93,22 @@ const PoolCard = (props: PoolProps) => {
       </Button>
     </CardContent>
     <CardActions>
-      <Grid container justify="space-between">
+      <Grid container>
         <Grid item xs={12}>
           <Divider style={{marginBottom: 24}}/>
         </Grid>
-        <Grid item>
-          manual info
+        <Grid item xs={6} container alignItems="center">
+          <SmallButton size="small" color="primary" style={{marginRight: 8}}>
+            <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
+          </SmallButton>
+          <InfoOutlinedIcon color="disabled"/>
         </Grid>
-        <Grid item>
+        <Grid item xs={6} container alignItems="center" justify="flex-end">
           <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
-            Details
+            <Typography variant="body2" color="primary" className={ css.detailsActionText }>
+              Details
+            </Typography>
+            <ArrowIcon fontSize="small" color={detailOpen ? "primary" : "disabled"} style={{ transform: `rotate(${ detailOpen ? "180deg" : "0deg"})`}}/>
           </ButtonBase>
         </Grid>
         <Grid item xs={12}>
@@ -151,4 +162,8 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
   },
+  detailsActionText:{
+    fontWeight: 500,
+    marginRight: theme.spacing(1)
+  }
 }))
