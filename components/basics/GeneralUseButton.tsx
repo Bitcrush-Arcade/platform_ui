@@ -34,6 +34,9 @@ const styles = (theme:Theme) => createStyles({
   },
   sizeSmall:{
     width: (props : FabStyles) => props.width && (typeof(props.width) == 'string' ? props.width : `${props.width}px`) + ' !important' || null,
+  },
+  extended:{
+    width: (props : FabStyles) => props.width && (typeof(props.width) == 'string' ? props.width : `${props.width}px`) + ' !important' || null,
   }
 })
 
