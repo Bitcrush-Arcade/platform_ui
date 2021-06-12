@@ -38,7 +38,7 @@ export const useEagerConnect = () => {
 const web3 = new Web3(Web3.givenProvider)
 
 // easy import of a contract to interact with
-export const useContract = (abi: any, address: string): ContractHandles => {
+export function useContract <T> (abi: T, address: string): ContractHandles{
   const { chainId } = useWeb3React()
   const [contract, setContract] = useState(() => [56, 97].indexOf(chainId || 0)> -1 ? new web3.eth.Contract(abi,address) : null)
   

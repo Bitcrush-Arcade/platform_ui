@@ -1,14 +1,25 @@
+import { useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
+import { useAuth } from './web3Hooks'
 
 
 export function useWithWallet<T>(options:walletOptions<T>) {
   const { account } = useWeb3React()
+  const { login } = useAuth()
 
-  const action = account
-    ? options.action
-    : console.log('no wallet yet do something')
+  const action = useCallback(
+    (e) => {
+      if(account)
+        options.action(e)
+      else 
+        login()
+    },
+    [options.action, account]
+  )
 
-  return action
+  return {
+    action
+  }
 }
 
 type walletOptions<T> ={
