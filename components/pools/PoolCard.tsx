@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // web3
 import { useWeb3React } from '@web3-react/core'
 // Material
@@ -9,9 +9,11 @@ import CardHeader from "@material-ui/core/CardHeader"
 import CardContent from "@material-ui/core/CardContent"
 import CardActions from "@material-ui/core/CardActions"
 import Collapse from "@material-ui/core/Collapse"
+import Dialog from '@material-ui/core/Dialog'
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
+import TextField from '@material-ui/core/TextField'
 // Material Icons
 import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
@@ -25,107 +27,149 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 import { currencyFormat } from 'utils/text/text'
 import Button from 'components/basics/GeneralUseButton'
 import SmallButton from 'components/basics/SmallButton'
+import { useWithWallet } from 'hooks/unlockWithWallet'
+import { useContract } from 'hooks/web3Hooks'
+// CONTRACTS
+import IERC20 from 'abi/IERC20.json'
+import { useImmer } from 'use-immer'
 
 const PoolCard = (props: PoolProps) => {
 
   // Web3
   const { account } = useWeb3React()
+  const { contract, methods } = useContract(IERC20.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
+  const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
+  const toggleModal = () => setOpenStakeModal( p => !p )
+  const { action: stake } = useWithWallet({ action: toggleModal })
 
+  const [items, setItems] = useImmer({ balance : 0 })
+
+  useEffect( async ()=>{
+    if(!contract || !account) return
+    const availTokens = await methods.balanceOf(account).call()
+    setItems( draft => {
+      draft.balance = availTokens
+    })
+    console.log('availableTokens', availTokens)
+  },[contract, account])
 
   const css = useStyles({})
 
   const amount = 0.00025423
   const apr = 1.5
 
-  return <Card background="light" className={ css.card } >
-    <CardHeader classes={{ action: css.headerAction }}
-      title="Auto Bitcrush"
-      titleTypographyProps={{ className: css.headerTitle }}
-      subheader="Automatic restaking"
-      subheaderTypographyProps={{ variant: 'body2' }}
-      action={
-        <Avatar className={css.avatar}>
-          <InvaderIcon className={ css.avatarIcon }/>
-        </Avatar>
-      }
-    />
-    <CardContent>
-      {/* APR */}
-      <Grid container justify="space-between" alignItems="center">
-        <Grid item>
-          <Typography color="textSecondary" variant="body2" >
-            APR:
-          </Typography>
-        </Grid>
-        <Grid item>
-          <ButtonBase>
-            <Grid container alignItems="center" spacing={1}>
-              <Grid item>
-                <Typography color="primary" variant="body2" className={ css.percent }>
-                  {apr * 100}%
-                </Typography>
-              </Grid>
-              <Grid item>
-                <CalculationIcon className={ css.aprAction }/>
-              </Grid>
-            </Grid>
-          </ButtonBase>
-        </Grid>
-      </Grid>
-      <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
-        <Grid item>
-          <Typography variant="body2" color="textSecondary">
-            CRUSH EARNED
-          </Typography>
-          <Typography variant="h5" component="div" color="primary">
-            {account 
-              ? currencyFormat(amount, { decimalsToShow: 8 })
-              : "--.--"
-            }
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            $&nbsp;{account ? currencyFormat(amount, { decimalsToShow: 2 }) : "--.--"} USD
-          </Typography>
-        </Grid>
-        <Grid item>
-          {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
-            Harvest
-          </Button>}
-        </Grid>
-      </Grid>
-      <Button width="100%" color="primary">
-        STAKE
-      </Button>
-    </CardContent>
-    <CardActions>
-      <Grid container>
-        <Grid item xs={12}>
-          <Divider style={{marginBottom: 24}}/>
-        </Grid>
-        <Grid item xs={6} container alignItems="center">
-          <SmallButton size="small" color="primary" style={{marginRight: 8}}>
-            <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
-          </SmallButton>
-          <InfoOutlinedIcon color="disabled"/>
-        </Grid>
-        <Grid item xs={6} container alignItems="center" justify="flex-end">
-          <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
-            <Typography variant="body2" color="primary" className={ css.detailsActionText }>
-              Details
+  return <>
+    <Card background="light" className={ css.card } >
+      <CardHeader classes={{ action: css.headerAction }}
+        title="Auto Bitcrush"
+        titleTypographyProps={{ className: css.headerTitle }}
+        subheader="Automatic restaking"
+        subheaderTypographyProps={{ variant: 'body2' }}
+        action={
+          <Avatar className={css.avatar}>
+            <InvaderIcon className={ css.avatarIcon }/>
+          </Avatar>
+        }
+      />
+      <CardContent>
+        {/* APR */}
+        <Grid container justify="space-between" alignItems="center">
+          <Grid item>
+            <Typography color="textSecondary" variant="body2" >
+              APR:
             </Typography>
-            <ArrowIcon fontSize="small" color={detailOpen ? "primary" : "disabled"} style={{ transform: `rotate(${ detailOpen ? "180deg" : "0deg"})`}}/>
-          </ButtonBase>
+          </Grid>
+          <Grid item>
+            <ButtonBase>
+              <Grid container alignItems="center" spacing={1}>
+                <Grid item>
+                  <Typography color="primary" variant="body2" className={ css.percent }>
+                    {apr * 100}%
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <CalculationIcon className={ css.aprAction }/>
+                </Grid>
+              </Grid>
+            </ButtonBase>
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <Collapse in={detailOpen}>
-            COLLAPSED INFO
-          </Collapse>
+        <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
+          <Grid item>
+            <Typography variant="body2" color="textSecondary">
+              CRUSH EARNED
+            </Typography>
+            <Typography variant="h5" component="div" color="primary">
+              {account 
+                ? currencyFormat(amount, { decimalsToShow: 8 })
+                : "--.--"
+              }
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              $&nbsp;{account ? currencyFormat(amount, { decimalsToShow: 2 }) : "--.--"} USD
+            </Typography>
+          </Grid>
+          <Grid item>
+            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
+              Harvest
+            </Button>}
+          </Grid>
         </Grid>
-      </Grid>
-    </CardActions>
-  </Card>
+        <Button width="100%" color="primary" onClick={stake}>
+          { account ? "STAKE" : "Unlock Wallet"}
+        </Button>
+      </CardContent>
+      <CardActions>
+        <Grid container>
+          <Grid item xs={12}>
+            <Divider style={{marginBottom: 24}}/>
+          </Grid>
+          <Grid item xs={6} container alignItems="center">
+            <SmallButton size="small" color="primary" style={{marginRight: 8}}>
+              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
+            </SmallButton>
+            <InfoOutlinedIcon color="disabled"/>
+          </Grid>
+          <Grid item xs={6} container alignItems="center" justify="flex-end">
+            <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
+              <Typography variant="body2" color="primary" className={ css.detailsActionText }>
+                Details
+              </Typography>
+              <ArrowIcon fontSize="small" color={detailOpen ? "primary" : "disabled"} style={{ transform: `rotate(${ detailOpen ? "180deg" : "0deg"})`}}/>
+            </ButtonBase>
+          </Grid>
+          <Grid item xs={12}>
+            <Collapse in={detailOpen}>
+              COLLAPSED INFO
+            </Collapse>
+          </Grid>
+        </Grid>
+      </CardActions>
+    </Card>
+    <Dialog 
+      PaperComponent={Card}
+      PaperProps={{
+        background: "light",
+        style: { padding: 24 }
+      }}
+      open={openStakeModal}
+      onBackdropClick={toggleModal}
+    >
+      Available Tokens {currencyFormat(items?.balance || 0, { isGwei: true })}
+      <TextField
+        type="number"
+        fullWidth
+        label="Tokens to Stake"
+        placeholder="0.00"
+        variant="outlined"
+      />
+      <Button color="primary" onClick={()=>console.log("Approve/stake")}>
+        approve/stake
+      </Button>
+    </Dialog>
+  </>
 }
 
 export default PoolCard
