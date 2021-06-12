@@ -86,7 +86,7 @@ export default HeaderBar
 
 const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradientId2: string}>( (theme: Theme) => createStyles({
   appBar:{
-    zIndex: 1900,
+    zIndex: 1250,
     border: 'none'
   },
   menuLogoDivider:{
