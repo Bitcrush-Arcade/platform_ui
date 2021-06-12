@@ -28,12 +28,16 @@ import SmallButton from 'components/basics/SmallButton'
 
 const PoolCard = (props: PoolProps) => {
 
+  // Web3
+  const { account } = useWeb3React()
+  // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
 
 
   const css = useStyles({})
 
   const amount = 0.00025423
+  const apr = 1.5
 
   return <Card background="light" className={ css.card } >
     <CardHeader classes={{ action: css.headerAction }}
@@ -60,7 +64,7 @@ const PoolCard = (props: PoolProps) => {
             <Grid container alignItems="center" spacing={1}>
               <Grid item>
                 <Typography color="primary" variant="body2" className={ css.percent }>
-                  150%
+                  {apr * 100}%
                 </Typography>
               </Grid>
               <Grid item>
@@ -76,16 +80,19 @@ const PoolCard = (props: PoolProps) => {
             CRUSH EARNED
           </Typography>
           <Typography variant="h5" component="div" color="primary">
-            {currencyFormat(amount, { decimalsToShow: 8 })}
+            {account 
+              ? currencyFormat(amount, { decimalsToShow: 8 })
+              : "--.--"
+            }
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            $&nbsp;{currencyFormat(amount, { decimalsToShow: 2 })} USD
+            $&nbsp;{account ? currencyFormat(amount, { decimalsToShow: 2 }) : "--.--"} USD
           </Typography>
         </Grid>
         <Grid item>
-          <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
+          {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
             Harvest
-          </Button>
+          </Button>}
         </Grid>
       </Grid>
       <Button width="100%" color="primary">
