@@ -49,10 +49,10 @@ export const contracts : { [key: string] : { 56: string, 97:string, abi: any }} 
   },
 }
 
-export const getContracts = (contract: string, chainId: 56 | 97 ): { address: string, abi: AbiItem } => {
+export const getContracts = (contract: string, chainId: number ): { address: string, abi: AbiItem } => {
   const data = contracts[contract]
   return {
-    address: data[chainId],
+    address: [56,97].indexOf(chainId) > -1 && data[chainId] || '',
     abi: data.abi
   }
 }

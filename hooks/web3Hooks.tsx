@@ -3,6 +3,8 @@ import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector } from '@web3-react/injected-connector'
 import { useState, useEffect, useCallback } from 'react'
 
+import { AbiItem } from 'web3-utils'
+
 // Login and Logout Hook -> Handles Wallet Connection
 export const useAuth = () => {
 
@@ -38,7 +40,7 @@ export const useEagerConnect = () => {
 const web3 = new Web3(Web3.givenProvider)
 
 // easy import of a contract to interact with
-export function useContract <T> (abi: T, address: string): ContractHandles{
+export function useContract(abi: any, address: string): ContractHandles{
   const { chainId } = useWeb3React()
   const [contract, setContract] = useState(() => [56, 97].indexOf(chainId || 0)> -1 ? new web3.eth.Contract(abi,address) : null)
   
