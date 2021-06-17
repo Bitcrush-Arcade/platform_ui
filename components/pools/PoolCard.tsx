@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 // web3
 import { useWeb3React } from '@web3-react/core'
 // Material
@@ -30,32 +30,71 @@ import SmallButton from 'components/basics/SmallButton'
 import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
 // CONTRACTS
-import IERC20 from 'abi/IERC20.json'
+import CrushCoin from 'abi/CrushToken.json'
 import { useImmer } from 'use-immer'
+import BigNumber from 'bignumber.js'
 
 const PoolCard = (props: PoolProps) => {
-
+  const { abi, tokenAddress, contractAddress, tokenAbi } = props
   // Web3
-  const { account } = useWeb3React()
-  const { contract, methods } = useContract(IERC20.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
+  const { account, chainId } = useWeb3React()
+  const { contract: coinContract, methods: coinMethods } = useContract(CrushCoin.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
+  const { contract: mainContract, methods: mainMethods } = useContract(abi, contractAddress)
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
-  const toggleModal = () => setOpenStakeModal( p => !p )
-  const { action: stake } = useWithWallet({ action: toggleModal })
+  const [ hydrate, setHydrate ] = useState<boolean>(false)
 
-  const [items, setItems] = useImmer({ balance : 0 })
+  const triggerHydrate = useCallback(() => {
+    setHydrate( p => !p )
+  }, [setHydrate])
+
+  const [items, setItems] = useImmer({ balance : 0, approved: 0 })
+  const isApproved = items.approved > 0
+  
+  const buttonAction = () =>{
+    if(isApproved) 
+      setOpenStakeModal( p => !p )
+    else{
+      coinMethods.approve( contractAddress, new BigNumber(items.balance).times(new BigNumber(10).pow(18)) ).send({ from: account, gasPrice: new BigNumber(10).pow(10) })
+        .on('transactionHash', (tx) => {
+          console.log('hash', tx )
+          return tx
+        })
+        .on('receipt', ( rc) => {
+          console.log('receipt',rc)
+          triggerHydrate()
+        })
+    }
+  }
+
+  const removeApproval = () => {
+    coinMethods.decreaseAllowance( contractAddress, items.approved ).send({ from: account, gas: 60000, gasPrice: new BigNumber(10).pow(10) })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        return tx
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        triggerHydrate()
+      })
+  }
+
+  const { action: stake } = useWithWallet({ action: buttonAction })
+
 
   useEffect( ()=>{
-    const getTokenBalance = async () => {
-      if(!contract || !account) return
-      const availTokens = await methods.balanceOf(account).call()
+    const getPoolData = async () => {
+      if(!coinContract || !account || [97].indexOf(chainId) == -1 ) return
+      const availTokens = await coinMethods.balanceOf(account).call()
+      const approved = await coinMethods.allowance(account, contractAddress).call()
       setItems( draft => {
         draft.balance = availTokens
+        draft.approved = approved
       })
     }
-    getTokenBalance()
-  },[contract, account, methods, setItems])
+    getPoolData()
+  },[coinContract, account, coinMethods, setItems, chainId, hydrate])
 
   const css = useStyles({})
 
@@ -120,7 +159,9 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
         </Grid>
         <Button width="100%" color="primary" onClick={stake}>
-          { account ? "STAKE" : "Unlock Wallet"}
+          { account 
+              ? isApproved ? "STAKE" : "Enable"
+              : "Unlock Wallet"}
         </Button>
       </CardContent>
       <CardActions>
@@ -145,19 +186,25 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}>
             <Collapse in={detailOpen}>
               COLLAPSED INFO
+              <Button onClick={removeApproval}>
+                Remove Allowance
+              </Button>
             </Collapse>
           </Grid>
         </Grid>
       </CardActions>
     </Card>
+    {/* 
+        STAKING FORM
+    */}
     <Dialog 
       PaperComponent={Card}
       PaperProps={{
         background: "light",
-        style: { padding: 24 }
+        style: { padding: 32 }
       }}
       open={openStakeModal}
-      onBackdropClick={toggleModal}
+      onBackdropClick={ () => setOpenStakeModal(false) }
     >
       Available Tokens {currencyFormat(items?.balance || 0, { isGwei: true })}
       <TextField
@@ -168,7 +215,7 @@ const PoolCard = (props: PoolProps) => {
         variant="outlined"
       />
       <Button color="primary" onClick={()=>console.log("Approve/stake")}>
-        approve/stake
+        stake
       </Button>
     </Dialog>
   </>
@@ -178,8 +225,9 @@ export default PoolCard
 
 type PoolProps = {
   abi: any,
-  contract: string, // address
+  contractAddress: string, // address
   tokenAddress ?: string //address
+  tokenAbi?: any,
 }
 
 const useStyles = makeStyles<Theme>( theme => createStyles({

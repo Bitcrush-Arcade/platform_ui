@@ -10,12 +10,17 @@ import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
 // libs
 import { currencyFormat } from "utils/text/text"
+import { getContracts } from "data/contracts"
+import { useWeb3React } from "@web3-react/core"
 
 const Mining = () => {
 
   const css = useStyles({})
+  const { chainId } = useWeb3React()
 
   const distributionAmount = 0
+
+  const firstPool = getContracts('masterChef', chainId )
 
   return <PageContainer background="galactic">
     <Grid container justify="space-evenly">
@@ -65,7 +70,7 @@ const Mining = () => {
     </Grid>
     <Grid container className={ css.section }>
       <Grid item>
-        <PoolCard abi={"pending"} contract={"pending"}/>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address}/>
       </Grid>
     </Grid>
   </PageContainer>
