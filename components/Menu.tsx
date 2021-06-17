@@ -1,5 +1,6 @@
 // React imports
 import React, { useState, Fragment } from 'react'
+import { useImmer } from 'use-immer'
 // Next
 import { useRouter } from 'next/router'
 import Link from 'next/link'
@@ -54,12 +55,15 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         { name: 'MORE', icon: null, subMenu: [ { name: 'GitHub', icon: <GitHubIcon color="inherit"/>, url_link: 'https://www.github.com'} ] },
     ]
 
-    const linkItems = linkArray.map( link => {
+    const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false) )
+
+    const linkItems = linkArray.map( (link, linkIndex) => {
         const { name, icon, url_link, subMenu, disabled } = link
-        const [ openSubMenu, setOpenSubMenu ] = useState<boolean>(false)
         const click = (e : any) => {
             e.stopPropagation()
-            subMenu && setOpenSubMenu( p => !p )
+            subMenu && setSubMenuOpen( draft => {
+                draft[linkIndex] = !draft[linkIndex]
+            } )
             !open && toggleOpen()
         }
         const selected = url_link == router.pathname
@@ -78,13 +82,13 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                 </ListItemIcon>
                 <ListItemText
                     primary={<>
-                        {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: openSubMenu ? 'rotate( 180deg )' : undefined}}/>}
+                        {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
                         {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
                     </>}
                     primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''}`  }}
                 />
             </ListItem>
-            {subMenu && <Collapse in={openSubMenu}>
+            {subMenu && <Collapse in={subMenuOpen[linkIndex]}>
                 <List dense className={css.subList}>
                     {subMenu.map( sub => {
                         const isLink = sub.url_link ? true: undefined

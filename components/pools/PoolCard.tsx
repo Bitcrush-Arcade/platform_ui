@@ -46,14 +46,16 @@ const PoolCard = (props: PoolProps) => {
 
   const [items, setItems] = useImmer({ balance : 0 })
 
-  useEffect( async ()=>{
-    if(!contract || !account) return
-    const availTokens = await methods.balanceOf(account).call()
-    setItems( draft => {
-      draft.balance = availTokens
-    })
-    console.log('availableTokens', availTokens)
-  },[contract, account])
+  useEffect( ()=>{
+    const getTokenBalance = async () => {
+      if(!contract || !account) return
+      const availTokens = await methods.balanceOf(account).call()
+      setItems( draft => {
+        draft.balance = availTokens
+      })
+    }
+    getTokenBalance()
+  },[contract, account, methods, setItems])
 
   const css = useStyles({})
 

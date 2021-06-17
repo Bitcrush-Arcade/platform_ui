@@ -112,6 +112,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   },[])
   // On resize, reset State
   useLayoutEffect(() => {
+    const currentCarouselRef = carouselRef.current
     const snapToGrid = () => {
       if(!carouselRef.current) return
       const currentPos = carouselRef.current?.scrollLeft || 0
@@ -125,15 +126,16 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
     window.addEventListener('resize', resetShown )
     return () => {
       window.removeEventListener('resize', resetShown )
-      carouselRef.current?.removeEventListener('scroll', snapToGrid)
+      currentCarouselRef?.removeEventListener('scroll', snapToGrid)
     };
   }, [containerWidth])
 
   useEffect(()=>{
+    const itemCount = items.length
     const timeout = setTimeout(() => {
       if(!carouselRef.current) return
       const width = carouselRef.current.scrollWidth
-      const itemWidth = width/count
+      const itemWidth = width/itemCount
       const curPos = carouselRef.current.scrollLeft
       const mod = curPos%itemWidth
       const dif = mod - Math.floor(itemWidth/2)

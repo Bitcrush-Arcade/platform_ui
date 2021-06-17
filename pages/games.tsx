@@ -36,7 +36,7 @@ const Games = () => {
         <Card className={ css.featuredCard } background="light">
           <Grid container direction="row-reverse" alignItems="center" spacing={1}>
             <Grid item xs={12} md={6}>
-              <Image src={'/games/dice_invaders_pv.png'} width={2358/6} height={1290/6} layout="responsive"/>
+              <Image src={'/games/dice_invaders_pv.png'} width={2358/6} height={1290/6} layout="responsive" alt="Dice Invaders Game Demo"/>
             </Grid>
             <Grid item xs={12} md={6} >
               <div className={ css.textContainer }>
