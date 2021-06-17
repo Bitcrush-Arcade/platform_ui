@@ -68,7 +68,7 @@ const Mining = () => {
       </Grid>
       <Grid item style={{ width: 280}} />
     </Grid>
-    <Grid container className={ css.section }>
+    <Grid container justify="center" spacing={1} className={ css.section }>
       <Grid item>
         <PoolCard abi={firstPool.abi} contractAddress={firstPool.address}/>
       </Grid>
