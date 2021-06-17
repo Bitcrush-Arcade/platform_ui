@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback, useContext } from 'react'
 // web3
 import { useWeb3React } from '@web3-react/core'
+import { Formik, Form, Field } from 'formik'
+import { TextField } from 'formik-material-ui'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
+import MButton from "@material-ui/core/Button"
 import ButtonBase from "@material-ui/core/ButtonBase"
 import CardHeader from "@material-ui/core/CardHeader"
 import CardContent from "@material-ui/core/CardContent"
@@ -13,7 +16,7 @@ import Dialog from '@material-ui/core/Dialog'
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
-import TextField from '@material-ui/core/TextField'
+// import TextField from '@material-ui/core/TextField'
 // Material Icons
 import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
@@ -34,6 +37,7 @@ import { TransactionContext } from 'components/context/TransactionContext'
 import CrushCoin from 'abi/CrushToken.json'
 import { useImmer } from 'use-immer'
 import BigNumber from 'bignumber.js'
+import { fromWei, toWei } from 'web3-utils'
 
 const PoolCard = (props: PoolProps) => {
   const { abi, tokenAddress, contractAddress, tokenAbi } = props
@@ -52,7 +56,9 @@ const PoolCard = (props: PoolProps) => {
     setHydrate( p => !p )
   }, [setHydrate])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0 })
+  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null })
+  const [coinInfo, setCoinInfo] = useState({ name: '', symbol: ''})
+
   const isApproved = items.approved > 0
   
   const buttonAction = () =>{
@@ -88,21 +94,37 @@ const PoolCard = (props: PoolProps) => {
       })
   }
 
-  const { action: stake } = useWithWallet({ action: buttonAction })
+  const { action: cardPreStake } = useWithWallet({ action: buttonAction })
 
-
+  useEffect(()=>{
+    if(!coinMethods) return
+    const getCoinData = async () => {
+      const tokenName = await coinMethods.name().call()
+      const tokenSymbol = await coinMethods.symbol().call()
+      setCoinInfo({
+        name: tokenName,
+        symbol: tokenSymbol,
+      })
+    }
+    getCoinData()
+  },[coinMethods])
+// Hydrate changing Data
   useEffect( ()=>{
     const getPoolData = async () => {
       if(!coinContract || !account || [97].indexOf(chainId) == -1 ) return
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
+      const userInfo = await mainMethods.userInfo(0, account).call()
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
+        draft.userInfo = userInfo
       })
     }
     getPoolData()
   },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
+
+  const maxBalance = +fromWei(`${items.balance}`)
 
   const css = useStyles({})
 
@@ -148,7 +170,7 @@ const PoolCard = (props: PoolProps) => {
         <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
           <Grid item>
             <Typography variant="body2" color="textSecondary">
-              CRUSH EARNED
+              {coinInfo.symbol} EARNED
             </Typography>
             <Typography variant="h5" component="div" color="primary">
               {account 
@@ -166,9 +188,9 @@ const PoolCard = (props: PoolProps) => {
             </Button>}
           </Grid>
         </Grid>
-        <Button width="100%" color="primary" onClick={stake}>
+        <Button width="100%" color="primary" onClick={cardPreStake}>
           { account 
-              ? isApproved ? "STAKE" : "Enable"
+              ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
               : "Unlock Wallet"}
         </Button>
       </CardContent>
@@ -206,21 +228,69 @@ const PoolCard = (props: PoolProps) => {
         STAKING FORM
     */}
     <Dialog 
-      PaperComponent={p => <Card {...p} background="light" style={{ padding: 32 }}/>}
+      PaperComponent={p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>}
       open={openStakeModal}
       onBackdropClick={ () => setOpenStakeModal(false) }
     >
-      Available Tokens {currencyFormat(items?.balance || 0, { isGwei: true })}
-      <TextField
-        type="number"
-        fullWidth
-        label="Tokens to Stake"
-        placeholder="0.00"
-        variant="outlined"
-      />
-      <Button color="primary" onClick={()=>console.log("Approve/stake")}>
-        stake
-      </Button>
+      <Formik
+        initialValues = {{
+          stakeAmount: 0
+        }}
+        onSubmit={ ( values, { setSubmitting } ) => {
+          const weiAmount = toWei(`${values.stakeAmount}`)
+          console.log('submit', weiAmount )
+          // This isn't ready yet
+          // return mainMethods.enterStaking(weiAmount).send({ from: account })
+          //   .on('transactionHash', tx =>{
+          //     editTransactions(tx,'pending')
+          //   })
+          //   .on('receipt', rc => {
+          //     editTransactions(rc.transactionHash, 'complete')
+
+          //   })
+          //   .on('error', (error, receipt) => {
+          //     receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          //   })
+          setSubmitting(false)
+        }}
+        validate ={ ( values ) => {
+          let errors: any = {}
+          if(values.stakeAmount > maxBalance )
+            errors.stakeAmount = "Insufficient Funds"
+          if(values.stakeAmount <= 0)
+            errors.stakeAmount = "Invalid Input"
+          
+          return errors
+        }}
+        validateOnChange
+      >
+      { ({setFieldValue, isSubmitting}) =>
+        <Form>
+          <Typography paragraph variant="body2" color="textSecondary" component="div" align="right">
+            {coinInfo.symbol}: {currencyFormat(items?.balance || 0, { isGwei: true })}
+          </Typography>
+          <Field
+            type="number"
+            fullWidth
+            label={`${coinInfo.name} to stake`}
+            id="stakeAmount"
+            name="stakeAmount"
+            placeholder="0.00"
+            variant="outlined"
+            component={TextField}
+            InputProps={{
+              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxBalance )}>
+                MAX
+              </MButton>,
+              className: css.textField 
+            }}
+          />
+          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
+            STAKE {coinInfo.symbol}
+          </Button>
+        </Form>
+        }
+      </Formik>
     </Dialog>
   </>
 }
@@ -270,5 +340,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   detailsActionText:{
     fontWeight: 500,
     marginRight: theme.spacing(1)
-  }
+  },
+  textField:{
+    borderRadius: theme.spacing(4),
+    paddingLeft: theme.spacing(3),
+  },
+  submitBtn:{
+    marginTop: theme.spacing(2)
+  },
 }))
