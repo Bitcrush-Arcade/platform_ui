@@ -102,7 +102,7 @@ const PoolCard = (props: PoolProps) => {
       })
     }
     getPoolData()
-  },[coinContract, account, coinMethods, setItems, chainId, hydrate])
+  },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
 
   const css = useStyles({})
 
@@ -206,11 +206,7 @@ const PoolCard = (props: PoolProps) => {
         STAKING FORM
     */}
     <Dialog 
-      PaperComponent={Card}
-      PaperProps={{
-        background: "light",
-        style: { padding: 32 }
-      }}
+      PaperComponent={p => <Card {...p} background="light" style={{ padding: 32 }}/>}
       open={openStakeModal}
       onBackdropClick={ () => setOpenStakeModal(false) }
     >
