@@ -1,8 +1,9 @@
 // React
-import { useState, ReactNode, useEffect } from 'react'
+import { useState, ReactNode, useEffect, useContext } from 'react'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
+import LinearProgress from "@material-ui/core/LinearProgress"
 import Container from '@material-ui/core/Container'
 // Components
 import Header from 'components/HeaderBar'
@@ -11,13 +12,28 @@ import Menu from 'components/Menu'
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
 import { styledBy } from 'utils/styles/styling'
+// Context
+import { TransactionContext } from 'components/context/TransactionContext'
 
 const PageContainer = ( props: ContainerProps ) => {
+  
   const { children } = props
+  
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
+  
   const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
+  
   const css = useStyles({ menuToggle, ...props })
+
+  const { pending, completed } = useContext(TransactionContext)
+
+  useEffect( ()=>{
+
+    console.log('container', pending, completed )
+
+  },[pending, completed])
+
   useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
@@ -30,6 +46,7 @@ const PageContainer = ( props: ContainerProps ) => {
     <Header open={menuToggle} toggleOpen={toggleMenu}/>
     <Menu open={menuToggle} toggleOpen={toggleMenu}/>
     <Container maxWidth="xl" className={css.contentContainer}>
+      {pending.length > 0 && <LinearProgress/>}
       {children}
     </Container>
   </div>

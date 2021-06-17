@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useContext } from 'react'
 // web3
 import { useWeb3React } from '@web3-react/core'
 // Material
@@ -29,6 +29,7 @@ import Button from 'components/basics/GeneralUseButton'
 import SmallButton from 'components/basics/SmallButton'
 import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
+import { TransactionContext } from 'components/context/TransactionContext'
 // CONTRACTS
 import CrushCoin from 'abi/CrushToken.json'
 import { useImmer } from 'use-immer'
@@ -40,6 +41,8 @@ const PoolCard = (props: PoolProps) => {
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(CrushCoin.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
   const { contract: mainContract, methods: mainMethods } = useContract(abi, contractAddress)
+  // Context
+  const { editTransactions } = useContext(TransactionContext)
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
@@ -59,11 +62,16 @@ const PoolCard = (props: PoolProps) => {
       coinMethods.approve( contractAddress, new BigNumber(items.balance).times(new BigNumber(10).pow(18)) ).send({ from: account, gasPrice: new BigNumber(10).pow(10) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
-          return tx
+          editTransactions(tx,'pending')
         })
         .on('receipt', ( rc) => {
           console.log('receipt',rc)
           triggerHydrate()
+          editTransactions(rc.transactionHash,'complete')
+        })
+        .on('error', (error, receipt) => {
+          console.log('error', error, receipt)
+          editTransactions(receipt.transactionHash, 'error', error)
         })
     }
   }

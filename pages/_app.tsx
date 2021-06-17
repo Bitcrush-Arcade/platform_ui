@@ -6,6 +6,8 @@ import baseTheme from '../styles/BaseTheme'
 // BlockChain
 import Web3 from 'web3'
 import { Web3ReactProvider } from '@web3-react/core'
+// Context
+import { TransactionLoadingContext } from 'components/context/TransactionContext'
 
 function MyApp({ Component, pageProps }) {
 
@@ -19,10 +21,12 @@ function MyApp({ Component, pageProps }) {
   const getLibrary = ( provider ): Web3 => provider
 
   return (<Web3ReactProvider getLibrary={ getLibrary }>
-    <ThemeProvider theme={baseTheme}>
-      <CssBaseline/>
-      <Component {...pageProps} />
-    </ThemeProvider>
+    <TransactionLoadingContext>
+      <ThemeProvider theme={baseTheme}>
+        <CssBaseline/>
+        <Component {...pageProps} />
+      </ThemeProvider>
+    </TransactionLoadingContext>
   </Web3ReactProvider>
   )
 }
