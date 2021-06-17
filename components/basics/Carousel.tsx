@@ -131,11 +131,10 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   }, [containerWidth])
 
   useEffect(()=>{
-    const itemCount = items.length
     const timeout = setTimeout(() => {
       if(!carouselRef.current) return
       const width = carouselRef.current.scrollWidth
-      const itemWidth = width/itemCount
+      const itemWidth = width/count
       const curPos = carouselRef.current.scrollLeft
       const mod = curPos%itemWidth
       const dif = mod - Math.floor(itemWidth/2)
@@ -144,7 +143,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
       }
     },200)
     return () => clearTimeout(timeout)
-  },[scrollPos])
+  },[scrollPos, count])
 
   const scrollNext = () => {
     if(!carouselRef.current) return
