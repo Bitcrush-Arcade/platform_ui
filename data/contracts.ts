@@ -24,11 +24,6 @@ export const contracts : { [key: string] : { 56: string, 97:string, abi: any }} 
   },
   crushToken:{
     56: '',
-    97: '0xec6b02847DF550337d4Ecc199731505C027e68Cb',
-    abi: CrushToken.abi,
-  },
-  prevTestToken:{
-    56: '',
     97: '0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6',
     abi: CrushToken.abi,
   },
