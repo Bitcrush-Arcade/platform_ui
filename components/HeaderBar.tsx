@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useMemo, useContext } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
@@ -17,15 +18,20 @@ import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
 import Coin from 'components/tokens/Token2'
 // Hooks
 import { useAuth } from 'hooks/web3Hooks'
+import { TransactionContext } from 'components/context/TransactionContext'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
   const [ svgGradient, gradientId] = gradient()
   const [ svgGradient2, gradientId2] = gradient2()
   const css = useStyles({ open, gradientId, gradientId2 })
+  const theme = useTheme()
+  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { pathname } = useRouter()
   const isGame = pathname.indexOf('/games') > -1
-  const imgReducer = 18
+  const imgReducer = isSm ? 24 : 18
+  
+  const { tokenInfo } = useContext(TransactionContext)
 
   const token1Actions = [
     {name:'Deposit', onClick: ()=>console.log('action 1')},
@@ -34,7 +40,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     {name:'History', onClick: ()=>console.log('action 4')},
   ]
 
-  return <AppBar color="transparent" className={css.appBar} variant="outlined">
+  return <AppBar color="transparent" className={css.appBar} variant="outlined" position="absolute">
     <Toolbar>
       <Grid container justify="space-between" alignItems="center" style={{ paddingTop: 32}}>
         {/* LEFT SIDE OF HEADER */}
@@ -43,7 +49,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
             <Grid item>
               <Button onClick={toggleOpen} className={css.menuOpen}>
                 {svgGradient}{svgGradient2}
-                <MenuIcon fontSize="large" className={ css.gradient } />
+                <MenuIcon fontSize={isSm ? "default" : "large"} className={ css.gradient } />
               </Button>
             </Grid>
             <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
@@ -66,10 +72,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
             {/* <Grid item> 
               <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
             </Grid> */}
-            <Grid item>
-              <TokenDisplay amount={1578.100015580000005946} icon={<Coin scale={0.25}/>} color="primary" actions={token1Actions} />
+            <Grid item className={ css.dropOnSm }>
+              <TokenDisplay amount={tokenInfo.balance} icon={<Coin scale={0.25}/>} color="primary" actions={token1Actions} />
             </Grid>
-            <Grid item>
+            <Grid item className={ css.dropOnSm }>
               <ConnectButton/>
             </Grid>
             <Grid item>
@@ -94,7 +100,12 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
   },
   gradient:{
     fill: props =>  `url(#${ props.open ? props.gradientId : props.gradientId2})`,
-  }
+  },
+  dropOnSm:{
+    [theme.breakpoints.down('sm')]:{
+      display:'none'
+    }
+  },
 }))
 
 const ConnectButton = () => {
