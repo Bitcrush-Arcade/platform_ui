@@ -20,7 +20,7 @@ const styles = (theme:Theme) => createStyles({
     )(props),
     borderRadius: theme.spacing(4),
     borderColor: props => theme.palette[props.shadow !== 'dark' && props.shadow ||'primary'][props.shadow == 'dark' ? 'dark': 'main'],
-    borderStyle: 'solid',
+    borderStyle: props => props.noBorder ? 'none' : 'solid',
     borderWidth: 1,
   }
 })
@@ -28,7 +28,8 @@ const styles = (theme:Theme) => createStyles({
 type CardStyles ={
   background?: 'transparent' | 'light' | 'dark',
   opacity?: number,
-  shadow?: 'primary' | 'secondary' | 'dark'
+  shadow?: 'primary' | 'secondary' | 'dark' ,
+  noBorder?: boolean,
 } & WithStyles< typeof styles > & CardProps
 
 interface BackgroundMapping {
