@@ -46,8 +46,8 @@ const Games = () => {
                 <Typography variant="body2">
                  Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. 
                 </Typography>
-                <Button width="100%" color="primary" style={{ marginTop: 32 }}>
-                  Play
+                <Button width="100%" color="primary" style={{ marginTop: 32 }} disabled>
+                  Coming Soon
                 </Button>
               </div>
             </Grid>
@@ -61,13 +61,9 @@ const Games = () => {
       </Grid>
     </Grid>
     <div className={ css.otherGamesContainer }>
-      <Grid container alignItems="center" className={ css.otherGamesTitle } >
-        <Grid item>
-          <Typography variant="h6">
-            Featured Partner :: Dragon Gaming
-          </Typography>
-        </Grid>
-      </Grid>
+      <Typography variant="h6" paragraph>
+        Featured Partner :: Dragon Gaming :: Coming Soon
+      </Typography>
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
