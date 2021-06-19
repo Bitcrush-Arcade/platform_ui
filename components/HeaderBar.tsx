@@ -19,6 +19,7 @@ import Coin from 'components/tokens/Token2'
 // Hooks
 import { useAuth } from 'hooks/web3Hooks'
 import { TransactionContext } from 'components/context/TransactionContext'
+import { shortAddress } from 'utils/text/text'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -111,13 +112,7 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
 const ConnectButton = () => {
   const { login, account } = useAuth()
 
-  const displayAccount = useMemo( () => {
-    const accountChars = (account || '').split('')
-    const accountLength = accountChars.length - 8
-    accountLength > 0 && accountChars.splice(4,accountLength,'...')
-    return accountChars.join('')
-  },[account])
-  
+  const displayAccount = useMemo( () => shortAddress(account || ''),[account])
   
   return <GeneralButton disabled={!!account } onClick={login}>
     {account 
