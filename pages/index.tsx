@@ -1,5 +1,6 @@
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
 import Divider from '@material-ui/core/Divider'
@@ -15,6 +16,9 @@ import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 import { currencyFormat } from 'utils/text/text'
 
 export default function Home() {
+
+  const theme = useTheme()
+  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
 
   const [ gradient, gradientId ] = invaderGradient()
   const css = useStyles({ gradientId })
@@ -48,37 +52,38 @@ export default function Home() {
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7}>
               <CardContent style={{paddingBottom: 16}}>
                 <Grid container justify="space-around">
-                  <Grid item>
-                    <Typography variant="caption" component="div" align="left" color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
+                  <Grid item xs={12} md={'auto'}>
+                    <Typography variant="caption" component="div" align={isSm ? "center" : "left"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Locked
                     </Typography>
-                    <Typography variant="h4" component="div" align="left">
+                    <Typography variant="h4" component="div" align={isSm ? "center" : "left"}>
                       {currencyFormat(totalValueLocked,{ decimalsToShow: 0})}
                     </Typography>
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
-                  <Grid item>
+                  <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Max Win
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {currencyFormat(maxWin,{ decimalsToShow: 0})}
+                      {/* {currencyFormat(maxWin,{ decimalsToShow: 0})} */}
+                      COMING SOON
                     </Typography>
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
-                  <Grid item>
-                    <Typography variant="caption" component="div" align="right" color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
+                  <Grid item xs={12} md={'auto'}>
+                    <Typography variant="caption" component="div" align={isSm ? "center" : "right"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Shared
                     </Typography>
-                    <Typography variant="h4" component="div" align="right">
+                    <Typography variant="h4" component="div" align={isSm ? "center" : "right"}>
                       {currencyFormat(totalValueShared,{ decimalsToShow: 0})}
                     </Typography>
                   </Grid>
                 </Grid>
               </CardContent>
             </Card>
-            <Grid container justify="center" spacing={3} style={{marginTop: 32}}>
-              <Grid item xs={12} md={6}>
+            <Grid container justify="space-around" spacing={3} style={{marginTop: 32}}>
+              <Grid item md={6}>
                 <HarvestCard title="Staking Pool" color="primary"
                   stakedInfo={{
                     title: "CRUSH to Harvest",
@@ -95,24 +100,32 @@ export default function Home() {
                   action1Title="Harvest All"
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item md={6}>
                 <Grid container justify="flex-end">
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: 547.2140070078,
-                      subtitle: "-$ 0.00",
+                      amount: 0,
+                      subtitle: " --- ",
                       currency: "CRUSH",
+                      comingSoon: true
                     }}
                     rewardInfo={{
                       title: "HOUSE Profit Earned",
-                      amount: 547.2140070078,
-                      subtitle: "-$ 0.00",
+                      amount: 0,
+                      subtitle: " --- ",
                       currency: "CRUSH",
+                      comingSoon: true
                     }}
-                    action1Title="Collect Winnings"
-                    action2Title="On Sale Soon"
+                    action1Title="Stake Now"
+                    action2Title="Buy Now"
                     action2Color="primary"
+                    btn1Props={{
+                      href: "/mining"
+                    }}
+                    btn2Props={{
+                      href: "https://dex.apeswap.finance/#/swap"
+                    }}
                   />
                 </Grid>
               </Grid>

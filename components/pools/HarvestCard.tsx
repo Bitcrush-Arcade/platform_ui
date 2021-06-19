@@ -6,14 +6,14 @@ import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
-import Button from 'components/basics/GeneralUseButton'
+import Button, {FabStyles} from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 // utils
 import { currencyFormat } from 'utils/text/text'
 
 const PoolCard = (props: PoolCardProps) => {
 
-  const { color, stakedInfo, rewardInfo, action1Title, action2Title, firstAction, secondAction, action2Color } = props
+  const { color, stakedInfo, rewardInfo, action1Title, action2Title, firstAction, secondAction, action2Color, btn1Props, btn2Props } = props
   const css = useStyles({})
   const action1Width = action2Title ? 200 : '100%'
   const action1Grid = action2Title ? 'auto' : 12
@@ -40,12 +40,12 @@ const PoolCard = (props: PoolCardProps) => {
     <CardActions className={ css.actions } >
       <Grid container spacing={1} justify="space-between">
         <Grid item xs={action1Grid}>
-          <Button color={color} width={action1Width} onClick={firstAction}>
+          <Button color={color} width={action1Width} onClick={firstAction} {...(btn1Props || {})}>
             {action1Title}
           </Button>
         </Grid>
         {action2Title && <Grid item >
-          <Button color={action2Color || color} width={200} onClick={secondAction}>
+          <Button color={action2Color || color} width={200} onClick={secondAction} {...(btn2Props || {})}>
             {action2Title}
           </Button>
         </Grid>}
@@ -61,6 +61,8 @@ type PoolCardProps ={
   icon?: JSX.Element,
   action1Title: string,
   action2Title?: string,
+  btn1Props?: {href ?: string },
+  btn2Props?: {href ?: string },
   firstAction?: () => void,
   secondAction?: () => void,
   color?: 'primary' | 'secondary',
@@ -74,11 +76,12 @@ type InfoStakeProps = {
   amount: number,
   currency:string,
   subtitle: string,
-  color?: 'primary' | 'secondary'
+  color?: 'primary' | 'secondary',
+  comingSoon?: boolean
 }
 
 const InfoMoney = ( props: InfoStakeProps ) => {
-  const { title, subtitle, currency, amount, color } = props
+  const { title, subtitle, currency, amount, color, comingSoon } = props
   const css = useMoneyStyles({})
   return <>
     <Typography variant="body2" color="textSecondary" className={ css.general }>
@@ -88,7 +91,8 @@ const InfoMoney = ( props: InfoStakeProps ) => {
       <Typography color={color || 'primary'} display="inline" className={ css.currency }>
         {currency}
         <Typography className={ css.value } display="inline">
-          {currencyFormat(amount, { decimalsToShow: 4})}
+          {comingSoon ? "COMING SOON"
+          : currencyFormat(amount, { decimalsToShow: 4})}
         </Typography>
       </Typography>
     </div>
