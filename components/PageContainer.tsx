@@ -78,6 +78,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       galactic: 'url("/backgrounds/Galactic.jpg")',
     }),
     minHeight: '100vh',
+    maxWidth: '100vw',
     backgroundPosition: 'top left',
     backgroundAttachment: 'fixed',
     backgroundSize: 'cover',
