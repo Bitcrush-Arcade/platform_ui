@@ -23,6 +23,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Bitcrush
 import Card from 'components/basics/Card'
+import RoiModal from 'components/pools/RoiModal'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
@@ -50,13 +51,16 @@ const PoolCard = (props: PoolProps) => {
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
+  const [ openRoi, setOpenRoi ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
 
   const triggerHydrate = useCallback(() => {
     setHydrate( p => !p )
   }, [setHydrate])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null })
+  const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
+
+  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null, staked: 0, stakePercent: 0 })
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: ''})
 
   const isApproved = items.approved > 0
@@ -149,11 +153,28 @@ const PoolCard = (props: PoolProps) => {
         <Grid container justify="space-between" alignItems="center">
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
+              Staked
+            </Typography>
+          </Grid>
+          <Grid item xs={12}/>
+          <Grid item>
+            <Typography color="primary" variant="body2" style={{fontWeight: 500}}>
+              {currencyFormat(items.staked || 0)}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography color="textSecondary" variant="body2" >
+              Your stake&nbsp;{currencyFormat((items.stakePercent || 0) * 100) }%
+            </Typography>
+          </Grid>
+          <Grid item xs={12}/>
+          <Grid item>
+            <Typography color="textSecondary" variant="body2" >
               APR:
             </Typography>
           </Grid>
           <Grid item>
-            <ButtonBase>
+            <ButtonBase onClick={toggleRoi}>
               <Grid container alignItems="center" spacing={1}>
                 <Grid item>
                   <Typography color="primary" variant="body2" className={ css.percent }>
@@ -292,6 +313,7 @@ const PoolCard = (props: PoolProps) => {
         }
       </Formik>
     </Dialog>
+    <RoiModal open={openRoi} onClose={toggleRoi} tokenSymbol={coinInfo.symbol} tokenLink={"https://dex.apeswap.finance/#/swap"}/>
   </>
 }
 
