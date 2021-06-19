@@ -12,7 +12,7 @@ const GameCard = (props: GameCardProps ) => {
 
   return (
     <Card className={css.card}>
-      <ButtonBase className={ css.button } >
+      <ButtonBase className={ css.button } href="https://dragongaming.com/" target=" _blank" >
         <PlayIcon className={ css.playIcon } />
       </ButtonBase>
     </Card>
