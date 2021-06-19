@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   carouselContainer: {
     position: 'relative',
     width: '100%',
-    overflowX: 'hidden',
+    overflow: 'hidden',
   },
   slider:{
     overflowX: 'scroll',
