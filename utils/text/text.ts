@@ -1,5 +1,7 @@
 
-// Receives a number as Eth (normal) or gwei and transforms it into human readable currency
+/* 
+* Receives a number as Eth (normal) or gwei and transforms it into human readable currency
+*/
 export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, decimalsToShow?: number } ) => {
   const { isGwei = false, decimalsToShow } = options || {}
 
@@ -26,4 +28,16 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
 
   
   return `${joinIntegers || '0'}${decimalString}`
+}
+
+/*
+* Take a string for an address and return the first and final 4 digits of the address
+* this includes '0x'
+*/
+export const shortAddress = ( address: string ) => {
+  const addressChars = address.split('')
+  const itemsToDelete = addressChars.length - 8
+  if( itemsToDelete <= 0 ) return address
+  addressChars.splice(4, itemsToDelete, '...')
+  return addressChars.join('')
 }
