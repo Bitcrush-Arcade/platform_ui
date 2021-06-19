@@ -24,9 +24,9 @@ const Mining = () => {
 
   return <PageContainer background="galactic">
     <Grid container justify="space-evenly">
-      <Grid item xs={10} sm={8} md={6}>
+    <Grid item xs={10} sm={8} md={6}>
         <Descriptor
-          title="Galactic Mining"
+          title="Mining Pool"
           description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
             Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
             Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
@@ -57,21 +57,21 @@ const Mining = () => {
         </Card>
       </Grid>
     </Grid>
+    <Grid container justify="center" spacing={1} className={ css.section }>
+      <Grid item>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address}/>
+      </Grid>
+    </Grid>
     <Grid container justify="space-evenly" className={ css.section }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
-          title="Mining Pool"
+          title="Galactic Mining"
           description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
             Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
             Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
         />
       </Grid>
       <Grid item style={{ width: 280}} />
-    </Grid>
-    <Grid container justify="center" spacing={1} className={ css.section }>
-      <Grid item>
-        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address}/>
-      </Grid>
     </Grid>
   </PageContainer>
 }
