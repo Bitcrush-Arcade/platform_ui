@@ -1,5 +1,5 @@
 // React imports
-import React, { useState, Fragment } from 'react'
+import React, { useState, Fragment, useContext } from 'react'
 import { useImmer } from 'use-immer'
 // Next
 import { useRouter } from 'next/router'
@@ -25,6 +25,7 @@ import TelegramIcon from '@material-ui/icons/Telegram'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
+import { TransactionContext } from 'components/context/TransactionContext'
 // Utils
 import { currencyFormat } from 'utils/text/text'
 // Icons
@@ -41,6 +42,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
     const router = useRouter()
     const css = useStyles({ open })
+
+    const { tokenInfo } = useContext( TransactionContext )
 
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
@@ -130,7 +133,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         </Grid>
                         <Grid item>
                             <Typography variant="body2" color="textPrimary">
-                                $ {currencyFormat(114.256, { decimalsToShow: 2 })}
+                                $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 2 })}
                             </Typography>
                         </Grid>
                     </Grid>
