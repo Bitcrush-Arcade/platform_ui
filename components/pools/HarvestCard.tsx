@@ -6,7 +6,7 @@ import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
-import Button, {FabStyles} from 'components/basics/GeneralUseButton'
+import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 // utils
 import { currencyFormat } from 'utils/text/text'
