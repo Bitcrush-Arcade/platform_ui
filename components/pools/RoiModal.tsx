@@ -77,7 +77,7 @@ const RoiModal = ( props: RoiProps ) => {
       Calculated based on current rates. Compounding 288x daily. Rates are estimates provided for your convienience only and by no means represent guaranteed returns.
     </Typography>
     <Typography color="textSecondary" variant="caption" paragraph align="center" component="p">
-      All estimated rates take into account this pool's 3% performance fee.
+      All estimated rates take into account this pool&apos;s 3% performance fee.
     </Typography>
     <Grid container justify="center">
       <Button color="secondary" className={ css.getToken } href={tokenLink} target="_blank" disabled={!tokenLink}>
