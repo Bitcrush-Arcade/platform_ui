@@ -47,7 +47,6 @@ export const TransactionLoadingContext = ({ children })=>{
       if(!account || !methods) return
       const tokenBalance = await methods.balanceOf(account).call()
       const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
-      console.log('context', crushPrice)
       setCoinInfo( draft => {
         draft.weiBalance = tokenBalance
         draft.balance = +fromWei(`${tokenBalance}`)
