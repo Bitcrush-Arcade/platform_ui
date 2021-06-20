@@ -23,7 +23,7 @@ export const contracts : { [key: string] : { 56: string, 97:string, abi: any }} 
     abi: BitcrushRouter01.abi,
   },
   crushToken:{
-    56: '',
+    56: '0x0ef0626736c2d484a792508e99949736d0af807e',
     97: '0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6',
     abi: CrushToken.abi,
   },
