@@ -61,7 +61,7 @@ const PoolCard = (props: PoolProps) => {
 
   const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null, staked: 0, stakePercent: 0 })
+  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null, staked: 0, stakePercent: 0, profit: 0 })
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: ''})
 
   const isApproved = items.approved > 0
@@ -245,10 +245,28 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
           <Grid item xs={12}>
             <Collapse in={detailOpen}>
-              COLLAPSED INFO
-              <Button onClick={removeApproval}>
-                Remove Allowance
-              </Button>
+              <Grid container alignItems="flex-end" style={{marginTop: 24}}>
+                <Grid item xs={12}>
+                  <Typography variant="body2" color="primary" style={{ fontWeight: 600 }}>
+                    {coinInfo.symbol} Profit Earned
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography>
+                    {currencyFormat(items.profit || 0)}
+                  </Typography>
+                  <Typography color="textSecondary" variant="caption">
+                    USD {currencyFormat(items.profit || 0)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
+                    0.5% unstaking fee if withdrawn within 72h.{'\n'}
+                    Performance Fee 3%
+                  </Typography>
+                </Grid>
+              </Grid>
+
             </Collapse>
           </Grid>
         </Grid>
