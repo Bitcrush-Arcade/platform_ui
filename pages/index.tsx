@@ -1,3 +1,4 @@
+import Head from 'next/head'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
@@ -26,7 +27,12 @@ export default function Home() {
   const maxWin = totalValueLocked * 0.01
   const totalValueShared = 65010004.115487
 
-  return (
+  return (<>
+  <Head>
+    <title>BITCRUSH</title>
+    <meta name="description" content="The first hybrid DEFI Casino on BSC"/>
+    <meta name="author" content="Bitcrush"/>
+  </Head>
     <div>
       <PageContainer >
           <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500, whiteSpace: 'pre-line' }}>
@@ -133,7 +139,7 @@ export default function Home() {
           </Container>
       </PageContainer>
     </div>
-  )
+  </>)
 }
 
 const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyles({
