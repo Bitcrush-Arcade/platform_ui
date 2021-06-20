@@ -53,6 +53,7 @@ const PoolCard = (props: PoolProps) => {
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
   const [ openRoi, setOpenRoi ] = useState<boolean>(false)
+  const [ stakeAction, setStakeAction ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
 
   const triggerHydrate = useCallback(() => {
@@ -130,7 +131,7 @@ const PoolCard = (props: PoolProps) => {
   },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
 
   const maxBalance = +fromWei(`${items.balance}`)
-
+  const maxStaked = +fromWei(`${items.staked}`)
   const css = useStyles({})
 
   const amount = 0.00025423
@@ -286,7 +287,7 @@ const PoolCard = (props: PoolProps) => {
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
           const weiAmount = toWei(`${values.stakeAmount}`)
-          console.log('submit', weiAmount )
+          console.log('submit', weiAmount, stakeAction )
           // This isn't ready yet
           // return mainMethods.enterStaking(weiAmount).send({ from: account })
           //   .on('transactionHash', tx =>{
@@ -303,7 +304,9 @@ const PoolCard = (props: PoolProps) => {
         }}
         validate ={ ( values ) => {
           let errors: any = {}
-          if(values.stakeAmount > maxBalance )
+          if(!stakeAction && values.stakeAmount > maxBalance )
+            errors.stakeAmount = "Insufficient Funds"
+          if(stakeAction && values.stakeAmount > maxStaked )
             errors.stakeAmount = "Insufficient Funds"
           if(values.stakeAmount <= 0)
             errors.stakeAmount = "Invalid Input"
@@ -314,9 +317,21 @@ const PoolCard = (props: PoolProps) => {
       >
       { ({setFieldValue, isSubmitting}) =>
         <Form>
-          <Typography paragraph variant="body2" color="textSecondary" component="div" align="right">
-            {coinInfo.symbol}: {currencyFormat(items?.balance || 0, { isGwei: true })}
-          </Typography>
+          <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
+            <Grid item>
+              <MButton className={ css.stakeActionBtn } color={ !stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(false)}>
+                STAKE
+              </MButton>
+            </Grid>
+            <Grid item>
+              <Divider orientation="vertical"/>
+            </Grid>
+            <Grid item>
+              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(true)} disabled={items.staked <=0 }>
+                WITHDRAW
+              </MButton>
+            </Grid>
+          </Grid>
           <Field
             type="number"
             fullWidth
@@ -327,14 +342,19 @@ const PoolCard = (props: PoolProps) => {
             variant="outlined"
             component={TextField}
             InputProps={{
-              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxBalance )}>
+              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', stakeAction ? maxStaked : maxBalance )}>
                 MAX
               </MButton>,
               className: css.textField 
             }}
           />
+          <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
+            { stakeAction 
+                ? `Staked ${coinInfo.symbol}: ${currencyFormat(items?.staked || 0, { isGwei: true })} `
+                : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isGwei: true })} `}
+          </Typography>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
-            STAKE {coinInfo.symbol}
+            {stakeAction ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
           </Button>
         </Form>
         }
@@ -400,5 +420,15 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   tooltips:{
     padding: `${theme.spacing(2)}`
+  },
+  stakeActionBtn:{
+    fontWeight: 600,
+  },
+  stakeActionBtnContainer:{
+    marginBottom: theme.spacing(2),
+  },
+  currentTokenText:{
+    marginTop: theme.spacing(1),
+    paddingRight: theme.spacing(2)
   }
 }))
