@@ -16,6 +16,7 @@ import Dialog from '@material-ui/core/Dialog'
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
+import Tooltip from "@material-ui/core/Tooltip"
 // import TextField from '@material-ui/core/TextField'
 // Material Icons
 import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
@@ -41,7 +42,7 @@ import BigNumber from 'bignumber.js'
 import { fromWei, toWei } from 'web3-utils'
 
 const PoolCard = (props: PoolProps) => {
-  const { abi, tokenAddress, contractAddress, tokenAbi } = props
+  const { abi, tokenAddress, contractAddress, tokenAbi, infoText } = props
   // Web3
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(CrushCoin.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
@@ -224,7 +225,15 @@ const PoolCard = (props: PoolProps) => {
             <SmallButton size="small" color="primary" style={{marginRight: 8}}>
               <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
             </SmallButton>
-            <InfoOutlinedIcon color="disabled"/>
+            <Tooltip arrow
+              title={
+                <Typography className={ css.tooltip }>
+                  {infoText || "Any funds you stake in this pool will be automagically harvested and restaked (compounded) for you"}
+                </Typography>
+              }
+            >
+              <InfoOutlinedIcon color="disabled"/>
+            </Tooltip>
           </Grid>
           <Grid item xs={6} container alignItems="center" justify="flex-end">
             <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
@@ -324,6 +333,7 @@ type PoolProps = {
   contractAddress: string, // address
   tokenAddress ?: string //address
   tokenAbi?: any,
+  infoText?: string
 }
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
@@ -370,4 +380,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   submitBtn:{
     marginTop: theme.spacing(2)
   },
+  tooltips:{
+    padding: `${theme.spacing(2)}`
+  }
 }))
