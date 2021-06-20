@@ -4,7 +4,7 @@ import Fab, {FabProps} from '@material-ui/core/Fab'
 // Libs
 import { styledBy } from 'utils/styles/styling'
 
-type FabStyles ={
+export type FabStyles ={
   width?: string | number,
   href?: string,
   target?: string,
