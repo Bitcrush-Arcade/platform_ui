@@ -70,7 +70,7 @@ const PoolCard = (props: PoolProps) => {
     if(isApproved) 
       setOpenStakeModal( p => !p )
     else{
-      coinMethods.approve( contractAddress, parseInt(`${new BigNumber(items.balance).times(new BigNumber(10).pow(18))}`) ).send({ from: account, gasPrice: new BigNumber(10).pow(10) })
+      coinMethods.approve( contractAddress, parseInt(`${new BigNumber(items.balance).times(new BigNumber(10).pow(18))}`) ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
           editTransactions(tx,'pending')
