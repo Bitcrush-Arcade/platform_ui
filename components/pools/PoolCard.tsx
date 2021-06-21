@@ -137,7 +137,7 @@ const PoolCard = (props: PoolProps) => {
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
   const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
   const profitAmount = +fromWei(`${userProfit}`)
-  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(30000000).times( new BigNumber(10).pow(18)) ).times( new BigNumber(100) ) //missing total staked amount
+  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(30000000).times( new BigNumber(10).pow(18)) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = +fromWei(`${items.balance}`)
   const maxStaked = +fromWei(`${userStaked}`)
