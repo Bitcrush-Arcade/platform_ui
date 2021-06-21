@@ -1,18 +1,24 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Web3 from 'web3'
-import { AbiItem, fromWei } from 'web3-utils'
+import { fromWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { currencyFormat } from 'utils/text/text'
 import { getContracts } from 'data/contracts'
+import minuteDifference from 'date-fns/differenceInMinutes'
 
+let calculatedLast = new Date()
+let previousCalc = undefined
 
 export default async function getApy(req : NextApiRequest, res: NextApiResponse){
   // Check validity of request
   const body = JSON.parse(req.body || "{}" )
   const host = req.headers.host
   const isLocal = host.indexOf('localhost:') > -1
-  if( !isLocal && ( req.method !== 'GET' || !body.chainId ) )
+  if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
+  console.log('calculation',minuteDifference( new Date(), calculatedLast ) < 30, minuteDifference( new Date(), calculatedLast ) )
+  if( previousCalc && minuteDifference( new Date(), calculatedLast ) < 30 )
+    return res.status(304).json(previousCalc)
   // Fetch current crushPrice
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then( r => r.json() )
 
@@ -48,20 +54,29 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
       d30 = addedRewards + reward
   }
   const totalRewards = prev.reduce( (acc,val) => acc+val, 0)
-  return res.status(200).json({
+  previousCalc = {
     constants:{
       initialStake,
       initialPool: totalPool,
       price: price.crushUsdPrice,
     },
-    d1: d1,
-    d7: d7,
-    d30: d30,
-    d365: totalRewards,
-    pd1: currencyFormat(d1 / initialStake * 100, { decimalsToShow: 4}) + '%',
-    pd7: currencyFormat(d7 / initialStake * 100, { decimalsToShow: 4}) + '%',
-    pd30: currencyFormat(d30 / initialStake * 100, { decimalsToShow: 4}) + '%',
-    pd365: currencyFormat(totalRewards / initialStake * 100, { decimalsToShow: 4}) + '%',
-    totalPool: 1000000
-  })
+    d1: {
+      return: d1,
+      percent: currencyFormat(d1 / initialStake * 100, { decimalsToShow: 2}) + '%',
+    },
+    d7: {
+      return: d7,
+      percent: currencyFormat(d7 / initialStake * 100, { decimalsToShow: 2}) + '%',
+    },
+    d30: {
+      return: d30,
+      percent: currencyFormat(d30 / initialStake * 100, { decimalsToShow: 2}) + '%',
+    },
+    d365: {
+      return: totalRewards,
+      percent: currencyFormat(totalRewards / initialStake * 100, { decimalsToShow: 2}) + '%',
+    },
+  }
+  calculatedLast = new Date()
+  return res.status(200).json(previousCalc)
 }
