@@ -54,7 +54,7 @@ export const TransactionLoadingContext = ({ children })=>{
       })
     }
     getTokenInfo()
-  },[methods, account, hydration])
+  },[methods, account, hydration, setCoinInfo])
 
   useEffect( ()=>{
     const interval = setInterval( hydrate, 30000)

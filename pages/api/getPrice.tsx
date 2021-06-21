@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 
 
 
-export default async (req : NextApiRequest, res: NextApiResponse) => {
+export default async function getPrice(req : NextApiRequest, res: NextApiResponse){
 
   const web3 = new Web3( new Web3.providers.HttpProvider('https://bsc-dataseed4.binance.org/') )
 

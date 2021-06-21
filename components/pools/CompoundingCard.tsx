@@ -46,7 +46,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   useEffect( () => {
     const hydrateInterval = setInterval( toggleHydrate, 5000 )
     return () => clearInterval(hydrateInterval)
-  },[setHydrate])
+  },[setHydrate, toggleHydrate])
 
   const usdReward = tokenInfo.crushUsdPrice * rewardToDistribute
   console.log('view reward', rewardToDistribute, tokenInfo.crushUsdPrice, usdReward)
