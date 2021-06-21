@@ -111,10 +111,16 @@ const PoolCard = (props: PoolProps) => {
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods.stakings(account).call()
       const totalPool = await mainMethods.totalPool().call()
+      const perBlock = await mainMethods.crushPerBlock().call()
+      console.log('perBlock', perBlock, fromWei(perBlock) )
+      console.log('totalPool', totalPool, fromWei(totalPool) )
+      console.log('userInfo', userInfo)
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
-        draft.userInfo = userInfo
+        draft.userInfo.stakedAmount = +userInfo.stakedAmount
+        draft.userInfo.claimedAmount = +userInfo.claimedAmount
+        draft.userInfo.compoundedAmount = +userInfo.compoundedAmount
         draft.totalPool = totalPool
       })
     }
@@ -124,13 +130,12 @@ const PoolCard = (props: PoolProps) => {
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
   const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
   const profitAmount = +fromWei(`${userProfit}`)
-  const stakedPercent = userStaked / 30000000 //missing total staked amount
+  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(30000000).times( new BigNumber(10).pow(18)) ).times( new BigNumber(100) ) //missing total staked amount
 
   const maxBalance = +fromWei(`${items.balance}`)
   const maxStaked = +fromWei(`${userStaked}`)
   const css = useStyles({})
 
-  const amount = 0.00025423
   const apr = 1.5
 
 
@@ -158,12 +163,12 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}/>
           <Grid item>
             <Typography color="primary" variant="body2" style={{fontWeight: 500}}>
-              {currencyFormat(items.userInfo.stakedAmount || 0)}
+              {currencyFormat(maxStaked || 0)}
             </Typography>
           </Grid>
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
-              Your stake&nbsp;{currencyFormat((stakedPercent || 0) * 100) }%
+              Your stake&nbsp;{currencyFormat(stakedPercent || 0) }%
             </Typography>
           </Grid>
           <Grid item xs={12}/>
@@ -266,7 +271,18 @@ const PoolCard = (props: PoolProps) => {
                   </Typography>
                 </Grid>
               </Grid>
-
+              {/* TESTING */}
+              <Button onClick={ () => {
+                mainMethods.addRewardToPool( 5000 ).send({ from: account })
+                  .on('transactionHash', tx => editTransactions(tx, 'pending'))
+                  .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
+                  .on('error', (error, receipt) => {
+                    receipt.transactionHash && editTransactions(receipt.transactionHash, 'error')
+                    console.log('error', error)
+                  })
+              }}>
+                ADD REWARD TO POOL
+              </Button>
             </Collapse>
           </Grid>
         </Grid>

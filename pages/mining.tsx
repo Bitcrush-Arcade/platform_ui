@@ -1,24 +1,20 @@
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import CardContent from "@material-ui/core/CardContent"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
-import Button from 'components/basics/GeneralUseButton'
-import Card from 'components/basics/Card'
+import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
 // libs
-import { currencyFormat } from "utils/text/text"
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
+import { useContract } from "hooks/web3Hooks"
 
 const Mining = () => {
 
   const css = useStyles({})
   const { chainId } = useWeb3React()
-
-  const distributionAmount = 0
 
   const firstPool = getContracts('singleAsset', chainId )
   const token = getContracts('crushToken', chainId )
@@ -34,28 +30,7 @@ const Mining = () => {
         />
       </Grid>
       <Grid item>
-        <Card background="light" shadow="dark" className={ css.claimCard } >
-          <CardContent className={ css.cardContent }>
-            <Typography className={ css.cardTitle } paragraph>
-              House Profit Distribution
-            </Typography>
-            <Grid container justify="space-between" alignItems="flex-end">
-              <Grid item>
-                <Typography color="primary" variant="h5" component="p">
-                  {currencyFormat(distributionAmount, { decimalsToShow: 4 })}
-                </Typography>
-                <Typography color="textSecondary" variant="caption" component="p">
-                  $&nbsp;{currencyFormat(distributionAmount, { decimalsToShow: 2 })}
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Button size="small" width={80} color="primary">
-                  Claim
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
+        <CompoundingCard/>
       </Grid>
     </Grid>
     <Grid container justify="center" spacing={1} className={ css.section }>
@@ -80,21 +55,11 @@ const Mining = () => {
 export default Mining
 
 const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
-  cardTitle:{
-    fontWeight: 'bold'
-  },
-  cardContent:{
-    padding: theme.spacing(3)
-  },
+  
   section:{
     marginTop: theme.spacing(4)
   },
-  claimCard:{
-    [theme.breakpoints.down('sm')]:{
-      marginTop: theme.spacing(4)
-    },
-    width: 280,
-  },
+  
 }))
 
 const useDescriptorStyles = makeStyles<Theme, {}>( (theme) => createStyles({
