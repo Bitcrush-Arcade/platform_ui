@@ -20,7 +20,8 @@ const Mining = () => {
 
   const distributionAmount = 0
 
-  const firstPool = getContracts('masterChef', chainId )
+  const firstPool = getContracts('singleAsset', chainId )
+  const token = getContracts('crushToken', chainId )
 
   return <PageContainer background="galactic">
     <Grid container justify="space-evenly">
@@ -59,7 +60,7 @@ const Mining = () => {
     </Grid>
     <Grid container justify="center" spacing={1} className={ css.section }>
       <Grid item>
-        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address}/>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
       </Grid>
     </Grid>
     <Grid container justify="space-evenly" className={ css.section }>

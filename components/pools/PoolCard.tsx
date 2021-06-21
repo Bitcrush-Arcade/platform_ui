@@ -36,7 +36,6 @@ import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
 import { TransactionContext } from 'components/context/TransactionContext'
 // CONTRACTS
-import CrushCoin from 'abi/CrushToken.json'
 import { useImmer } from 'use-immer'
 import BigNumber from 'bignumber.js'
 import { fromWei, toWei } from 'web3-utils'
@@ -45,7 +44,7 @@ const PoolCard = (props: PoolProps) => {
   const { abi, tokenAddress, contractAddress, tokenAbi, infoText } = props
   // Web3
   const { account, chainId } = useWeb3React()
-  const { contract: coinContract, methods: coinMethods } = useContract(CrushCoin.abi, "0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6")
+  const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
   const { contract: mainContract, methods: mainMethods } = useContract(abi, contractAddress)
   // Context
   const { editTransactions } = useContext(TransactionContext)
