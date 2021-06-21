@@ -126,6 +126,11 @@ const PoolCard = (props: PoolProps) => {
     }
     getPoolData()
   },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
+
+  useEffect(() => {
+    const hydrateInterval = setInterval(triggerHydrate,5000)
+    return () => clearInterval(hydrateInterval)
+  },[setHydrate])
   
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
   const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
@@ -301,7 +306,7 @@ const PoolCard = (props: PoolProps) => {
           stakeAmount: 0
         }}
         onSubmit={ ( values ) => {
-          const weiAmount = toWei(`${values.stakeAmount}`)
+          const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
           console.log('submit', weiAmount, stakeAction )
           if(stakeAction)
             return mainMethods.leaveStaking(weiAmount).send({ from: account })
