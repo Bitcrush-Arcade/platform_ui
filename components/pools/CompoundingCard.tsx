@@ -19,9 +19,9 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const css = useStyles({})
 
-  const { chainId } = useWeb3React()
+  const { chainId, account } = useWeb3React()
 
-  const { tokenInfo } = useContext( TransactionContext )
+  const { tokenInfo, editTransactions } = useContext( TransactionContext )
   const stakeContract = getContracts('singleAsset', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<number>(0)
@@ -50,6 +50,16 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const usdReward = tokenInfo.crushUsdPrice * rewardToDistribute
   console.log('view reward', rewardToDistribute, tokenInfo.crushUsdPrice, usdReward)
 
+  const claim = () => {
+    methods.compoundAll().send({ from: account })
+      .on('transactionHash', tx => editTransactions(tx, 'pending'))
+      .on('receipt', rct => editTransactions(rct.transactionHash, 'complete'))
+      .on('error', (error, rct) => {
+        console.log('error compounding', error)
+        rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
+      } )
+  }
+
   return <Card background="light" shadow="dark" className={ css.claimCard } >
     <CardContent className={ css.cardContent }>
       <Grid container justify="space-between" alignItems="center">
@@ -71,7 +81,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary">
+          <Button size="small" width={80} color="primary" onClick={claim}>
             Claim
           </Button>
         </Grid>
