@@ -61,7 +61,7 @@ const PoolCard = (props: PoolProps) => {
 
   const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0 })
+  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
 
   const isApproved = items.approved > 0
@@ -112,9 +112,10 @@ const PoolCard = (props: PoolProps) => {
       const userInfo = await mainMethods.stakings(account).call()
       const totalPool = await mainMethods.totalPool().call()
       const perBlock = await mainMethods.crushPerBlock().call()
+      const pending = await mainMethods.pendingReward(account).call()
       console.log('perBlock', perBlock, fromWei(perBlock) )
       console.log('totalPool', totalPool, fromWei(totalPool) )
-      console.log('userInfo', userInfo)
+      console.log('staked', +userInfo.stakedAmount, 'claimed', +userInfo.claimedAmount, 'compounded',+userInfo.compoundedAmount , 'pending', pending)
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -122,6 +123,7 @@ const PoolCard = (props: PoolProps) => {
         draft.userInfo.claimedAmount = +userInfo.claimedAmount
         draft.userInfo.compoundedAmount = +userInfo.compoundedAmount
         draft.totalPool = totalPool
+        draft.pendingReward = pending
       })
     }
     getPoolData()
