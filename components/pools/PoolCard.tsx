@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useContext } from 'react'
+import { useImmer } from 'use-immer'
 // web3
 import { useWeb3React } from '@web3-react/core'
 import { Formik, Form, Field } from 'formik'
@@ -24,19 +25,17 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Bitcrush
 import Card from 'components/basics/Card'
-import RoiModal from 'components/pools/RoiModal'
+import Button from 'components/basics/GeneralUseButton'
+import RoiModal, { RoiProps } from 'components/pools/RoiModal'
+import SmallButton from 'components/basics/SmallButton'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
-import Button from 'components/basics/GeneralUseButton'
-import SmallButton from 'components/basics/SmallButton'
 import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
 import { TransactionContext } from 'components/context/TransactionContext'
-// CONTRACTS
-import { useImmer } from 'use-immer'
 import BigNumber from 'bignumber.js'
 import { fromWei, toWei } from 'web3-utils'
 
@@ -54,6 +53,7 @@ const PoolCard = (props: PoolProps) => {
   const [ openRoi, setOpenRoi ] = useState<boolean>(false)
   const [ stakeAction, setStakeAction ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
+  const [apyData, setApyData] = useState<RoiProps['apyData']>(undefined)
 
   const triggerHydrate = useCallback(() => {
     setHydrate( p => !p )
@@ -65,6 +65,17 @@ const PoolCard = (props: PoolProps) => {
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
 
   const isApproved = items.approved > 0
+
+  useEffect(() => {
+    fetch('/api/getAPY',{
+      method: 'POST',
+      body: JSON.stringify({
+        chainId
+      })
+    })
+    .then( response => response.json() )
+    .then( data => setApyData(data) )
+  },[chainId])
   
   const buttonAction = () =>{
     if(isApproved) 
@@ -189,7 +200,7 @@ const PoolCard = (props: PoolProps) => {
               <Grid container alignItems="center" spacing={1}>
                 <Grid item>
                   <Typography color="primary" variant="body2" className={ css.percent }>
-                    {apr * 100}%
+                    {apyData?.d365?.percent || '--%'}
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -394,7 +405,13 @@ const PoolCard = (props: PoolProps) => {
         }
       </Formik>
     </Dialog>
-    <RoiModal open={openRoi} onClose={toggleRoi} tokenSymbol={coinInfo.symbol} tokenLink={"https://dex.apeswap.finance/#/swap"}/>
+    <RoiModal
+      open={openRoi}
+      onClose={toggleRoi}
+      tokenSymbol={coinInfo.symbol}
+      tokenLink={"https://dex.apeswap.finance/#/swap"}
+      apyData={apyData}
+    />
   </>
 }
 

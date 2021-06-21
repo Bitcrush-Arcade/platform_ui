@@ -17,9 +17,11 @@ import CloseIcon from "@material-ui/icons/Close"
 import OpenNew from '@material-ui/icons/OpenInNew';
 // Bitcrush
 import Card from 'components/basics/Card'
+// utils
+import { currencyFormat } from 'utils/text/text'
 
 const RoiModal = ( props: RoiProps ) => {
-  const { open, onClose, tokenLink, tokenSymbol } = props
+  const { open, onClose, tokenLink, tokenSymbol, apyData } = props
 
   const css = useStyles({})
 
@@ -52,23 +54,23 @@ const RoiModal = ( props: RoiProps ) => {
       <TableBody>
         <TableRow>
           <TableCell>1d</TableCell>
-          <TableCell align="right">0.21%</TableCell>
-          <TableCell align="right">0.13</TableCell>
+          <TableCell align="right">{apyData?.d1?.percent || '-'}</TableCell>
+          <TableCell align="right">{apyData?.d1?.return && currencyFormat(apyData?.d1?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>7d</TableCell>
-          <TableCell align="right">1.42%</TableCell>
-          <TableCell align="right">0.88</TableCell>
+          <TableCell align="right">{apyData?.d7?.percent || '-'}</TableCell>
+          <TableCell align="right">{apyData?.d7?.return && currencyFormat(apyData?.d7?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>30d</TableCell>
-          <TableCell align="right">6.26%</TableCell>
-          <TableCell align="right">3.87</TableCell>
+          <TableCell align="right">{apyData?.d30?.percent || '-'}</TableCell>
+          <TableCell align="right">{apyData?.d30?.return && currencyFormat(apyData?.d30?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>365d (APY)</TableCell>
-          <TableCell align="right">109.36%</TableCell>
-          <TableCell align="right">67.6</TableCell>
+          <TableCell align="right">{apyData?.d365?.percent || '-'}</TableCell>
+          <TableCell align="right">{apyData?.d365?.return && currencyFormat(apyData?.d365?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
       </TableBody>
     </Table>
@@ -89,11 +91,22 @@ const RoiModal = ( props: RoiProps ) => {
 
 export default RoiModal
 
-type RoiProps = {
+export type RoiProps = {
   open: boolean,
   onClose: () => void,
   tokenSymbol: string,
   tokenLink: string,
+  apyData?:{
+    d1: ROIData,
+    d7: ROIData,
+    d30: ROIData,
+    d365: ROIData,
+  }
+}
+
+type ROIData = {
+  return: number,
+  percent: string,
 }
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
