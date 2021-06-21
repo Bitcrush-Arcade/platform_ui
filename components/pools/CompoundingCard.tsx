@@ -30,6 +30,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
   
   useEffect(() => {
+    if(!methods) return
     async function getRewards(){
       const totalPending = await methods.totalPendingRewards().call()
       const claimFee = await methods.PerformanceFeeCompounder().call()
@@ -40,7 +41,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       setRewardToDistribute( (+fromWei(totalPending)) * claimFee/1000 )
     }
     getRewards()
-  },[hydrate])
+  },[hydrate,methods])
 
   useEffect( () => {
     const hydrateInterval = setInterval( toggleHydrate, 5000 )
