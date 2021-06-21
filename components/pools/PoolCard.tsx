@@ -127,12 +127,12 @@ const PoolCard = (props: PoolProps) => {
       })
     }
     getPoolData()
-  },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
+  },[coinContract, account, coinMethods, mainMethods, setItems, chainId, hydrate, contractAddress])
 
   useEffect(() => {
     const hydrateInterval = setInterval(triggerHydrate,5000)
     return () => clearInterval(hydrateInterval)
-  },[setHydrate])
+  },[ setHydrate, triggerHydrate ])
   
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
   const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
