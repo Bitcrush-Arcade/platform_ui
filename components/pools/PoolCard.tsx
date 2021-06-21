@@ -47,7 +47,7 @@ const PoolCard = (props: PoolProps) => {
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
   const { contract: mainContract, methods: mainMethods } = useContract(abi, contractAddress)
   // Context
-  const { editTransactions } = useContext(TransactionContext)
+  const { editTransactions, tokenInfo } = useContext(TransactionContext)
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
@@ -61,8 +61,8 @@ const PoolCard = (props: PoolProps) => {
 
   const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: null, staked: 0, stakePercent: 0, profit: 0 })
-  const [coinInfo, setCoinInfo] = useState({ name: '', symbol: ''})
+  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0 })
+  const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
 
   const isApproved = items.approved > 0
   
@@ -70,7 +70,7 @@ const PoolCard = (props: PoolProps) => {
     if(isApproved) 
       setOpenStakeModal( p => !p )
     else{
-      coinMethods.approve( contractAddress, new BigNumber(items.balance).times(new BigNumber(10).pow(18)) ).send({ from: account, gasPrice: new BigNumber(10).pow(10) })
+      coinMethods.approve( contractAddress, parseInt(`${new BigNumber(items.balance).times(new BigNumber(10).pow(18))}`) ).send({ from: account, gasPrice: new BigNumber(10).pow(10) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
           editTransactions(tx,'pending')
@@ -82,21 +82,9 @@ const PoolCard = (props: PoolProps) => {
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
-          editTransactions(receipt.transactionHash, 'error', error)
+          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
     }
-  }
-
-  const removeApproval = () => {
-    coinMethods.decreaseAllowance( contractAddress, items.approved ).send({ from: account, gas: 60000, gasPrice: new BigNumber(10).pow(10) })
-      .on('transactionHash', (tx) => {
-        console.log('hash', tx )
-        return tx
-      })
-      .on('receipt', ( rc) => {
-        console.log('receipt',rc)
-        triggerHydrate()
-      })
   }
 
   const { action: cardPreStake } = useWithWallet({ action: buttonAction })
@@ -106,9 +94,11 @@ const PoolCard = (props: PoolProps) => {
     const getCoinData = async () => {
       const tokenName = await coinMethods.name().call()
       const tokenSymbol = await coinMethods.symbol().call()
+      const tokenDecimals = await coinMethods.decimals().call()
       setCoinInfo({
         name: tokenName,
         symbol: tokenSymbol,
+        decimals: tokenDecimals
       })
     }
     getCoinData()
@@ -119,22 +109,30 @@ const PoolCard = (props: PoolProps) => {
       if(!coinContract || !account || [97].indexOf(chainId) == -1 ) return
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
-      const userInfo = await mainMethods.userInfo(0, account).call()
+      const userInfo = await mainMethods.stakings(account).call()
+      const totalPool = await mainMethods.totalPool().call()
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
         draft.userInfo = userInfo
+        draft.totalPool = totalPool
       })
     }
     getPoolData()
   },[coinContract, account, coinMethods, setItems, chainId, hydrate, contractAddress])
+  
+  const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
+  const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
+  const profitAmount = +fromWei(`${userProfit}`)
+  const stakedPercent = userStaked / 30000000 //missing total staked amount
 
   const maxBalance = +fromWei(`${items.balance}`)
-  const maxStaked = +fromWei(`${items.staked}`)
+  const maxStaked = +fromWei(`${userStaked}`)
   const css = useStyles({})
 
   const amount = 0.00025423
   const apr = 1.5
+
 
   return <>
     <Card background="light" className={ css.card } >
@@ -160,12 +158,12 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}/>
           <Grid item>
             <Typography color="primary" variant="body2" style={{fontWeight: 500}}>
-              {currencyFormat(items.staked || 0)}
+              {currencyFormat(items.userInfo.stakedAmount || 0)}
             </Typography>
           </Grid>
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
-              Your stake&nbsp;{currencyFormat((items.stakePercent || 0) * 100) }%
+              Your stake&nbsp;{currencyFormat((stakedPercent || 0) * 100) }%
             </Typography>
           </Grid>
           <Grid item xs={12}/>
@@ -196,12 +194,12 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
             <Typography variant="h5" component="div" color="primary">
               {account 
-                ? currencyFormat(amount, { decimalsToShow: 8 })
+                ? currencyFormat(profitAmount, { decimalsToShow: 8 })
                 : "--.--"
               }
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              $&nbsp;{account ? currencyFormat(amount, { decimalsToShow: 2 }) : "--.--"} USD
+              $&nbsp;{account ? currencyFormat( profitAmount * tokenInfo.crushUsdPrice , { decimalsToShow: 2 }) : "--.--"} USD
             </Typography>
           </Grid>
           <Grid item>
@@ -210,7 +208,9 @@ const PoolCard = (props: PoolProps) => {
             </Button>}
           </Grid>
         </Grid>
-        <Button width="100%" color="primary" onClick={cardPreStake}>
+        <Button width="100%" color="primary" onClick={cardPreStake} 
+          // disabled={items.totalPool == 0}
+        >
           { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
               : "Unlock Wallet"}
@@ -253,10 +253,10 @@ const PoolCard = (props: PoolProps) => {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography>
-                    {currencyFormat(items.profit || 0)}
+                    {currencyFormat(userProfit || 0)}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
-                    USD {currencyFormat(items.profit || 0)}
+                    USD {currencyFormat(userProfit || 0)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -284,22 +284,34 @@ const PoolCard = (props: PoolProps) => {
         initialValues = {{
           stakeAmount: 0
         }}
-        onSubmit={ ( values, { setSubmitting } ) => {
+        onSubmit={ ( values ) => {
           const weiAmount = toWei(`${values.stakeAmount}`)
           console.log('submit', weiAmount, stakeAction )
-          // This isn't ready yet
-          // return mainMethods.enterStaking(weiAmount).send({ from: account })
-          //   .on('transactionHash', tx =>{
-          //     editTransactions(tx,'pending')
-          //   })
-          //   .on('receipt', rc => {
-          //     editTransactions(rc.transactionHash, 'complete')
-
-          //   })
-          //   .on('error', (error, receipt) => {
-          //     receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-          //   })
-          setSubmitting(false)
+          if(stakeAction)
+            return mainMethods.leaveStaking(weiAmount).send({ from: account })
+              .on('transactionHash', tx =>{
+                editTransactions(tx,'pending')
+              })
+              .on('receipt', rc => {
+                editTransactions(rc.transactionHash, 'complete')
+                triggerHydrate()
+              })
+              .on('error', (error, receipt) => {
+                receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+                triggerHydrate()
+              })
+          return mainMethods.enterStaking(weiAmount).send({ from: account })
+            .on('transactionHash', tx =>{
+              editTransactions(tx,'pending')
+            })
+            .on('receipt', rc => {
+              editTransactions(rc.transactionHash, 'complete')
+              triggerHydrate()
+            })
+            .on('error', (error, receipt) => {
+              receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+              triggerHydrate()
+            })
         }}
         validate ={ ( values ) => {
           let errors: any = {}
@@ -326,7 +338,7 @@ const PoolCard = (props: PoolProps) => {
               <Divider orientation="vertical"/>
             </Grid>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(true)} disabled={items.staked <=0 }>
+              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(true)} disabled={ userStaked <=0 }>
                 WITHDRAW
               </MButton>
             </Grid>
@@ -349,7 +361,7 @@ const PoolCard = (props: PoolProps) => {
           />
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
             { stakeAction 
-                ? `Staked ${coinInfo.symbol}: ${currencyFormat(items?.staked || 0, { isGwei: true })} `
+                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isGwei: true })} `
                 : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isGwei: true })} `}
           </Typography>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
