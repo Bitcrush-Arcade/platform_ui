@@ -67,10 +67,11 @@ const PoolCard = (props: PoolProps) => {
   const isApproved = items.approved > 0
 
   useEffect(() => {
+    if(!chainId) return
     fetch('/api/getAPY',{
       method: 'POST',
       body: JSON.stringify({
-        chainId
+        chainId: chainId
       })
     })
     .then( response => response.json() )
