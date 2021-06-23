@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from "react"
+import { useState, useEffect, useContext, useCallback, useMemo } from "react"
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from "@material-ui/core/Grid"
@@ -7,13 +7,15 @@ import CardContent from "@material-ui/core/CardContent"
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
+import { TransactionContext } from "components/context/TransactionContext"
 // libs
 import { currencyFormat } from 'utils/text/text'
-import { TransactionContext } from "components/context/TransactionContext"
-import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "hooks/web3Hooks"
 import { fromWei } from "web3-utils"
+// data
+import { getContracts } from "data/contracts"
+import BigNumber from 'bignumber.js'
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
@@ -24,7 +26,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const { tokenInfo, editTransactions } = useContext( TransactionContext )
   const stakeContract = getContracts('singleAsset', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
-  const [rewardToDistribute, setRewardToDistribute ] = useState<number>(0)
+  const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
   
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
@@ -34,11 +36,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     async function getRewards(){
       const totalPending = await methods.totalPendingRewards().call()
       const claimFee = await methods.PerformanceFeeCompounder().call()
-      const burnFee = await methods.PerformanceFeeBurn().call()
-      const reserveFee = await methods.PerformanceFeeReserve().call()
-      console.log('claimFee',claimFee, burnFee, reserveFee )
-      console.log('method reward', totalPending, fromWei(totalPending), +fromWei(totalPending))
-      setRewardToDistribute( (+fromWei(totalPending)) * claimFee/1000 )
+      setRewardToDistribute( new BigNumber(fromWei(totalPending)).times(claimFee).div(1000)  )
     }
     getRewards()
   },[hydrate,methods])
@@ -48,8 +46,10 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     return () => clearInterval(hydrateInterval)
   },[setHydrate, toggleHydrate])
 
-  const usdReward = tokenInfo.crushUsdPrice * rewardToDistribute
-  console.log('view reward', rewardToDistribute, tokenInfo.crushUsdPrice, usdReward)
+  const usdReward = useMemo( () => {
+    console.log('view reward', rewardToDistribute.toFixed(), tokenInfo.crushUsdPrice, usdReward)
+    return rewardToDistribute.times(tokenInfo.crushUsdPrice)
+  }, [rewardToDistribute, tokenInfo])
 
   const claim = () => {
     methods.compoundAll().send({ from: account })
@@ -75,10 +75,10 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
           <Typography color="primary" variant="h5" component="p">
-            {currencyFormat(rewardToDistribute, { decimalsToShow: 8 })}
+            {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4 })}
           </Typography>
           <Typography color="textSecondary" variant="caption" component="p">
-            $&nbsp;{currencyFormat(usdReward, { decimalsToShow: 2 })}
+            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2 })}
           </Typography>
         </Grid>
         <Grid item>
