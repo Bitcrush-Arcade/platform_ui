@@ -4,6 +4,9 @@ import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
 import CardContent from "@material-ui/core/CardContent"
+import Tooltip from "@material-ui/core/Tooltip"
+// Icons
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
@@ -12,7 +15,6 @@ import { TransactionContext } from "components/context/TransactionContext"
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "hooks/web3Hooks"
-import { fromWei } from "web3-utils"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
@@ -36,7 +38,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     async function getRewards(){
       const totalPending = await methods.totalPendingRewards().call()
       const claimFee = await methods.PerformanceFeeCompounder().call()
-      setRewardToDistribute( new BigNumber(fromWei(totalPending)).times(claimFee).div(1000)  )
+      setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(1000)  )
     }
     getRewards()
   },[hydrate,methods])
@@ -47,7 +49,6 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   },[setHydrate, toggleHydrate])
 
   const usdReward = useMemo( () => {
-    console.log('view reward', rewardToDistribute.toFixed(), tokenInfo.crushUsdPrice, usdReward)
     return rewardToDistribute.times(tokenInfo.crushUsdPrice)
   }, [rewardToDistribute, tokenInfo])
 
@@ -70,13 +71,30 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          info
+          <Tooltip
+            arrow
+            title={
+              <Typography variant="body2" style={{ whiteSpace: 'pre-line', margin: 8}}>
+                This bounty is given as a reward for prividing a service to other users.{'\n\n'}
+                Whenever you successfully claim the bounty, you're also helping out by activating the Auto CRUSH Pool's compounding function for everyone.{'\n\n'}
+                <strong>
+                  Auto-compound Bounty of 0.1% of all Auto CRUSH pool users pending yield.
+                </strong>
+              </Typography>
+            }
+          >
+            <InfoIcon color="disabled"/>
+          </Tooltip>
         </Grid>
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
-          <Typography color="primary" variant="h5" component="p">
-            {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4 })}
-          </Typography>
+          <Tooltip title={<Typography>
+            {rewardToDistribute.toFixed()}
+          </Typography>} arrow>
+            <Typography color="primary" variant="h5" component="p">
+              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4 })}
+            </Typography>
+          </Tooltip>
           <Typography color="textSecondary" variant="caption" component="p">
             $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2 })}
           </Typography>
