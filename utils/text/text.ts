@@ -6,7 +6,7 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
   const { isGwei = false, decimalsToShow } = options || {}
 
   const numberAsString = (isGwei
-    ? new BigNumber(amount).times( new BigNumber(10).pow(18) )
+    ? new BigNumber(amount).div( new BigNumber(10).pow(18) )
     : new BigNumber(amount) ).toFixed(18)
   const [integers, decimals] = numberAsString.split('.')
   const splitIntegers = integers.split('')
