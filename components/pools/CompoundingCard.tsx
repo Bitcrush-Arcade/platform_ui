@@ -76,7 +76,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
             title={
               <Typography variant="body2" style={{ whiteSpace: 'pre-line', margin: 8}}>
                 This bounty is given as a reward for prividing a service to other users.{'\n\n'}
-                Whenever you successfully claim the bounty, you're also helping out by activating the Auto CRUSH Pool's compounding function for everyone.{'\n\n'}
+                Whenever you successfully claim the bounty, you&apos;re also helping out by activating the Auto CRUSH Pool&apos;s compounding function for everyone.{'\n\n'}
                 <strong>
                   Auto-compound Bounty of 0.1% of all Auto CRUSH pool users pending yield.
                 </strong>
