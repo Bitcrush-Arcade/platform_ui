@@ -1,4 +1,4 @@
-
+import BigNumber from "bignumber.js"
 /* 
 * Receives a number as Eth (normal) or gwei and transforms it into human readable currency
 */
@@ -6,8 +6,8 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
   const { isGwei = false, decimalsToShow } = options || {}
 
   const numberAsString = (isGwei
-    ? amount/( 10 ** 18 )
-    : amount ).toString()
+    ? new BigNumber(amount).times( new BigNumber(10).pow(18) )
+    : new BigNumber(amount) ).toFixed(18)
   const [integers, decimals] = numberAsString.split('.')
   const splitIntegers = integers.split('')
   const integerAmount = integers.split('').length
@@ -24,7 +24,24 @@ export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, deci
     ? (decimals || new Array(decimalsToShow).fill(0).join('')).slice(0, decimalsToShow)
     : decimals
 
-  const decimalString = decimalsToShow === 0 ? '' : `.${allDecimals || '00'}`
+  const reviewDecimals = (allDecimals || '00').split('')
+  const decimalLength  = reviewDecimals.length
+  let significantReached = false
+  const finalDecimals = []
+  reviewDecimals.map( (d,i) => {
+    const index = decimalLength - 1 - i
+    if( 
+      decimalsToShow && index <= decimalsToShow 
+      || decimalsToShow == undefined && index < 2 
+      || significantReached 
+      || +reviewDecimals[index] > 0
+    ){
+      significantReached = true
+      return finalDecimals.unshift(reviewDecimals[index])
+    }
+  })
+
+  const decimalString = decimalsToShow === 0 ? '' : `.${finalDecimals.join('')}`
 
   
   return `${joinIntegers || '0'}${decimalString}`
