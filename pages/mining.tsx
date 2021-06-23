@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
@@ -16,8 +17,8 @@ const Mining = () => {
   const css = useStyles({})
   const { chainId } = useWeb3React()
 
-  const firstPool = getContracts('singleAsset', chainId )
-  const token = getContracts('crushToken', chainId )
+  const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
+  const token = useMemo( () => getContracts('crushToken', chainId ), [chainId])
 
   return <PageContainer background="galactic">
     <Grid container justify="space-evenly">
