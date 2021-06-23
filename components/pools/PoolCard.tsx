@@ -447,8 +447,8 @@ const PoolCard = (props: PoolProps) => {
           />
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
             { stakeAction 
-                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isGwei: true })} `
-                : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isGwei: true })} `}
+                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isWei: true })} `
+                : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isWei: true })} `}
           </Typography>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
             {stakeAction ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}

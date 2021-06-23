@@ -2,10 +2,10 @@ import BigNumber from "bignumber.js"
 /* 
 * Receives a number as Eth (normal) or gwei and transforms it into human readable currency
 */
-export const currencyFormat = ( amount: number, options?:{isGwei?: boolean, decimalsToShow?: number } ) => {
-  const { isGwei = false, decimalsToShow } = options || {}
+export const currencyFormat = ( amount: number, options?:{isWei?: boolean, decimalsToShow?: number } ) => {
+  const { isWei = false, decimalsToShow } = options || {}
 
-  const numberAsString = (isGwei
+  const numberAsString = (isWei
     ? new BigNumber(amount).div( new BigNumber(10).pow(18) )
     : new BigNumber(amount) ).toFixed(18)
   const [integers, decimals] = numberAsString.split('.')
