@@ -31,8 +31,8 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const emission = await contract.methods.crushPerBlock().call()
   const totalStaked = fromWei( await contract.methods.totalStaked().call() )
   const performanceFee = 0.03
-  const compoundEmitted = 97 // emission * (1 - performanceFee) * 100
-  const totalPool = parseFloat(totalStaked) || 1000000
+  const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).times(100).toNumber()
+  const totalPool = new BigNumber(totalStaked).toNumber() || 1000000
   
   let d1 = 0
   let d7 = 0
