@@ -16,7 +16,6 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const isLocal = host.indexOf('localhost:') > -1
   if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
-  console.log('calculation',minuteDifference( new Date(), calculatedLast ) < 30, minuteDifference( new Date(), calculatedLast ) )
   if( previousCalc && minuteDifference( new Date(), calculatedLast ) < 30 )
     return res.status(304).json(previousCalc)
   // Fetch current crushPrice
