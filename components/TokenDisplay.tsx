@@ -15,12 +15,13 @@ type TokenDisplayProps ={
   color: 'primary' | 'secondary',
   amount: number,
   icon: JSX.Element,
-  actions: Array< { name: string, onClick?: () => void, url?: string } >
+  actions?: Array< { name: string, onClick?: () => void, url?: string } >,
+  symbol?: string
 }
 
 const TokenDisplay = ( props: TokenDisplayProps ) => {
 
-  const { amount, icon, actions, color } = props
+  const { amount, icon, actions, color, symbol } = props
   const [ showActions, setShowActions ] = useState<boolean>(false)
 
   const css = useStyles({ showActions, ...props })
@@ -37,15 +38,15 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" spacing={1} aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color}>
-            $&nbsp;{currencyFormat(amount)}
+            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true })}
           </Typography>
         </Grid>
         <Grid item>
           {icon}
         </Grid>
-        <Grid item>
+        {actions && <Grid item>
           <ArrowDropIcon fontSize="small" className={ css.dropdown }/>
-        </Grid>
+        </Grid>}
       </Grid>
     </ButtonBase>
     <Menu

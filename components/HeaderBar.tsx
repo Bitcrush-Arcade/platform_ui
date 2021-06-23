@@ -74,7 +74,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
             </Grid> */}
             <Grid item className={ css.dropOnSm }>
-              <TokenDisplay amount={tokenInfo.balance} icon={<Coin scale={0.25}/>} color="primary" actions={token1Actions} />
+              <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" />
             </Grid>
             <Grid item className={ css.dropOnSm }>
               <ConnectButton/>
