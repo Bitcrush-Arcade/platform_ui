@@ -183,13 +183,19 @@ const PoolCard = (props: PoolProps) => {
   },[ setHydrate, triggerHydrate ])
   
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
-  const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
-  const profitAmount = +fromWei(`${userProfit}`)
+  const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount + items.pendingReward) || 0
+  const pendingRewards = (items.userInfo.compoundedAmount + items.pendingReward) || 0
   const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = +fromWei(`${items.balance}`)
   const maxStaked = +fromWei(`${userStaked}`)
   const css = useStyles({})
+
+  const shownInfo = useCallback( ( amount: number, decimals?: number ) => {
+    if(!account)
+      return "--.--"
+    return currencyFormat(amount, { decimalsToShow: decimals, isWei: true })
+  },[account])
 
   return <>
     <Card background="light" className={ css.card } >
@@ -220,7 +226,7 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
-              Your stake&nbsp;{currencyFormat(stakedPercent || 0) }%
+              Your stake&nbsp;{currencyFormat(stakedPercent || 0, { decimalsToShow: 6 }) }%
             </Typography>
           </Grid>
           <Grid item xs={12}/>
@@ -250,13 +256,10 @@ const PoolCard = (props: PoolProps) => {
               {coinInfo.symbol} EARNED
             </Typography>
             <Typography variant="h5" component="div" color="primary">
-              {account 
-                ? currencyFormat(profitAmount, { decimalsToShow: 8 })
-                : "--.--"
-              }
+              {shownInfo(pendingRewards, 8)}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              $&nbsp;{account ? currencyFormat( profitAmount * tokenInfo.crushUsdPrice , { decimalsToShow: 2 }) : "--.--"} USD
+              $&nbsp;{shownInfo(pendingRewards * tokenInfo.crushUsdPrice, 2)} USD
             </Typography>
           </Grid>
           <Grid item>
@@ -310,10 +313,10 @@ const PoolCard = (props: PoolProps) => {
                 </Grid>
                 <Grid item xs={6}>
                   <Typography>
-                    {currencyFormat(userProfit || 0)}
+                    {currencyFormat(userProfit || 0, { isWei: true})}
                   </Typography>
                   <Typography color="textSecondary" variant="caption">
-                    USD {currencyFormat(userProfit || 0)}
+                    USD {currencyFormat(userProfit || 0, { isWei: true, decimalsToShow: 2})}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
