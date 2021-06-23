@@ -123,11 +123,7 @@ const PoolCard = (props: PoolProps) => {
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods.stakings(account).call()
       const totalPool = await mainMethods.totalPool().call()
-      const perBlock = await mainMethods.crushPerBlock().call()
       const pending = await mainMethods.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
-      console.log('perBlock', perBlock, fromWei(perBlock) )
-      console.log('totalPool', totalPool, fromWei(totalPool) )
-      console.log('staked', +userInfo.stakedAmount, 'claimed', +userInfo.claimedAmount, 'compounded',+userInfo.compoundedAmount ,'pending', pending)
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -233,7 +229,7 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
         </Grid>
         <Button width="100%" color="primary" onClick={cardPreStake} 
-          // disabled={items.totalPool == 0}
+          disabled={items.totalPool == 0}
         >
           { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
