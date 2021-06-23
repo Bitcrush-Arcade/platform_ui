@@ -59,6 +59,10 @@ const PoolCard = (props: PoolProps) => {
     setHydrate( p => !p )
   }, [setHydrate])
 
+  const FormComponent = useCallback( p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>, [] )
+
+  const toggleStakeModal = useCallback( () => setOpenStakeModal(p => !p), [setOpenStakeModal] )
+
   const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
 
   const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
@@ -82,7 +86,7 @@ const PoolCard = (props: PoolProps) => {
     if(isApproved) 
       setOpenStakeModal( p => !p )
     else{
-      coinMethods.approve( contractAddress, parseInt(`${new BigNumber(items.balance).times(new BigNumber(10).pow(18))}`) ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
+      coinMethods.approve( contractAddress, new BigNumber(items.balance).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
           editTransactions(tx,'pending')
@@ -100,6 +104,39 @@ const PoolCard = (props: PoolProps) => {
   }
 
   const { action: cardPreStake } = useWithWallet({ action: buttonAction })
+
+  const harvest = () => {
+    mainMethods?.claim().send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending')
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        triggerHydrate()
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  }
+  const manualCompound = () => {
+    mainMethods?.singleCompound().send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending')
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        triggerHydrate()
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  }
 
   useEffect(()=>{
     if(!coinMethods) return
@@ -123,7 +160,9 @@ const PoolCard = (props: PoolProps) => {
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods.stakings(account).call()
       const totalPool = await mainMethods.totalPool().call()
+      const totalStaked = await mainMethods.totalStaked().call()
       const pending = await mainMethods.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
+      console.log('pending',pending)
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -131,6 +170,7 @@ const PoolCard = (props: PoolProps) => {
         draft.userInfo.claimedAmount = +userInfo.claimedAmount
         draft.userInfo.compoundedAmount = +userInfo.compoundedAmount
         draft.totalPool = totalPool
+        draft.totalStaked = totalStaked
         draft.pendingReward = pending
       })
     }
@@ -145,14 +185,11 @@ const PoolCard = (props: PoolProps) => {
   const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
   const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount) || 0
   const profitAmount = +fromWei(`${userProfit}`)
-  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(30000000).times( new BigNumber(10).pow(18)) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
+  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = +fromWei(`${items.balance}`)
   const maxStaked = +fromWei(`${userStaked}`)
   const css = useStyles({})
-
-  const apr = 1.5
-
 
   return <>
     <Card background="light" className={ css.card } >
@@ -223,13 +260,13 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
           </Grid>
           <Grid item>
-            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px">
+            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest}>
               Harvest
             </Button>}
           </Grid>
         </Grid>
         <Button width="100%" color="primary" onClick={cardPreStake} 
-          disabled={items.totalPool == 0}
+          // disabled={items.totalPool == 0}
         >
           { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
@@ -242,7 +279,7 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 8}}>
+            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound}>
               <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
             </SmallButton>
             <Tooltip arrow
@@ -288,15 +325,26 @@ const PoolCard = (props: PoolProps) => {
               </Grid>
               {/* TESTING */}
               <Button onClick={ () => {
-                mainMethods.addRewardToPool( 5000 ).send({ from: account })
+                mainMethods.addRewardToPool( new BigNumber(5000).times( new BigNumber(10).pow(18) ) ).send({ from: account })
                   .on('transactionHash', tx => editTransactions(tx, 'pending'))
                   .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
                   .on('error', (error, receipt) => {
-                    receipt.transactionHash && editTransactions(receipt.transactionHash, 'error')
+                    receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error')
                     console.log('error', error)
                   })
               }}>
                 ADD REWARD TO POOL
+              </Button>
+              <Button onClick={ () => {
+                coinMethods.approve( contractAddress, 0 ).send({ from: account })
+                  .on('transactionHash', tx => editTransactions(tx, 'pending'))
+                  .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
+                  .on('error', (error, receipt) => {
+                    receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error')
+                    console.log('error', error)
+                  })
+              }}>
+                DISPROVE CONTRACT
               </Button>
             </Collapse>
           </Grid>
@@ -307,9 +355,9 @@ const PoolCard = (props: PoolProps) => {
         STAKING FORM
     */}
     <Dialog 
-      PaperComponent={p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>}
+      PaperComponent={FormComponent}
       open={openStakeModal}
-      onBackdropClick={ () => setOpenStakeModal(false) }
+      onBackdropClick={ toggleStakeModal }
     >
       <Formik
         initialValues = {{
