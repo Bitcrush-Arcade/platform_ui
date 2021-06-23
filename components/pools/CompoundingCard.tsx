@@ -67,7 +67,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       <Grid container justify="space-between" alignItems="center">
         <Grid item>
           <Typography className={ css.cardTitle }>
-            House Profit Distribution
+            CRUSH Auto Bounty
           </Typography>
         </Grid>
         <Grid item>
