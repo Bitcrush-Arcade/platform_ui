@@ -47,8 +47,8 @@ const RoiModal = ( props: RoiProps ) => {
       <TableHead>
         <TableRow>
           <TableCell>Timeframe</TableCell>
-          <TableCell>ROI</TableCell>
-          <TableCell>Per $1000</TableCell>
+          <TableCell align="center">ROI</TableCell>
+          <TableCell align="center">Per $1000</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -114,7 +114,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3),
     boxShadow: 'none',
     minWidth: 320,
-    maxWidth: 360,
+    maxWidth: 640,
   },
   divider:{
     marginTop: theme.spacing(2),
