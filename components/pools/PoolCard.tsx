@@ -365,31 +365,34 @@ const PoolCard = (props: PoolProps) => {
         }}
         onSubmit={ ( values ) => {
           const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
-          console.log('submit', weiAmount, stakeAction )
           if(stakeAction)
-            return mainMethods.leaveStaking(weiAmount).send({ from: account })
+            return mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending')
               })
               .on('receipt', rc => {
                 editTransactions(rc.transactionHash, 'complete')
                 triggerHydrate()
+                openStakeModal && toggleStakeModal()
               })
               .on('error', (error, receipt) => {
                 receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
                 triggerHydrate()
+                openStakeModal && toggleStakeModal()
               })
-          return mainMethods.enterStaking(weiAmount).send({ from: account })
+          return mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
             .on('transactionHash', tx =>{
               editTransactions(tx,'pending')
             })
             .on('receipt', rc => {
               editTransactions(rc.transactionHash, 'complete')
               triggerHydrate()
+              openStakeModal && toggleStakeModal()
             })
             .on('error', (error, receipt) => {
               receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
               triggerHydrate()
+              openStakeModal && toggleStakeModal()
             })
         }}
         validate ={ ( values ) => {
