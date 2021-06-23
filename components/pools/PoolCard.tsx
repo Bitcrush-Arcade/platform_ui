@@ -363,10 +363,10 @@ const PoolCard = (props: PoolProps) => {
         initialValues = {{
           stakeAmount: 0
         }}
-        onSubmit={ ( values ) => {
+        onSubmit={ ( values, { setSubmitting } ) => {
           const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
           if(stakeAction)
-            return mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
+            mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending')
               })
@@ -374,13 +374,15 @@ const PoolCard = (props: PoolProps) => {
                 editTransactions(rc.transactionHash, 'complete')
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
+                setSubmitting(false)
               })
               .on('error', (error, receipt) => {
                 receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
+                setSubmitting(false)
               })
-          return mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
+          else mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
             .on('transactionHash', tx =>{
               editTransactions(tx,'pending')
             })
@@ -388,11 +390,13 @@ const PoolCard = (props: PoolProps) => {
               editTransactions(rc.transactionHash, 'complete')
               triggerHydrate()
               openStakeModal && toggleStakeModal()
+              setSubmitting(false)
             })
             .on('error', (error, receipt) => {
               receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
               triggerHydrate()
               openStakeModal && toggleStakeModal()
+              setSubmitting(false)
             })
         }}
         validate ={ ( values ) => {
