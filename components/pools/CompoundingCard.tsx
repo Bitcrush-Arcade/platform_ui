@@ -92,11 +92,11 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
             {rewardToDistribute.toFixed()}
           </Typography>} arrow>
             <Typography color="primary" variant="h5" component="p">
-              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4 })}
+              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4, isWei: true })}
             </Typography>
           </Tooltip>
           <Typography color="textSecondary" variant="caption" component="p">
-            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2 })}
+            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2, isWei: true })}
           </Typography>
         </Grid>
         <Grid item>
