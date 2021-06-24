@@ -107,9 +107,8 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     minHeight: '100vh',
     maxWidth: '100vw',
     position: 'relative',
-    background: props => props.background == 'galactic' ? undefined
-      : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 100% )`,
-    zIndex: -2,
+    // background: props => props.background == 'galactic' ? undefined
+    //   : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 100% )`,
     // backgroundPosition: 'top left',
     // backgroundAttachment: 'fixed',
     // backgroundSize: '100% auto',
