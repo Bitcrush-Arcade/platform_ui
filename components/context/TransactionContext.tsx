@@ -4,7 +4,6 @@ import { createContext, useEffect, useState } from 'react'
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
 import { useWeb3React } from '@web3-react/core'
-import { fromWei } from 'web3-utils'
 // data
 import { contracts } from 'data/contracts'
 // hooks
@@ -15,7 +14,7 @@ type ContextType = {
   completed: Array<string>,
   error: Array<{ id: string, data: any }>,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => void,
-  tokenInfo: { weiBalance: number , balance: number, crushUsdPrice: number}
+  tokenInfo: { weiBalance: number , crushUsdPrice: number}
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -23,7 +22,7 @@ export const TransactionContext = createContext<ContextType>({
   completed: [],
   error: [],
   editTransactions: () => {},
-  tokenInfo: { weiBalance: 0, balance: 0, crushUsdPrice: 0 }
+  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 }
 })
 
 export const TransactionLoadingContext = ({ children })=>{
@@ -37,7 +36,7 @@ export const TransactionLoadingContext = ({ children })=>{
   const [ completedArray, setCompletedArray ] = useImmer<Array<string>>([])
   const [ errorArray, setErrorArray ] = useImmer<Array<{ id: string, data: any }>>([])
 
-  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, balance: 0, crushUsdPrice: 0})
+  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [hydration, setHydration] = useState<boolean>(false)
 
   const hydrate = () => setHydration(p => !p)
@@ -49,7 +48,6 @@ export const TransactionLoadingContext = ({ children })=>{
       const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
       setCoinInfo( draft => {
         draft.weiBalance = tokenBalance
-        draft.balance = +fromWei(`${tokenBalance}`)
         draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
       })
     }
