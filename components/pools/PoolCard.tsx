@@ -37,7 +37,7 @@ import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
 import { TransactionContext } from 'components/context/TransactionContext'
 import BigNumber from 'bignumber.js'
-import { fromWei, toWei } from 'web3-utils'
+import { toWei } from 'web3-utils'
 
 const PoolCard = (props: PoolProps) => {
   const { abi, tokenAddress, contractAddress, tokenAbi, infoText } = props
@@ -187,8 +187,8 @@ const PoolCard = (props: PoolProps) => {
   const pendingRewards = (items.userInfo.compoundedAmount + items.pendingReward) || 0
   const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
-  const maxBalance = +fromWei(`${items.balance}`)
-  const maxStaked = +fromWei(`${userStaked}`)
+  const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
+  const maxStaked = new BigNumber(userStaked).div( new BigNumber(10).pow(18) )
   const css = useStyles({})
 
   const shownInfo = useCallback( ( amount: number, decimals?: number ) => {
