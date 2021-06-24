@@ -404,9 +404,9 @@ const PoolCard = (props: PoolProps) => {
         }}
         validate ={ ( values ) => {
           let errors: any = {}
-          if(!stakeAction && values.stakeAmount > maxBalance )
+          if(!stakeAction && new BigNumber(values.stakeAmount).isGreaterThan( maxBalance ) )
             errors.stakeAmount = "Insufficient Funds"
-          if(stakeAction && values.stakeAmount > maxStaked )
+          if(stakeAction && new BigNumber(values.stakeAmount).isGreaterThan( maxStaked ) )
             errors.stakeAmount = "Insufficient Funds"
           if(values.stakeAmount <= 0)
             errors.stakeAmount = "Invalid Input"
