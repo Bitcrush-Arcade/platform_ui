@@ -2,7 +2,7 @@ import BigNumber from "bignumber.js"
 /* 
 * Receives a number as Eth (normal) or gwei and transforms it into human readable currency
 */
-export const currencyFormat = ( amount: number, options?:{isWei?: boolean, decimalsToShow?: number } ) => {
+export const currencyFormat = ( amount: number | string, options?:{isWei?: boolean, decimalsToShow?: number } ) => {
   const { isWei = false, decimalsToShow } = options || {}
 
   const numberAsString = (isWei
