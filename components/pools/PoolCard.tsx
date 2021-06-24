@@ -221,7 +221,7 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}/>
           <Grid item>
             <Typography color="primary" variant="body2" style={{fontWeight: 500}}>
-              {currencyFormat(maxStaked || 0)}
+              {currencyFormat(maxStaked.toFixed(18) || 0)}
             </Typography>
           </Grid>
           <Grid item>
