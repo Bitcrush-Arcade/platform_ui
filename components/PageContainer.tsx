@@ -1,5 +1,6 @@
 // React
 import { useState, ReactNode, useEffect, useContext } from 'react'
+import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
@@ -28,6 +29,10 @@ const PageContainer = ( props: ContainerProps ) => {
 
   const { pending, completed } = useContext(TransactionContext)
 
+  const backgroundImgSrc = props.background !== 'galactic' 
+    ? { url: "/backgrounds/CenteredBaseBackground.png", width: 1615, height: 944}
+    : { url: "/backgrounds/Galactic.jpg", width: 1920, height: 1467 }
+
   useEffect( ()=>{
 
     console.log('container', pending, completed )
@@ -49,6 +54,9 @@ const PageContainer = ( props: ContainerProps ) => {
       {pending.length > 0 && <LinearProgress/>}
       {children}
     </Container>
+    <div className={css.img}>
+      <Image src={backgroundImgSrc.url} layout="responsive" width={backgroundImgSrc.width} height={backgroundImgSrc.height}/>
+    </div>
   </div>
 }
 
@@ -72,16 +80,39 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
-  fullContainer:{
-    backgroundImage: styledBy( 'background', {
-      default: 'url("/backgrounds/BaseBackground.jpg")',
-      galactic: 'url("/backgrounds/Galactic.jpg")',
+  img:{
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: -1,
+    paddingLeft: props => props.background == 'galactic' ? 0
+      : theme.spacing(9),
+    [theme.breakpoints.up('md')]:{
+      paddingLeft: props => props.background!== 'galactic'
+        ? props.menuToggle ? theme.spacing(30) : theme.spacing(9)
+        : 0,
+    },
+    transition: theme.transitions.create('padding', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
     }),
+  },
+  fullContainer:{
+    // backgroundImage: styledBy( 'background', {
+    //   default: 'url("/backgrounds/CenteredBaseBackground.png")',
+    //   galactic: 'url("/backgrounds/Galactic.jpg")',
+    // }),
     minHeight: '100vh',
     maxWidth: '100vw',
-    backgroundPosition: 'top left',
-    backgroundAttachment: 'fixed',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat',
-  }
+    position: 'relative',
+    background: props => props.background == 'galactic' ? undefined
+      : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 100% )`,
+    zIndex: -2,
+    // backgroundPosition: 'top left',
+    // backgroundAttachment: 'fixed',
+    // backgroundSize: '100% auto',
+    // backgroundRepeat: 'no-repeat',
+  } 
 }))
