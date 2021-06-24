@@ -55,7 +55,7 @@ const PageContainer = ( props: ContainerProps ) => {
       {children}
     </Container>
     <div className={css.img}>
-      <Image src={backgroundImgSrc.url} layout="responsive" width={backgroundImgSrc.width} height={backgroundImgSrc.height}/>
+      <Image src={backgroundImgSrc.url} layout="responsive" width={backgroundImgSrc.width} height={backgroundImgSrc.height} />
     </div>
   </div>
 }
@@ -89,6 +89,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     zIndex: -1,
     paddingLeft: props => props.background == 'galactic' ? 0
       : theme.spacing(9),
+    paddingBottom: theme.spacing(4),
     [theme.breakpoints.up('md')]:{
       paddingLeft: props => props.background!== 'galactic'
         ? props.menuToggle ? theme.spacing(30) : theme.spacing(9)
@@ -98,20 +99,11 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    background: props=> props.background =='galactic' ? undefined : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 40%, rgb(0,0,0) 95%, ${theme.palette.background.default} 100%)`
   },
   fullContainer:{
-    // backgroundImage: styledBy( 'background', {
-    //   default: 'url("/backgrounds/CenteredBaseBackground.png")',
-    //   galactic: 'url("/backgrounds/Galactic.jpg")',
-    // }),
     minHeight: '100vh',
     maxWidth: '100vw',
     position: 'relative',
-    // background: props => props.background == 'galactic' ? undefined
-    //   : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 100% )`,
-    // backgroundPosition: 'top left',
-    // backgroundAttachment: 'fixed',
-    // backgroundSize: '100% auto',
-    // backgroundRepeat: 'no-repeat',
-  } 
+  },
 }))
