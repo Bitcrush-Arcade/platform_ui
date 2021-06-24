@@ -55,7 +55,7 @@ const ProfileAvatar = () => {
         <ListItem>
           <ListItemText
             primary={ hasAccount 
-              ? currencyFormat(tokenInfo.balance) 
+              ? currencyFormat(tokenInfo.weiBalance, { isWei: true }) 
               : "No data"}
             secondary={"Current CRUSH"}
           />
