@@ -5,17 +5,34 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "@binance-chain/bsc-connector": "^1.0.0",
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",
-    "next": "10.2.2",
+    "@web3-react/core": "^6.1.9",
+    "@web3-react/injected-connector": "^6.0.7",
+    "@web3-react/walletconnect-connector": "^6.2.0",
+    "bignumber.js": "^9.0.1",
+    "date-fns": "^2.22.1",
+    "ethers": "^5.3.1",
+    "formik": "^2.2.9",
+    "formik-material-ui": "^3.0.1",
+    "immer": "^9.0.3",
+    "lodash": "^4.17.21",
+    "next": "^11.0.0",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "react-router-dom": "^5.2.0",
+    "use-immer": "^0.5.2",
+    "web3": "^1.3.6"
   },
   "devDependencies": {
-    "typescript": "^4.2.4"
+    "eslint": "^7.28.0",
+    "eslint-config-next": "^11.0.0",
+    "typescript": "^4.3.3"
   }
 }
