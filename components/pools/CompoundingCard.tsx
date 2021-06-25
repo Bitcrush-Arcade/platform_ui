@@ -36,9 +36,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   useEffect(() => {
     if(!methods) return
     async function getRewards(){
+      const totalPool = await methods.totalPool().call()
       const totalPending = await methods.totalPendingRewards().call()
       const claimFee = await methods.PerformanceFeeCompounder().call()
-      setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(1000)  )
+      if( new BigNumber(totalPool).isLessThanOrEqualTo(0) )
+        setRewardToDistribute( new BigNumber(0) )
+      else 
+        setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(1000)  )
     }
     getRewards()
   },[hydrate,methods])
@@ -89,7 +93,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
           <Tooltip title={<Typography>
-            {rewardToDistribute.toFixed()}
+            {rewardToDistribute.div( new BigNumber(10).pow(18) ).toFixed(18)}
           </Typography>} arrow>
             <Typography color="primary" variant="h5" component="p">
               {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4, isWei: true })}

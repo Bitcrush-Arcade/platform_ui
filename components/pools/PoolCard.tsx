@@ -163,7 +163,6 @@ const PoolCard = (props: PoolProps) => {
       const totalPool = await mainMethods.totalPool().call()
       const totalStaked = await mainMethods.totalStaked().call()
       const pending = await mainMethods.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
-      console.log('pending',pending)
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -183,9 +182,9 @@ const PoolCard = (props: PoolProps) => {
     return () => clearInterval(hydrateInterval)
   },[ setHydrate, triggerHydrate ])
   
-  const userStaked = (items.userInfo.stakedAmount + items.userInfo.compoundedAmount) || 0
-  const userProfit = (items.userInfo.claimedAmount + items.userInfo.compoundedAmount + items.pendingReward) || 0
-  const pendingRewards = (items.userInfo.compoundedAmount + items.pendingReward) || 0
+  const userStaked = new BigNumber(items.userInfo.stakedAmount).plus(items.userInfo.compoundedAmount).toNumber()
+  const userProfit = new BigNumber(items.userInfo.claimedAmount).plus(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
+  const pendingRewards = new BigNumber(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
   const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
@@ -197,7 +196,7 @@ const PoolCard = (props: PoolProps) => {
       return "--.--"
     return currencyFormat(amount, { decimalsToShow: decimals, isWei: true })
   },[account])
-
+  
   const InvaderThumb = useCallback( (allProps: {thumbProps: any, percent: BigNumber}) => {
     const isMax = allProps.percent.toNumber() === 100
     return(
