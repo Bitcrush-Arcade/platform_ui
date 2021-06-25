@@ -39,4 +39,7 @@ interface BackgroundMapping {
   light: string,
 }
 
-export default withStyles(styles)( (props: CardStyles) => <Card {...props}/> )
+export default withStyles(styles)( (props: CardStyles) => {
+  const { noBorder, ...cardProps} = props
+  return <Card {...cardProps}/>
+} )

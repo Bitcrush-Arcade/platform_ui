@@ -5,7 +5,8 @@ import Fab, {FabProps} from '@material-ui/core/Fab'
 import { styledBy } from 'utils/styles/styling'
 
 type FabStyles = {
-  color?: 'primary' | 'secondary'
+  color?: 'primary' | 'secondary',
+  hasIcon?: boolean
 } & WithStyles< typeof styles > & FabProps
 
 const styles = (theme: Theme) => createStyles({
@@ -26,9 +27,13 @@ const styles = (theme: Theme) => createStyles({
   label:{
     fontSize: theme.typography.caption.fontSize,
     fontWeight: 400, 
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(1),
+    paddingLeft: props => props.hasIcon ? theme.spacing(1) : 0,
+    paddingRight: props => props.hasIcon ? theme.spacing(1) : 0,
+    paddingTop: props => props.hasIcon ? 0 : theme.spacing(0.5)
   },
 })
 
-export default withStyles(styles)( (props: FabStyles) => <Fab {...props} variant="extended" />)
+export default withStyles(styles)( (props: FabStyles) => {
+  const { hasIcon, ...filteredProps } = props
+  return <Fab {...filteredProps} variant="extended" />
+})
