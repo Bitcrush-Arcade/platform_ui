@@ -16,6 +16,7 @@ import Collapse from "@material-ui/core/Collapse"
 import Dialog from '@material-ui/core/Dialog'
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
+import Slider from '@material-ui/core/Slider'
 import Typography from "@material-ui/core/Typography"
 import Tooltip from "@material-ui/core/Tooltip"
 // import TextField from '@material-ui/core/TextField'
@@ -197,6 +198,19 @@ const PoolCard = (props: PoolProps) => {
     return currencyFormat(amount, { decimalsToShow: decimals, isWei: true })
   },[account])
 
+  const InvaderThumb = useCallback( (allProps: {thumbProps: any, percent: BigNumber}) => {
+    const isMax = allProps.percent.toNumber() === 100
+    return(
+      <span {...allProps.thumbProps}>
+        <div style={{position: 'relative'}}>
+          <InvaderIcon color="secondary" style={{position: 'absolute',left: -12, bottom: -10}}/>
+          <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
+            { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
+          </Typography>
+        </div>
+      </span>
+  )},[])
+
   return <>
     <Card background="light" className={ css.card } >
       <CardHeader classes={{ action: css.headerAction }}
@@ -263,7 +277,7 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
           </Grid>
           <Grid item>
-            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest}>
+            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest} disabled={ pendingRewards == 0 }>
               Harvest
             </Button>}
           </Grid>
@@ -282,7 +296,7 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound}>
+            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound} hasIcon>
               <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
             </SmallButton>
             <Tooltip arrow
@@ -415,8 +429,14 @@ const PoolCard = (props: PoolProps) => {
         }}
         validateOnChange
       >
-      { ({setFieldValue, isSubmitting}) =>
-        <Form>
+      { ({values, setFieldValue, isSubmitting}) =>{
+        const maxUsed = stakeAction ? maxStaked : maxBalance
+        const percent = new BigNumber(values.stakeAmount).div( maxUsed ).times(100)
+        const sliderChange = (e: any, value: number) => {
+          const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
+          setFieldValue('stakeAmount', newValue)
+        }
+        return(<Form>
           <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
             <Grid item>
               <MButton className={ css.stakeActionBtn } color={ !stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(false)}>
@@ -432,32 +452,55 @@ const PoolCard = (props: PoolProps) => {
               </MButton>
             </Grid>
           </Grid>
+          <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
+            { stakeAction 
+                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isWei: true })} `
+                : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isWei: true })} `}
+          </Typography>
           <Field
             type="number"
             fullWidth
-            label={`${coinInfo.name} to stake`}
+            label={stakeAction ? 'Withdraw Amount' : `Stake Amount`}
             id="stakeAmount"
             name="stakeAmount"
             placeholder="0.00"
             variant="outlined"
             component={TextField}
             InputProps={{
-              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', stakeAction ? maxStaked : maxBalance )}>
+              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxUsed )}>
                 MAX
               </MButton>,
               className: css.textField 
             }}
           />
-          <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            { stakeAction 
-                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isWei: true })} `
-                : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isWei: true })} `}
-          </Typography>
+          <div className={ css.sliderContainer }>
+            <Slider
+              value={ percent.toNumber() }
+              onChange={sliderChange}
+              step={ 10 }
+              ThumbComponent={p => <InvaderThumb thumbProps={p} percent={percent}/>}
+              valueLabelDisplay="on"
+            />
+          </div>
+          <Grid container justify="space-evenly">
+            <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
+              25%
+            </SmallButton>
+            <SmallButton color="primary" onClick={() => sliderChange(null,50)}>
+              50%
+            </SmallButton>
+            <SmallButton color="primary" onClick={() => sliderChange(null,75)}>
+              75%
+            </SmallButton>
+            <SmallButton color="primary" onClick={() => sliderChange(null,100)}>
+              MAX
+            </SmallButton>
+          </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
             {stakeAction ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
           </Button>
-        </Form>
-        }
+        </Form>)
+        }}
       </Formik>
     </Dialog>
     <RoiModal
@@ -519,7 +562,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   textField:{
     borderRadius: theme.spacing(4),
-    paddingLeft: theme.spacing(3),
+    paddingLeft: theme.spacing(1),
   },
   submitBtn:{
     marginTop: theme.spacing(2)
@@ -531,10 +574,13 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     fontWeight: 600,
   },
   stakeActionBtnContainer:{
-    marginBottom: theme.spacing(2),
+    marginBottom: theme.spacing(0.5),
   },
   currentTokenText:{
-    marginTop: theme.spacing(1),
+    marginBottom: theme.spacing(1.5),
     paddingRight: theme.spacing(2)
-  }
+  },
+  sliderContainer:{
+    padding: theme.spacing(2),
+  },
 }))
