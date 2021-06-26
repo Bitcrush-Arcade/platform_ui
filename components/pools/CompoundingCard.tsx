@@ -39,10 +39,11 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       const totalPool = await methods.totalPool().call()
       const totalPending = await methods.totalPendingRewards().call()
       const claimFee = await methods.PerformanceFeeCompounder().call()
+      const divisor = await methods.Divisor().call()
       if( new BigNumber(totalPool).isLessThanOrEqualTo(0) )
         setRewardToDistribute( new BigNumber(0) )
       else 
-        setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(1000)  )
+        setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(divisor)  )
     }
     getRewards()
   },[hydrate,methods])
