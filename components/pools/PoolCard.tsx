@@ -184,7 +184,7 @@ const PoolCard = (props: PoolProps) => {
   
   const userStaked = new BigNumber(items.userInfo.stakedAmount).plus(items.userInfo.compoundedAmount).toNumber()
   const userProfit = new BigNumber(items.userInfo.claimedAmount).plus(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
-  const pendingRewards = new BigNumber(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
+  const pendingRewards = new BigNumber(items.pendingReward).toNumber()
   const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
