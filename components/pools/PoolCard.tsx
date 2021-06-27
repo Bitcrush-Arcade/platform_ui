@@ -342,7 +342,7 @@ const PoolCard = (props: PoolProps) => {
               </Grid>
               {/* TESTING */}
               <Button onClick={ () => {
-                mainMethods.addRewardToPool( new BigNumber(5000).times( new BigNumber(10).pow(18).toNumber() ) ).send({ from: account })
+                mainMethods.addRewardToPool( new BigNumber(5000).times( new BigNumber(10).pow(18).toFixed(0,1) ) ).send({ from: account })
                   .on('transactionHash', tx => editTransactions(tx, 'pending'))
                   .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
                   .on('error', (error, receipt) => {

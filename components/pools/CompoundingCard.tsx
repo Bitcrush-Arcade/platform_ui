@@ -60,9 +60,12 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const claim = () => {
     methods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending'))
-      .on('receipt', rct => editTransactions(rct.transactionHash, 'complete'))
+      .on('receipt', rct =>{
+        editTransactions(rct.transactionHash, 'complete')
+        console.log('receipt', rct)
+      })
       .on('error', (error, rct) => {
-        console.log('error compounding', error)
+        console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
       } )
   }
