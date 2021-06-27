@@ -168,7 +168,6 @@ const PoolCard = (props: PoolProps) => {
         draft.approved = approved
         draft.userInfo.stakedAmount = +userInfo.stakedAmount
         draft.userInfo.claimedAmount = +userInfo.claimedAmount
-        draft.userInfo.compoundedAmount = +userInfo.compoundedAmount
         draft.totalPool = totalPool
         draft.totalStaked = totalStaked
         draft.pendingReward = pending
@@ -182,9 +181,9 @@ const PoolCard = (props: PoolProps) => {
     return () => clearInterval(hydrateInterval)
   },[ setHydrate, triggerHydrate ])
   
-  const userStaked = new BigNumber(items.userInfo.stakedAmount).plus(items.userInfo.compoundedAmount).toNumber()
-  const userProfit = new BigNumber(items.userInfo.claimedAmount).plus(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
-  const pendingRewards = new BigNumber(items.userInfo.compoundedAmount).plus(items.pendingReward).toNumber()
+  const userStaked = new BigNumber(items.userInfo.stakedAmount).toNumber()
+  const userProfit = new BigNumber(items.userInfo.claimedAmount).plus(items.pendingReward).toNumber()
+  const pendingRewards = new BigNumber(items.pendingReward).toNumber()
   const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
 
   const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
@@ -325,11 +324,13 @@ const PoolCard = (props: PoolProps) => {
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography>
-                    {currencyFormat(userProfit || 0, { isWei: true})}
-                  </Typography>
+                  <Tooltip title={currencyFormat(userProfit || 0, { isWei: true})}>
+                    <Typography noWrap style={{ maxWidth: '95%'}}>
+                      {currencyFormat(userProfit || 0, { isWei: true})}
+                    </Typography>
+                  </Tooltip>
                   <Typography color="textSecondary" variant="caption">
-                    USD {currencyFormat(userProfit || 0, { isWei: true, decimalsToShow: 2})}
+                    USD {currencyFormat((userProfit || 0)*tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2})}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -380,9 +381,14 @@ const PoolCard = (props: PoolProps) => {
           stakeAmount: 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
+          const maxUsed = stakeAction ? maxStaked : maxBalance
+          const percent = new BigNumber(values.stakeAmount).div( maxUsed ).times(100)
           const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
-          if(stakeAction)
-            mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
+          if(stakeAction){
+            (percent.isLessThan(100) 
+              ? mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
+              : mainMethods.leaveStakingCompletely().send({ from: account })
+            )
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending')
               })
@@ -391,14 +397,16 @@ const PoolCard = (props: PoolProps) => {
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
+                setStakeAction(false)
               })
               .on('error', (error, receipt) => {
                 receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
+                setStakeAction(false)
               })
-          else mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
+          }else mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
             .on('transactionHash', tx =>{
               editTransactions(tx,'pending')
             })
