@@ -385,10 +385,7 @@ const PoolCard = (props: PoolProps) => {
           const percent = new BigNumber(values.stakeAmount).div( maxUsed ).times(100)
           const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
           if(stakeAction){
-            (percent.isLessThan(100) 
-              ? mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
-              : mainMethods.leaveStakingCompletely().send({ from: account })
-            )
+            mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending')
               })
