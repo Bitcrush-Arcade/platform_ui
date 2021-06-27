@@ -15,7 +15,7 @@ export const contracts : { [key: string] : { 56: string, 97:string, abi: any }} 
   },
   singleAsset:{
     56:'',
-    97: '0xc7839fc00601d606Eb6266b0978c2B6841da94Bf',
+    97: '0x1FB1714f8263d204dA9A989b0890bc5957dd4ADC',
     abi: BitcrushStaking.abi
   }
 }
