@@ -43,20 +43,18 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   let d30 = 0
   const max = new BigNumber(288).times(365) // 288 compounds per day for 365 days
   const maxNumber = max.toNumber()
-  const prev = [0]
+  let previousReward = 0
   for(let j= 1; j <= maxNumber; j ++ ){
-    const addedRewards = prev.reduce( (acc, val) => acc + val, 0 )
     const EmitBlockTotal = compoundEmitted / ( totalPool + (compoundEmitted * ( j - 1 )))
-    const reward = (initialStake + addedRewards) * EmitBlockTotal
-    prev.push(reward)
+    const reward = (initialStake + previousReward) * EmitBlockTotal
+    previousReward += reward
     if( j == (1 * 288) && !d1 )
-      d1 = addedRewards + reward
+      d1 = previousReward
     if( j == (8 * 288) && !d7 )
-      d7 = addedRewards + reward
+      d7 = previousReward
     if( j == (30 * 288) && !d30 )
-      d30 = addedRewards + reward
+      d30 = previousReward
   }
-  const totalRewards = prev.reduce( (acc,val) => acc+val, 0)
   previousCalc = {
     constants:{
       initialStake,
@@ -77,8 +75,8 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
       percent: currencyFormat(d30 / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
     d365: {
-      return: totalRewards,
-      percent: currencyFormat(totalRewards / initialStake * 100, { decimalsToShow: 2}) + '%',
+      return: previousReward,
+      percent: currencyFormat(previousReward / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
   }
   calculatedLast = new Date()
