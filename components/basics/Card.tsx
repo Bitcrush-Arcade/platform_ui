@@ -6,10 +6,10 @@ import { styledBy } from 'utils/styles/styling'
 const styles = (theme:Theme) => createStyles({
   root:{
     boxShadow: styledBy( 'shadow', {
-      default: `inset 0 0 20px rgba(174,82,227,0.65)`,
-      primary: `inset 0 0 20px rgba(174,82,227,0.65)`,
-      dark: `inset 0 0 15px rgba(98, 0, 234,0.75)`,
-      secondary: `inset 0 0 20px rgba(29, 233, 182,0.65)`
+      default: `inset 0 0 20px ${theme.palette.shadow.primary.main}`,
+      primary: `inset 0 0 20px ${theme.palette.shadow.primary.main}`,
+      dark: `inset 0 0 15px ${theme.palette.shadow.primary.dark}`,
+      secondary: `inset 0 0 20px ${theme.palette.shadow.secondary.main}`
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
         transparent: `rgba(0,0,0,${props.opacity || '0'})`,
