@@ -46,7 +46,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const css = useStyles({ open })
 
     const { tokenInfo, toggleDarkMode, isDark } = useContext( TransactionContext )
-
+    
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
@@ -152,7 +152,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                     <Divider orientation="horizontal"/>
                 </Grid>
                 <Grid item>
-                    <Switch value={isDark} onClick={toggleDarkMode} />
+                    <Switch checked={isDark} onClick={toggleDarkMode} />
                 </Grid>
             </Grid>
         </Paper>
