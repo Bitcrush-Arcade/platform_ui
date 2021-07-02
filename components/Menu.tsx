@@ -7,6 +7,7 @@ import Link from 'next/link'
 // Material imports
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Collapse from '@material-ui/core/Collapse'
+import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Grid from "@material-ui/core/Grid"
 import IconButton from "@material-ui/core/IconButton"
@@ -15,6 +16,7 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Paper from '@material-ui/core/Paper'
+import Switch from '@material-ui/core/Switch'
 import Typography from '@material-ui/core/Typography'
 // Icons
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
@@ -43,7 +45,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const router = useRouter()
     const css = useStyles({ open })
 
-    const { tokenInfo } = useContext( TransactionContext )
+    const { tokenInfo, toggleDarkMode, isDark } = useContext( TransactionContext )
 
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
@@ -146,6 +148,12 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         <TwitterIcon color="disabled"/>
                     </IconButton>
                 </Grid>
+                <Grid item xs={12}>
+                    <Divider orientation="horizontal"/>
+                </Grid>
+                <Grid item>
+                    <Switch value={isDark} onClick={toggleDarkMode} />
+                </Grid>
             </Grid>
         </Paper>
       </Drawer>
@@ -170,7 +178,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
             duration: theme.transitions.duration.leavingScreen,
           }),
         overflowX: 'hidden',
-        backgroundColor: 'rgb(23,24,54)',
+        backgroundColor: theme.palette.background.menu,
         color: 'white',
         paddingLeft: theme.spacing(1),
         paddingTop: theme.spacing(1),
@@ -203,7 +211,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         borderRightStyle: 'solid',
         borderColor: theme.palette.primary.main,
         borderWidth: 4,
-        background: 'linear-gradient(90deg, rgba(13,12,44,1) 67%, rgba(0,0,0,0) 95%)'
+        background: props => props.open ? `linear-gradient(90deg, ${theme.palette.background.highlight} 67%, rgba(0,0,0,0) 95%)` : theme.palette.background.highlight,
     },
     baseItem:{
         borderTopLeftRadius: theme.spacing(2),
@@ -217,7 +225,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         fontSize: 12,
     },
     menuTextPrimaryNotSelected:{
-        color: theme.palette.grey[200],
+        color: theme.palette.text.secondary,
     },
     menuTextSecondary:{
         fontSize: 10,
@@ -225,7 +233,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     disabled:{
         fontSize: 8,
         textTransform: 'uppercase',
-        color: theme.palette.text.secondary,
+        color: theme.palette.type =='dark' ? theme.palette.grey[200] : theme.palette.grey[400],
     }
 }))
 

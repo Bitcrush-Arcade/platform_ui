@@ -21,7 +21,8 @@
     "paths":{
       "components" : ["/components"],
       "utils": ["/utils"],
-      "abi": ["/abi"]
+      "abi": ["/abi"],
+      "styles": ["/styles"]
     }
   },
   "include": [

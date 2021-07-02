@@ -1,5 +1,5 @@
 // React
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState, ReactNode } from 'react'
 // third party libs
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
@@ -14,7 +14,9 @@ type ContextType = {
   completed: Array<string>,
   error: Array<{ id: string, data: any }>,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => void,
-  tokenInfo: { weiBalance: number , crushUsdPrice: number}
+  tokenInfo: { weiBalance: number , crushUsdPrice: number},
+  toggleDarkMode?: () => void,
+  isDark: boolean,
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -22,11 +24,13 @@ export const TransactionContext = createContext<ContextType>({
   completed: [],
   error: [],
   editTransactions: () => {},
-  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 }
+  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 },
+  toggleDarkMode: () => {},
+  isDark: true
 })
 
-export const TransactionLoadingContext = ({ children })=>{
-
+export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDark: () => void, dark: boolean})=>{
+  const { children, toggleDark, dark } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const token = contracts.crushToken
@@ -95,7 +99,9 @@ export const TransactionLoadingContext = ({ children })=>{
     completed: completedArray,
     error: errorArray,
     editTransactions: editTransactions,
-    tokenInfo: coinInfo
+    tokenInfo: coinInfo,
+    toggleDarkMode: toggleDark,
+    isDark: dark
   }}>
     {children}
   </TransactionContext.Provider>

@@ -28,7 +28,10 @@ const styles = (theme:Theme) => createStyles({
       primary: `inset 0 0 15px ${theme.palette.shadow.primary.main}`,
       secondary:`inset 0 0 15px rgba(29, 233, 182,0.65)`
     }),
-    color: theme.palette.grey[200],
+    color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+    '&:hover':{
+      color: props => !props.background ? theme.palette.common.black : theme.palette.grey[200],
+    }
   },
   disabled:{
     backgroundColor: 'transparent !important',

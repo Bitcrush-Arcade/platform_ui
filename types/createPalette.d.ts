@@ -1,4 +1,4 @@
-import {Palette, PaletteColorOptions, PaletteColorOptions } from '@material-ui/core/styles/createPalette'
+import {Palette, PaletteColorOptions, PaletteColorOptions, TypeBackground } from '@material-ui/core/styles/createPalette'
 
 declare module '@material-ui/core/styles/createPalette' {
   interface PaletteOptions{
@@ -13,5 +13,11 @@ declare module '@material-ui/core/styles/createPalette' {
       primary: PaletteColor;
       secondary: PaletteColor;
     };
+  }
+
+  interface TypeBackground{
+    card: string,
+    menu: string,
+    highlight: string,
   }
 }
