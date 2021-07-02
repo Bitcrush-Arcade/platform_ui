@@ -69,7 +69,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   useEffect( () => {
     const savedTheme = window.localStorage.getItem('theme')
-    savedTheme && setDark( savedTheme === "true" )
+    setDark( savedTheme === "true" )
   },[])
 
   const edits = {
