@@ -30,7 +30,7 @@ const styles = (theme:Theme) => createStyles({
     }),
     color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
     '&:hover':{
-      color: props => !props.background ? theme.palette.common.black : theme.palette.grey[200],
+      color: props => !props.color ? theme.palette.common.black : theme.palette.grey[200],
     }
   },
   disabled:{
