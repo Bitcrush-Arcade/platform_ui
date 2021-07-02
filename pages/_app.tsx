@@ -18,7 +18,15 @@ function MyApp({ Component, pageProps }) {
     if( jssStyles ){
       jssStyles.parentElement.removeChild(jssStyles)
     }
+    setDark( Boolean( localStorage.getItem('theme') ?? true ) )
   }, [])
+
+  useEffect( () => {
+    const initState = localStorage.getItem('theme')
+    const initBool = Boolean(initState)
+    if(initState && initBool == dark) return
+    localStorage.setItem('theme', String(!!dark))
+  },[dark])
 
   const getLibrary = ( provider ): Web3 => provider
 

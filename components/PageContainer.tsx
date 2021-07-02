@@ -86,7 +86,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     },
     [theme.breakpoints.up('md')]:{
       backgroundPosition: props => (props.background || 'default') == 'default' ? 
-        props.menuToggle ? 'left calc(100% - 50% + 120px) top 0' : 'left calc(100% - 50% + 32px) top 0'
+        props.menuToggle ? `left calc( 50% + ${ theme.palette.type =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.type =='dark' ? 12 : 32}px ) top 0`
         : 'top',
     },
     backgroundRepeat: 'no-repeat',
@@ -98,8 +98,8 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
 
 const backgrounds = {
   dark:{
-    default: '/backgrounds/CenteredBaseBackground.png',
-    galactic:'/backgrounds/Galactic.jpg',
+    default: '/backgrounds/defaultBg.jpg',
+    galactic:'/backgrounds/galactic.jpg',
   },
   light:{
     default: '/backgrounds/light/palms.jpg',
