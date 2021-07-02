@@ -43,13 +43,15 @@ const PageContainer = ( props: ContainerProps ) => {
     setMenuToggle(!isSm)
   },[isSm])
 
-  return <div className={ css.fullContainer }>
-    <Header open={menuToggle} toggleOpen={toggleMenu}/>
-    <Menu open={menuToggle} toggleOpen={toggleMenu}/>
-    <Container maxWidth="xl" className={css.contentContainer}>
-      {pending.length > 0 && <LinearProgress/>}
-      {children}
-    </Container>
+  return <div>
+    <div className={ css.fullContainer }>
+      <Header open={menuToggle} toggleOpen={toggleMenu}/>
+      <Menu open={menuToggle} toggleOpen={toggleMenu}/>
+      <Container maxWidth="xl" className={css.contentContainer}>
+        {pending.length > 0 && <LinearProgress/>}
+        {children}
+      </Container>
+    </div>
   </div>
 }
 
