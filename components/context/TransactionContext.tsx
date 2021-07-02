@@ -1,9 +1,12 @@
 // React
-import { createContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, useEffect, useState, ReactNode, useMemo } from 'react'
 // third party libs
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
 import { useWeb3React } from '@web3-react/core'
+// Material Theming
+import { ThemeProvider } from '@material-ui/core/styles'
+import getTheme from 'styles/BaseTheme'
 // data
 import { contracts } from 'data/contracts'
 // hooks
@@ -29,8 +32,8 @@ export const TransactionContext = createContext<ContextType>({
   isDark: true
 })
 
-export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDark: () => void, dark: boolean})=>{
-  const { children, toggleDark, dark } = props
+export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
+  const { children } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const token = contracts.crushToken
@@ -42,6 +45,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDar
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [hydration, setHydration] = useState<boolean>(false)
+  const [ dark, setDark ] = useState<boolean>( true )
 
   const hydrate = () => setHydration(p => !p)
 
@@ -61,6 +65,11 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDar
   useEffect( ()=>{
     const interval = setInterval( hydrate, 30000)
     return () => clearInterval(interval)
+  },[])
+
+  useEffect( () => {
+    const savedTheme = window.localStorage.getItem('theme')
+    savedTheme && setDark( savedTheme === "true" )
   },[])
 
   const edits = {
@@ -89,6 +98,16 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDar
     },
   }
 
+  const basicTheme = useMemo( () => getTheme(dark), [dark])
+
+  const toggle = () => {
+    setDark( p => {
+      const newVal = !p
+      localStorage.setItem('theme', String(newVal))
+      return newVal
+    } )
+  }
+
   const editTransactions = (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => {
     const getFn = edits[type]
     getFn(id, errorData)
@@ -100,9 +119,11 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, toggleDar
     error: errorArray,
     editTransactions: editTransactions,
     tokenInfo: coinInfo,
-    toggleDarkMode: toggleDark,
+    toggleDarkMode: toggle,
     isDark: dark
   }}>
-    {children}
+    <ThemeProvider theme={basicTheme}>
+      {children}
+    </ThemeProvider>
   </TransactionContext.Provider>
 }
