@@ -23,6 +23,10 @@ const styles = (theme: Theme) => createStyles({
       primary: `inset 0 0 15px rgba(174,82,227,0.65)`,
       secondary:`inset 0 0 15px rgba(29, 233, 182,0.65)`
     }),
+    color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+    '&:hover':{
+      color: theme.palette.grey[200],
+    }
   },
   label:{
     fontSize: theme.typography.caption.fontSize,

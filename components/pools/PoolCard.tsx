@@ -19,6 +19,7 @@ import Grid from "@material-ui/core/Grid"
 import Slider from '@material-ui/core/Slider'
 import Typography from "@material-ui/core/Typography"
 import Tooltip from "@material-ui/core/Tooltip"
+import Skeleton from "@material-ui/lab/Skeleton"
 // import TextField from '@material-ui/core/TextField'
 // Material Icons
 import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
@@ -244,16 +245,19 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}/>
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
-              APR:
+              APY:
             </Typography>
           </Grid>
           <Grid item>
             <ButtonBase onClick={toggleRoi}>
               <Grid container alignItems="center" spacing={1}>
                 <Grid item>
-                  <Typography color="primary" variant="body2" className={ css.percent }>
-                    {apyData?.d365?.percent || '--%'}
-                  </Typography>
+                  { apyData?.d365?.percent 
+                    ? <Typography color="primary" variant="body2" className={ css.percent }>
+                        {apyData?.d365?.percent || '--%'}
+                      </Typography>
+                    : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
+                  }
                 </Grid>
                 <Grid item>
                   <CalculationIcon className={ css.aprAction }/>

@@ -8,7 +8,8 @@ export type FabStyles ={
   width?: string | number,
   href?: string,
   target?: string,
-  background?: 'default' | 'primary' | 'secondary'
+  background?: 'default' | 'primary' | 'secondary',
+  solidDisabledText?: boolean,
 } & WithStyles< typeof styles > & FabProps
 
 
@@ -24,15 +25,18 @@ const styles = (theme:Theme) => createStyles({
     borderWidth: 1,
     borderStyle: 'solid',
     boxShadow: styledBy('color', {
-      default: `inset 0 0 15px rgba(174,82,227,0.65)`,
-      primary: `inset 0 0 15px rgba(174,82,227,0.65)`,
+      default: `inset 0 0 15px ${theme.palette.shadow.primary.main}`,
+      primary: `inset 0 0 15px ${theme.palette.shadow.primary.main}`,
       secondary:`inset 0 0 15px rgba(29, 233, 182,0.65)`
     }),
-    color: theme.palette.grey[200],
+    color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+    '&:hover':{
+      color: props => !props.color ? theme.palette.common.black : theme.palette.grey[200],
+    }
   },
   disabled:{
     backgroundColor: 'transparent !important',
-    color: `${theme.palette.grey[200]} !important`,
+    color:  props => props.solidDisabledText ? `black !important` : `${theme.palette.grey[200]} !important`,
     boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
     borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
   },

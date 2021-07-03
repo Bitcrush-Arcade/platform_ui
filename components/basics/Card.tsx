@@ -6,20 +6,20 @@ import { styledBy } from 'utils/styles/styling'
 const styles = (theme:Theme) => createStyles({
   root:{
     boxShadow: styledBy( 'shadow', {
-      default: `inset 0 0 20px rgba(174,82,227,0.65)`,
-      primary: `inset 0 0 20px rgba(174,82,227,0.65)`,
-      dark: `inset 0 0 15px rgba(98, 0, 234,0.75)`,
-      secondary: `inset 0 0 20px rgba(29, 233, 182,0.65)`
+      default: theme.palette.type =="light" ? "none" : `inset 0 0 20px ${theme.palette.shadow.primary.main}`,
+      primary: theme.palette.type =="light" ? "none" : `inset 0 0 20px ${theme.palette.shadow.primary.main}`,
+      dark: theme.palette.type =="light" ? "none" : `inset 0 0 15px ${theme.palette.shadow.primary.dark}`,
+      secondary: theme.palette.type =="light" ? "none" : `inset 0 0 20px ${theme.palette.shadow.secondary.main}`,
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
-        transparent: `rgba(0,0,0,${props.opacity || '0'})`,
+        transparent: theme.palette.type == 'dark' ? `rgba(0,0,0,${props.opacity || '0'})` : theme.palette.common.white ,
         light: `linear-gradient(45deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 10%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
         dark: `${theme.palette.background.paper}`,
         default: theme.palette.background.default
       }
     )(props),
     borderRadius: theme.spacing(4),
-    borderColor: props => theme.palette[props.shadow !== 'dark' && props.shadow ||'primary'][props.shadow == 'dark' ? 'dark': 'main'],
+    borderColor: props =>  theme.palette[ props.shadow !== "dark" && theme.palette.type !=="light" && props.shadow ||'primary'][props.shadow == 'dark' ? 'dark': 'main'],
     borderStyle: props => props.noBorder ? 'none' : 'solid',
     borderWidth: 1,
   }
@@ -28,7 +28,7 @@ const styles = (theme:Theme) => createStyles({
 type CardStyles ={
   background?: 'transparent' | 'light' | 'dark',
   opacity?: number,
-  shadow?: 'primary' | 'secondary' | 'dark' ,
+  shadow?: 'primary' | 'secondary' | 'dark',
   noBorder?: boolean,
 } & WithStyles< typeof styles > & CardProps
 

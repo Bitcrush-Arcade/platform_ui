@@ -1,9 +1,12 @@
 // React
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState, ReactNode, useMemo } from 'react'
 // third party libs
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
 import { useWeb3React } from '@web3-react/core'
+// Material Theming
+import { ThemeProvider } from '@material-ui/core/styles'
+import getTheme from 'styles/BaseTheme'
 // data
 import { contracts } from 'data/contracts'
 // hooks
@@ -14,7 +17,9 @@ type ContextType = {
   completed: Array<string>,
   error: Array<{ id: string, data: any }>,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => void,
-  tokenInfo: { weiBalance: number , crushUsdPrice: number}
+  tokenInfo: { weiBalance: number , crushUsdPrice: number},
+  toggleDarkMode?: () => void,
+  isDark: boolean,
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -22,11 +27,13 @@ export const TransactionContext = createContext<ContextType>({
   completed: [],
   error: [],
   editTransactions: () => {},
-  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 }
+  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 },
+  toggleDarkMode: () => {},
+  isDark: true
 })
 
-export const TransactionLoadingContext = ({ children })=>{
-
+export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
+  const { children } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const token = contracts.crushToken
@@ -38,6 +45,7 @@ export const TransactionLoadingContext = ({ children })=>{
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [hydration, setHydration] = useState<boolean>(false)
+  const [ dark, setDark ] = useState<boolean>( true )
 
   const hydrate = () => setHydration(p => !p)
 
@@ -57,6 +65,11 @@ export const TransactionLoadingContext = ({ children })=>{
   useEffect( ()=>{
     const interval = setInterval( hydrate, 30000)
     return () => clearInterval(interval)
+  },[])
+
+  useEffect( () => {
+    const savedTheme = window.localStorage.getItem('theme')
+    setDark( savedTheme === "true" )
   },[])
 
   const edits = {
@@ -85,6 +98,16 @@ export const TransactionLoadingContext = ({ children })=>{
     },
   }
 
+  const basicTheme = useMemo( () => getTheme(dark), [dark])
+
+  const toggle = () => {
+    setDark( p => {
+      const newVal = !p
+      localStorage.setItem('theme', String(newVal))
+      return newVal
+    } )
+  }
+
   const editTransactions = (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => {
     const getFn = edits[type]
     getFn(id, errorData)
@@ -95,8 +118,12 @@ export const TransactionLoadingContext = ({ children })=>{
     completed: completedArray,
     error: errorArray,
     editTransactions: editTransactions,
-    tokenInfo: coinInfo
+    tokenInfo: coinInfo,
+    toggleDarkMode: toggle,
+    isDark: dark
   }}>
-    {children}
+    <ThemeProvider theme={basicTheme}>
+      {children}
+    </ThemeProvider>
   </TransactionContext.Provider>
 }

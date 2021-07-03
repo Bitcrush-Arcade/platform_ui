@@ -29,10 +29,6 @@ const PageContainer = ( props: ContainerProps ) => {
 
   const { pending, completed } = useContext(TransactionContext)
 
-  const backgroundImgSrc = props.background !== 'galactic' 
-    ? { url: "/backgrounds/CenteredBaseBackground.png", width: 1615, height: 944}
-    : { url: "/backgrounds/Galactic.jpg", width: 1920, height: 1467 }
-
   useEffect( ()=>{
 
     console.log('container', pending, completed )
@@ -47,15 +43,14 @@ const PageContainer = ( props: ContainerProps ) => {
     setMenuToggle(!isSm)
   },[isSm])
 
-  return <div className={ css.fullContainer }>
-    <Header open={menuToggle} toggleOpen={toggleMenu}/>
-    <Menu open={menuToggle} toggleOpen={toggleMenu}/>
-    <Container maxWidth="xl" className={css.contentContainer}>
-      {pending.length > 0 && <LinearProgress/>}
-      {children}
-    </Container>
-    <div className={css.img}>
-      <Image src={backgroundImgSrc.url} layout="responsive" width={backgroundImgSrc.width} height={backgroundImgSrc.height} />
+  return <div>
+    <div className={ css.fullContainer }>
+      <Header open={menuToggle} toggleOpen={toggleMenu}/>
+      <Menu open={menuToggle} toggleOpen={toggleMenu}/>
+      <Container maxWidth="xl" className={css.contentContainer}>
+        {pending.length > 0 && <LinearProgress/>}
+        {children}
+      </Container>
     </div>
   </div>
 }
@@ -80,30 +75,36 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       duration: theme.transitions.duration.leavingScreen,
     }),
   },
-  img:{
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: -1,
-    paddingLeft: props => props.background == 'galactic' ? 0
-      : theme.spacing(9),
-    paddingBottom: theme.spacing(4),
-    [theme.breakpoints.up('md')]:{
-      paddingLeft: props => props.background!== 'galactic'
-        ? props.menuToggle ? theme.spacing(30) : theme.spacing(9)
-        : 0,
-    },
-    transition: theme.transitions.create('padding', {
+  fullContainer:{
+    transition: theme.transitions.create('background', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    background: props=> props.background =='galactic' ? undefined : `linear-gradient( 180deg, ${theme.palette.background.default} 0%, rgb(0,0,0) 40%, rgb(0,0,0) 95%, ${theme.palette.background.default} 100%)`
-  },
-  fullContainer:{
+    backgroundImage: props =>  `url(${backgrounds[theme.palette.type][props.background || 'default']})`,
+    backgroundSize: 'cover',
+    [theme.breakpoints.down('sm')]:{
+      backgroundSize: '200% auto',
+      backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
+    },
+    [theme.breakpoints.up('md')]:{
+      backgroundPosition: props => (props.background || 'default') == 'default' ? 
+        props.menuToggle ? `left calc( 50% + ${ theme.palette.type =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.type =='dark' ? 12 : 32}px ) top 0`
+        : 'top',
+    },
+    backgroundRepeat: 'no-repeat',
     minHeight: '100vh',
     maxWidth: '100vw',
     position: 'relative',
   },
 }))
+
+const backgrounds = {
+  dark:{
+    default: '/backgrounds/defaultBg.jpg',
+    galactic:'/backgrounds/galactic.jpg',
+  },
+  light:{
+    default: '/backgrounds/light/palms.jpg',
+    galactic:'/backgrounds/light/cosmic.jpg',
+  }
+}

@@ -33,7 +33,6 @@ export default function Home() {
     <meta name="description" content="The first hybrid DEFI Casino on BSC"/>
     <meta name="author" content="Bitcrush"/>
   </Head>
-    <div>
       <PageContainer >
           <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500, whiteSpace: 'pre-line' }}>
             <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
@@ -55,7 +54,7 @@ export default function Home() {
           </Grid>
           {/* BITCRUSH TVL INFO */}
           <Container maxWidth="lg">
-            <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7}>
+            <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
                 <Grid container justify="space-around">
                   <Grid item xs={12} md={'auto'}>
@@ -138,7 +137,6 @@ export default function Home() {
             </Grid>
           </Container>
       </PageContainer>
-    </div>
   </>)
 }
 
