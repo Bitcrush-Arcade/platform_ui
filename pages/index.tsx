@@ -54,7 +54,7 @@ export default function Home() {
           </Grid>
           {/* BITCRUSH TVL INFO */}
           <Container maxWidth="lg">
-            <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7}>
+            <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
                 <Grid container justify="space-around">
                   <Grid item xs={12} md={'auto'}>

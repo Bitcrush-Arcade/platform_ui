@@ -8,7 +8,8 @@ export type FabStyles ={
   width?: string | number,
   href?: string,
   target?: string,
-  background?: 'default' | 'primary' | 'secondary'
+  background?: 'default' | 'primary' | 'secondary',
+  solidDisabledText?: boolean,
 } & WithStyles< typeof styles > & FabProps
 
 
@@ -35,7 +36,7 @@ const styles = (theme:Theme) => createStyles({
   },
   disabled:{
     backgroundColor: 'transparent !important',
-    color: `${theme.palette.grey[200]} !important`,
+    color:  props => props.solidDisabledText ? `black !important` : `${theme.palette.grey[200]} !important`,
     boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
     borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
   },
