@@ -184,7 +184,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         paddingTop: theme.spacing(1),
         borderTopRightRadius: theme.spacing(3),
         borderBottomRightRadius: theme.spacing(3),
-        borderColor: 'rgb(34,35,63)',
+        borderColor: theme.palette.border[ theme.palette.type ],
         borderWidth: 1,
         borderStyle: 'solid',
         borderLeftStyle: 'none',

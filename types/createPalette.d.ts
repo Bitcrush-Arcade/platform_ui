@@ -5,7 +5,8 @@ declare module '@material-ui/core/styles/createPalette' {
     shadow?: {
       primary: PaletteColorOptions;
       secondary: PaletteColorOptions;
-    }
+    };
+    border: PaletteColorOptions;
   }
 
   interface Palette{
@@ -13,6 +14,7 @@ declare module '@material-ui/core/styles/createPalette' {
       primary: PaletteColor;
       secondary: PaletteColor;
     };
+    border: PaletteColor;
   }
 
   interface TypeBackground{

@@ -32,6 +32,11 @@ const theme = (isDark?: boolean) => createMuiTheme({
         main: 'rgba(29, 233, 182,0.65)'
       },
     },
+    border:{
+      light: deepPurple['100'],
+      dark: 'rgb(34,35,63)',
+      main: 'rgb(174,82,227)',
+    },
     type: isDark ? 'dark' : 'light',
   },
   typography:{
