@@ -36,7 +36,7 @@ const styles = (theme:Theme) => createStyles({
   },
   disabled:{
     backgroundColor: 'transparent !important',
-    color:  props => props.solidDisabledText ? `black !important` : `${theme.palette.grey[200]} !important`,
+    color:  props => (props.solidDisabledText && theme.palette.type == 'light') ? `${theme.palette.grey[600]} !important` : `${theme.palette.grey[200]} !important`,
     boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
     borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
   },

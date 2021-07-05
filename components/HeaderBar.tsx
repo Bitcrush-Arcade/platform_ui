@@ -114,7 +114,7 @@ const ConnectButton = () => {
 
   const displayAccount = useMemo( () => shortAddress(account || ''),[account])
   
-  return <GeneralButton disabled={!!account } onClick={login}>
+  return <GeneralButton disabled={!!account } onClick={login} solidDisabledText>
     {account 
       ? displayAccount
       : "Connect"

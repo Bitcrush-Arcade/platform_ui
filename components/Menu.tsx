@@ -57,7 +57,9 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
         // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
-        { name: 'MORE', icon: null, subMenu: [ { name: 'GitHub', icon: <GitHubIcon color="inherit"/>, url_link: 'https://www.github.com'} ] },
+        { name: 'MORE', icon: null, subMenu: [ 
+            { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://www.github.com'},
+        ] },
     ]
 
     const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false) )
@@ -142,10 +144,10 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                 </Grid>
                 <Grid item>
                     <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
-                        <TelegramIcon color="disabled"/>
+                        <TelegramIcon className={ css.baseIcon }/>
                     </IconButton>
                     <IconButton size="small" component="a" href="https://twitter.com/bitcrusharcade" target="_blank">
-                        <TwitterIcon color="disabled"/>
+                        <TwitterIcon className={ css.baseIcon }/>
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}>
@@ -199,7 +201,9 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         width: theme.spacing(28)
     },
     subList: {
-        backgroundColor: 'rgba(255,255,255,0.1)'
+        backgroundColor: theme.palette.type =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+        borderBottomLeftRadius: theme.spacing(4),
+        borderTopLeftRadius: theme.spacing(4),
     },
     selectedIcon:{
         color: theme.palette.primary.main
@@ -228,7 +232,8 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         color: theme.palette.text.secondary,
     },
     menuTextSecondary:{
-        fontSize: 10,
+        fontSize: 11,
+        color: theme.palette.text.secondary,
     },
     disabled:{
         fontSize: 8,
