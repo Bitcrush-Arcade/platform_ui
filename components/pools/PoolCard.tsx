@@ -279,7 +279,7 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
           </Grid>
           <Grid item>
-            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest} disabled={ pendingRewards == 0 }>
+            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest} disabled={ pendingRewards == 0 } solidDisabledText>
               Harvest
             </Button>}
           </Grid>
