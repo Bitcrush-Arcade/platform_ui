@@ -74,7 +74,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     borderColor: theme.palette.primary.dark,
   },
   avatarImg:{
-    filter: 'invert(1) opacity(35%)',
+    filter: theme.palette.type == "dark" ? 'invert(1) opacity(35%)' : 'invert(0) opacity(65%)',
     width: 22,
     height: 16,
   },
