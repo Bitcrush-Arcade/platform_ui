@@ -142,10 +142,10 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                 </Grid>
                 <Grid item>
                     <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
-                        <TelegramIcon color="disabled"/>
+                        <TelegramIcon className={ css.baseIcon }/>
                     </IconButton>
                     <IconButton size="small" component="a" href="https://twitter.com/bitcrusharcade" target="_blank">
-                        <TwitterIcon color="disabled"/>
+                        <TwitterIcon className={ css.baseIcon }/>
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}>
