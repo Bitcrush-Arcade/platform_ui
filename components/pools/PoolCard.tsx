@@ -91,7 +91,7 @@ const PoolCard = (props: PoolProps) => {
       coinMethods.approve( contractAddress, new BigNumber(items.balance).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
-          editTransactions(tx,'pending')
+          editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
         })
         .on('receipt', ( rc) => {
           console.log('receipt',rc)
@@ -111,7 +111,7 @@ const PoolCard = (props: PoolProps) => {
     mainMethods?.claim().send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
-        editTransactions(tx,'pending')
+        editTransactions(tx,'pending', { description: 'Harvest Rewards'})
       })
       .on('receipt', ( rc) => {
         console.log('receipt',rc)
@@ -120,14 +120,14 @@ const PoolCard = (props: PoolProps) => {
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
       })
   }
   const manualCompound = () => {
     mainMethods?.singleCompound().send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
-        editTransactions(tx,'pending')
+        editTransactions(tx,'pending', { description: "Compound My Assets" })
       })
       .on('receipt', ( rc) => {
         console.log('receipt',rc)
@@ -136,7 +136,7 @@ const PoolCard = (props: PoolProps) => {
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
       })
   }
 
@@ -363,12 +363,11 @@ const PoolCard = (props: PoolProps) => {
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
           const maxUsed = stakeAction ? maxStaked : maxBalance
-          const percent = new BigNumber(values.stakeAmount).div( maxUsed ).times(100)
           const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
           if(stakeAction){
             mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
-                editTransactions(tx,'pending')
+                editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
               })
               .on('receipt', rc => {
                 editTransactions(rc.transactionHash, 'complete')
@@ -386,7 +385,7 @@ const PoolCard = (props: PoolProps) => {
               })
           }else mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
             .on('transactionHash', tx =>{
-              editTransactions(tx,'pending')
+              editTransactions(tx,'pending', { description: "Stake Crush in pool"})
             })
             .on('receipt', rc => {
               editTransactions(rc.transactionHash, 'complete')
