@@ -4,8 +4,8 @@ import PageContainer from 'components/PageContainer'
 
 const Trade = () => {
   return <PageContainer>
-    <Typography>
-      Trade PAGE
+    <Typography variant="h1" align="center">
+      TRADING COMING SOON
     </Typography>
   </PageContainer>
 }

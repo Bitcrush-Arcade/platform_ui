@@ -4,8 +4,8 @@ import PageContainer from 'components/PageContainer'
 
 const Warp = () => {
   return <PageContainer>
-    <Typography>
-      Warp PAGE
+    <Typography variant="h1" align="center">
+      Warp PAGE COMING SOON
     </Typography>
   </PageContainer>
 }
