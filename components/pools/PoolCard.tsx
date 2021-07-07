@@ -344,29 +344,6 @@ const PoolCard = (props: PoolProps) => {
                   </Typography>
                 </Grid>
               </Grid>
-              {/* TESTING */}
-              <Button onClick={ () => {
-                mainMethods.addRewardToPool( new BigNumber(5000).times( new BigNumber(10).pow(18).toFixed(0,1) ) ).send({ from: account })
-                  .on('transactionHash', tx => editTransactions(tx, 'pending'))
-                  .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
-                  .on('error', (error, receipt) => {
-                    receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error')
-                    console.log('error', error)
-                  })
-              }}>
-                ADD REWARD TO POOL
-              </Button>
-              <Button onClick={ () => {
-                coinMethods.approve( contractAddress, 0 ).send({ from: account })
-                  .on('transactionHash', tx => editTransactions(tx, 'pending'))
-                  .on('receipt', receipt => editTransactions(receipt.transactionHash, 'complete'))
-                  .on('error', (error, receipt) => {
-                    receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error')
-                    console.log('error', error)
-                  })
-              }}>
-                DISPROVE CONTRACT
-              </Button>
             </Collapse>
           </Grid>
         </Grid>
