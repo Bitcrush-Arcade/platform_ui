@@ -4,17 +4,17 @@ import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
-import LinearProgress from "@material-ui/core/LinearProgress"
 import Container from '@material-ui/core/Container'
 // Components
 import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
+import TxCard from 'components/context/TransactionCard'
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
-import { styledBy } from 'utils/styles/styling'
 // Context
 import { TransactionContext } from 'components/context/TransactionContext'
+
 
 const PageContainer = ( props: ContainerProps ) => {
   
@@ -29,12 +29,6 @@ const PageContainer = ( props: ContainerProps ) => {
 
   const { pending, completed } = useContext(TransactionContext)
 
-  useEffect( ()=>{
-
-    console.log('container', pending, completed )
-
-  },[pending, completed])
-
   useEagerConnect()
 
   const toggleMenu = () => setMenuToggle( p => !p )
@@ -48,8 +42,10 @@ const PageContainer = ( props: ContainerProps ) => {
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
       <Menu open={menuToggle} toggleOpen={toggleMenu}/>
       <Container maxWidth="xl" className={css.contentContainer}>
-        {pending.length > 0 && <LinearProgress/>}
         {children}
+        {Object.keys(pending).length > 0 && <div style={{ position: 'absolute', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
+          <TxCard hashes={pending}/>
+        </div>}
       </Container>
     </div>
   </div>
