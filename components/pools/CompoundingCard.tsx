@@ -59,7 +59,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const claim = () => {
     methods.compoundAll().send({ from: account })
-      .on('transactionHash', tx => editTransactions(tx, 'pending'))
+      .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
       .on('receipt', rct =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)

@@ -11,12 +11,13 @@ import getTheme from 'styles/BaseTheme'
 import { contracts } from 'data/contracts'
 // hooks
 import { useContract } from 'hooks/web3Hooks'
+// types
+import { TransactionHash } from 'types/TransactionTypes'
 
 type ContextType = {
-  pending: Array<string>,
-  completed: Array<string>,
-  error: Array<{ id: string, data: any }>,
-  editTransactions: (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => void,
+  pending: TransactionHash,
+  completed: TransactionHash,
+  editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
   toggleDarkMode?: () => void,
   isDark: boolean,
@@ -39,9 +40,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const token = contracts.crushToken
   const { methods } = useContract(token.abi, token[chainId])
 
-  const [ pendingTransactions, setPendingTransactions ] = useImmer<Array<string>>([])
-  const [ completedArray, setCompletedArray ] = useImmer<Array<string>>([])
-  const [ errorArray, setErrorArray ] = useImmer<Array<{ id: string, data: any }>>([])
+  const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
+  const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [hydration, setHydration] = useState<boolean>(false)
@@ -72,31 +72,42 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     setDark( savedTheme === "true" )
   },[])
 
-  const edits = {
+  const clearPending = (id: string) => {
+    setTimeout( () => setPendingTransactions(draft => { delete draft[id] }), 5000)
+  }
+
+  const edits = useMemo( () => ({
     pending: (id: string, data?: any) => {
       setPendingTransactions( draft => {
-        draft.push(id)
+        draft[id] = { status: 'pending', description: data?.comment || '' }
       })
     },
     complete: ( id: string, data?: any ) =>{
-      setCompletedArray( draft => {
-        draft.push(id)
+      setCompleteTransactions( draft => {
+        draft[id] = { 
+          ...pendingTransactions[id],
+          status: 'success'
+        }
       })
       setPendingTransactions( draft => {
-        const pendingIndex = findIndex( draft, o => o == id )
-        draft.splice(pendingIndex, 1)
+        draft[id].status = 'success'
       })
+      clearPending(id)
     },
     error: ( id: string, data?: any ) =>{
-      setErrorArray( draft => {
-        draft.push( { id: id, data: data })
+      setCompleteTransactions( draft => {
+        draft[id] = { 
+          ...pendingTransactions[id],
+          status: 'error',
+          more: data || null
+        }
       })
       setPendingTransactions( draft => {
-        const pendingIndex = findIndex( draft, o => o == id )
-        draft.splice(pendingIndex, 1)
+        draft[id].status = 'error'
       })
+      clearPending(id)
     },
-  }
+  }),[setPendingTransactions, setCompleteTransactions])
 
   const basicTheme = useMemo( () => getTheme(dark), [dark])
 
@@ -108,15 +119,14 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     } )
   }
 
-  const editTransactions = (id: string, type: 'pending' | 'complete' | 'error', errorData?: any ) => {
+  const editTransactions = (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => {
     const getFn = edits[type]
-    getFn(id, errorData)
+    getFn(id, data)
   }
 
   return <TransactionContext.Provider value={{
     pending: pendingTransactions,
-    completed: completedArray,
-    error: errorArray,
+    completed: completeTransactions,
     editTransactions: editTransactions,
     tokenInfo: coinInfo,
     toggleDarkMode: toggle,
@@ -127,3 +137,4 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     </ThemeProvider>
   </TransactionContext.Provider>
 }
+

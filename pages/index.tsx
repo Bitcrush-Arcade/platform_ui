@@ -60,7 +60,7 @@ export default function Home() {
     methods.claim().send({ from: account })
     .on('transactionHash', (tx) => {
       console.log('hash', tx )
-      editTransactions(tx,'pending')
+      editTransactions(tx,'pending', { description: 'Harvest All Pools' })
     })
     .on('receipt', ( rc) => {
       console.log('receipt',rc)
@@ -68,7 +68,7 @@ export default function Home() {
     })
     .on('error', (error, receipt) => {
       console.log('error', error, receipt)
-      receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
   },[methods, router, staked, account])
 

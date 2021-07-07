@@ -34,6 +34,7 @@ import Coin from 'components/tokens/Token2'
 import { TransactionContext } from 'components/context/TransactionContext'
 // Utils
 import { currencyFormat } from 'utils/text/text'
+import { ConditionalLinkWrapper } from 'utils/wrappers'
 // Icons
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
@@ -86,23 +87,26 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             subMenu ? 'secondary' : undefined
         const component = disabled ? 'li' :
             url_link ? 'a' : 'button'
-        const listItem = <Fragment key={`nav-menu-item-${name}`} >
-            <ListItem 
-                button={subMenu || url_link && !disabled ? true: undefined}
-                onClick={ click } component={component}  href={url_link}
-                className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
-            >
-                <ListItemIcon className={ `${selected ? css.selectedIcon : css.baseIcon } ${css.listIcon}` }>
-                    {icon}
-                </ListItemIcon>
-                <ListItemText
-                    primary={<>
-                        {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
-                        {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
-                    </>}
-                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
-                />
-            </ListItem>
+
+        return <Fragment key={`nav-menu-item-${name}`} >
+            <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }}>
+                <ListItem 
+                    button={subMenu || url_link && !disabled ? true: undefined}
+                    onClick={ click } component={component}
+                    className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
+                >
+                    <ListItemIcon className={ `${selected ? css.selectedIcon : css.baseIcon } ${css.listIcon}` }>
+                        {icon}
+                    </ListItemIcon>
+                    <ListItemText
+                        primary={<>
+                            {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
+                            {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
+                        </>}
+                        primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
+                    />
+                </ListItem>
+            </ConditionalLinkWrapper>
             {subMenu && <Collapse in={subMenuOpen[linkIndex]}>
                 <List dense className={css.subList}>
                     {subMenu.map( sub => {
@@ -123,12 +127,6 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                 </List>
             </Collapse>}
         </Fragment>
-
-        return url_link 
-            ? <Link href={url_link} key={`nav-link-menu-item-${name}`} passHref>
-                {listItem}
-            </Link>
-            : listItem
     })
 
     return <>

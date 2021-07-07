@@ -1,20 +1,22 @@
 // React
-import { useState, ReactNode, useEffect, useContext } from 'react'
-import Image from 'next/image'
+import { useState, ReactNode, useEffect, useContext, useMemo } from 'react'
+import { useImmer } from 'use-immer'
+// 3p
+import compact from 'lodash/compact'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
-import LinearProgress from "@material-ui/core/LinearProgress"
 import Container from '@material-ui/core/Container'
 // Components
 import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
+import TxCard from 'components/context/TransactionCard'
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
-import { styledBy } from 'utils/styles/styling'
 // Context
 import { TransactionContext } from 'components/context/TransactionContext'
+
 
 const PageContainer = ( props: ContainerProps ) => {
   
@@ -24,16 +26,11 @@ const PageContainer = ( props: ContainerProps ) => {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   
   const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
+  const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
   
   const css = useStyles({ menuToggle, ...props })
 
   const { pending, completed } = useContext(TransactionContext)
-
-  useEffect( ()=>{
-
-    console.log('container', pending, completed )
-
-  },[pending, completed])
 
   useEagerConnect()
 
@@ -42,14 +39,25 @@ const PageContainer = ( props: ContainerProps ) => {
   useEffect(()=>{
     setMenuToggle(!isSm)
   },[isSm])
+  const allHashes = compact( Object.keys(pending).map( hash => hiddenPending[hash] && pending[hash].status == hiddenPending[hash] ? null : pending[hash] ) )
+  const shownPending = useMemo( () => {
+    const filteredPending = {...pending}
+    Object.keys(hiddenPending).map( hash => {
+      if( filteredPending[hash]?.status == hiddenPending[hash] )
+        delete filteredPending[hash]
+    })
+    return filteredPending
+  },[pending, hiddenPending ])
 
   return <div>
     <div className={ css.fullContainer }>
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
       <Menu open={menuToggle} toggleOpen={toggleMenu}/>
       <Container maxWidth="xl" className={css.contentContainer}>
-        {pending.length > 0 && <LinearProgress/>}
         {children}
+        {Object.keys(allHashes).length > 0 && <div style={{ position: 'fixed', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
+          <TxCard hashes={shownPending} onClose={ hash => setHiddenPending( draft => { draft[hash] = pending[hash].status } )}/>
+        </div>}
       </Container>
     </div>
   </div>
