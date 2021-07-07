@@ -13,7 +13,7 @@ const styles = (theme:Theme) => createStyles({
     }),
     background: (props: CardStyles ) => styledBy<CardStyles, BackgroundMapping>('background',{
         transparent: theme.palette.type == 'dark' ? `rgba(0,0,0,${props.opacity || '0'})` : theme.palette.common.white ,
-        light: `linear-gradient(45deg, ${theme.palette.background.default} 0%,${theme.palette.background.default} 10%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
+        light: `linear-gradient(45deg, ${theme.palette.background[theme.palette.type == 'dark' ? 'default' : 'paper']} 0%,${theme.palette.background[theme.palette.type == 'dark' ? 'default' : 'paper']} 10%, ${theme.palette.background.paper} 75%, ${theme.palette.background.paper} 100%)`,
         dark: `${theme.palette.background.paper}`,
         default: theme.palette.background.default
       }
