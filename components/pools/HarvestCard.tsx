@@ -1,5 +1,6 @@
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { FabProps } from '@material-ui/core/Fab'
 import CardContent from '@material-ui/core/CardContent'
 import CardActions from '@material-ui/core/CardActions'
 import Divider from '@material-ui/core/Divider'
@@ -61,8 +62,8 @@ type PoolCardProps ={
   icon?: JSX.Element,
   action1Title: string,
   action2Title?: string,
-  btn1Props?: {href ?: string },
-  btn2Props?: {href ?: string },
+  btn1Props?: {href ?: string } & Omit<FabProps, "children">,
+  btn2Props?: {href ?: string } & Omit<FabProps, "children">,
   firstAction?: () => void,
   secondAction?: () => void,
   color?: 'primary' | 'secondary',
@@ -74,7 +75,7 @@ type PoolCardProps ={
 type InfoStakeProps = {
   title: string,
   amount: number,
-  currency:string,
+  currency?:string,
   subtitle: string,
   color?: 'primary' | 'secondary',
   comingSoon?: boolean
@@ -82,7 +83,7 @@ type InfoStakeProps = {
 
 const InfoMoney = ( props: InfoStakeProps ) => {
   const { title, subtitle, currency, amount, color, comingSoon } = props
-  const css = useMoneyStyles({})
+  const css = useMoneyStyles(props)
   return <>
     <Typography variant="body2" color="textSecondary" className={ css.general }>
       {title}
@@ -125,7 +126,7 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
     }
   }
 }))
-const useMoneyStyles = makeStyles( (theme: Theme) => createStyles({
+const useMoneyStyles = makeStyles<Theme,InfoStakeProps>( theme => createStyles({
   currency:{
     fontWeight: 500,
     fontSize: theme.typography.h5.fontSize,
@@ -133,7 +134,7 @@ const useMoneyStyles = makeStyles( (theme: Theme) => createStyles({
   value:{
     fontSize: theme.typography.h4.fontSize,
     fontWeight: 500,
-    paddingLeft: theme.spacing(1)
+    paddingLeft: props => props.currency ? theme.spacing(1) : 0,
   },
   general:{
     opacity: 0.75,
