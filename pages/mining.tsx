@@ -39,7 +39,7 @@ const Mining = () => {
         <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
       </Grid>
     </Grid>
-    <Grid container justify="space-evenly" className={ css.section }>
+    {/* <Grid container justify="space-evenly" className={ css.section }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Galactic Mining"
@@ -49,7 +49,7 @@ const Mining = () => {
         />
       </Grid>
       <Grid item style={{ width: 280}} />
-    </Grid>
+    </Grid> */}
   </PageContainer>
 }
 

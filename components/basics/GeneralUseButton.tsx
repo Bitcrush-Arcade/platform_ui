@@ -48,4 +48,7 @@ const styles = (theme:Theme) => createStyles({
   }
 })
 
-export default withStyles(styles)( (props: FabStyles) => <Fab {...props} variant={props.variant || "extended"} component={ props.href ? 'a' : 'button' } target={props.target} />)
+export default withStyles(styles)( (props: FabStyles) => {
+  const { solidDisabledText, ...others } = props
+  return <Fab {...others} variant={props.variant || "extended"} component={ props.href ? 'a' : 'button' } target={props.target} />
+})

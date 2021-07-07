@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 // Material imports
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import Button from '@material-ui/core/Button'
 import Collapse from '@material-ui/core/Collapse'
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
@@ -19,11 +20,14 @@ import Paper from '@material-ui/core/Paper'
 import Switch from '@material-ui/core/Switch'
 import Typography from '@material-ui/core/Typography'
 // Icons
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import GitHubIcon from '@material-ui/icons/GitHub'
 import HomeIcon from '@material-ui/icons/Home'
+import RateReviewIcon from '@material-ui/icons/RateReview';
 import TwitterIcon from '@material-ui/icons/Twitter'
 import TelegramIcon from '@material-ui/icons/Telegram'
+import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
@@ -39,6 +43,8 @@ import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
 import WarpIcon from 'components/svg/WarpIcon'
+import NightIcon from 'components/svg/Night'
+import DayIcon from 'components/svg/Day'
 
 const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
@@ -58,7 +64,9 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
-            { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://www.github.com'},
+            { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},
+            { name: 'Audit', icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
+            { name: 'Charts', icon: <TrendingUpIcon color="inherit" fontSize="small"/>, url_link: 'https://charts.bogged.finance/?token=0x0Ef0626736c2d484A792508e99949736D0AF807e'},
         ] },
     ]
 
@@ -92,7 +100,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
                         {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
                     </>}
-                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''}`  }}
+                    primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
                 />
             </ListItem>
             {subMenu && <Collapse in={subMenuOpen[linkIndex]}>
@@ -151,10 +159,21 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                     </IconButton>
                 </Grid>
                 <Grid item xs={12}>
-                    <Divider orientation="horizontal"/>
+                    <Divider orientation="horizontal" style={{marginBottom: 4, marginTop: 4}}/>
                 </Grid>
                 <Grid item>
-                    <Switch checked={isDark} onClick={toggleDarkMode} />
+                    <Button onClick={toggleDarkMode} style={{ width: 80, paddingLeft: 4, paddingRight:4 }}>
+                        <Grid container justify="space-between" alignItems="center">
+                            <DayIcon color={ isDark ? "disabled" : "primary"}/>
+                            <Divider orientation="vertical" flexItem/>
+                            <NightIcon color={ !isDark ? "disabled" : "primary"}/>
+                        </Grid>
+                    </Button>
+                </Grid>
+                <Grid item>
+                    <Button onClick={toggleOpen}>
+                        <ArrowBackIosIcon color="disabled"/>
+                    </Button>
                 </Grid>
             </Grid>
         </Paper>
@@ -239,7 +258,10 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         fontSize: 8,
         textTransform: 'uppercase',
         color: theme.palette.type =='dark' ? theme.palette.grey[200] : theme.palette.grey[400],
-    }
+    },
+    subMenu:{
+        color: theme.palette.type =="light" ? theme.palette.secondary.light : theme.palette.secondary.main
+    },
 }))
 
 type LinkItem ={
