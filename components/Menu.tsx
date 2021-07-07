@@ -22,8 +22,10 @@ import Typography from '@material-ui/core/Typography'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
 import GitHubIcon from '@material-ui/icons/GitHub'
 import HomeIcon from '@material-ui/icons/Home'
+import RateReviewIcon from '@material-ui/icons/RateReview';
 import TwitterIcon from '@material-ui/icons/Twitter'
 import TelegramIcon from '@material-ui/icons/Telegram'
+import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
@@ -58,7 +60,9 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
-            { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://www.github.com'},
+            { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},
+            { name: 'Audit', icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
+            { name: 'Charts', icon: <TrendingUpIcon color="inherit" fontSize="small"/>, url_link: 'https://charts.bogged.finance/?token=0x0Ef0626736c2d484A792508e99949736D0AF807e'},
         ] },
     ]
 
