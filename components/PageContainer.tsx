@@ -101,7 +101,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
 const backgrounds = {
   dark:{
     default: '/backgrounds/defaultBg.jpg',
-    galactic:'/backgrounds/galactic.jpg',
+    galactic:'/backgrounds/Galactic.jpg',
   },
   light:{
     default: '/backgrounds/light/palms.jpg',
