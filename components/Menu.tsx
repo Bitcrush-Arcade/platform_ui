@@ -3,7 +3,7 @@ import React, { useState, Fragment, useContext } from 'react'
 import { useImmer } from 'use-immer'
 // Next
 import { useRouter } from 'next/router'
-import Link from 'next/link'
+import Image from 'next/image'
 // Material imports
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Button from '@material-ui/core/Button'
@@ -47,6 +47,8 @@ import WarpIcon from 'components/svg/WarpIcon'
 import NightIcon from 'components/svg/Night'
 import DayIcon from 'components/svg/Day'
 
+const hashexScale = 5
+
 const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
     const router = useRouter()
@@ -66,7 +68,15 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
             { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},
-            { name: 'Audit', icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
+            { name: <Grid container alignItems="center">
+                    <Grid item>
+                        <Image src="/hashex_logo.png" width={295 / hashexScale } height={81 / hashexScale} className={ css.hashexLogo }/>
+                    </Grid>
+                    <Grid item>
+                        &nbsp;Audit&nbsp;
+                    </Grid>
+                </Grid>, 
+                icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
             { name: 'Charts', icon: <TrendingUpIcon color="inherit" fontSize="small"/>, url_link: 'https://charts.bogged.finance/?token=0x0Ef0626736c2d484A792508e99949736D0AF807e'},
         ] },
     ]
@@ -260,15 +270,18 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     subMenu:{
         color: theme.palette.type =="light" ? theme.palette.secondary.light : theme.palette.secondary.main
     },
+    hashexLogo:{
+        filter: `brightness(0) invert(${theme.palette.type =='dark'? '0.75' : '0.05'}) opacity(50%)`
+    }
 }))
 
 type LinkItem ={
-    name: string,
+    name: string | JSX.Element,
     icon: JSX.Element | null,
     url_link?: string,
     disabled?: boolean,
     subMenu?: Array< {
-        name: string,
+        name: string | JSX.Element,
         icon: JSX.Element | null,
         url_link?: string,
         disabled?: boolean,
