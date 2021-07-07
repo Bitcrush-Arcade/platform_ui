@@ -90,7 +90,7 @@ const InfoMoney = ( props: InfoStakeProps ) => {
     <div>
       <Typography color={color || 'primary'} display="inline" className={ css.currency }>
         {currency}
-        <Typography className={ css.value } display="inline">
+        <Typography className={ css.value } display="inline" component="span">
           {comingSoon ? "COMING SOON"
           : currencyFormat(amount, { decimalsToShow: 4})}
         </Typography>
