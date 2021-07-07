@@ -1,6 +1,8 @@
 // React
-import { useState, ReactNode, useEffect, useContext } from 'react'
-import Image from 'next/image'
+import { useState, ReactNode, useEffect, useContext, useMemo } from 'react'
+import { useImmer } from 'use-immer'
+// 3p
+import compact from 'lodash/compact'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
@@ -24,6 +26,7 @@ const PageContainer = ( props: ContainerProps ) => {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   
   const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
+  const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
   
   const css = useStyles({ menuToggle, ...props })
 
@@ -36,6 +39,15 @@ const PageContainer = ( props: ContainerProps ) => {
   useEffect(()=>{
     setMenuToggle(!isSm)
   },[isSm])
+  const allHashes = compact( Object.keys(pending).map( hash => hiddenPending[hash] && pending[hash].status == hiddenPending[hash] ? null : pending[hash] ) )
+  const shownPending = useMemo( () => {
+    const filteredPending = {...pending}
+    Object.keys(hiddenPending).map( hash => {
+      if( filteredPending[hash]?.status == hiddenPending[hash] )
+        delete filteredPending[hash]
+    })
+    return filteredPending
+  },[pending, hiddenPending ])
 
   return <div>
     <div className={ css.fullContainer }>
@@ -43,8 +55,8 @@ const PageContainer = ( props: ContainerProps ) => {
       <Menu open={menuToggle} toggleOpen={toggleMenu}/>
       <Container maxWidth="xl" className={css.contentContainer}>
         {children}
-        {Object.keys(pending).length > 0 && <div style={{ position: 'absolute', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
-          <TxCard hashes={pending}/>
+        {Object.keys(allHashes).length > 0 && <div style={{ position: 'fixed', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
+          <TxCard hashes={shownPending} onClose={ hash => setHiddenPending( draft => { draft[hash] = pending[hash].status } )}/>
         </div>}
       </Container>
     </div>

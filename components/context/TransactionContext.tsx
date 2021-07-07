@@ -40,7 +40,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const token = contracts.crushToken
   const { methods } = useContract(token.abi, token[chainId])
 
-  const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({ "0x919238rfhoa89afoiku2q398f1" : { description: "Something Happened", status: 'error' }})
+  const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
@@ -72,6 +72,10 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     setDark( savedTheme === "true" )
   },[])
 
+  const clearPending = (id: string) => {
+    setTimeout( () => setPendingTransactions(draft => { delete draft[id] }), 5000)
+  }
+
   const edits = useMemo( () => ({
     pending: (id: string, data?: any) => {
       setPendingTransactions( draft => {
@@ -80,22 +84,28 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     },
     complete: ( id: string, data?: any ) =>{
       setCompleteTransactions( draft => {
-        draft[id] = pendingTransactions[id]
-        draft[id].status = 'success'
+        draft[id] = { 
+          ...pendingTransactions[id],
+          status: 'success'
+        }
       })
       setPendingTransactions( draft => {
-        delete draft[id]
+        draft[id].status = 'success'
       })
+      clearPending(id)
     },
     error: ( id: string, data?: any ) =>{
       setCompleteTransactions( draft => {
-        draft[id] = pendingTransactions[id]
-        draft[id].status = 'error'
-        draft[id].more = data || null
+        draft[id] = { 
+          ...pendingTransactions[id],
+          status: 'error',
+          more: data || null
+        }
       })
       setPendingTransactions( draft => {
-        delete draft[id]
+        draft[id].status = 'error'
       })
+      clearPending(id)
     },
   }),[setPendingTransactions, setCompleteTransactions])
 

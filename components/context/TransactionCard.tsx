@@ -21,7 +21,7 @@ import { useWeb3React } from '@web3-react/core'
 
 export default function TxCard( props: TxCardProps ){
 
-  const { hashes } = props
+  const { hashes, onClose } = props
   const { chainId } = useWeb3React()
   const css = useStyles({})
   const keys = Object.keys(hashes)
@@ -33,7 +33,7 @@ export default function TxCard( props: TxCardProps ){
   const first = hashes[ keys[0] ]
 
   return <Card background="dark" className={ css.card } shadow="dark">
-    <Grid container alignItems="center" spacing={1}>
+    <Grid container alignItems="center" justify="space-between" >
       <Grid item>
         {usedIcon[ hashes[ keys[0] ].status ] }
       </Grid>
@@ -54,7 +54,7 @@ export default function TxCard( props: TxCardProps ){
         </a>
       </Grid>
       <Grid item>
-        <IconButton>
+        <IconButton size="small" onClick={() => onClose(keys[0])}>
           <HighlightOffIcon className={ css.closeIcon } />
         </IconButton>
       </Grid>
@@ -64,7 +64,7 @@ export default function TxCard( props: TxCardProps ){
 
 type TxCardProps = {
   hashes: TransactionHash,
-  onClose?: () => void,
+  onClose?: (hash: string) => void,
 }
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
