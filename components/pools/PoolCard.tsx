@@ -12,14 +12,16 @@ import ButtonBase from "@material-ui/core/ButtonBase"
 import CardHeader from "@material-ui/core/CardHeader"
 import CardContent from "@material-ui/core/CardContent"
 import CardActions from "@material-ui/core/CardActions"
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Collapse from "@material-ui/core/Collapse"
 import Dialog from '@material-ui/core/Dialog'
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
+import IconButton from '@material-ui/core/IconButton'
+import Skeleton from "@material-ui/lab/Skeleton"
 import Slider from '@material-ui/core/Slider'
 import Typography from "@material-ui/core/Typography"
 import Tooltip from "@material-ui/core/Tooltip"
-import Skeleton from "@material-ui/lab/Skeleton"
 // import TextField from '@material-ui/core/TextField'
 // Material Icons
 import ArrowIcon from '@material-ui/icons/ArrowDropDownCircleOutlined';
@@ -55,11 +57,16 @@ const PoolCard = (props: PoolProps) => {
   const [ openRoi, setOpenRoi ] = useState<boolean>(false)
   const [ stakeAction, setStakeAction ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
+  const [ hydrateAPY, setHydrateAPY ] = useState<boolean>(true)
   const [apyData, setApyData] = useState<RoiProps['apyData']>(undefined)
 
   const triggerHydrate = useCallback(() => {
     setHydrate( p => !p )
   }, [setHydrate])
+
+  const triggerAPYHydrate = useCallback( () => {
+    setHydrateAPY(p => !p)
+  },[setHydrateAPY])
 
   const FormComponent = useCallback( p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>, [] )
 
@@ -73,7 +80,7 @@ const PoolCard = (props: PoolProps) => {
   const isApproved = items.approved > 0
 
   useEffect(() => {
-    if(!chainId) return
+    if(!chainId || !hydrateAPY) return
     fetch('/api/getAPY',{
       method: 'POST',
       body: JSON.stringify({
@@ -82,7 +89,8 @@ const PoolCard = (props: PoolProps) => {
     })
     .then( response => response.json() )
     .then( data => setApyData(data) )
-  },[chainId])
+    .finally( () => hydrateAPY && triggerAPYHydrate() )
+  },[chainId, hydrateAPY, setApyData, hydrateAPY])
   
   const buttonAction = () =>{
     if(isApproved) 
@@ -264,6 +272,10 @@ const PoolCard = (props: PoolProps) => {
                 </Grid>
               </Grid>
             </ButtonBase>
+            <IconButton size="small" color="primary" onClick={triggerAPYHydrate}>
+              { hydrateAPY ? <CircularProgress size="inherit"/>
+                : <RefreshIcon fontSize="inherit"/>}
+            </IconButton>
           </Grid>
         </Grid>
         <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
@@ -362,8 +374,7 @@ const PoolCard = (props: PoolProps) => {
           stakeAmount: 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
-          const maxUsed = stakeAction ? maxStaked : maxBalance
-          const weiAmount = new BigNumber( toWei(`${values.stakeAmount}`) )
+          const weiAmount = new BigNumber( toWei(`${new BigNumber(values.stakeAmount).toFixed(18)}`) )
           if(stakeAction){
             mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
@@ -420,6 +431,10 @@ const PoolCard = (props: PoolProps) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', newValue)
         }
+
+        useEffect(()=>{
+          setFieldValue('stakeAmount',0)
+        },[stakeAction])
         return(<Form>
           <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
             <Grid item>
@@ -454,12 +469,13 @@ const PoolCard = (props: PoolProps) => {
               endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxUsed )}>
                 MAX
               </MButton>,
-              className: css.textField 
+              className: css.textField,
+              onFocus: e => e.target.select()
             }}
           />
           <div className={ css.sliderContainer }>
             <Slider
-              value={ percent.toNumber() }
+              value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
               onChange={sliderChange}
               step={ 10 }
               ThumbComponent={p => <InvaderThumb thumbProps={p} percent={percent}/>}
