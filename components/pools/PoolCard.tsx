@@ -90,7 +90,7 @@ const PoolCard = (props: PoolProps) => {
     .then( response => response.json() )
     .then( data => setApyData(data) )
     .finally( () => hydrateAPY && triggerAPYHydrate() )
-  },[chainId, hydrateAPY, setApyData, hydrateAPY])
+  },[chainId, hydrateAPY, setApyData, hydrateAPY, triggerAPYHydrate])
   
   const buttonAction = () =>{
     if(isApproved) 
@@ -431,14 +431,14 @@ const PoolCard = (props: PoolProps) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', newValue)
         }
-
-        useEffect(()=>{
+        const toggleStakeAction = (stakeActionValue: boolean) => {
+          setStakeAction(stakeActionValue)
           setFieldValue('stakeAmount',0)
-        },[stakeAction])
+        }
         return(<Form>
           <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(false)}>
+              <MButton className={ css.stakeActionBtn } color={ !stakeAction ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
                 STAKE
               </MButton>
             </Grid>
@@ -446,7 +446,7 @@ const PoolCard = (props: PoolProps) => {
               <Divider orientation="vertical"/>
             </Grid>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => setStakeAction(true)} disabled={ userStaked <=0 }>
+              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
                 WITHDRAW
               </MButton>
             </Grid>

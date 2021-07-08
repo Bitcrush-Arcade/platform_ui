@@ -1,5 +1,5 @@
 // React
-import { createContext, useEffect, useState, ReactNode, useMemo } from 'react'
+import { createContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react'
 // third party libs
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
@@ -71,9 +71,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     setDark( savedTheme === "true" )
   },[])
 
-  const clearPending = (id: string) => {
+  const clearPending = useCallback((id: string) => {
     setTimeout( () => setPendingTransactions(draft => { delete draft[id] }), 5000)
-  }
+  },[setPendingTransactions])
 
   const edits = useMemo( () => ({
     pending: (id: string, data?: any) => {
