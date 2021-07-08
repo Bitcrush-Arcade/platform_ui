@@ -27,7 +27,7 @@ const RoiModal = ( props: RoiProps ) => {
 
   return <Dialog
     open={open}
-    PaperComponent={ paperProps => <Card {...paperProps} noBorder className={ css.card } />}
+    PaperComponent={ paperProps => <Card {...paperProps} noBorder className={ css.card } background="light" />}
     onClose={onClose}
   >
     <Grid container justify="space-between" alignItems="center">
@@ -121,5 +121,10 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     marginBottom: theme.spacing(2),
   },
   getToken:{
+    backgroundColor: theme.palette.secondary.light,
+    color: theme.palette.common.white,
+    '&:hover':{
+      backgroundColor: theme.palette.secondary.dark,
+    }
   }
 }))
