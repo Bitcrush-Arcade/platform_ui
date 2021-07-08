@@ -33,7 +33,7 @@ export default function Home() {
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions } = useContext(TransactionContext)
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
-  const { methods } = useContract(firstPool.abi, firstPool.address)
+  const { methods } = firstPool.address ? useContract(firstPool.abi, firstPool.address) : { methods: undefined }
 
   const [tvl, setTvl ] = useState<number>(0)
   const [staked, setStaked ] = useState<number>(0)

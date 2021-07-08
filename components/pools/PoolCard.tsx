@@ -48,7 +48,7 @@ const PoolCard = (props: PoolProps) => {
   // Web3
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
-  const { contract: mainContract, methods: mainMethods } = useContract(abi, contractAddress)
+  const { methods: mainMethods } = !contractAddress ? { methods: undefined } : useContract(abi, contractAddress)
   // Context
   const { editTransactions, tokenInfo } = useContext(TransactionContext)
   // State
@@ -168,10 +168,10 @@ const PoolCard = (props: PoolProps) => {
       if(!coinContract || !account || [97].indexOf(chainId) == -1 ) return
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
-      const userInfo = await mainMethods.stakings(account).call()
-      const totalPool = await mainMethods.totalPool().call()
-      const totalStaked = await mainMethods.totalStaked().call()
-      const pending = await mainMethods.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
+      const userInfo = await mainMethods?.stakings(account).call()
+      const totalPool = await mainMethods?.totalPool().call()
+      const totalStaked = await mainMethods?.totalStaked().call()
+      const pending = await mainMethods?.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -272,7 +272,7 @@ const PoolCard = (props: PoolProps) => {
                 </Grid>
               </Grid>
             </ButtonBase>
-            <IconButton size="small" color="primary" onClick={triggerAPYHydrate}>
+            <IconButton size="small" color="primary" onClick={triggerAPYHydrate} disabled={!contractAddress}>
               { hydrateAPY ? <CircularProgress size="inherit"/>
                 : <RefreshIcon fontSize="inherit"/>}
             </IconButton>
@@ -296,12 +296,13 @@ const PoolCard = (props: PoolProps) => {
             </Button>}
           </Grid>
         </Grid>
-        <Button width="100%" color="primary" onClick={cardPreStake} 
-          // disabled={items.totalPool == 0}
+        <Button width="100%" color="primary" onClick={cardPreStake} solidDisabledText
+          disabled={!contractAddress || items.totalPool == 0}
         >
-          { account 
+          COMING SOON
+          {/* { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
-              : "Unlock Wallet"}
+              : "Unlock Wallet"} */}
         </Button>
       </CardContent>
       <CardActions>
@@ -310,7 +311,7 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound} hasIcon>
+            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
               <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
             </SmallButton>
             <Tooltip arrow
@@ -376,7 +377,7 @@ const PoolCard = (props: PoolProps) => {
         onSubmit={ ( values, { setSubmitting } ) => {
           const weiAmount = new BigNumber( toWei(`${new BigNumber(values.stakeAmount).toFixed(18)}`) )
           if(stakeAction){
-            mainMethods.leaveStaking(weiAmount.toFixed()).send({ from: account })
+            mainMethods?.leaveStaking(weiAmount.toFixed()).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
               })
@@ -394,7 +395,7 @@ const PoolCard = (props: PoolProps) => {
                 setSubmitting(false)
                 setStakeAction(false)
               })
-          }else mainMethods.enterStaking(weiAmount.toFixed()).send({ from: account })
+          }else mainMethods?.enterStaking(weiAmount.toFixed()).send({ from: account })
             .on('transactionHash', tx =>{
               editTransactions(tx,'pending', { description: "Stake Crush in pool"})
             })
