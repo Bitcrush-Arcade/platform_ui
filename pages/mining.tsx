@@ -10,7 +10,6 @@ import PoolCard from 'components/pools/PoolCard'
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
-import { useContract } from "hooks/web3Hooks"
 
 const Mining = () => {
 
