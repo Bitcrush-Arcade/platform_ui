@@ -24,9 +24,8 @@ type ContextType = {
 }
 
 export const TransactionContext = createContext<ContextType>({
-  pending: [],
-  completed: [],
-  error: [],
+  pending: {},
+  completed: {},
   editTransactions: () => {},
   tokenInfo: { weiBalance: 0, crushUsdPrice: 0 },
   toggleDarkMode: () => {},
