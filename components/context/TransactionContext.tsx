@@ -106,7 +106,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       })
       clearPending(id)
     },
-  }),[setPendingTransactions, setCompleteTransactions])
+  }),[setPendingTransactions, setCompleteTransactions, clearPending, pendingTransactions])
 
   const basicTheme = useMemo( () => getTheme(dark), [dark])
 

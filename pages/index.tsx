@@ -70,7 +70,7 @@ export default function Home() {
       console.log('error', error, receipt)
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
-  },[methods, router, staked, account])
+  },[methods, router, staked, account, editTransactions])
 
   return (<>
   <Head>

@@ -70,7 +70,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},
             { name: <Grid container alignItems="center">
                     <Grid item>
-                        <Image src="/hashex_logo.png" width={295 / hashexScale } height={81 / hashexScale} className={ css.hashexLogo }/>
+                        <Image src="/hashex_logo.png" width={295 / hashexScale } height={81 / hashexScale} className={ css.hashexLogo } alt="HashEx Logo"/>
                     </Grid>
                     <Grid item>
                         &nbsp;Audit&nbsp;
