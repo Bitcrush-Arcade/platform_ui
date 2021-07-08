@@ -48,7 +48,7 @@ const PoolCard = (props: PoolProps) => {
   // Web3
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
-  const { methods: mainMethods } = !contractAddress ? { methods: undefined } : useContract(abi, contractAddress)
+  const { methods: mainMethods } = useContract(abi, contractAddress)
   // Context
   const { editTransactions, tokenInfo } = useContext(TransactionContext)
   // State
@@ -90,7 +90,7 @@ const PoolCard = (props: PoolProps) => {
     .then( response => response.json() )
     .then( data => setApyData(data) )
     .finally( () => hydrateAPY && triggerAPYHydrate() )
-  },[chainId, hydrateAPY, setApyData, hydrateAPY, triggerAPYHydrate])
+  },[chainId, hydrateAPY, setApyData, triggerAPYHydrate])
   
   const buttonAction = () =>{
     if(isApproved) 

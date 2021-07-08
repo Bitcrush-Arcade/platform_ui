@@ -27,7 +27,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const { tokenInfo, editTransactions } = useContext( TransactionContext )
   const stakeContract = getContracts('singleAsset', chainId )
-  const { methods } = !stakeContract.address ? { methods: undefined } : useContract( stakeContract.abi, stakeContract.address )
+  const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
   

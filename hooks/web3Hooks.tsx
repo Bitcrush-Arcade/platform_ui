@@ -42,10 +42,10 @@ const web3 = new Web3(Web3.givenProvider)
 // easy import of a contract to interact with
 export function useContract(abi: any, address: string): ContractHandles{
   const { chainId } = useWeb3React()
-  const [contract, setContract] = useState(() => [56, 97].indexOf(chainId || 0)> -1 ? new web3.eth.Contract(abi,address) : null)
+  const [contract, setContract] = useState(() => [56, 97].indexOf(chainId || 0)> -1 && address ? new web3.eth.Contract(abi,address) : null)
   
   useEffect( () => {
-    chainId && setContract( () => [56, 97].indexOf(chainId || 0)> -1 ? new web3.eth.Contract(abi,address) : null )
+    chainId && setContract( () => [56, 97].indexOf(chainId || 0)> -1 && address ? new web3.eth.Contract(abi,address) : null )
   },[chainId])
   
   return { contract, methods: contract?.methods || null, web3 }
