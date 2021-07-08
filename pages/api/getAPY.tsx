@@ -55,6 +55,10 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
     if( j == (30 * 288) && !d30 )
       d30 = previousReward
   }
+  const readableD1 = new BigNumber(d1).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD7 = new BigNumber(d7).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD30 = new BigNumber(d30).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD365 = new BigNumber(previousReward).div( new BigNumber(10).pow(18) ).toNumber()
   previousCalc = {
     constants:{
       initialStake,
@@ -63,20 +67,20 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
       crushPerBlock: new BigNumber(emission).div( new BigNumber(10).pow(18) ).toFixed()
     },
     d1: {
-      return: d1,
-      percent: currencyFormat(d1 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      return: readableD1,
+      percent: currencyFormat(readableD1 / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
     d7: {
-      return: d7,
-      percent: currencyFormat(d7 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      return: readableD7,
+      percent: currencyFormat(readableD7 / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
     d30: {
-      return: d30,
-      percent: currencyFormat(d30 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      return: readableD30,
+      percent: currencyFormat(readableD30 / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
     d365: {
-      return: previousReward,
-      percent: currencyFormat(previousReward / initialStake * 100, { decimalsToShow: 2}) + '%',
+      return: readableD365,
+      percent: currencyFormat(readableD365 / initialStake * 100, { decimalsToShow: 2}) + '%',
     },
   }
   calculatedLast = new Date()
