@@ -47,7 +47,7 @@ export default function TxCard( props: TxCardProps ){
             { first.description || shortAddress(keys[0])}
           </Typography>
         </Tooltip>
-        <a href={`https://${chainId == 97 ? 'testnet.': ''}bscscan.com/tx/${keys[0]}`} target="_blank" className={ css.link}>
+        <a href={`https://${chainId == 97 ? 'testnet.': ''}bscscan.com/tx/${keys[0]}`} target="_blank" className={ css.link} rel="noreferrer">
           <Typography color="secondary" variant="caption">
             view on BSCscan <LaunchIcon fontSize="inherit"/>
           </Typography>
