@@ -94,10 +94,17 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       backgroundSize: '200% auto',
       backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
     },
+    [theme.breakpoints.down(750)]:{
+      backgroundSize: '400% auto',
+      backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
+    },
     [theme.breakpoints.up('md')]:{
       backgroundPosition: props => (props.background || 'default') == 'default' ? 
         props.menuToggle ? `left calc( 50% + ${ theme.palette.type =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.type =='dark' ? 12 : 32}px ) top 0`
         : 'top',
+    },
+    [theme.breakpoints.up('xl')]:{
+      backgroundSize: '120% auto',
     },
     backgroundRepeat: 'no-repeat',
     minHeight: '100vh',

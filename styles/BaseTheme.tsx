@@ -1,6 +1,6 @@
 import { createMuiTheme, responsiveFontSizes,  } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple'
-// import purple from '@material-ui/core/colors/purple'
+import grey from '@material-ui/core/colors/grey'
 import teal from '@material-ui/core/colors/teal'
 
 const theme = (isDark?: boolean) => createMuiTheme({
@@ -15,7 +15,7 @@ const theme = (isDark?: boolean) => createMuiTheme({
       dark: 'rgb(9,130,105)'
     },
     background: {
-      default: isDark ? 'rgb(12,15,32)' : 'white',
+      default: isDark ? 'rgb(12,15,32)' : 'rgb(222,211,241)',
       paper: isDark ? 'rgb(27,30,65)' : 'white',
       menu: isDark ? 'rgb(23,24,54)' : 'white',
       highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)'
