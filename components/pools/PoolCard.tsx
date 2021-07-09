@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useState, useEffect, useCallback, useContext, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 // web3
 import { useWeb3React } from '@web3-react/core'
@@ -77,7 +77,7 @@ const PoolCard = (props: PoolProps) => {
   const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
 
-  const isApproved = items.approved > 0
+  const isApproved = useMemo( () => items.approved > 0 || items.userInfo.stakedAmount > 0, [items])
 
   useEffect(() => {
     if(!chainId || !hydrateAPY) return
@@ -96,7 +96,7 @@ const PoolCard = (props: PoolProps) => {
     if(isApproved) 
       setOpenStakeModal( p => !p )
     else{
-      coinMethods.approve( contractAddress, new BigNumber(items.balance).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
+      coinMethods.approve( contractAddress, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
