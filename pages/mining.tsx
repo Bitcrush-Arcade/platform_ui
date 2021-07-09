@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+// Next
+import Head from 'next/head'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
@@ -20,6 +22,10 @@ const Mining = () => {
   const token = useMemo( () => getContracts('crushToken', chainId ), [chainId])
 
   return <PageContainer background="galactic">
+    <Head>
+      <title>BITCRUSH - MINING</title>
+      <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
+    </Head>
     <Grid container justify="space-evenly">
     <Grid item xs={10} sm={8} md={6}>
         <Descriptor
