@@ -165,7 +165,7 @@ const PoolCard = (props: PoolProps) => {
 // Hydrate changing Data
   useEffect( ()=>{
     const getPoolData = async () => {
-      if(!coinContract || !account || [97].indexOf(chainId) == -1 ) return
+      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) return
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods?.stakings(account).call()
