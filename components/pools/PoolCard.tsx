@@ -299,10 +299,9 @@ const PoolCard = (props: PoolProps) => {
         <Button width="100%" color="primary" onClick={cardPreStake} solidDisabledText
           disabled={!contractAddress || items.totalPool == 0}
         >
-          COMING SOON
-          {/* { account 
+          { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
-              : "Unlock Wallet"} */}
+              : "Unlock Wallet"}
         </Button>
       </CardContent>
       <CardActions>

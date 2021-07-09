@@ -8,7 +8,7 @@ import { useWeb3React } from '@web3-react/core'
 import { ThemeProvider } from '@material-ui/core/styles'
 import getTheme from 'styles/BaseTheme'
 // data
-import { contracts } from 'data/contracts'
+import { getContracts } from 'data/contracts'
 // hooks
 import { useContract } from 'hooks/web3Hooks'
 // types
@@ -36,8 +36,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const { children } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
-  const token = contracts.crushToken
-  const { methods } = useContract(token.abi, token[chainId])
+  const token = getContracts('crushToken', chainId)
+  const { methods } = useContract(token.abi, token.address )
 
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
