@@ -77,7 +77,7 @@ const PoolCard = (props: PoolProps) => {
   const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
   const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
 
-  const isApproved = useMemo( () => items.approved > 0 || items.userInfo.stakedAmount > 0, [items])
+  const isApproved = useMemo( () => items.approved > 0 , [items])
 
   useEffect(() => {
     if(!chainId || !hydrateAPY) return
