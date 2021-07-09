@@ -16,8 +16,8 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const isLocal = host.indexOf('localhost:') > -1
   if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
-  if( previousCalc && minuteDifference( new Date(), calculatedLast ) < 30 )
-    return res.status(304).json(previousCalc)
+  // if( previousCalc && minuteDifference( new Date(), calculatedLast ) < 30 )
+  //   return res.status(304).json(previousCalc)
   // Fetch current crushPrice
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then( r => r.json() )
 
