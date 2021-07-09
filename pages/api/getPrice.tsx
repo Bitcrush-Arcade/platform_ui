@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 
 export default async function getPrice(req : NextApiRequest, res: NextApiResponse){
 
-  const web3 = new Web3( new Web3.providers.HttpProvider('https://bsc-dataseed4.binance.org/') )
+  const web3 = new Web3( new Web3.providers.HttpProvider('https://bsc-dataseed1.defibit.io/') )
 
   // POOL ADDRESS
   const contract = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x8A10489f1255fb63217Be4cc96B8F4CD4D42a469')
