@@ -76,7 +76,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         &nbsp;Audit&nbsp;
                     </Grid>
                 </Grid>, 
-                icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
+                icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/HashEx/public_audits/blob/master/bitcrush%20arcade/Bitcrush%20Arcade%20report.pdf'},
             { name: 'Charts', icon: <TrendingUpIcon color="inherit" fontSize="small"/>, url_link: 'https://charts.bogged.finance/?token=0x0Ef0626736c2d484A792508e99949736D0AF807e'},
         ] },
     ]
