@@ -23,7 +23,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
 
   const initialStake = 1000 / price.crushUsdPrice 
   // Get info from contract
-  const usedChain = body?.chainId ? parseInt(body.chainId) : 97
+  const usedChain = 56//body?.chainId ? parseInt(body.chainId) : 97
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const contractSetup = getContracts('singleAsset', usedChain )
@@ -56,10 +56,10 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
     if( j == (30 * 288) && !d30 )
       d30 = previousReward
   }
-  const readableD1 = new BigNumber(d1).toNumber()
-  const readableD7 = new BigNumber(d7).toNumber()
-  const readableD30 = new BigNumber(d30).toNumber()
-  const readableD365 = new BigNumber(previousReward).toNumber()
+  const readableD1 = new BigNumber(d1).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD7 = new BigNumber(d7).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD30 = new BigNumber(d30).div( new BigNumber(10).pow(18) ).toNumber()
+  const readableD365 = new BigNumber(previousReward).div( new BigNumber(10).pow(18) ).toNumber()
   previousCalc = {
     constants:{
       initialStake,
