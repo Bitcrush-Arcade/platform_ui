@@ -23,7 +23,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
 
   const initialStake = 1000 / price.crushUsdPrice 
   // Get info from contract
-  const usedChain = 56//body?.chainId ? parseInt(body.chainId) : 97
+  const usedChain = body?.chainId ? parseInt(body.chainId) : 97
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const contractSetup = getContracts('singleAsset', usedChain )
@@ -31,12 +31,12 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
 
   const emission = await contract.methods.crushPerBlock().call()
   const totalStaked = fromWei( await contract.methods.totalStaked().call() )
-  const compounder =  await contract.methods.performanceFeeCompounder().call()
-  const reserve = await contract.methods.performanceFeeReserve().call()
-  const burn = await contract.methods.performanceFeeBurn().call()
-  const divisor = "10000"
+  // const compounder =  await contract.methods.performanceFeeCompounder().call()
+  // const reserve = await contract.methods.performanceFeeReserve().call()
+  // const burn = await contract.methods.performanceFeeBurn().call()
+  // const divisor = "10000"
 
-  const performanceFee = new BigNumber(compounder).plus(reserve).plus(burn).div(divisor).toNumber()
+  const performanceFee = 0.03
   const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).times(100).toNumber()
   const totalPool = new BigNumber(totalStaked).toNumber() || new BigNumber( 1000000 ).times( new BigNumber(10).pow(18) ).toNumber()
   let d1 = 0
