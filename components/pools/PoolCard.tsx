@@ -374,7 +374,7 @@ const PoolCard = (props: PoolProps) => {
           stakeAmount: 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
-          const weiAmount = toWei(`${new BigNumber(values.stakeAmount).toFixed(18)}`)
+          const weiAmount = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
           if(stakeAction){
             mainMethods?.leaveStaking(weiAmount).send({ from: account })
               .on('transactionHash', tx =>{
