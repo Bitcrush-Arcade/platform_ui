@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useCallback } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Avatar from '@material-ui/core/Avatar'
@@ -10,10 +10,13 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemText from '@material-ui/core/ListItemText'
 // Libs
 import { currencyFormat, shortAddress } from 'utils/text/text'
+import BigNumber from 'bignumber.js'
 // Hooks
-import { useAuth } from 'hooks/web3Hooks'
+import { useAuth, useContract } from 'hooks/web3Hooks'
 // Context
 import { TransactionContext } from 'components/context/TransactionContext'
+// data
+import { getContracts } from 'data/contracts'
 
 const ProfileAvatar = () => {
 
@@ -21,7 +24,26 @@ const ProfileAvatar = () => {
   const css = useStyles({})
   const { login, logout, account } = useAuth()
 
-  const { tokenInfo } = useContext(TransactionContext)
+  const { tokenInfo, editTransactions } = useContext(TransactionContext)
+  const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
+  const { address: stakingContract } = getContracts('singleAsset', 56)
+  const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
+
+  const approve = useCallback(() => {
+    coinMethods.approve( stakingContract, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  },[coinMethods, account, editTransactions, stakingContract])
 
   const hasAccount = Boolean(account)
   const toggleDrawer = () => setOpenMenu( p => !p )
@@ -60,6 +82,14 @@ const ProfileAvatar = () => {
             secondary={"Current CRUSH"}
           />
         </ListItem>
+        {hasAccount && <ListItem button
+          onClick={ approve }
+        >
+          <ListItemText
+            primary={"Approve SAS Pool"}
+            secondary={"In case of issue staking"}
+          />
+        </ListItem>}
       </List>
     </Drawer>
   </>
