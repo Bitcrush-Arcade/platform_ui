@@ -374,9 +374,9 @@ const PoolCard = (props: PoolProps) => {
           stakeAmount: 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
-          const weiAmount = new BigNumber( toWei(`${new BigNumber(values.stakeAmount).toFixed(18)}`) )
+          const weiAmount = toWei(`${new BigNumber(values.stakeAmount).toFixed(18)}`)
           if(stakeAction){
-            mainMethods?.leaveStaking(weiAmount.toFixed()).send({ from: account })
+            mainMethods?.leaveStaking(weiAmount).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
               })
@@ -394,7 +394,7 @@ const PoolCard = (props: PoolProps) => {
                 setSubmitting(false)
                 setStakeAction(false)
               })
-          }else mainMethods?.enterStaking(weiAmount.toFixed()).send({ from: account })
+          }else mainMethods?.enterStaking(weiAmount).send({ from: account })
             .on('transactionHash', tx =>{
               editTransactions(tx,'pending', { description: "Stake Crush in pool"})
             })
