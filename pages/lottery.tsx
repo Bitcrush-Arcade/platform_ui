@@ -5,16 +5,16 @@ import Typography from '@material-ui/core/Typography'
 // Bitcrush
 import PageContainer from 'components/PageContainer'
 
-const Warp = () => {
+const Trade = () => {
   return <PageContainer>
-    <Head>
-      <title>BITCRUSH - WARP (Coming Soon)</title>
-      <meta name="description" content="Warp through the spacetime of crypto. Coming soon"/>
+     <Head>
+      <title>BITCRUSH - Lottery (comingSoon)</title>
+      <meta name="description" content="Lottery Coming Soon"/>
     </Head>
     <Typography variant="h1" align="center">
-      Warp PAGE COMING SOON
+      LOTTERY COMING SOON
     </Typography>
   </PageContainer>
 }
 
-export default Warp
+export default Trade
