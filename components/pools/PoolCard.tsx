@@ -55,7 +55,6 @@ const PoolCard = (props: PoolProps) => {
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
   const [ openRoi, setOpenRoi ] = useState<boolean>(false)
-  const [ stakeAction, setStakeAction ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
   const [ hydrateAPY, setHydrateAPY ] = useState<boolean>(true)
   const [apyData, setApyData] = useState<RoiProps['apyData']>(undefined)
@@ -371,12 +370,17 @@ const PoolCard = (props: PoolProps) => {
     >
       <Formik
         initialValues = {{
-          stakeAmount: 0
+          stakeAmount: 0,
+          actionType: false
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
-          const weiAmount = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
-          if(stakeAction){
-            mainMethods?.leaveStaking(weiAmount).send({ from: account })
+          const { stakeAmount, actionType } = values
+          const maxUsed = actionType ? maxStaked : maxBalance
+          const isMax = new BigNumber( stakeAmount ).div( maxUsed ).isEqualTo( 1 )
+          console.log(stakeAmount, maxUsed, actionType ? "withdraw" : "stake", isMax, new BigNumber( stakeAmount ).div( maxUsed ).toFixed(18,1))
+          const weiAmount = toWei(`${new BigNumber(stakeAmount).toFixed(18,1)}`)
+          if(actionType){
+            ( isMax ? mainMethods?.leaveStakingCompletely() : mainMethods?.leaveStaking(weiAmount)).send({ from: account })
               .on('transactionHash', tx =>{
                 editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
               })
@@ -385,14 +389,12 @@ const PoolCard = (props: PoolProps) => {
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
-                setStakeAction(false)
               })
               .on('error', (error, receipt) => {
                 receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
-                setStakeAction(false)
               })
           }else mainMethods?.enterStaking(weiAmount).send({ from: account })
             .on('transactionHash', tx =>{
@@ -413,9 +415,9 @@ const PoolCard = (props: PoolProps) => {
         }}
         validate ={ ( values ) => {
           let errors: any = {}
-          if(!stakeAction && new BigNumber(values.stakeAmount).isGreaterThan( maxBalance ) )
+          if(!values.actionType && new BigNumber(values.stakeAmount).isGreaterThan( maxBalance ) )
             errors.stakeAmount = "Insufficient Funds"
-          if(stakeAction && new BigNumber(values.stakeAmount).isGreaterThan( maxStaked ) )
+          if(values.actionType && new BigNumber(values.stakeAmount).isGreaterThan( maxStaked ) )
             errors.stakeAmount = "Insufficient Funds"
           if(values.stakeAmount <= 0)
             errors.stakeAmount = "Invalid Input"
@@ -425,20 +427,21 @@ const PoolCard = (props: PoolProps) => {
         validateOnChange
       >
       { ({values, setFieldValue, isSubmitting}) =>{
-        const maxUsed = stakeAction ? maxStaked : maxBalance
-        const percent = new BigNumber(values.stakeAmount).div( maxUsed ).times(100)
+        const { actionType, stakeAmount } = values
+        const maxUsed = actionType ? maxStaked : maxBalance
+        const percent = new BigNumber( stakeAmount ).div( maxUsed ).times(100)
         const sliderChange = (e: any, value: number) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', newValue)
         }
         const toggleStakeAction = (stakeActionValue: boolean) => {
-          setStakeAction(stakeActionValue)
-          setFieldValue('stakeAmount',0)
+          setFieldValue('actionType', stakeActionValue )
+          setFieldValue('stakeAmount', 0 )
         }
         return(<Form>
           <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !stakeAction ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
+              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
                 STAKE
               </MButton>
             </Grid>
@@ -446,20 +449,20 @@ const PoolCard = (props: PoolProps) => {
               <Divider orientation="vertical"/>
             </Grid>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ stakeAction ? "secondary" : "default"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
+              <MButton className={ css.stakeActionBtn } color={ actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
                 WITHDRAW
               </MButton>
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            { stakeAction 
+            { actionType 
                 ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isWei: true })} `
                 : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isWei: true })} `}
           </Typography>
           <Field
             type="number"
             fullWidth
-            label={stakeAction ? 'Withdraw Amount' : `Stake Amount`}
+            label={actionType ? 'Withdraw Amount' : `Stake Amount`}
             id="stakeAmount"
             name="stakeAmount"
             placeholder="0.00"
@@ -497,7 +500,7 @@ const PoolCard = (props: PoolProps) => {
             </SmallButton>
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
-            {stakeAction ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
+            {actionType ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
           </Button>
         </Form>)
         }}
