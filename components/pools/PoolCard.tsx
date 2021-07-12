@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 // web3
 import { useWeb3React } from '@web3-react/core'
@@ -32,6 +32,7 @@ import Card from 'components/basics/Card'
 import Button from 'components/basics/GeneralUseButton'
 import RoiModal, { RoiProps } from 'components/pools/RoiModal'
 import SmallButton from 'components/basics/SmallButton'
+import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
@@ -39,7 +40,6 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 import { currencyFormat } from 'utils/text/text'
 import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
-import { TransactionContext } from 'components/context/TransactionContext'
 import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
 
@@ -50,7 +50,7 @@ const PoolCard = (props: PoolProps) => {
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
   const { methods: mainMethods } = useContract(abi, contractAddress)
   // Context
-  const { editTransactions, tokenInfo } = useContext(TransactionContext)
+  const { editTransactions, tokenInfo } = useTransactionContext()
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)

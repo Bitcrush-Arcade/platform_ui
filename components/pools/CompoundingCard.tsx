@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from "@material-ui/core/Grid"
@@ -10,11 +10,12 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
-import { TransactionContext } from "components/context/TransactionContext"
 // libs
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "hooks/web3Hooks"
+// Context
+import { useTransactionContext } from "hooks/contextHooks"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
@@ -25,7 +26,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const { chainId, account } = useWeb3React()
 
-  const { tokenInfo, editTransactions } = useContext( TransactionContext )
+  const { tokenInfo, editTransactions } = useTransactionContext()
   const stakeContract = getContracts('singleAsset', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )

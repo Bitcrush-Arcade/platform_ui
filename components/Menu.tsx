@@ -1,5 +1,5 @@
 // React imports
-import React, { useState, Fragment, useContext } from 'react'
+import React, { Fragment } from 'react'
 import { useImmer } from 'use-immer'
 // Next
 import { useRouter } from 'next/router'
@@ -31,8 +31,8 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
-import { TransactionContext } from 'components/context/TransactionContext'
 // Utils
+import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 import { ConditionalLinkWrapper } from 'utils/wrappers'
 // Icons
@@ -54,7 +54,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const router = useRouter()
     const css = useStyles({ open })
 
-    const { tokenInfo, toggleDarkMode, isDark } = useContext( TransactionContext )
+    const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
     
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },

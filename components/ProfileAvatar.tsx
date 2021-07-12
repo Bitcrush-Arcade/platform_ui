@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Avatar from '@material-ui/core/Avatar'
@@ -13,7 +13,7 @@ import { currencyFormat, shortAddress } from 'utils/text/text'
 // Hooks
 import { useAuth } from 'hooks/web3Hooks'
 // Context
-import { TransactionContext } from 'components/context/TransactionContext'
+import { useTransactionContext } from 'hooks/contextHooks'
 
 const ProfileAvatar = () => {
 
@@ -21,7 +21,7 @@ const ProfileAvatar = () => {
   const css = useStyles({})
   const { login, logout, account } = useAuth()
 
-  const { tokenInfo } = useContext(TransactionContext)
+  const { tokenInfo } = useTransactionContext()
 
   const hasAccount = Boolean(account)
   const toggleDrawer = () => setOpenMenu( p => !p )
