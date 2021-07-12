@@ -18,7 +18,7 @@
     "@web3-react/walletconnect-connector": "^6.2.0",
     "bignumber.js": "^9.0.1",
     "date-fns": "^2.22.1",
-    "ethers": "^5.3.1",
+    "ethers": "^5.4.1",
     "formik": "^2.2.9",
     "formik-material-ui": "^3.0.1",
     "immer": "^9.0.3",
