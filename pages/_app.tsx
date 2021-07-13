@@ -1,11 +1,8 @@
 // import App from 'next/app'
 import { useEffect } from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline'
-// BlockChain
-import { ethers } from 'ethers'
-import { Web3ReactProvider } from '@web3-react/core'
 // Context
-import { TransactionLoadingContext } from 'components/context/TransactionContext'
+import ContextProviders from 'components/context/ContextProviders'
 
 function MyApp({ Component, pageProps }) {
 
@@ -16,18 +13,10 @@ function MyApp({ Component, pageProps }) {
     }
   }, [])
 
-  const getLibrary = ( provider ): ethers.providers.Web3Provider =>{ 
-    const library = new ethers.providers.Web3Provider(  provider )
-    library.pollingInterval = 12000
-    return library
-  }
-
-  return (<Web3ReactProvider getLibrary={ getLibrary }>
-    <TransactionLoadingContext>
+  return (<ContextProviders>
       <CssBaseline/>
       <Component {...pageProps} />
-    </TransactionLoadingContext>
-  </Web3ReactProvider>
+    </ContextProviders>
   )
 }
 

@@ -50,9 +50,15 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   useEffect( () => {
     async function getTokenInfo (){
-      if(!account || !methods) return
-      const tokenBalance = await methods.balanceOf(account).call()
       const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
+      if(!account || !methods) {
+        setCoinInfo( draft => {
+          draft.weiBalance = 0
+          draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
+        })
+        return
+      }
+      const tokenBalance = await methods.balanceOf(account).call()
       setCoinInfo( draft => {
         draft.weiBalance = tokenBalance
         draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
