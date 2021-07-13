@@ -1,6 +1,5 @@
 // React
-import { createContext, ReactNode, useState, useMemo } from "react"
-import Image from 'next/image'
+import { createContext, ReactNode, useState } from "react"
 // Material
 import Avatar from "@material-ui/core/Avatar"
 import Dialog from "@material-ui/core/Dialog"
@@ -17,7 +16,6 @@ import Card from 'components/basics/Card'
 import { useAuth, ConnectorNames } from 'hooks/web3Hooks'
 // data
 import wallets from 'data/wallets'
-import { useWeb3React } from "@web3-react/core"
 
 type AuthContextType = {
   login: () => void,
@@ -38,7 +36,7 @@ export const AuthContext = (props: { children: ReactNode }) => {
 
   const { login, logout, account, chainId } = useAuth()
 
-  const [ openDialog, setOpenDialog ] = useState<boolean>(true)
+  const [ openDialog, setOpenDialog ] = useState<boolean>(false)
 
   const walletItems = wallets.map( (wallet, walletIdx) => {
     return <ListItem 
