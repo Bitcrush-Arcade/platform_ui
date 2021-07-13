@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo, useContext } from 'react'
+import { useMemo } from 'react'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
@@ -17,9 +17,9 @@ import ProfileAvatar from 'components/ProfileAvatar'
 import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
 import Coin from 'components/tokens/Token2'
 // Hooks
-import { useAuth } from 'hooks/web3Hooks'
-import { TransactionContext } from 'components/context/TransactionContext'
+import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
+import { useTransactionContext } from 'hooks/contextHooks'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -32,7 +32,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 24 : 18
   
-  const { tokenInfo } = useContext(TransactionContext)
+  const { tokenInfo } = useTransactionContext()
 
   const token1Actions = [
     {name:'Deposit', onClick: ()=>console.log('action 1')},
@@ -110,7 +110,7 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
 }))
 
 const ConnectButton = () => {
-  const { login, account } = useAuth()
+  const { login, account } = useAuthContext()
 
   const displayAccount = useMemo( () => shortAddress(account || ''),[account])
   

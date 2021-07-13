@@ -1,5 +1,5 @@
 // React
-import { useState, ReactNode, useEffect, useContext, useMemo } from 'react'
+import { useState, ReactNode, useEffect, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 // 3p
 import compact from 'lodash/compact'
@@ -15,7 +15,7 @@ import TxCard from 'components/context/TransactionCard'
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
 // Context
-import { TransactionContext } from 'components/context/TransactionContext'
+import { useTransactionContext } from 'hooks/contextHooks'
 
 
 const PageContainer = ( props: ContainerProps ) => {
@@ -30,7 +30,7 @@ const PageContainer = ( props: ContainerProps ) => {
   
   const css = useStyles({ menuToggle, ...props })
 
-  const { pending, completed } = useContext(TransactionContext)
+  const { pending, completed } = useTransactionContext()
 
   useEagerConnect()
 

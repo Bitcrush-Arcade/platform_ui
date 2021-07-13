@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Checkbox from '@material-ui/core/Checkbox'
@@ -14,11 +14,12 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
-import { TransactionContext } from "components/context/TransactionContext"
 // libs
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "hooks/web3Hooks"
+// Context
+import { useTransactionContext } from "hooks/contextHooks"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
@@ -29,14 +30,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const { chainId, account } = useWeb3React()
 
-  const { tokenInfo, editTransactions } = useContext( TransactionContext )
+  const { tokenInfo, editTransactions } = useTransactionContext()
   const stakeContract = getContracts('singleAsset', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
 
   const [ showWarning, setShowWarning ] = useState<boolean>(false)
-  const [ agreed, setAgreed ] = useState<boolean>(false)
   
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
   
@@ -123,7 +123,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || (showWarning && !agreed )}>
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account || showWarning }>
             Claim
           </Button>
         </Grid>

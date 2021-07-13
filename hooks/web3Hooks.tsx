@@ -1,27 +1,43 @@
+// State
+import { useState, useEffect, useCallback, useMemo } from 'react'
+// Web3
 import Web3 from 'web3'
 import { useWeb3React } from '@web3-react/core'
-import { InjectedConnector } from '@web3-react/injected-connector'
-import { useState, useEffect, useCallback } from 'react'
+import { InjectedConnector,  UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector'
+import { WalletConnectConnector, UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from '@web3-react/walletconnect-connector'
+// data
+import { getRpcUrl } from 'data/rpc'
 
-import { AbiItem } from 'web3-utils'
-
+const validChains = [56,97]
+const POLLING_INTERVAL = 12000
 // Login and Logout Hook -> Handles Wallet Connection
 export const useAuth = () => {
 
-  const validChains = [56,97]
   
-  const { activate, deactivate, account } = useWeb3React()
+  const { activate, deactivate, account, chainId } = useWeb3React()
   
-  const login = useCallback(() => {
-    const connector = new InjectedConnector({ supportedChainIds: validChains})
+  const login = useCallback((specifiedConnector?: ConnectorNames) => {
+    const connector = CONNECTORS[specifiedConnector || "injected"]
     if(connector)
       activate(connector, async(error) =>{
         console.log('failed activation',error)
+        if( error instanceof UserRejectedRequestErrorWalletConnect && connector instanceof WalletConnectConnector)
+          connector.walletConnectProvider = null
+        
       })
-      .then( () => window.localStorage.setItem('connectorId', 'injected'))
-  },[])
+      .then( () => window.localStorage.setItem('connectorId', specifiedConnector || '' ))
+  },[activate])
 
-  return { login, logout: deactivate, account }
+  const logout = useCallback(() => {
+    deactivate()
+    if(window.localStorage.getItem('connectorId') == "walletConnect"){
+      CONNECTORS.walletConnect.close()
+      CONNECTORS.walletConnect.walletConnectProvider = null
+    }
+    window.localStorage.setItem('connectorId', '')
+  }, [deactivate])
+
+  return { login, logout, account, chainId }
 }
 // Automatically try to login if use has previously logged in
 export const useEagerConnect = () => {
@@ -30,11 +46,11 @@ export const useEagerConnect = () => {
   
   useEffect(()=>{
     
-    const connector = window.localStorage.getItem('connectorId')
+    const connector = window.localStorage.getItem('connectorId') as ConnectorNames
     if(!connector) return
-    login()
+    login(connector)
 
-  }, [])
+  }, [login])
 }
 
 const web3 = new Web3(Web3.givenProvider)
@@ -46,7 +62,7 @@ export function useContract(abi: any, address: string): ContractHandles{
   
   useEffect( () => {
     chainId && setContract( () => [56, 97].indexOf(chainId || 0)> -1 && address ? new web3.eth.Contract(abi,address) : null )
-  },[chainId])
+  },[chainId,abi,address])
   
   return { contract, methods: contract?.methods || null, web3 }
 }
@@ -55,4 +71,20 @@ type ContractHandles = {
   contract: any,
   methods: any,
   web3: Web3,
+}
+
+export const CONNECTORS: {[connector in ConnectorNames]: any } = {
+  "injected": new InjectedConnector({ supportedChainIds: validChains}),
+  "walletConnect" : new WalletConnectConnector({
+    rpc: { 
+      56: getRpcUrl(56),
+      97: getRpcUrl(97)
+    },
+    qrcode: true,
+    pollingInterval: POLLING_INTERVAL
+  })
+}
+export enum ConnectorNames {
+  INJECTED = "injected",
+  WALLET_CONNECT="walletConnect"
 }

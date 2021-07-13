@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Avatar from '@material-ui/core/Avatar'
@@ -12,9 +12,9 @@ import ListItemText from '@material-ui/core/ListItemText'
 import { currencyFormat, shortAddress } from 'utils/text/text'
 import BigNumber from 'bignumber.js'
 // Hooks
-import { useAuth, useContract } from 'hooks/web3Hooks'
+import { useContract } from 'hooks/web3Hooks'
 // Context
-import { TransactionContext } from 'components/context/TransactionContext'
+import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
 // data
 import { getContracts } from 'data/contracts'
 
@@ -22,9 +22,9 @@ const ProfileAvatar = () => {
 
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
-  const { login, logout, account } = useAuth()
+  const { login, logout, account } = useAuthContext()
 
-  const { tokenInfo, editTransactions } = useContext(TransactionContext)
+  const { tokenInfo, editTransactions } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)

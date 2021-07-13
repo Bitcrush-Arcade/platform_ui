@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 // web3
 import { useWeb3React } from '@web3-react/core'
@@ -32,6 +32,7 @@ import Card from 'components/basics/Card'
 import Button from 'components/basics/GeneralUseButton'
 import RoiModal, { RoiProps } from 'components/pools/RoiModal'
 import SmallButton from 'components/basics/SmallButton'
+import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
@@ -39,7 +40,6 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 import { currencyFormat } from 'utils/text/text'
 import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
-import { TransactionContext } from 'components/context/TransactionContext'
 import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
 
@@ -50,7 +50,7 @@ const PoolCard = (props: PoolProps) => {
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
   const { methods: mainMethods } = useContract(abi, contractAddress)
   // Context
-  const { editTransactions, tokenInfo } = useContext(TransactionContext)
+  const { editTransactions, tokenInfo } = useTransactionContext()
   // State
   const [ detailOpen, setDetailOpen ] = useState<boolean>(false)
   const [ openStakeModal, setOpenStakeModal ] = useState<boolean>(false)
@@ -79,11 +79,11 @@ const PoolCard = (props: PoolProps) => {
   const isApproved = useMemo( () => items.approved > 0 , [items])
 
   useEffect(() => {
-    if(!chainId || !hydrateAPY) return
+    if(!hydrateAPY) return
     fetch('/api/getAPY',{
       method: 'POST',
       body: JSON.stringify({
-        chainId: chainId
+        chainId: chainId || 56
       })
     })
     .then( response => response.json() )
@@ -164,7 +164,18 @@ const PoolCard = (props: PoolProps) => {
 // Hydrate changing Data
   useEffect( ()=>{
     const getPoolData = async () => {
-      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) return
+      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) {
+        setItems( draft => {
+          draft.balance = 0
+          draft.approved = 0
+          draft.userInfo.stakedAmount = 0
+          draft.userInfo.claimedAmount = 0
+          draft.totalPool = 0
+          draft.totalStaked = 1
+          draft.pendingReward = 0
+        })
+        return
+      }
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods?.stakings(account).call()
