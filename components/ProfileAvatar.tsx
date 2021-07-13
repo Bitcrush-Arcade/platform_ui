@@ -11,7 +11,7 @@ import ListItemText from '@material-ui/core/ListItemText'
 // Libs
 import { currencyFormat, shortAddress } from 'utils/text/text'
 // Hooks
-import { useAuth } from 'hooks/web3Hooks'
+import { useAuthContext } from 'hooks/contextHooks'
 // Context
 import { useTransactionContext } from 'hooks/contextHooks'
 
@@ -19,7 +19,7 @@ const ProfileAvatar = () => {
 
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
-  const { login, logout, account } = useAuth()
+  const { login, logout, account } = useAuthContext()
 
   const { tokenInfo } = useTransactionContext()
 

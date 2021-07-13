@@ -109,7 +109,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods}>
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account}>
             Claim
           </Button>
         </Grid>

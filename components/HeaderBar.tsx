@@ -17,7 +17,7 @@ import ProfileAvatar from 'components/ProfileAvatar'
 import MenuIcon, { gradient, gradient2 } from 'components/svg/MenuIcon'
 import Coin from 'components/tokens/Token2'
 // Hooks
-import { useAuth } from 'hooks/web3Hooks'
+import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
 
@@ -110,7 +110,7 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
 }))
 
 const ConnectButton = () => {
-  const { login, account } = useAuth()
+  const { login, account } = useAuthContext()
 
   const displayAccount = useMemo( () => shortAddress(account || ''),[account])
   

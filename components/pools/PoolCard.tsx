@@ -80,11 +80,11 @@ const PoolCard = (props: PoolProps) => {
   const isApproved = useMemo( () => items.approved > 0 , [items])
 
   useEffect(() => {
-    if(!chainId || !hydrateAPY) return
+    if(!hydrateAPY) return
     fetch('/api/getAPY',{
       method: 'POST',
       body: JSON.stringify({
-        chainId: chainId
+        chainId: chainId || 56
       })
     })
     .then( response => response.json() )
@@ -165,7 +165,18 @@ const PoolCard = (props: PoolProps) => {
 // Hydrate changing Data
   useEffect( ()=>{
     const getPoolData = async () => {
-      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) return
+      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) {
+        setItems( draft => {
+          draft.balance = 0
+          draft.approved = 0
+          draft.userInfo.stakedAmount = 0
+          draft.userInfo.claimedAmount = 0
+          draft.totalPool = 0
+          draft.totalStaked = 1
+          draft.pendingReward = 0
+        })
+        return
+      }
       const availTokens = await coinMethods.balanceOf(account).call()
       const approved = await coinMethods.allowance(account, contractAddress).call()
       const userInfo = await mainMethods?.stakings(account).call()
