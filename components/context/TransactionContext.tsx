@@ -1,5 +1,5 @@
 // React
-import { createContext, useEffect, useState, ReactNode, useMemo } from 'react'
+import { createContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react'
 // third party libs
 import { useImmer } from 'use-immer'
 import findIndex from 'lodash/findIndex'
@@ -8,7 +8,7 @@ import { useWeb3React } from '@web3-react/core'
 import { ThemeProvider } from '@material-ui/core/styles'
 import getTheme from 'styles/BaseTheme'
 // data
-import { contracts } from 'data/contracts'
+import { getContracts } from 'data/contracts'
 // hooks
 import { useContract } from 'hooks/web3Hooks'
 // types
@@ -36,8 +36,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const { children } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
-  const token = contracts.crushToken
-  const { methods } = useContract(token.abi, token[chainId])
+  const token = getContracts('crushToken', chainId)
+  const { methods } = useContract(token.abi, token.address )
 
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
@@ -50,9 +50,15 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   useEffect( () => {
     async function getTokenInfo (){
-      if(!account || !methods) return
-      const tokenBalance = await methods.balanceOf(account).call()
       const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
+      if(!account || !methods) {
+        setCoinInfo( draft => {
+          draft.weiBalance = 0
+          draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
+        })
+        return
+      }
+      const tokenBalance = await methods.balanceOf(account).call()
       setCoinInfo( draft => {
         draft.weiBalance = tokenBalance
         draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
@@ -71,9 +77,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     setDark( savedTheme === "true" )
   },[])
 
-  const clearPending = (id: string) => {
+  const clearPending = useCallback((id: string) => {
     setTimeout( () => setPendingTransactions(draft => { delete draft[id] }), 5000)
-  }
+  },[setPendingTransactions])
 
   const edits = useMemo( () => ({
     pending: (id: string, data?: any) => {

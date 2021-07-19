@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+// Next
+import Head from 'next/head'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
@@ -20,13 +22,17 @@ const Mining = () => {
   const token = useMemo( () => getContracts('crushToken', chainId ), [chainId])
 
   return <PageContainer background="galactic">
+    <Head>
+      <title>BITCRUSH - MINING</title>
+      <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
+    </Head>
     <Grid container justify="space-evenly">
     <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Mining Pool"
-          description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
-            Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
-            Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
+          description={`Stake CRUSH coins in our single asset staking pool to earn APY that is Auto Compounded.
+            You can help the community by calling the auto Compound function and earning a bounty % of the entire pending reward amount. 
+            All you need to do it press the Claim button,  and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
       <Grid item>

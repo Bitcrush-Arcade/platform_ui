@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState, useEffect, useCallback } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -7,7 +7,6 @@ import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/sty
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
-import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
@@ -15,11 +14,12 @@ import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
 import HarvestCard from 'components/pools/HarvestCard'
+// Context
+import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
-import { TransactionContext } from 'components/context/TransactionContext'
 import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
 import { useWeb3React } from '@web3-react/core'
@@ -31,7 +31,7 @@ export default function Home() {
   const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
-  const { tokenInfo, editTransactions } = useContext(TransactionContext)
+  const { tokenInfo, editTransactions } = useTransactionContext()
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
   const { methods } = useContract(firstPool.abi, firstPool.address)
 

@@ -1,6 +1,10 @@
-import { useState, useEffect, useContext, useCallback, useMemo } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import Checkbox from '@material-ui/core/Checkbox'
+import Dialog from '@material-ui/core/Dialog'
+import DialogContent from '@material-ui/core/DialogContent'
+import FormControlLabel from "@material-ui/core/FormControlLabel"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
 import CardContent from "@material-ui/core/CardContent"
@@ -10,11 +14,12 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
-import { TransactionContext } from "components/context/TransactionContext"
 // libs
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
 import { useContract } from "hooks/web3Hooks"
+// Context
+import { useTransactionContext } from "hooks/contextHooks"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
@@ -25,11 +30,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const { chainId, account } = useWeb3React()
 
-  const { tokenInfo, editTransactions } = useContext( TransactionContext )
+  const { tokenInfo, editTransactions } = useTransactionContext()
   const stakeContract = getContracts('singleAsset', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
+
+  const [ showWarning, setShowWarning ] = useState<boolean>(false)
   
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
   
@@ -38,8 +45,8 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     async function getRewards(){
       const totalPool = await methods.totalPool().call()
       const totalPending = await methods.totalPendingRewards().call()
-      const claimFee = await methods.PerformanceFeeCompounder().call()
-      const divisor = await methods.Divisor().call()
+      const claimFee = await methods.performanceFeeCompounder().call()
+      const divisor = 10000
       if( new BigNumber(totalPool).isLessThanOrEqualTo(0) )
         setRewardToDistribute( new BigNumber(0) )
       else 
@@ -58,6 +65,11 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   }, [rewardToDistribute, tokenInfo])
 
   const claim = () => {
+    if(!showWarning){
+      setShowWarning(true)
+      return
+    }
+    setShowWarning(false)
     methods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
       .on('receipt', rct =>{
@@ -70,7 +82,10 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       } )
   }
 
-  return <Card background="light" shadow="dark" className={ css.claimCard } >
+  const exitClaim = () => setShowWarning( false )
+
+  return <>
+  <Card background="light" shadow="dark" className={ css.claimCard } >
     <CardContent className={ css.cardContent }>
       <Grid container justify="space-between" alignItems="center">
         <Grid item>
@@ -83,7 +98,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
             arrow
             title={
               <Typography variant="body2" style={{ whiteSpace: 'pre-line', margin: 8}}>
-                This bounty is given as a reward for prividing a service to other users.{'\n\n'}
+                This bounty is given as a reward for providing a service to other users.{'\n\n'}
                 Whenever you successfully claim the bounty, you&apos;re also helping out by activating the Auto CRUSH Pool&apos;s compounding function for everyone.{'\n\n'}
                 <strong>
                   Auto-compound Bounty of 0.1% of all Auto CRUSH pool users pending yield.
@@ -108,13 +123,37 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary" onClick={claim}>
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account || showWarning }>
             Claim
           </Button>
         </Grid>
       </Grid>
     </CardContent>
   </Card>
+  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
+    <DialogContent>
+      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
+        Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
+        {'\n'}If you don’t understand, please have the mods explain this to you.
+      </Typography>
+      <Typography align="center" paragraph>
+        Are you sure?
+      </Typography>
+      <Grid container justify="center" spacing={2}>
+        <Grid item>
+          <Button color="secondary" width={120} onClick={claim}>
+            CLAIM
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button color="primary" width={120} onClick={exitClaim}>
+            EXIT
+          </Button>
+        </Grid>
+      </Grid>
+    </DialogContent>
+  </Dialog>
+  </>
 }
 
 export default CompoundingCard

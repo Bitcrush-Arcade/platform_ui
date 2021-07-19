@@ -1,11 +1,8 @@
 // import App from 'next/app'
 import { useEffect } from 'react'
 import CssBaseline from '@material-ui/core/CssBaseline'
-// BlockChain
-import Web3 from 'web3'
-import { Web3ReactProvider } from '@web3-react/core'
 // Context
-import { TransactionLoadingContext } from 'components/context/TransactionContext'
+import ContextProviders from 'components/context/ContextProviders'
 
 function MyApp({ Component, pageProps }) {
 
@@ -16,14 +13,10 @@ function MyApp({ Component, pageProps }) {
     }
   }, [])
 
-  const getLibrary = ( provider ): Web3 => provider
-
-  return (<Web3ReactProvider getLibrary={ getLibrary }>
-    <TransactionLoadingContext>
+  return (<ContextProviders>
       <CssBaseline/>
       <Component {...pageProps} />
-    </TransactionLoadingContext>
-  </Web3ReactProvider>
+    </ContextProviders>
   )
 }
 

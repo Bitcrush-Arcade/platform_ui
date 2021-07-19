@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import Head from 'next/head'
 import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
@@ -31,6 +32,10 @@ const Games = () => {
   </Button>
   }
   return <PageContainer>
+     <Head>
+      <title>BITCRUSH ARCARDE</title>
+      <meta name="description" content="Bitcrush Defenders and other cryto games for you."/>
+    </Head>
     <Grid container justify="center" className={ css.featuredContainer } >
       <Grid item className={ css.cardContainer } >
         <Card className={ css.featuredCard } background="light">

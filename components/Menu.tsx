@@ -1,5 +1,5 @@
 // React imports
-import React, { useState, Fragment, useContext } from 'react'
+import React, { Fragment } from 'react'
 import { useImmer } from 'use-immer'
 // Next
 import { useRouter } from 'next/router'
@@ -31,8 +31,8 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
-import { TransactionContext } from 'components/context/TransactionContext'
 // Utils
+import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 import { ConditionalLinkWrapper } from 'utils/wrappers'
 // Icons
@@ -54,7 +54,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const router = useRouter()
     const css = useStyles({ open })
 
-    const { tokenInfo, toggleDarkMode, isDark } = useContext( TransactionContext )
+    const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
     
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
@@ -76,7 +76,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         &nbsp;Audit&nbsp;
                     </Grid>
                 </Grid>, 
-                icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://medium.com/hashex-blog/tagged/audit'},
+                icon: <RateReviewIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/HashEx/public_audits/blob/master/bitcrush%20arcade/Bitcrush%20Arcade%20report.pdf'},
             { name: 'Charts', icon: <TrendingUpIcon color="inherit" fontSize="small"/>, url_link: 'https://charts.bogged.finance/?token=0x0Ef0626736c2d484A792508e99949736D0AF807e'},
         ] },
     ]
