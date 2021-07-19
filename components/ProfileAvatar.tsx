@@ -45,6 +45,11 @@ const ProfileAvatar = () => {
       })
   },[coinMethods, account, editTransactions, stakingContract])
 
+  const changeWallet = useCallback( () => {
+    logout()
+    login()
+  },[logout, login])
+
   const hasAccount = Boolean(account)
   const toggleDrawer = () => setOpenMenu( p => !p )
 
@@ -66,7 +71,7 @@ const ProfileAvatar = () => {
     >
       <List>
         <ListItem 
-          button={ hasAccount || undefined }
+          button
           onClick={ hasAccount ? logout : login }
         >
           <ListItemText
@@ -88,6 +93,14 @@ const ProfileAvatar = () => {
           <ListItemText
             primary={"Approve SAS Pool"}
             secondary={"In case of issue staking"}
+          />
+        </ListItem>}
+        {!hasAccount && <ListItem button
+          onClick={ changeWallet }
+        >
+          <ListItemText
+            primary={"Change Wallet"}
+            secondary={"Choose a different wallet type"}
           />
         </ListItem>}
       </List>
