@@ -137,8 +137,8 @@ export default function Home() {
                 </Grid>
               </CardContent>
             </Card>
-            <Grid container justify="space-around" spacing={3} style={{marginTop: 32}}>
-              <Grid item md={6}>
+            <Grid container justify="space-around" style={{marginTop: 16}}>
+              <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
                     title: "CRUSH in Wallet",
@@ -151,14 +151,14 @@ export default function Home() {
                     subtitle: `$ ${currencyFormat( staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2 })}`,
                   }}
                   action1Title={ !account && 'Connect First' || staked > 0 && "Harvest All" || "Go to Pool"}
-                  icon={<Coin scale={0.75}/>}
+                  icon={<Coin scale={0.5}/>}
                   firstAction={harvestAll}
                   btn1Props={{
                     disabled: !account,
                   }}
                 />
               </Grid>
-              <Grid item md={6}>
+              <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
                 <Grid container justify="flex-end">
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
@@ -199,7 +199,7 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
   },
   gradientContainer:{
     background: theme.palette.type == "dark" 
-      ? `radial-gradient(${theme.palette.common.black} 0%, transparent 80%)`
-      : `radial-gradient(${theme.palette.common.white} 0%, transparent 80%)`
+      ? `radial-gradient( closest-side, ${theme.palette.common.black} 0%, rgba(0,0,0,0) 100%)`
+      : `radial-gradient( closest-side,${theme.palette.common.white} 0%, rgba(255,255,255,0) 100%)`
   }
 }))

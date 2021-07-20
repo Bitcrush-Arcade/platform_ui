@@ -268,8 +268,8 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
           <Grid item>
             <ButtonBase onClick={toggleRoi}>
-              <Grid container alignItems="center" spacing={1}>
-                <Grid item>
+              <Grid container alignItems="center">
+                <Grid item style={{paddingRight: 8}}>
                   { apyData?.d365?.percent 
                     ? <Typography color="primary" variant="body2" className={ css.percent }>
                         {apyData?.d365?.percent || '--%'}
@@ -277,7 +277,7 @@ const PoolCard = (props: PoolProps) => {
                     : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
                   }
                 </Grid>
-                <Grid item>
+                <Grid item style={{paddingRight: 4}}>
                   <CalculationIcon className={ css.aprAction }/>
                 </Grid>
               </Grid>
@@ -450,7 +450,7 @@ const PoolCard = (props: PoolProps) => {
           setFieldValue('stakeAmount', 0 )
         }
         return(<Form>
-          <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
+          <Grid container className={ css.stakeActionBtnContainer }>
             <Grid item>
               <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
                 STAKE

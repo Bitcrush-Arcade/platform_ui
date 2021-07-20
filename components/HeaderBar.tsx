@@ -46,7 +46,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
       <Grid container justify="space-between" alignItems="center" style={{ paddingTop: 32}}>
         {/* LEFT SIDE OF HEADER */}
         <Grid item>
-          <Grid container alignItems="center" spacing={1}>
+          <Grid container alignItems="center">
             <Grid item>
               <Button onClick={toggleOpen} className={css.menuOpen}>
                 {svgGradient}{svgGradient2}
@@ -68,15 +68,15 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         </Grid>
         {/* RIGHT SIDE OF HEADER */}
         <Grid item>
-          <Grid container alignItems="center" spacing={2}>
+          <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             {/* <Grid item> 
               <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
             </Grid> */}
-            <Grid item className={ css.dropOnSm }>
+            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" />
             </Grid>
-            <Grid item className={ css.dropOnSm }>
+            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <ConnectButton/>
             </Grid>
             <Grid item>
@@ -97,6 +97,7 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
     border: 'none'
   },
   menuLogoDivider:{
+    marginLeft: theme.spacing(1),
     marginRight: theme.spacing(2)
   },
   gradient:{

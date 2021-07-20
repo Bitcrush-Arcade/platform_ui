@@ -147,8 +147,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             </List>
             <Grid container className={ css.footer } alignItems="center" justify="space-between">
                 <Grid item>
-                    <Grid container alignItems="center" spacing={1}>
-                        <Grid item>
+                    <Grid container alignItems="center">
+                        <Grid item style={{paddingRight: 8}}>
                             <Coin scale={0.35}/>
                         </Grid>
                         <Grid item>
