@@ -198,6 +198,8 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
     fill: props => `url(#${ props.gradientId })`,
   },
   gradientContainer:{
-    background: `radial-gradient(${theme.palette.common[ theme.palette.type == "dark" ? "black" : "white"]} 0%, transparent 80%)`
+    background: theme.palette.type == "dark" 
+      ? `radial-gradient(${theme.palette.common.black} 0%, transparent 80%)`
+      : `radial-gradient(${theme.palette.common.white} 0%, transparent 80%)`
   }
 }))
