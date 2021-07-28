@@ -344,12 +344,12 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}>
             <Collapse in={detailOpen}>
               <Grid container alignItems="flex-end" style={{marginTop: 24}}>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <Typography variant="body2" color="primary" style={{ fontWeight: 600 }}>
                     {coinInfo.symbol} Profit Earned
                   </Typography>
-                </Grid>
-                <Grid item xs={6}>
+                </Grid> */}
+                {/* <Grid item xs={6}>
                   <Tooltip title={currencyFormat(userProfit || 0, { isWei: true})}>
                     <Typography noWrap style={{ maxWidth: '95%'}}>
                       {currencyFormat(userProfit || 0, { isWei: true})}
@@ -358,8 +358,8 @@ const PoolCard = (props: PoolProps) => {
                   <Typography color="textSecondary" variant="caption">
                     USD {currencyFormat((userProfit || 0)*tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2})}
                   </Typography>
-                </Grid>
-                <Grid item xs={6}>
+                </Grid> */}
+                <Grid item xs={12}>
                   <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
                     0.5% unstaking fee if withdrawn within 72h.{'\n'}
                     Performance Fee 3%
