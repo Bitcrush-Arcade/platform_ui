@@ -37,7 +37,7 @@ const featuredGames = [
       and all the bounty that comes with it!\n
       60% goes to the winner, 30% rolled over to the next round, 5% goes to Wizard Financial for creating this masterpiece, and 5% goes to Bitcrush Arcade reserve to be burned.`,
     disabled: false,
-    link: 'https://app.wizard.financial/bitcrush',
+    link: 'https://crush.wizard.financial/',
     imgSrc: '/games/bountyWinner.png',
     width: 824/4,
     height: 640/4,
