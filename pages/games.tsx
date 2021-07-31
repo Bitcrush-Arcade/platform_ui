@@ -1,10 +1,13 @@
-import { useRef } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Typography from '@material-ui/core/Typography'
+import Fab from '@material-ui/core/Fab'
+import IconButton from '@material-ui/core/IconButton'
+import Slide from '@material-ui/core/Slide'
 import Grid from "@material-ui/core/Grid"
+import Typography from '@material-ui/core/Typography'
 // Icons
 import ChevronLeft from "@material-ui/icons/ChevronLeft"
 import ChevronRight from "@material-ui/icons/ChevronRight"
@@ -13,11 +16,59 @@ import Card from 'components/basics/Card'
 import Carousel, { CarouselHandles } from 'components/basics/Carousel'
 import GameCard from 'components/basics/GameCard'
 import Button from 'components/basics/GeneralUseButton'
+import SmallButton from 'components/basics/SmallButton'
 import PageContainer from 'components/PageContainer'
+
+const featuredGames = [
+  { 
+    name: 'Dice Invaders',
+    description: 'Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
+    disabled: true,
+    link: undefined,
+    imgSrc: '/games/dice_invaders_pv.png',
+    width: 2358/6,
+    height: 1290/6,
+    alt: 'Dice Invaders Game Demo'
+  },
+  {
+    name: "Bitcrush Bounty",
+    description: `
+      Compete against other squad members to make the final bid and win the bounty. When the timer reaches zero, the final member bid wins the game,
+      and all the bounty that comes with it!\n
+      60% goes to the winner, 30% rolled over to the next round, 5% goes to Wizard Financial for creating this masterpiece, and 5% goes to Bitcrush Arcade reserve to be burned.`,
+    disabled: false,
+    link: 'https://app.wizard.financial/bitcrush',
+    imgSrc: '/games/bountyWinner.png',
+    width: 824/4,
+    height: 640/4,
+    alt: "Dragon\'s Den Game"
+  }
+]
 
 const Games = () => {
 
   const css = useStyles({})
+
+  const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(1)
+  const [showSlide, setShowSlide] = useState<boolean>(true)
+
+  const selectedGame = useMemo( () => featuredGames[selectFeaturedGame], [selectFeaturedGame])
+
+  const toggleSlide = () => setShowSlide( p => !p )
+
+  const cycleFeatured = () => {
+    toggleSlide()
+    setTimeout(() => {
+      setSelectFeaturedGame( prev => {
+        const newVal = prev + 1
+        const maxFeatured = featuredGames.length
+        if( newVal >= maxFeatured )
+          return 0
+        return newVal
+      })
+      toggleSlide()
+    }, 300)
+  }
 
   const LeftScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
@@ -36,35 +87,55 @@ const Games = () => {
       <title>BITCRUSH ARCARDE</title>
       <meta name="description" content="Bitcrush Defenders and other cryto games for you."/>
     </Head>
-    <Grid container justify="center" className={ css.featuredContainer } >
-      <Grid item className={ css.cardContainer } >
-        <Card className={ css.featuredCard } background="light">
-          <Grid container direction="row-reverse" alignItems="center" spacing={1}>
-            <Grid item xs={12} md={6}>
-              <Image src={'/games/dice_invaders_pv.png'} width={2358/6} height={1290/6} layout="responsive" alt="Dice Invaders Game Demo"/>
-            </Grid>
-            <Grid item xs={12} md={6} >
-              <div className={ css.textContainer }>
-                <Typography variant="h4" paragraph>
-                  Dice Invaders
-                </Typography>
-                <Typography variant="body2">
-                 Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. 
-                </Typography>
-                <Button width="100%" color="primary" style={{ marginTop: 32 }} disabled solidDisabledText>
-                  Coming Soon
-                </Button>
-              </div>
-            </Grid>
-          </Grid>
-        </Card>
-        <div className={ css.featuredTag }>
-          <Typography className={ css.tagText }>
-            Featured Game
-          </Typography>
-        </div>
+    <Slide in={showSlide} direction="right">
+      <Grid container justify="center" className={ css.featuredContainer } >
+        <Grid item className={ css.cardContainer } >
+            <Card className={ css.featuredCard } background="light">
+                <Grid container direction="row-reverse" alignItems="center" spacing={1}>
+                  <Grid item xs={12} md={6}>
+                    <Image src={selectedGame.imgSrc} width={selectedGame.width} height={selectedGame.height} layout="responsive" alt={selectedGame.alt}/>
+                  </Grid>
+                  <Grid item xs={12} md={6} >
+                    <div className={ css.textContainer }>
+                      <Typography variant="h4" paragraph>
+                        {selectedGame.name}
+                      </Typography>
+                      <Typography variant="body2">
+                      {selectedGame.description}
+                      </Typography>
+                      <Button width="100%" color="primary" style={{ marginTop: 32 }}
+                        disabled={selectedGame.disabled}
+                        solidDisabledText
+                        href={selectedGame.link}
+                        target="_blank"
+                      >
+                        {selectedGame.disabled ? "Coming Soon" : "Play Now"}
+                      </Button>
+                    </div>
+                  </Grid>
+                  <Grid item xs={12} container justify="flex-end">
+                    <div style={{ marginLeft: 'auto', marginTop: 8, marginRight: 24}}>
+                      <SmallButton size="small" color="secondary" variant="extended" onClick={cycleFeatured}>
+                        <Typography variant="caption" color="textPrimary" style={{ fontWeight: 600}}>
+                          View Other Featured
+                        </Typography>
+                        <ChevronRight fontSize="inherit" color="inherit" style={{paddingBottom: 4}}/>
+                      </SmallButton>
+                    </div>
+                  </Grid>
+                </Grid>
+            </Card>
+          <div className={ css.featuredTag }>
+            <Typography className={ css.tagText }>
+              Featured Game
+              <IconButton size="small" color="inherit" onClick={cycleFeatured}>
+                <ChevronRight fontSize="inherit"/>
+              </IconButton>
+            </Typography>
+          </div>
+        </Grid>
       </Grid>
-    </Grid>
+    </Slide>
     <div className={ css.otherGamesContainer }>
       <Typography variant="h6" paragraph>
         Featured Partner :: Dragon Gaming :: Coming Soon

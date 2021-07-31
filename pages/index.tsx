@@ -1,6 +1,8 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 
 import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
@@ -11,6 +13,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
+import SmallBtn from 'components/basics/SmallButton'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
 import HarvestCard from 'components/pools/HarvestCard'
@@ -99,6 +102,7 @@ export default function Home() {
           </Grid>
           {/* BITCRUSH TVL INFO */}
           <Container maxWidth="lg">
+            {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
                 <Grid container justify="space-around">
@@ -134,6 +138,37 @@ export default function Home() {
                       {currencyFormat(totalValueShared,{ decimalsToShow: 0})}
                     </Typography>
                   </Grid> */}
+                </Grid>
+              </CardContent>
+            </Card>
+            {/* Announcement Card */}
+            <Card style={{marginTop: 24}}>
+              <CardContent>
+                <Typography variant="h4" align="center" className={ css.announcementTitle }>
+                  Announcements
+                </Typography>
+                <Grid container justify="space-evenly" alignItems="center">
+                  <Grid item xs={12} md={5}>
+                    <Image src={`/games/bountyBanner.png`} layout="responsive" width={1260/6} height={432/6} alt={`announcement banner for bitcrush bounty game`}/>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Grid container justify="flex-end">
+                      <Grid item xs={12}>
+                        <Typography style={{ padding: 16, whiteSpace: 'pre-line'}} >
+                          We&apos;re excited to announce our first live game in collaboration with Wizard Financial; “Bitcrush Bounty”!{'\n'}
+                          Compete against other squad members to place the final bid and win the bounty.
+                          Games happen several times daily so be sure to check in often and Crush It!
+                        </Typography>
+                      </Grid>
+                      <Grid item>
+                        <Link href="/games" passHref>
+                          <SmallBtn color="secondary" style={{ marginLeft: 'auto'}}>
+                            GO PLAY!
+                          </SmallBtn>
+                        </Link>
+                      </Grid>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -201,5 +236,11 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
     background: theme.palette.type == "dark" 
       ? `radial-gradient( closest-side, ${theme.palette.common.black} 0%, rgba(0,0,0,0) 100%)`
       : `radial-gradient( closest-side,${theme.palette.common.white} 0%, rgba(255,255,255,0) 100%)`
-  }
+  },
+  announcementTitle:{
+    marginTop: 16,
+    [theme.breakpoints.down('xs')]:{
+      fontSize: theme.typography.h6.fontSize
+    }
+  },
 }))
