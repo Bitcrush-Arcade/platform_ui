@@ -84,8 +84,8 @@ const Games = () => {
   }
   return <PageContainer>
      <Head>
-      <title>BITCRUSH ARCARDE</title>
-      <meta name="description" content="Bitcrush Defenders and other cryto games for you."/>
+      <title>BITCRUSH ARCADE</title>
+      <meta name="description" content="A BSC hybrid gaming platform"/>
     </Head>
     <Slide in={showSlide} direction="right">
       <Grid container justify="center" className={ css.featuredContainer } >
