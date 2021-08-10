@@ -1,3 +1,4 @@
+import { useState } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
@@ -8,9 +9,11 @@ import Typography from "@material-ui/core/Typography"
 import AddIcon from "@material-ui/icons/Add"
 import RemoveIcon from "@material-ui/icons/Remove"
 // Bitcrush
+import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import SmBtn from "components/basics/SmallButton"
 import TextField from "components/basics/TextField"
+import StakeModal from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
 // Icons
@@ -20,8 +23,22 @@ function BankPool( ) {
   const css = useStyles()
 
   const { bankInfo, userInfo } = useBank()
+  const [ openStaking, setOpenStaking ] = useState(false)
 
-  return (
+  const stakingOptions = [
+    // { name: 'Stake', description: 'Wallet', maxValue: userInfo.staked },
+    // { name: 'Withdraw', description: 'Staked', maxValue: userInfo.staked },
+    // { name: 'Transfer', description: 'Rewarded', maxValue: userInfo.stakingReward + userInfo.edgeReward },
+    { name: 'Stake', description: 'Wallet', maxValue: 12044457798131585796 },
+    { name: 'Withdraw', description: 'Staked', maxValue: 150000000000000000 },
+    { name: 'Transfer', description: 'Rewarded', maxValue: 14000000000000000000 },
+  ]
+  const submit = ( values, {setSubmitting}) => {
+    console.log('here\'s the values', values)
+    setSubmitting(false)
+  }
+
+  return (<>
     <Card className={ css.card } >
       <Grid container justify="space-between">
         {/* STAKE INTERACTIVE AREA */}
@@ -56,37 +73,18 @@ function BankPool( ) {
               </Grid>
             </Grid>
           </Grid>
-          <TextField 
-            type="number"
-            variant="outlined"
-            placeholder="Stake / Unstake Amount"
-            fullWidth
-            onFocus={ e => e.target.select() }
-            InputProps={{
-              endAdornment: <>
-                <IconButton color="primary" className={ `${css.icnBtn} ${css.addIcn}` } style={{marginRight: 4}} >
-                  <AddIcon color="action"/>
-                </IconButton>
-                <IconButton color="primary" className={ `${css.icnBtn} ${css.removeIcn}` } >
-                  <RemoveIcon color="action"/>
-                </IconButton>
-              </>
-            }}
-          />
+          <Button color="primary" onClick={() => setOpenStaking(true)} width="100%">
+            STAKE BANKROLL
+          </Button>
           <Grid container justify="center" spacing={2} className={ css.actionBtns } >
             <Grid item>
               <SmBtn color="primary">
-                Compount
+                Compound
               </SmBtn>
             </Grid>
             <Grid item>
               <SmBtn color="primary">
                 Harvest
-              </SmBtn>
-            </Grid>
-            <Grid item>
-              <SmBtn color="primary">
-                Transfer
               </SmBtn>
             </Grid>
           </Grid>
@@ -97,7 +95,14 @@ function BankPool( ) {
       </Grid>
       {/* STAKE COLLAPSABLE AREA */}
     </Card>
-  )
+    <StakeModal
+      open={openStaking}
+      onClose={()=> setOpenStaking(false)}
+      options={ stakingOptions }
+      coinInfo={ { symbol: 'CRUSH', name: 'Crush Coin'} }
+      onSubmit={ submit }
+    />
+  </>)
 }
 
 export default BankPool
