@@ -18,7 +18,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
   const { percent, crushBuffer } = props
   const css = useStyles()
 
-  const textProperties = useMemo( () => {
+  const textProperties:{ color: 'primary' | 'secondary' | 'error', text: string} = useMemo( () => {
     if(percent > 95)
       return {
         color: 'secondary',
@@ -33,7 +33,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
       color: 'error',
       text: 'stalled'
     }
-  },[props.percent])
+  },[percent])
 
   return (<div>
     <Grid container justify="space-between" alignItems="stretch">
@@ -75,7 +75,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
       </Grid>
       <Grid item xs={12}>
         <div style={{ maxHeight: 40 }}>
-          <Image src='/assets/launcher/planet.png' width={406} height={81} layout="responsive" />
+          <Image src='/assets/launcher/planet.png' width={406} height={81} layout="responsive" alt="Launching from planet" />
         </div>
       </Grid>
     </Grid>
