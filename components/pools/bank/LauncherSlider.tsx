@@ -48,10 +48,10 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number 
       </div>
       <div style={{position: 'relative'}}>
         { percent > 90 && <div className={ css.blast }>
-          <Image src="/assets/launcher/blast.png" width={32} height={54} layout="fixed"/>
+          <Image src="/assets/launcher/blast.png" width={32} height={54} layout="fixed" alt="rocket blast"/>
         </div>}
         { percent > 5 && percent <= 90 && <div className={ css.cloud }>
-          <Image src="/assets/launcher/cloud.png" width={48/cloudSize} height={54/cloudSize} layout="fixed"/>
+          <Image src="/assets/launcher/cloud.png" width={48/cloudSize} height={54/cloudSize} layout="fixed" alt="rocket blast smoke"/>
         </div>}
       </div>
     </span>
