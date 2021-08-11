@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography"
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
+import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import SmBtn from "components/basics/SmallButton"
 import StakeModal from "components/basics/StakeModal"
 // Hooks
@@ -35,7 +36,7 @@ function BankPool( ) {
   }
 
   return (<>
-    <Card className={ css.card } >
+    <Card className={ css.card } background="light">
       <Grid container justify="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
@@ -164,7 +165,9 @@ function BankPool( ) {
           </Grid>
         </Grid>
         {/* INVADER LAUNCHER */}
-        <Grid item xs={12} md={5}></Grid>
+        <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
+          <InvaderLauncher percent={80} crushBuffer={199.5}/>
+        </Grid>
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
           <Divider className={ css.divider } />
