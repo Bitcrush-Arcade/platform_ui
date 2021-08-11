@@ -69,13 +69,13 @@ function StakeModal( props: StakeModalProps ) {
           <Grid container className={ css.stakeActionBtnContainer }>
             {options.map((option, index) => {
               const { name, description, maxValue } = option
-              return <Fragment>
+              return <Fragment key={`stake-option-${description}-${index}`}>
                 { index > 0 && 
                   <Grid item>
                     <Divider orientation="vertical"/>
                   </Grid>
                 }
-                <Grid item key={`stake-option-${description}-${index}`}>
+                <Grid item>
                   <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "default"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
                     {name}
                   </MButton>
