@@ -320,8 +320,8 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
-              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
+            <SmallButton size="small" color="primary" style={{marginRight: 4}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
+              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 4}}/>Manual
             </SmallButton>
             <Tooltip arrow
               title={
@@ -330,7 +330,7 @@ const PoolCard = (props: PoolProps) => {
                 </Typography>
               }
             >
-              <InfoOutlinedIcon color="disabled"/>
+              <InfoOutlinedIcon color="disabled" fontSize="small"/>
             </Tooltip>
           </Grid>
           <Grid item xs={6} container alignItems="center" justify="flex-end">
@@ -539,7 +539,8 @@ type PoolProps = {
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
   card:{
-    width: 385,
+    maxWidth: 385,
+    width: '100%',
     padding: theme.spacing(2),
     paddingTop: theme.spacing(1),
   },

@@ -27,7 +27,7 @@ const Mining = () => {
       <title>BITCRUSH - MINING</title>
       <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
     </Head>
-    <Grid container justify="space-evenly" className={ css.section }>
+    <Grid container justify="space-evenly" className={ css.topSection }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Galactic Mining"
@@ -41,7 +41,7 @@ const Mining = () => {
         <BankPool/>
       </Grid>
     </Grid>
-    <Grid container justify="space-evenly">
+    <Grid container justify="space-evenly" className={ css.section }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Mining Pool"
@@ -67,7 +67,14 @@ export default Mining
 const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   
   section:{
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
+  },
+  topSection:{
+    marginTop: 0,
+    [theme.breakpoints.down('sm')]:{
+      marginTop: theme.spacing(4)
+    },
   },
   
 }))

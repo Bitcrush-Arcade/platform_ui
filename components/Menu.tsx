@@ -5,9 +5,11 @@ import { useImmer } from 'use-immer'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 // Material imports
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Button from '@material-ui/core/Button'
 import Collapse from '@material-ui/core/Collapse'
+import ClickAwayListener from "@material-ui/core/ClickAwayListener"
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Grid from "@material-ui/core/Grid"
@@ -17,7 +19,6 @@ import ListItem from '@material-ui/core/ListItem'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Paper from '@material-ui/core/Paper'
-import Switch from '@material-ui/core/Switch'
 import Typography from '@material-ui/core/Typography'
 // Icons
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
@@ -53,6 +54,8 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     const { open, toggleOpen } = props
     const router = useRouter()
     const css = useStyles({ open })
+    const theme = useTheme()
+    const isSm = useMediaQuery( theme.breakpoints.down('sm') )
 
     const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
     
@@ -140,51 +143,57 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
     })
 
     return <>
-      <Drawer open={open} variant="permanent" className={ `${css.drawerContainer}` } PaperProps={{ className: css.drawer}}>
-        <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
-            <List>
-                {linkItems}
-            </List>
-            <Grid container className={ css.footer } alignItems="center" justify="space-between">
-                <Grid item>
-                    <Grid container alignItems="center">
-                        <Grid item style={{paddingRight: 8}}>
-                            <Coin scale={0.35}/>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="body2" color="textPrimary">
-                                $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 2 })}
-                            </Typography>
+      <Drawer open={open} variant={ isSm ? "temporary" : "permanent"} className={ `${css.drawerContainer}` } PaperProps={{ className: css.drawer}}>
+        <ClickAwayListener onClickAway={() => { 
+            if(!isSm || !open) return
+            toggleOpen()
+            
+            } }>
+            <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
+                <List>
+                    {linkItems}
+                </List>
+                <Grid container className={ css.footer } alignItems="center" justify="space-between">
+                    <Grid item>
+                        <Grid container alignItems="center">
+                            <Grid item style={{paddingRight: 8}}>
+                                <Coin scale={0.35}/>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="body2" color="textPrimary">
+                                    $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 2 })}
+                                </Typography>
+                            </Grid>
                         </Grid>
                     </Grid>
+                    <Grid item>
+                        <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
+                            <TelegramIcon className={ css.baseIcon }/>
+                        </IconButton>
+                        <IconButton size="small" component="a" href="https://twitter.com/bitcrusharcade" target="_blank">
+                            <TwitterIcon className={ css.baseIcon }/>
+                        </IconButton>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Divider orientation="horizontal" style={{marginBottom: 4, marginTop: 4}}/>
+                    </Grid>
+                    <Grid item>
+                        <Button onClick={toggleDarkMode} style={{ width: 80, paddingLeft: 4, paddingRight:4 }}>
+                            <Grid container justify="space-between" alignItems="center">
+                                <DayIcon color={ isDark ? "disabled" : "primary"}/>
+                                <Divider orientation="vertical" flexItem/>
+                                <NightIcon color={ !isDark ? "disabled" : "primary"}/>
+                            </Grid>
+                        </Button>
+                    </Grid>
+                    <Grid item>
+                        <Button onClick={toggleOpen}>
+                            <ArrowBackIosIcon color="disabled"/>
+                        </Button>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
-                        <TelegramIcon className={ css.baseIcon }/>
-                    </IconButton>
-                    <IconButton size="small" component="a" href="https://twitter.com/bitcrusharcade" target="_blank">
-                        <TwitterIcon className={ css.baseIcon }/>
-                    </IconButton>
-                </Grid>
-                <Grid item xs={12}>
-                    <Divider orientation="horizontal" style={{marginBottom: 4, marginTop: 4}}/>
-                </Grid>
-                <Grid item>
-                    <Button onClick={toggleDarkMode} style={{ width: 80, paddingLeft: 4, paddingRight:4 }}>
-                        <Grid container justify="space-between" alignItems="center">
-                            <DayIcon color={ isDark ? "disabled" : "primary"}/>
-                            <Divider orientation="vertical" flexItem/>
-                            <NightIcon color={ !isDark ? "disabled" : "primary"}/>
-                        </Grid>
-                    </Button>
-                </Grid>
-                <Grid item>
-                    <Button onClick={toggleOpen}>
-                        <ArrowBackIosIcon color="disabled"/>
-                    </Button>
-                </Grid>
-            </Grid>
-        </Paper>
+            </Paper>
+        </ClickAwayListener>
       </Drawer>
     </>
 }
@@ -197,7 +206,8 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     },
     drawer:{
         backgroundColor: 'transparent',
-        borderRight: 'none'
+        borderRight: 'none',
+        boxShadow: 'none',
     },
     paper:{
         position: 'relative',

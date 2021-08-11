@@ -170,7 +170,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard:{
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down(888)]:{
       marginTop: theme.spacing(4)
     },
     width: 280,

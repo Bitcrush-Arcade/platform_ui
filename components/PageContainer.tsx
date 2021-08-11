@@ -73,8 +73,11 @@ type ContainerProps ={
 
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
   contentContainer:{
-    paddingTop: props => props.fullPage ? 0 : 96,
-    paddingLeft: theme.spacing(12),
+    paddingTop: 96,
+    [theme.breakpoints.down('sm')]:{
+      paddingTop: 0,
+    },
+    paddingLeft: theme.spacing(3),
     [theme.breakpoints.up('md')]:{
       paddingLeft: props => props.menuToggle ? theme.spacing(33) : theme.spacing(12),
     },

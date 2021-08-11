@@ -21,5 +21,6 @@ declare module '@material-ui/core/styles/createPalette' {
     card: string,
     menu: string,
     highlight: string,
+    header: string,
   }
 }
