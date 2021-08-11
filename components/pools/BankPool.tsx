@@ -2,17 +2,13 @@ import { useState } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
+import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
-import IconButton from "@material-ui/core/IconButton"
 import Typography from "@material-ui/core/Typography"
-// Material Icons
-import AddIcon from "@material-ui/icons/Add"
-import RemoveIcon from "@material-ui/icons/Remove"
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import SmBtn from "components/basics/SmallButton"
-import TextField from "components/basics/TextField"
 import StakeModal from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
@@ -40,7 +36,7 @@ function BankPool( ) {
 
   return (<>
     <Card className={ css.card } >
-      <Grid container justify="space-between">
+      <Grid container justify="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
           <Typography variant="h4" component="div" className={ css.heavier }>
@@ -61,7 +57,7 @@ function BankPool( ) {
             <Grid item>
               <Grid container alignItems="center" spacing={1}>
                 <Grid item>
-                  <Typography variant="h6" component="div" style={{ fontFamily: 'Zebulon', letterSpacing: 2 }} display="inline">
+                  <Typography variant="h6" component="div" className={ css.coinText } display="inline">
                     BITCRUSH
                   </Typography>
                 </Grid>
@@ -90,10 +86,133 @@ function BankPool( ) {
           </Grid>
         </Grid>
         {/* STAKE INFORMATION AREA */}
+        <Grid item xs={12} md={5} className={ css.secondQuadrant }>
+          <Grid container alignItems="center" justify="space-around">
+            <Grid item>
+              <Typography color="textPrimary" variant="body2">
+                Staking Rewards
+              </Typography>
+              <Typography color="primary" variant="h6" component="div">
+                percent%
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="primary" variant="h6" component="div">
+                +
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="textPrimary" variant="body2">
+                House Edge Rewards
+              </Typography>
+              <Typography color="primary" variant="h6" component="div">
+                percent%
+              </Typography>
+            </Grid>
+            <Grid item xs={12} sm={'auto'}>
+              <Typography color="secondary" variant="h6" component="div" align="center">
+                =
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="primary" variant="h4" component="div">
+                940.2523%
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Divider className={ css.divider }/>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="textSecondary" variant="body2">
+                Crush Earned
+              </Typography>
+              <Grid container justify="space-between">
+                <Grid item>
+                  <Typography>Staking Rewards</Typography>
+                </Grid>
+                <Grid item>
+                  <Typography color="primary">CRUSH STAKING REWARD</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography color="primary">
+                    +
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography>House Edge Reward</Typography>
+                </Grid>
+                <Grid item>
+                  <Typography color="primary">CRUSH EDGE REWARD</Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography color="secondary">
+                    =
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography variant="h5" color="secondary">
+                    Total Reward
+                  </Typography>
+                </Grid>
+                <Grid item>
+                  <Typography color="secondary" variant="h5">
+                    TOTALREWARDCRUSH
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* INVADER LAUNCHER */}
+        <Grid item xs={12} md={5}></Grid>
+        {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
+          <Divider className={ css.divider } />
+          <Grid container justify="space-between" alignItems="center">
+            <Grid item>
+              <Typography>
+                Total Bankroll:
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="primary" align="right" variant="h6" component="div">
+                BANKROLLAMOUNT
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                BANKROLLAMOUNT USD
+              </Typography>
+            </Grid>
+            <Grid item xs={12} className={ css.invisibleDivider } />
+            <Grid item>
+              <Typography>
+                Total Value Distributed:
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="primary" align="right" variant="h6" component="div">
+                TVLDistributed
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                TVL USD
+              </Typography>
+            </Grid>
+            <Grid item xs={12} className={ css.invisibleDivider } />
+            <Grid item>
+              <Typography>
+                House Profit Distribution:
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography color="primary" align="right" variant="h6" component="div">
+                ProfitDistributedAmount
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                PROFITDISTRITBUTED USD
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
-      {/* STAKE COLLAPSABLE AREA */}
     </Card>
     <StakeModal
       open={openStaking}
@@ -117,16 +236,15 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     height: 36,
   },
   card:{
-    width: '80%',
+    width: '100%',
     [theme.breakpoints.up('md')]:{
-      marginLeft: 'auto',
-      marginRight: 'auto',
+      width: '80%',
     },
+    marginLeft: 'auto',
+    marginRight: 'auto',
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
     padding: theme.spacing(2),
-    paddingLeft: theme.spacing(3),
-    paddingRight: theme.spacing(3),
   },
   heavy:{
     fontWeight: 500
@@ -144,5 +262,26 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   removeIcn:{
     borderTopLeftRadius: 0,
+  },
+  divider:{
+    height: 1,
+    backgroundColor: theme.palette.primary.main,
+    marginTop: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+  },
+  invisibleDivider:{
+    height: theme.spacing(2)
+  },
+  secondQuadrant:{
+    [theme.breakpoints.down('sm')]:{
+      marginTop: theme.spacing(2)
+    }
+  },
+  coinText:{
+    fontFamily: 'Zebulon',
+    letterSpacing: 2,
+    [theme.breakpoints.down('md')]:{
+      fontSize: theme.typography.body1.fontSize
+    }
   },
 }))
