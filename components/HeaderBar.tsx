@@ -30,7 +30,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { pathname } = useRouter()
   const isGame = pathname.indexOf('/games') > -1
-  const imgReducer = isSm ? 24 : 18
+  const imgReducer = isSm ? 26 : 18
   
   const { tokenInfo } = useTransactionContext()
 
@@ -41,9 +41,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     {name:'History', onClick: ()=>console.log('action 4')},
   ]
 
-  return <AppBar color="transparent" className={css.appBar} variant="outlined" position="absolute">
+  return <AppBar className={css.appBar} variant="outlined" position={ isSm ? "sticky" : "absolute"}>
     <Toolbar>
-      <Grid container justify="space-between" alignItems="center" style={{ paddingTop: 32}}>
+      <Grid container justify="space-between" alignItems="center" className={ css.toolbar }>
         {/* LEFT SIDE OF HEADER */}
         <Grid item>
           <Grid container alignItems="center">
@@ -94,11 +94,19 @@ export default HeaderBar
 const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradientId2: string}>( (theme: Theme) => createStyles({
   appBar:{
     zIndex: 1250,
-    border: 'none'
+    border: 'none',
+    backgroundColor: 'transparent',
+    [theme.breakpoints.down('sm')]:{
+      backgroundColor: theme.palette.background.header
+    }
   },
   menuLogoDivider:{
     marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.down('sm')]:{
+      marginLeft: theme.spacing(0),
+      marginRight: theme.spacing(1),
+    }
   },
   gradient:{
     fill: props =>  `url(#${ props.open ? props.gradientId : props.gradientId2})`,
@@ -106,6 +114,14 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
   dropOnSm:{
     [theme.breakpoints.down('sm')]:{
       display:'none'
+    }
+  },
+  toolbar:{
+    paddingTop: theme.spacing(4),
+    paddingBottom: 0,
+    [theme.breakpoints.down('sm')]:{
+      paddingTop: theme.spacing(2),
+      paddingBottom: theme.spacing(1),
     }
   },
 }))
