@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography'
 import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
+import BankPool from 'components/pools/BankPool'
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
@@ -26,8 +27,22 @@ const Mining = () => {
       <title>BITCRUSH - MINING</title>
       <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
     </Head>
-    <Grid container justify="space-evenly">
-    <Grid item xs={10} sm={8} md={6}>
+    <Grid container justify="space-evenly" className={ css.topSection }>
+      <Grid item xs={10} sm={8} md={6}>
+        <Descriptor
+          title="Galactic Mining"
+          description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
+            Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
+            Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
+        />
+      </Grid>
+      <Grid item style={{ width: 280}} />
+      <Grid item xs={12}>
+        <BankPool/>
+      </Grid>
+    </Grid>
+    <Grid container justify="space-evenly" className={ css.section }>
+      <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Mining Pool"
           description={`Stake CRUSH coins in our single asset staking pool to earn APY that is Auto Compounded.
@@ -44,17 +59,6 @@ const Mining = () => {
         <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
       </Grid>
     </Grid>
-    {/* <Grid container justify="space-evenly" className={ css.section }>
-      <Grid item xs={10} sm={8} md={6}>
-        <Descriptor
-          title="Galactic Mining"
-          description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
-            Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
-            Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
-        />
-      </Grid>
-      <Grid item style={{ width: 280}} />
-    </Grid> */}
   </PageContainer>
 }
 
@@ -63,7 +67,14 @@ export default Mining
 const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   
   section:{
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
+  },
+  topSection:{
+    marginTop: 0,
+    [theme.breakpoints.down('sm')]:{
+      marginTop: theme.spacing(4)
+    },
   },
   
 }))

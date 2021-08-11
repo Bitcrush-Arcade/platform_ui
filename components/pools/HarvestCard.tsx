@@ -16,37 +16,36 @@ const PoolCard = (props: PoolCardProps) => {
 
   const { color, stakedInfo, rewardInfo, action1Title, action2Title, firstAction, secondAction, action2Color, btn1Props, btn2Props } = props
   const css = useStyles({})
-  const action1Width = action2Title ? 200 : '100%'
   const action1Grid = action2Title ? 'auto' : 12
   return <Card background="light" className={ css.main } >
     <CardContent className={ css.content } >
-      <Grid container justify="space-between" direction="row-reverse" >
-        <Grid item>
-          {props.icon || 'ICON'}
-        </Grid>
+      <Grid container justify="space-between" className={ css.titleGrid }>
         <Grid item>
           <Typography variant="h4" component="h2" className={css.title} >
             {props.title}
           </Typography>
-          <InfoMoney color={rewardInfo?.color || color}
-            {...rewardInfo}
-          />
+        </Grid>
+        <Grid item>
+          {props.icon || 'ICON'}
         </Grid>
       </Grid>
+      <InfoMoney color={rewardInfo?.color || color}
+        {...rewardInfo}
+      />
       <Divider orientation="horizontal" style={{marginBottom: 8, marginTop: 8}}/>
       <InfoMoney color={stakedInfo?.color || color}
         {...stakedInfo}
       />
     </CardContent>
     <CardActions className={ css.actions } >
-      <Grid container spacing={1} justify="space-between">
-        <Grid item xs={action1Grid}>
-          <Button color={color} width={action1Width} onClick={firstAction} {...(btn1Props || {})}>
+      <Grid container justify="center">
+        <Grid item xs={12} style={{ paddingTop: 4, paddingBottom: 4}}>
+          <Button color={color} width={"100%"} onClick={firstAction} {...(btn1Props || {})}>
             {action1Title}
           </Button>
         </Grid>
-        {action2Title && <Grid item >
-          <Button color={action2Color || color} width={200} onClick={secondAction} {...(btn2Props || {})}>
+        {action2Title && <Grid item xs={12} style={{ paddingTop: 4, paddingBottom: 4}}>
+          <Button color={action2Color || color} width={"100%"} onClick={secondAction} {...(btn2Props || {})}>
             {action2Title}
           </Button>
         </Grid>}
@@ -119,10 +118,14 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
   title:{
     fontWeight: 600,
     textTransform: 'uppercase',
-    marginBottom: theme.spacing(4),
+    [theme.breakpoints.down('sm')]:{
+      fontSize: theme.typography.h5.fontSize
+    }
+  },
+  titleGrid:{
+    marginBottom: theme.spacing(2),
     [theme.breakpoints.down('sm')]:{
       marginBottom: theme.spacing(2),
-      fontSize: theme.typography.h5.fontSize
     }
   }
 }))

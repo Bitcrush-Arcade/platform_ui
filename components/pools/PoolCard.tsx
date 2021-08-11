@@ -268,8 +268,8 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
           <Grid item>
             <ButtonBase onClick={toggleRoi}>
-              <Grid container alignItems="center" spacing={1}>
-                <Grid item>
+              <Grid container alignItems="center">
+                <Grid item style={{paddingRight: 8}}>
                   { apyData?.d365?.percent 
                     ? <Typography color="primary" variant="body2" className={ css.percent }>
                         {apyData?.d365?.percent || '--%'}
@@ -277,7 +277,7 @@ const PoolCard = (props: PoolProps) => {
                     : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
                   }
                 </Grid>
-                <Grid item>
+                <Grid item style={{paddingRight: 4}}>
                   <CalculationIcon className={ css.aprAction }/>
                 </Grid>
               </Grid>
@@ -320,8 +320,8 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 8}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
-              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 8}}/>Manual
+            <SmallButton size="small" color="primary" style={{marginRight: 4}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
+              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 4}}/>Manual
             </SmallButton>
             <Tooltip arrow
               title={
@@ -330,7 +330,7 @@ const PoolCard = (props: PoolProps) => {
                 </Typography>
               }
             >
-              <InfoOutlinedIcon color="disabled"/>
+              <InfoOutlinedIcon color="disabled" fontSize="small"/>
             </Tooltip>
           </Grid>
           <Grid item xs={6} container alignItems="center" justify="flex-end">
@@ -344,12 +344,12 @@ const PoolCard = (props: PoolProps) => {
           <Grid item xs={12}>
             <Collapse in={detailOpen}>
               <Grid container alignItems="flex-end" style={{marginTop: 24}}>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <Typography variant="body2" color="primary" style={{ fontWeight: 600 }}>
                     {coinInfo.symbol} Profit Earned
                   </Typography>
-                </Grid>
-                <Grid item xs={6}>
+                </Grid> */}
+                {/* <Grid item xs={6}>
                   <Tooltip title={currencyFormat(userProfit || 0, { isWei: true})}>
                     <Typography noWrap style={{ maxWidth: '95%'}}>
                       {currencyFormat(userProfit || 0, { isWei: true})}
@@ -358,8 +358,8 @@ const PoolCard = (props: PoolProps) => {
                   <Typography color="textSecondary" variant="caption">
                     USD {currencyFormat((userProfit || 0)*tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2})}
                   </Typography>
-                </Grid>
-                <Grid item xs={6}>
+                </Grid> */}
+                <Grid item xs={12}>
                   <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
                     0.5% unstaking fee if withdrawn within 72h.{'\n'}
                     Performance Fee 3%
@@ -450,7 +450,7 @@ const PoolCard = (props: PoolProps) => {
           setFieldValue('stakeAmount', 0 )
         }
         return(<Form>
-          <Grid container spacing={1} className={ css.stakeActionBtnContainer }>
+          <Grid container className={ css.stakeActionBtnContainer }>
             <Grid item>
               <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
                 STAKE
@@ -539,7 +539,8 @@ type PoolProps = {
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
   card:{
-    width: 385,
+    maxWidth: 385,
+    width: '100%',
     padding: theme.spacing(2),
     paddingTop: theme.spacing(1),
   },

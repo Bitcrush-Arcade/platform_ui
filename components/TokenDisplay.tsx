@@ -35,9 +35,9 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       className={ css.button }
       ref={btnRef}
     >
-      <Grid container alignItems="center" spacing={1} aria-controls="token-menu">
+      <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
-          <Typography variant="body2" color={color}>
+          <Typography variant="body2" color={color} style={{marginRight: 8}}>
             {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true })}
           </Typography>
         </Grid>

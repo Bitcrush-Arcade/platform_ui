@@ -139,13 +139,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       <Typography align="center" paragraph>
         Are you sure?
       </Typography>
-      <Grid container justify="center" spacing={2}>
-        <Grid item>
+      <Grid container justify="center">
+        <Grid item style={{paddingRight: 8}}>
           <Button color="secondary" width={120} onClick={claim}>
             CLAIM
           </Button>
         </Grid>
-        <Grid item>
+        <Grid item style={{ paddingLeft: 8}}>
           <Button color="primary" width={120} onClick={exitClaim}>
             EXIT
           </Button>
@@ -170,7 +170,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard:{
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down(888)]:{
       marginTop: theme.spacing(4)
     },
     width: 280,

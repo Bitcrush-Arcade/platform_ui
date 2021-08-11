@@ -10,7 +10,7 @@ const theme = (isDark?: boolean) => createMuiTheme({
       dark: deepPurple['A700']
     },
     secondary: {
-      main: teal['A400'],
+      main: isDark ? teal['A400'] : teal['A700'],
       light: 'rgb(27,168,139)', // This is slightly darker than main
       dark: 'rgb(9,130,105)'
     },
@@ -18,7 +18,8 @@ const theme = (isDark?: boolean) => createMuiTheme({
       default: isDark ? 'rgb(12,15,32)' : 'rgb(222,211,241)',
       paper: isDark ? 'rgb(27,30,65)' : 'white',
       menu: isDark ? 'rgb(23,24,54)' : 'white',
-      highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)'
+      highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)',
+      header: isDark ? 'rgb(13,12,44)' : 'rgb(231,171,247)'
     },
     text:{
       secondary: 'rgb(102,105,139)',
