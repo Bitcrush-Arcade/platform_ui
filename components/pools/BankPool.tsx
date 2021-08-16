@@ -40,10 +40,19 @@ function BankPool( ) {
       <Grid container justify="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
-          <Typography variant="h4" component="div" className={ css.heavier }>
-            STAKED
-          </Typography>
-          <Grid container justify="space-between">
+          <Grid container justify="space-between" className={ css.spacing }>
+            <Grid item>
+              <Typography variant="h4" component="div" className={ css.heavier }>
+                AUTO BITCRUSH V2
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Avatar className={ css.avatar }>
+                <InvaderIcon className={ css.avatarIcon} />
+              </Avatar>
+            </Grid>
+          </Grid>
+          <Grid container justify="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="body2" color="textSecondary">
                 Staked
@@ -56,42 +65,35 @@ function BankPool( ) {
               </Typography>
             </Grid>
             <Grid item>
-              <Grid container alignItems="center" spacing={1}>
+              <Grid container direction="column" spacing={1}>
                 <Grid item>
-                  <Typography variant="h6" component="div" className={ css.coinText } display="inline">
-                    BITCRUSH
-                  </Typography>
+                  <SmBtn color="primary">
+                    Compound
+                  </SmBtn>
                 </Grid>
                 <Grid item>
-                  <Avatar className={ css.avatar }>
-                    <InvaderIcon color="action" />
-                  </Avatar>
+                  <SmBtn color="primary" >
+                    Harvest
+                  </SmBtn>
+                </Grid>
+                <Grid item>
+                  <SmBtn color="primary">
+                    Transfer
+                  </SmBtn>
                 </Grid>
               </Grid>
             </Grid>
           </Grid>
           <Button color="primary" onClick={() => setOpenStaking(true)} width="100%">
-            STAKE BANKROLL
+            DEPOSIT / WITHDRAW
           </Button>
-          <Grid container justify="center" spacing={2} className={ css.actionBtns } >
-            <Grid item>
-              <SmBtn color="primary">
-                Compound
-              </SmBtn>
-            </Grid>
-            <Grid item>
-              <SmBtn color="primary">
-                Harvest
-              </SmBtn>
-            </Grid>
-          </Grid>
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
           <Grid container alignItems="center" justify="space-around">
             <Grid item>
               <Typography color="textPrimary" variant="body2">
-                Staking Rewards
+                APY
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                 percent%
@@ -104,7 +106,7 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="textPrimary" variant="body2">
-                House Edge Rewards
+                Profit Distribution
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                 percent%
@@ -116,7 +118,7 @@ function BankPool( ) {
               </Typography>
             </Grid>
             <Grid item>
-              <Typography color="primary" variant="h4" component="div">
+              <Typography color="secondary" variant="h4" component="div">
                 940.2523%
               </Typography>
             </Grid>
@@ -129,7 +131,7 @@ function BankPool( ) {
               </Typography>
               <Grid container justify="space-between">
                 <Grid item>
-                  <Typography>Staking Rewards</Typography>
+                  <Typography>APY Rewards</Typography>
                 </Grid>
                 <Grid item>
                   <Typography color="primary">CRUSH STAKING REWARD</Typography>
@@ -140,7 +142,7 @@ function BankPool( ) {
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <Typography>House Edge Reward</Typography>
+                  <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
                   <Typography color="primary">CRUSH EDGE REWARD</Typography>
@@ -166,7 +168,7 @@ function BankPool( ) {
         </Grid>
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
-          <InvaderLauncher percent={80} crushBuffer={199.5}/>
+          <InvaderLauncher percent={95} crushBuffer={199.5}/>
         </Grid>
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
@@ -238,6 +240,9 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     width: 36,
     height: 36,
   },
+  avatarIcon:{
+    color: theme.palette.common.white
+  },
   card:{
     width: '100%',
     [theme.breakpoints.up('md')]:{
@@ -287,4 +292,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
       fontSize: theme.typography.body1.fontSize
     }
   },
+  spacing:{
+    marginBottom: theme.spacing(2),
+  }
 }))

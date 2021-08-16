@@ -16,17 +16,15 @@ type InvaderLauncherProps = {
 
 function InvaderLauncher( props: InvaderLauncherProps ) {
   const { percent, crushBuffer } = props
-  const css = useStyles()
-
-  const textProperties:{ color: 'primary' | 'secondary' | 'error', text: string} = useMemo( () => {
-    if(percent > 95)
+  const textProperties:{ color: string, text: string} = useMemo( () => {
+    if(percent >= 100)
       return {
         color: 'secondary',
         text: 'ready'
       }
     if(percent > 20)
       return {
-        color: 'primary',
+        color: 'yellow',
         text: 'pending'
       }
     return {
@@ -34,6 +32,8 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
       text: 'stalled'
     }
   },[percent])
+  const css = useStyles(textProperties)
+
 
   return (<div>
     <Grid container justify="space-between" alignItems="stretch">
@@ -64,10 +64,10 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
             />
           </Grid>
           <Grid item xs={6}>
-            <Typography color={textProperties.color}>
+            <Typography className={ css.colorChange }>
               + {currencyFormat(crushBuffer || 0, { decimalsToShow: 0 })} CRUSH
             </Typography>
-            <Typography color={textProperties.color}>
+            <Typography className={ css.colorChange }>
               Blastoff {textProperties.text}
             </Typography>
           </Grid>
@@ -93,9 +93,21 @@ const marks = [
 
 export default InvaderLauncher
 
-const useStyles = makeStyles<Theme>( theme => createStyles({
+const useStyles = makeStyles<Theme,{ color: string, text: string }>( theme => createStyles({
   sliderContainer:{
     height: 220,
+  },
+  colorChange:{
+    color: props => {
+      switch(props.color){
+        case 'secondary':
+          return theme.palette.secondary.main
+        case 'yellow':
+          return theme.palette.type == 'dark' ? 'yellow' : theme.palette.primary.main
+        default: 
+          return theme.palette.error.main
+      }
+    }
   }
 }))
 
