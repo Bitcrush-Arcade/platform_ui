@@ -11,7 +11,7 @@ const styles = (theme: Theme) => createStyles({
   track:{
     width: `${theme.spacing(0.5)}px !important`,
     color: (props: LauncherSliderProps) => {
-      if(props.percent > 90)
+      if(props.percent >= 100)
         return theme.palette.secondary.light
       if(props.percent > 20)
         return 'yellow'
@@ -47,10 +47,10 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number 
         <InvaderIcon color="secondary" className={ css.gradient } style={{position: 'absolute',left: -30, bottom: -10}}/>
       </div>
       <div style={{position: 'relative'}}>
-        { percent > 90 && <div className={ css.blast }>
+        { percent >= 100 && <div className={ css.blast }>
           <Image src="/assets/launcher/blast.png" width={32} height={54} layout="fixed" alt="rocket blast"/>
         </div>}
-        { percent > 5 && percent <= 90 && <div className={ css.cloud }>
+        { percent > 5 && percent < 100 && <div className={ css.cloud }>
           <Image src="/assets/launcher/cloud.png" width={48/cloudSize} height={54/cloudSize} layout="fixed" alt="rocket blast smoke"/>
         </div>}
       </div>
@@ -70,7 +70,7 @@ const useInvaderStyle = makeStyles<Theme, { gradientId: string, cloudSize: numbe
   },
   cloud:{
     position: 'absolute',
-    bottom: props => -64 / props.cloudSize ,
+    bottom: props => -48 / props.cloudSize ,
     left: props => -24 / props.cloudSize ,
   }
 }))
