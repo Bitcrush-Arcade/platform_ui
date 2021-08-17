@@ -10,7 +10,7 @@ import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import SmBtn from "components/basics/SmallButton"
-import StakeModal from "components/basics/StakeModal"
+import StakeModal, { StakeOptionsType } from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
 // Icons
@@ -22,13 +22,16 @@ function BankPool( ) {
   const { bankInfo, userInfo } = useBank()
   const [ openStaking, setOpenStaking ] = useState(false)
 
-  const stakingOptions = [
+  const stakingOptions : Array<StakeOptionsType> = [
     // { name: 'Stake', description: 'Wallet', maxValue: userInfo.staked },
     // { name: 'Withdraw', description: 'Staked', maxValue: userInfo.staked },
     // { name: 'Transfer', description: 'Rewarded', maxValue: userInfo.stakingReward + userInfo.edgeReward },
-    { name: 'Stake', description: 'Wallet', maxValue: 12044457798131585796 },
-    { name: 'Withdraw', description: 'Staked', maxValue: 150000000000000000 },
-    { name: 'Transfer', description: 'Rewarded', maxValue: 14000000000000000000 },
+    { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
+      maxValue: 12044457798131585796 },
+    { name: 'Withdraw', btnText: 'Staked', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
+      maxValue: 150000000000000000 },
+    { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
+      maxValue: 14000000000000000000 },
   ]
   const submit = ( values, {setSubmitting}) => {
     console.log('here\'s the values', values)
