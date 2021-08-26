@@ -40,10 +40,10 @@ function BankPool( ) {
 
   return (<>
     <Card className={ css.card } background="light">
-      <Grid container justify="space-evenly">
+      <Grid container justifyContent="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
-          <Grid container justify="space-between" className={ css.spacing }>
+          <Grid container justifyContent="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2
@@ -55,7 +55,7 @@ function BankPool( ) {
               </Avatar>
             </Grid>
           </Grid>
-          <Grid container justify="space-between" className={ css.spacing }>
+          <Grid container justifyContent="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="body2" color="textSecondary">
                 Staked
@@ -93,7 +93,7 @@ function BankPool( ) {
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
-          <Grid container alignItems="center" justify="space-around">
+          <Grid container alignItems="center" justifyContent="space-around">
             <Grid item>
               <Typography color="textPrimary" variant="body2">
                 APY
@@ -132,7 +132,7 @@ function BankPool( ) {
               <Typography color="textSecondary" variant="body2">
                 Crush Earned
               </Typography>
-              <Grid container justify="space-between">
+              <Grid container justifyContent="space-between">
                 <Grid item>
                   <Typography>APY Rewards</Typography>
                 </Grid>
@@ -176,7 +176,7 @@ function BankPool( ) {
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
           <Divider className={ css.divider } />
-          <Grid container justify="space-between" alignItems="center">
+          <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Typography>
                 Total Bankroll:

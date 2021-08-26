@@ -53,7 +53,7 @@ function StakeModal( props: StakeModalProps ) {
     <Dialog 
       PaperComponent={FormComponent}
       open={open}
-      onBackdropClick={ onClose }
+      onClose={ onClose }
     >
       <Formik
         initialValues = {{
@@ -137,7 +137,7 @@ function StakeModal( props: StakeModalProps ) {
               valueLabelDisplay="on"
             />
           </div>
-          <Grid container justify="space-evenly">
+          <Grid container justifyContent="space-evenly">
             <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
               25%
             </SmallButton>

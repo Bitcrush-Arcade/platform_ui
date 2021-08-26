@@ -94,7 +94,7 @@ export default function Home() {
               ON BSC
             </Typography>
           </Typography>
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
               <Grid item className={css.gradientContainer}>
                 {gradient}
                 <InvaderIcon style={{fontSize: 120}} className={ css.gradient }/>
@@ -105,7 +105,7 @@ export default function Home() {
             {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
-                <Grid container justify="space-around">
+                <Grid container justifyContent="space-around">
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" 
                       align={"center"
@@ -147,12 +147,12 @@ export default function Home() {
                 <Typography variant="h4" align="center" className={ css.announcementTitle }>
                   Announcements
                 </Typography>
-                <Grid container justify="space-evenly" alignItems="center">
+                <Grid container justifyContent="space-evenly" alignItems="center">
                   <Grid item xs={12} md={5}>
                     <Image src={`/games/bountyBanner.png`} layout="responsive" width={1260/6} height={432/6} alt={`announcement banner for bitcrush bounty game`}/>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <Grid container justify="flex-end">
+                    <Grid container justifyContent="flex-end">
                       <Grid item xs={12}>
                         <Typography style={{ padding: 16, whiteSpace: 'pre-line'}} >
                           We&apos;re excited to announce our first live game in collaboration with Wizard Financial; “Bitcrush Bounty”!{'\n'}
@@ -172,7 +172,7 @@ export default function Home() {
                 </Grid>
               </CardContent>
             </Card>
-            <Grid container justify="space-around" style={{marginTop: 16}}>
+            <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
@@ -194,7 +194,7 @@ export default function Home() {
                 />
               </Grid>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
-                <Grid container justify="flex-end">
+                <Grid container justifyContent="flex-end">
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",

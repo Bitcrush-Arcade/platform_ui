@@ -27,7 +27,7 @@ const Mining = () => {
       <title>BITCRUSH - MINING</title>
       <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
     </Head>
-    <Grid container justify="space-evenly" className={ css.topSection }>
+    <Grid container justifyContent="space-evenly" className={ css.topSection }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Galactic Mining"
@@ -41,7 +41,7 @@ const Mining = () => {
         <BankPool/>
       </Grid>
     </Grid>
-    <Grid container justify="space-evenly" className={ css.section }>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Mining Pool"
@@ -54,7 +54,7 @@ const Mining = () => {
         <CompoundingCard/>
       </Grid>
     </Grid>
-    <Grid container justify="center" spacing={1} className={ css.section }>
+    <Grid container justifyContent="center" spacing={1} className={ css.section }>
       <Grid item>
         <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
       </Grid>
