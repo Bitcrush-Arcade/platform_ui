@@ -37,7 +37,7 @@ export default function Home() {
   const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
-  const { tokenInfo, editTransactions } = useTransactionContext()
+  const { tokenInfo, editTransactions, hydrateToken } = useTransactionContext()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
@@ -78,6 +78,7 @@ export default function Home() {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           getLiveWalletData()
+          hydrateToken()
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
@@ -96,6 +97,7 @@ export default function Home() {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         getLiveWalletData()
+        hydrateToken()
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
