@@ -29,6 +29,7 @@ import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
+import { toWei } from 'web3-utils'
 
 export default function Home() {
 
@@ -64,13 +65,13 @@ export default function Home() {
   const lwSubmit: SubmitFunction = ( values, form ) => {
     if(!liveWalletMethods) return form.setSubmitting(false)
     console.log('form submit', values)
-    const weiValue = new BigNumber(values.stakeAmount).times( new BigNumber(10).pow(18) )
+    const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
     if(!values.actionType){
       return liveWalletMethods.addbet( weiValue )
         .send({ from: account })
         .on('transactionHash', (tx) => {
           console.log('hash', tx )
-          editTransactions(tx,'pending', { description: `Add Funds`})
+          editTransactions(tx,'pending', { description: `Add Funds to Live Wallet`})
           setOpenLwModal(false)
         })
         .on('receipt', ( rc) => {
@@ -88,7 +89,7 @@ export default function Home() {
       .send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
-        editTransactions(tx,'pending', { description: `Withdraw Funds`})
+        editTransactions(tx,'pending', { description: `Withdraw Funds from LiveWallet`})
         setOpenLwModal(false)
       })
       .on('receipt', ( rc) => {
