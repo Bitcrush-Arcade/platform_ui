@@ -1,7 +1,9 @@
 // Import ABI's to use
 import CrushToken from 'abi/CrushToken.json'
-import BitcrushStaking from 'abi/BitcrushStaking.json'
 import BitcrushStaking_main from 'abi/BitcrushStaking_main.json'
+import BitcrushLiveWallet from 'abi/BitcrushLiveWallet.json'
+import BitcrushStaking from 'abi/BitcrushStaking.json'
+import BitcrushBankroll from 'abi/BitcrushBankroll.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -28,7 +30,38 @@ export const contracts : { [key: string] : ContractSelect} = {
       address: '0x127dfc82C778aa125564d5B4aD6Fb508c6737341',
       abi: BitcrushStaking_main.abi
     },
+  },
+  liveWallet:{
+    56:{
+      address: '',
+      abi: BitcrushLiveWallet.abi,
+    },
+    97:{
+      address: '0x3Fb4122f4b48001A1E588BC2F933f29daaA4c060',
+      abi: BitcrushLiveWallet.abi,
+    }
+  },
+  bankroll:{
+    56:{
+      address: '',
+      abi: BitcrushBankroll.abi,
+    },
+    97:{
+      address: '0x88C01b6b25156727CDcDef016656b7Fd472C51Bd',
+      abi: BitcrushBankroll.abi,
+    }
+  },
+  bankStaking:{
+    56:{
+      address: '',
+      abi: BitcrushStaking.abi,
+    },
+    97:{
+      address: '0x83f47386e243461AAcE9Fd60cCbdF64D8c96731E',
+      abi: BitcrushStaking.abi,
+    }
   }
+
 }
 
 export const getContracts = (contract: string, chainId: number ): { address: string, abi: AbiItem } => {

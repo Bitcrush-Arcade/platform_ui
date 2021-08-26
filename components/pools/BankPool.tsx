@@ -10,7 +10,7 @@ import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import SmBtn from "components/basics/SmallButton"
-import StakeModal from "components/basics/StakeModal"
+import StakeModal, { StakeOptionsType } from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
 // Icons
@@ -22,13 +22,16 @@ function BankPool( ) {
   const { bankInfo, userInfo } = useBank()
   const [ openStaking, setOpenStaking ] = useState(false)
 
-  const stakingOptions = [
+  const stakingOptions : Array<StakeOptionsType> = [
     // { name: 'Stake', description: 'Wallet', maxValue: userInfo.staked },
     // { name: 'Withdraw', description: 'Staked', maxValue: userInfo.staked },
     // { name: 'Transfer', description: 'Rewarded', maxValue: userInfo.stakingReward + userInfo.edgeReward },
-    { name: 'Stake', description: 'Wallet', maxValue: 12044457798131585796 },
-    { name: 'Withdraw', description: 'Staked', maxValue: 150000000000000000 },
-    { name: 'Transfer', description: 'Rewarded', maxValue: 14000000000000000000 },
+    { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
+      maxValue: 12044457798131585796 },
+    { name: 'Withdraw', btnText: 'Staked', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
+      maxValue: 150000000000000000 },
+    { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
+      maxValue: 14000000000000000000 },
   ]
   const submit = ( values, {setSubmitting}) => {
     console.log('here\'s the values', values)
@@ -37,10 +40,10 @@ function BankPool( ) {
 
   return (<>
     <Card className={ css.card } background="light">
-      <Grid container justify="space-evenly">
+      <Grid container justifyContent="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
-          <Grid container justify="space-between" className={ css.spacing }>
+          <Grid container justifyContent="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2
@@ -52,7 +55,7 @@ function BankPool( ) {
               </Avatar>
             </Grid>
           </Grid>
-          <Grid container justify="space-between" className={ css.spacing }>
+          <Grid container justifyContent="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="body2" color="textSecondary">
                 Staked
@@ -90,7 +93,7 @@ function BankPool( ) {
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
-          <Grid container alignItems="center" justify="space-around">
+          <Grid container alignItems="center" justifyContent="space-around">
             <Grid item>
               <Typography color="textPrimary" variant="body2">
                 APY
@@ -129,7 +132,7 @@ function BankPool( ) {
               <Typography color="textSecondary" variant="body2">
                 Crush Earned
               </Typography>
-              <Grid container justify="space-between">
+              <Grid container justifyContent="space-between">
                 <Grid item>
                   <Typography>APY Rewards</Typography>
                 </Grid>
@@ -173,7 +176,7 @@ function BankPool( ) {
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
           <Divider className={ css.divider } />
-          <Grid container justify="space-between" alignItems="center">
+          <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Typography>
                 Total Bankroll:

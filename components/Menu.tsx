@@ -153,7 +153,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                 <List>
                     {linkItems}
                 </List>
-                <Grid container className={ css.footer } alignItems="center" justify="space-between">
+                <Grid container className={ css.footer } alignItems="center" justifyContent="space-between">
                     <Grid item>
                         <Grid container alignItems="center">
                             <Grid item style={{paddingRight: 8}}>
@@ -179,7 +179,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                     </Grid>
                     <Grid item>
                         <Button onClick={toggleDarkMode} style={{ width: 80, paddingLeft: 4, paddingRight:4 }}>
-                            <Grid container justify="space-between" alignItems="center">
+                            <Grid container justifyContent="space-between" alignItems="center">
                                 <DayIcon color={ isDark ? "disabled" : "primary"}/>
                                 <Divider orientation="vertical" flexItem/>
                                 <NightIcon color={ !isDark ? "disabled" : "primary"}/>

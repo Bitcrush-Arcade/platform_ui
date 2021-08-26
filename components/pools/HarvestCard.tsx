@@ -19,7 +19,7 @@ const PoolCard = (props: PoolCardProps) => {
   const action1Grid = action2Title ? 'auto' : 12
   return <Card background="light" className={ css.main } >
     <CardContent className={ css.content } >
-      <Grid container justify="space-between" className={ css.titleGrid }>
+      <Grid container justifyContent="space-between" className={ css.titleGrid }>
         <Grid item>
           <Typography variant="h4" component="h2" className={css.title} >
             {props.title}
@@ -38,7 +38,7 @@ const PoolCard = (props: PoolCardProps) => {
       />
     </CardContent>
     <CardActions className={ css.actions } >
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <Grid item xs={12} style={{ paddingTop: 4, paddingBottom: 4}}>
           <Button color={color} width={"100%"} onClick={firstAction} {...(btn1Props || {})}>
             {action1Title}

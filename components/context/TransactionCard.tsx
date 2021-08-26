@@ -33,7 +33,7 @@ export default function TxCard( props: TxCardProps ){
   const first = hashes[ keys[0] ]
 
   return <Card background="dark" className={ css.card } shadow="dark">
-    <Grid container alignItems="center" justify="space-between" >
+    <Grid container alignItems="center" justifyContent="space-between" >
       <Grid item>
         {usedIcon[ hashes[ keys[0] ].status ] }
       </Grid>

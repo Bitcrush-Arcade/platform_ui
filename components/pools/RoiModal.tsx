@@ -30,7 +30,7 @@ const RoiModal = ( props: RoiProps ) => {
     PaperComponent={ paperProps => <Card {...paperProps} noBorder className={ css.card } background="light" />}
     onClose={onClose}
   >
-    <Grid container justify="space-between" alignItems="center">
+    <Grid container justifyContent="space-between" alignItems="center">
       <Grid item >
         <Typography variant="h5" align="right">
           &nbsp;&nbsp;ROI
@@ -81,7 +81,7 @@ const RoiModal = ( props: RoiProps ) => {
     <Typography color="textSecondary" variant="caption" paragraph align="center" component="p">
       All estimated rates take into account this pool&apos;s 3% performance fee.
     </Typography>
-    <Grid container justify="center">
+    <Grid container justifyContent="center">
       <Button color="secondary" className={ css.getToken } href={tokenLink} target="_blank" disabled={!tokenLink}>
         GET {tokenSymbol}&nbsp;<OpenNew fontSize="small" />
       </Button>

@@ -72,13 +72,13 @@ const Games = () => {
 
   const LeftScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
-    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    return <Button variant="circular" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
     <ChevronLeft/>
   </Button>
   }
   const RightScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
-    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    return <Button variant="circular" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
     <ChevronRight/>
   </Button>
   }
@@ -88,7 +88,7 @@ const Games = () => {
       <meta name="description" content="A BSC hybrid gaming platform"/>
     </Head>
     <Slide in={showSlide} direction="right">
-      <Grid container justify="center" className={ css.featuredContainer } >
+      <Grid container justifyContent="center" className={ css.featuredContainer } >
         <Grid item className={ css.cardContainer } >
             <Card className={ css.featuredCard } background="light">
                 <Grid container direction="row-reverse" alignItems="center" spacing={1}>
@@ -113,7 +113,7 @@ const Games = () => {
                       </Button>
                     </div>
                   </Grid>
-                  <Grid item xs={12} container justify="flex-end">
+                  <Grid item xs={12} container justifyContent="flex-end">
                     <div style={{ marginLeft: 'auto', marginTop: 8, marginRight: 24}}>
                       <SmallButton size="small" color="secondary" variant="extended" onClick={cycleFeatured}>
                         <Typography variant="caption" color="textPrimary" style={{ fontWeight: 600}}>

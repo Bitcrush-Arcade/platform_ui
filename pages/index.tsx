@@ -17,6 +17,7 @@ import SmallBtn from 'components/basics/SmallButton'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
 import HarvestCard from 'components/pools/HarvestCard'
+import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Context
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
@@ -24,6 +25,7 @@ import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
+import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
@@ -35,17 +37,96 @@ export default function Home() {
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions } = useTransactionContext()
+  const { approve, getApproved, isApproved } = useCoin()
+  // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
+  // TODO ONCE LIVE remove conditional
+  const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
+  const { methods: liveWalletMethods } = useContract( liveWallet.abi, liveWallet.address )
   const { methods } = useContract(firstPool.abi, firstPool.address)
 
   const [tvl, setTvl ] = useState<number>(0)
   const [staked, setStaked ] = useState<number>(0)
 
+  // LiveWalletCard
+  const [currentBalance, setCurrentBalance] = useState<number>(0) //IN WEI
+  const [openLwModal, setOpenLwModal] = useState<boolean>(false)
+
+  const lwOptions: Array<StakeOptionsType> = [
+    { name: 'Add Funds', description: 'Add Funds to Live Wallet from CRUSH', btnText: 'Wallet CRUSH', maxValue: tokenInfo.weiBalance },
+    { name: 'Withdraw Funds', description: 'Withdraw funds from Live Wallet to CRUSH', btnText: 'Live Wallet CRUSH', maxValue: currentBalance },
+  ]
+
+  // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
   const css = useStyles({ gradientId })
 
-  useEffect( () => {
+  const lwSubmit: SubmitFunction = ( values, form ) => {
+    if(!liveWalletMethods) return form.setSubmitting(false)
+    console.log('form submit', values)
+    const weiValue = new BigNumber(values.stakeAmount).times( new BigNumber(10).pow(18) )
+    if(!values.actionType){
+      return liveWalletMethods.addbet( weiValue )
+        .send({ from: account })
+        .on('transactionHash', (tx) => {
+          console.log('hash', tx )
+          editTransactions(tx,'pending', { description: `Add Funds`})
+          setOpenLwModal(false)
+        })
+        .on('receipt', ( rc) => {
+          console.log('receipt',rc)
+          editTransactions(rc.transactionHash,'complete')
+          getLiveWalletData()
+        })
+        .on('error', (error, receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          getLiveWalletData()
+        })
+    }
+    return liveWalletMethods.WithdrawBet( weiValue )
+      .send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Withdraw Funds`})
+        setOpenLwModal(false)
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        getLiveWalletData()
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        getLiveWalletData()
+      })
+  }
 
+  // LIVE WALLET Fns
+  const getLiveWalletData = useCallback(async () => {
+    const lwBalance = await liveWalletMethods.balanceOf( account ).call()
+    setCurrentBalance( new BigNumber(lwBalance).toNumber() )
+  }, [liveWalletMethods, setCurrentBalance, account])
+
+  useEffect( () => {
+    if(!liveWalletMethods || !account) return
+    getLiveWalletData()
+  },[account, liveWalletMethods, getLiveWalletData])
+
+  useEffect( () => {
+    // FETCH DATA EVERY 12 SECONDS
+    if(!liveWalletMethods || !account) return
+    const interval = setInterval( () => getLiveWalletData(), 12000 )
+    return () => clearInterval(interval)
+  },[account, liveWalletMethods, getLiveWalletData])
+
+  useEffect( () => {
+    if(!liveWallet?.address) return
+    getApproved(liveWallet.address)
+  },[liveWallet, getApproved])
+  // STAKED CRUSH
+  useEffect( () => {
     if(!methods) return
     const getTvl = async () => {
       const totalStaked = await methods.totalStaked().call()
@@ -94,7 +175,7 @@ export default function Home() {
               ON BSC
             </Typography>
           </Typography>
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
               <Grid item className={css.gradientContainer}>
                 {gradient}
                 <InvaderIcon style={{fontSize: 120}} className={ css.gradient }/>
@@ -105,7 +186,7 @@ export default function Home() {
             {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
-                <Grid container justify="space-around">
+                <Grid container justifyContent="space-around">
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" 
                       align={"center"
@@ -147,12 +228,12 @@ export default function Home() {
                 <Typography variant="h4" align="center" className={ css.announcementTitle }>
                   Announcements
                 </Typography>
-                <Grid container justify="space-evenly" alignItems="center">
+                <Grid container justifyContent="space-evenly" alignItems="center">
                   <Grid item xs={12} md={5}>
                     <Image src={`/games/bountyBanner.png`} layout="responsive" width={1260/6} height={432/6} alt={`announcement banner for bitcrush bounty game`}/>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <Grid container justify="flex-end">
+                    <Grid container justifyContent="flex-end">
                       <Grid item xs={12}>
                         <Typography style={{ padding: 16, whiteSpace: 'pre-line'}} >
                           We&apos;re excited to announce our first live game in collaboration with Wizard Financial; “Bitcrush Bounty”!{'\n'}
@@ -172,7 +253,7 @@ export default function Home() {
                 </Grid>
               </CardContent>
             </Card>
-            <Grid container justify="space-around" style={{marginTop: 16}}>
+            <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
@@ -194,14 +275,13 @@ export default function Home() {
                 />
               </Grid>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
-                <Grid container justify="flex-end">
+                <Grid container justifyContent="flex-end">
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: 0,
-                      subtitle: " --- ",
+                      amount: new BigNumber(currentBalance).div( new BigNumber(10).pow(18) ).toNumber(),
+                      subtitle: `$ ${currencyFormat( currentBalance * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
                       currency: "CRUSH",
-                      comingSoon: true
                     }}
                     rewardInfo={{
                       title: "HOUSE Profit Earned",
@@ -210,11 +290,11 @@ export default function Home() {
                       currency: "CRUSH",
                       comingSoon: true
                     }}
-                    action1Title="Stake Now"
-                    action2Title="Buy Now"
+                    action1Title={ isApproved ? "Fund Wallet" : "Approve LiveWallet"}
+                    action2Title="Buy CRUSH"
                     action2Color="primary"
                     btn1Props={{
-                      href: "/mining"
+                      onClick: () => isApproved ? setOpenLwModal(true) : approve(liveWallet.address)
                     }}
                     btn2Props={{
                       href: "https://dex.apeswap.finance/#/swap"
@@ -225,6 +305,12 @@ export default function Home() {
             </Grid>
           </Container>
       </PageContainer>
+      <StakeModal
+        open={openLwModal}
+        onClose={() => setOpenLwModal(false)}
+        options={lwOptions}
+        onSubmit={lwSubmit}
+      />
   </>)
 }
 

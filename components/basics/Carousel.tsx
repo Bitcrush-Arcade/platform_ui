@@ -180,7 +180,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
         <ChevronLeftIcon/>
       </IconButton>}
     </div>
-    <Grid container justify="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
+    <Grid container justifyContent="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
       innerRef={carouselRef}
     >
       {shownItems}
@@ -205,7 +205,7 @@ function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: an
   const lgVal = lg ?? md ?? sm ?? xs
   const gridCss = useGridStyle( { xs, sm: smVal, md: mdVal, lg: lgVal, itemIndex: shownIndex, containerWidth: containerWidth})
   return (<Grid item className={ gridCss.itemContainer }>
-    <Grid container justify="center" className={gridCss.showItem}>
+    <Grid container justifyContent="center" className={gridCss.showItem}>
       <Grid item>
         {item}
       </Grid>

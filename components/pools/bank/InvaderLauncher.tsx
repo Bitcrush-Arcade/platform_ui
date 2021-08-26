@@ -36,7 +36,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
 
 
   return (<div>
-    <Grid container justify="space-between" alignItems="stretch">
+    <Grid container justifyContent="space-between" alignItems="stretch">
       <Grid item xs={3}>
         <div className={css.sliderContainer}>
           <MarkerSlider
@@ -51,7 +51,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
         </div>
       </Grid>
       <Grid item xs={9}>
-        <Grid container justify="flex-end" alignItems="flex-end" style={{ height: '100%' }}>
+        <Grid container justifyContent="flex-end" alignItems="flex-end" style={{ height: '100%' }}>
           <Grid item xs={3} style={{ height: '100%', }}>
             <LauncherSlider
               disabled

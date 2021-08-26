@@ -9,7 +9,10 @@ import Dialog from "@material-ui/core/Dialog"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import Slider from "@material-ui/core/Slider"
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from "@material-ui/core/Typography"
+// Icons
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
@@ -20,22 +23,39 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 // libs
 import { currencyFormat } from 'utils/text/text'
 
+export type StakeOptionsType = {
+  name: string,
+  maxValue: number,
+  btnText: string,
+  description: string,
+}
+
+export type SubmitFunction = ( values : { stakeAmount: number, actionType: number }, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
+
 type StakeModalProps = {
   open: boolean,
   onClose: () => void,
-  options: Array<{ name: string, maxValue: number, description: string }>,
-  onSubmit: ( values : { stakeAmount: number, actionType: number }, second: { setSubmitting: (newSubmit: boolean) => void } ) => void,
+  options: Array<StakeOptionsType>,
+  onSubmit: SubmitFunction,
   coinInfo?: { symbol: string, name: string, decimals?: number }
 }
 
 function StakeModal( props: StakeModalProps ) {
   const {open, onClose, options, onSubmit, coinInfo } = props
   const css = useStyles({})
+
+  const InfoText = () => {
+    return <>
+      {options.map( (option, opIdx) => <Typography key={`option-description-tooltip-${opIdx}-${option.name}`} paragraph>
+        <strong>{option.name}:</strong>&nbsp;{option.description}
+      </Typography>)}
+    </>
+  }
   return (
     <Dialog 
       PaperComponent={FormComponent}
       open={open}
-      onBackdropClick={ onClose }
+      onClose={ onClose }
     >
       <Formik
         initialValues = {{
@@ -56,20 +76,20 @@ function StakeModal( props: StakeModalProps ) {
       { ({values, setFieldValue, isSubmitting}) =>{
         const { actionType, stakeAmount } = values
         const maxUsed = options[actionType].maxValue
-        const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo.decimals || 18 ) ) ).times(100)
+        const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
         const sliderChange = (e: any, value: number) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
-          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo.decimals || 18 ) ) )
+          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ).toNumber() )
         }
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
           setFieldValue('stakeAmount', 0 )
         }
         return(<Form>
-          <Grid container className={ css.stakeActionBtnContainer }>
+          <Grid container className={ css.stakeActionBtnContainer } alignItems="center">
             {options.map((option, index) => {
-              const { name, description, maxValue } = option
-              return <Fragment key={`stake-option-${description}-${index}`}>
+              const { name, btnText, maxValue } = option
+              return <Fragment key={`stake-option-${btnText}-${index}`}>
                 { index > 0 && 
                   <Grid item>
                     <Divider orientation="vertical"/>
@@ -82,9 +102,16 @@ function StakeModal( props: StakeModalProps ) {
                 </Grid>
               </Fragment>
             })}
+            <Grid item>
+              <Tooltip 
+                title={<InfoText/>}
+              >
+                <InfoIcon color="action" fontSize="small"/>
+              </Tooltip>
+            </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            {options[actionType].description} {coinInfo.symbol}: {currencyFormat( maxUsed || 0, { isWei: true })}
+            {options[actionType].btnText} {coinInfo?.symbol}: {currencyFormat( maxUsed || 0, { isWei: true })}
           </Typography>
           <Field
             type="number"
@@ -112,7 +139,7 @@ function StakeModal( props: StakeModalProps ) {
               valueLabelDisplay="on"
             />
           </div>
-          <Grid container justify="space-evenly">
+          <Grid container justifyContent="space-evenly">
             <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
               25%
             </SmallButton>
@@ -127,7 +154,7 @@ function StakeModal( props: StakeModalProps ) {
             </SmallButton>
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
-            {options[actionType].name} {coinInfo.symbol}
+            {options[actionType].name} {coinInfo?.symbol}
           </Button>
         </Form>)
         }}

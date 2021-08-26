@@ -87,7 +87,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   return <>
   <Card background="light" shadow="dark" className={ css.claimCard } >
     <CardContent className={ css.cardContent }>
-      <Grid container justify="space-between" alignItems="center">
+      <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography className={ css.cardTitle }>
             CRUSH Auto Bounty
@@ -132,14 +132,14 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   </Card>
   <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
     <DialogContent>
-      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
+      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justifyContent">
         Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
         {'\n'}If you don’t understand, please have the mods explain this to you.
       </Typography>
       <Typography align="center" paragraph>
         Are you sure?
       </Typography>
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <Grid item style={{paddingRight: 8}}>
           <Button color="secondary" width={120} onClick={claim}>
             CLAIM
