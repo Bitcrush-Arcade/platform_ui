@@ -21,6 +21,7 @@ type ContextType = {
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
   toggleDarkMode?: () => void,
   isDark: boolean,
+  hydrateToken: () => Promise<void>
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -29,7 +30,8 @@ export const TransactionContext = createContext<ContextType>({
   editTransactions: () => {},
   tokenInfo: { weiBalance: 0, crushUsdPrice: 0 },
   toggleDarkMode: () => {},
-  isDark: true
+  isDark: true,
+  hydrateToken: () => Promise.resolve(),
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
@@ -48,24 +50,25 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const hydrate = () => setHydration(p => !p)
 
+  const tokenHydration = useCallback( async () => {
+    if(!methods || !account) return
+    const tokenBalance = await methods.balanceOf(account).call()
+    setCoinInfo( draft => {
+      draft.weiBalance = tokenBalance
+    })
+  },[methods, account, setCoinInfo])
+
+  const getTokenInfo = useCallback( async() => {
+    const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
+    setCoinInfo( draft => {
+      draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
+    })
+    tokenHydration()
+  },[setCoinInfo, tokenHydration])
+
   useEffect( () => {
-    async function getTokenInfo (){
-      const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
-      if(!account || !methods) {
-        setCoinInfo( draft => {
-          draft.weiBalance = 0
-          draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
-        })
-        return
-      }
-      const tokenBalance = await methods.balanceOf(account).call()
-      setCoinInfo( draft => {
-        draft.weiBalance = tokenBalance
-        draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
-      })
-    }
     getTokenInfo()
-  },[methods, account, hydration, setCoinInfo])
+  },[ account, hydration, getTokenInfo ])
 
   useEffect( ()=>{
     const interval = setInterval( hydrate, 30000)
@@ -135,7 +138,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     editTransactions: editTransactions,
     tokenInfo: coinInfo,
     toggleDarkMode: toggle,
-    isDark: dark
+    isDark: dark,
+    hydrateToken: tokenHydration
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}
