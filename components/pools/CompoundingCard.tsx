@@ -132,7 +132,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   </Card>
   <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
     <DialogContent>
-      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justifyContent">
+      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
         Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
         {'\n'}If you don’t understand, please have the mods explain this to you.
       </Typography>
