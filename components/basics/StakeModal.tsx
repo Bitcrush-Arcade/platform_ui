@@ -30,11 +30,13 @@ export type StakeOptionsType = {
   description: string,
 }
 
+export type SubmitFunction = ( values : { stakeAmount: number, actionType: number }, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
+
 type StakeModalProps = {
   open: boolean,
   onClose: () => void,
   options: Array<StakeOptionsType>,
-  onSubmit: ( values : { stakeAmount: number, actionType: number }, second: { setSubmitting: (newSubmit: boolean) => void } ) => void,
+  onSubmit: SubmitFunction,
   coinInfo?: { symbol: string, name: string, decimals?: number }
 }
 
@@ -74,10 +76,10 @@ function StakeModal( props: StakeModalProps ) {
       { ({values, setFieldValue, isSubmitting}) =>{
         const { actionType, stakeAmount } = values
         const maxUsed = options[actionType].maxValue
-        const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo.decimals || 18 ) ) ).times(100)
+        const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
         const sliderChange = (e: any, value: number) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
-          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo.decimals || 18 ) ) )
+          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ).toNumber() )
         }
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
@@ -109,7 +111,7 @@ function StakeModal( props: StakeModalProps ) {
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            {options[actionType].btnText} {coinInfo.symbol}: {currencyFormat( maxUsed || 0, { isWei: true })}
+            {options[actionType].btnText} {coinInfo?.symbol}: {currencyFormat( maxUsed || 0, { isWei: true })}
           </Typography>
           <Field
             type="number"
@@ -152,7 +154,7 @@ function StakeModal( props: StakeModalProps ) {
             </SmallButton>
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
-            {options[actionType].name} {coinInfo.symbol}
+            {options[actionType].name} {coinInfo?.symbol}
           </Button>
         </Form>)
         }}
