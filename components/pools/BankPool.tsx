@@ -67,29 +67,27 @@ function BankPool( ) {
                 Your Stake {userInfo.staked / ( bankInfo.bankRoll || 1 )}%
               </Typography>
             </Grid>
-            <Grid item>
-              <Grid container direction="column" spacing={1}>
-                <Grid item>
-                  <SmBtn color="primary">
-                    Compound
-                  </SmBtn>
-                </Grid>
-                <Grid item>
-                  <SmBtn color="primary" >
-                    Harvest
-                  </SmBtn>
-                </Grid>
-                <Grid item>
-                  <SmBtn color="primary">
-                    Transfer
-                  </SmBtn>
-                </Grid>
-              </Grid>
-            </Grid>
           </Grid>
           <Button color="primary" onClick={() => setOpenStaking(true)} width="100%">
             DEPOSIT / WITHDRAW
           </Button>
+          <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
+            <Grid item>
+              <SmBtn color="primary">
+                Compound
+              </SmBtn>
+            </Grid>
+            <Grid item>
+              <SmBtn color="primary" >
+                Harvest
+              </SmBtn>
+            </Grid>
+            <Grid item>
+              <SmBtn color="primary">
+                Transfer
+              </SmBtn>
+            </Grid>
+          </Grid>
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
