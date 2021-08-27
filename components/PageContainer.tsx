@@ -20,12 +20,12 @@ import { useTransactionContext } from 'hooks/contextHooks'
 
 const PageContainer = ( props: ContainerProps ) => {
   
-  const { children } = props
+  const { children, menuSm } = props
   
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   
-  const [menuToggle, setMenuToggle] = useState<boolean>(!isSm)
+  const [menuToggle, setMenuToggle] = useState<boolean>( menuSm ? false : !isSm )
   const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
   
   const css = useStyles({ menuToggle, ...props })
@@ -37,8 +37,9 @@ const PageContainer = ( props: ContainerProps ) => {
   const toggleMenu = () => setMenuToggle( p => !p )
 
   useEffect(()=>{
+    if(menuSm) return
     setMenuToggle(!isSm)
-  },[isSm])
+  },[isSm, menuSm])
   const allHashes = compact( Object.keys(pending).map( hash => hiddenPending[hash] && pending[hash].status == hiddenPending[hash] ? null : pending[hash] ) )
   const shownPending = useMemo( () => {
     const filteredPending = {...pending}
@@ -52,7 +53,7 @@ const PageContainer = ( props: ContainerProps ) => {
   return <div>
     <div className={ css.fullContainer }>
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
-      <Menu open={menuToggle} toggleOpen={toggleMenu}/>
+      <Menu open={menuToggle} toggleOpen={toggleMenu} alwaysSm={menuSm}/>
       <Container maxWidth="xl" className={css.contentContainer}>
         {children}
         {Object.keys(allHashes).length > 0 && <div style={{ position: 'fixed', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
@@ -68,7 +69,8 @@ export default PageContainer
 type ContainerProps ={
   children?: ReactNode,
   fullPage?: boolean,
-  background?: 'default' | 'galactic'
+  background?: 'default' | 'galactic',
+  menuSm?: boolean,
 }
 
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
@@ -79,7 +81,11 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     },
     paddingLeft: theme.spacing(3),
     [theme.breakpoints.up('md')]:{
-      paddingLeft: props => props.menuToggle ? theme.spacing(33) : theme.spacing(12),
+      paddingLeft: props => {
+        if( props.menuSm )
+          return theme.spacing(3)
+        return props.menuToggle ? theme.spacing(33) : theme.spacing(12)
+      },
     },
     transition: theme.transitions.create('padding', {
       easing: theme.transitions.easing.sharp,

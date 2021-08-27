@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Fab from '@material-ui/core/Fab'
@@ -19,16 +20,29 @@ import Button from 'components/basics/GeneralUseButton'
 import SmallButton from 'components/basics/SmallButton'
 import PageContainer from 'components/PageContainer'
 
-const featuredGames = [
+type GameItem = {
+  name: string,
+  description: string,
+  disabled?: boolean,
+  link: string,
+  imgSrc: string,
+  width: number,
+  height: number,
+  alt: string,
+  local?: boolean
+}
+
+const featuredGames : GameItem[] = [
   { 
     name: 'Dice Invaders',
     description: 'Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
-    disabled: true,
-    link: undefined,
+    disabled: false,
+    link: '/games/diceInvaders',
     imgSrc: '/games/dice_invaders_pv.png',
     width: 2358/6,
     height: 1290/6,
-    alt: 'Dice Invaders Game Demo'
+    alt: 'Dice Invaders Game Demo',
+    local: true
   },
   {
     name: "Bitcrush Bounty",
@@ -82,6 +96,17 @@ const Games = () => {
     <ChevronRight/>
   </Button>
   }
+
+  const featuredButton = 
+    <Button width="100%" color="primary" style={{ marginTop: 32 }}
+      disabled={selectedGame.disabled}
+      solidDisabledText
+      href={selectedGame.local ? undefined : selectedGame.link}
+      target={selectedGame.local ? undefined : "_blank"}
+    >
+      {selectedGame.disabled ? "Coming Soon" : "Play Now"}
+    </Button>
+
   return <PageContainer>
      <Head>
       <title>BITCRUSH ARCADE</title>
@@ -103,14 +128,11 @@ const Games = () => {
                       <Typography variant="body2">
                       {selectedGame.description}
                       </Typography>
-                      <Button width="100%" color="primary" style={{ marginTop: 32 }}
-                        disabled={selectedGame.disabled}
-                        solidDisabledText
-                        href={selectedGame.link}
-                        target="_blank"
-                      >
-                        {selectedGame.disabled ? "Coming Soon" : "Play Now"}
-                      </Button>
+                      { selectedGame.local 
+                          ? <Link href={selectedGame.link} passHref>
+                              {featuredButton}
+                            </Link>
+                          : featuredButton}
                     </div>
                   </Grid>
                   <Grid item xs={12} container justifyContent="flex-end">
