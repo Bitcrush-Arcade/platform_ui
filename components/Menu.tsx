@@ -40,22 +40,29 @@ import { ConditionalLinkWrapper } from 'utils/wrappers'
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
 import UfoIcon from 'components/svg/UfoIcon'
-import Ufo2Icon from 'components/svg/Ufo2Icon'
-import RechargeIcon from 'components/svg/RechargeIcon'
+// import Ufo2Icon from 'components/svg/Ufo2Icon'
+// import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
-import WarpIcon from 'components/svg/WarpIcon'
+// import WarpIcon from 'components/svg/WarpIcon'
 import NightIcon from 'components/svg/Night'
 import DayIcon from 'components/svg/Day'
 
 const hashexScale = 5
 
-const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
-    const { open, toggleOpen } = props
+type MenuProps = {
+    open: boolean,
+    toggleOpen: () => void,
+    alwaysSm?: boolean
+}
+
+const Menu = ( props: MenuProps) => {
+    const { open, toggleOpen, alwaysSm } = props
     const router = useRouter()
-    const css = useStyles({ open })
+    const css = useStyles(props)
     const theme = useTheme()
-    const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+    const mediaSm = useMediaQuery( theme.breakpoints.down('sm') )
+    const isSm = alwaysSm || mediaSm
 
     const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
     
@@ -95,7 +102,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             } )
             !open && toggleOpen()
         }
-        const selected = url_link == router.pathname
+        const selected = url_link == router.pathname || (url_link || '').length > 1 && router.pathname.indexOf(url_link) > -1
         const mainColor = selected ? 'primary' :
             subMenu ? 'secondary' : undefined
         const component = disabled ? 'li' :
