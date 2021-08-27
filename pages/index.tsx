@@ -86,7 +86,7 @@ export default function Home() {
           getLiveWalletData()
         })
     }
-    return liveWalletMethods.WithdrawBet( weiValue )
+    return liveWalletMethods.withdrawBet( weiValue )
       .send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
