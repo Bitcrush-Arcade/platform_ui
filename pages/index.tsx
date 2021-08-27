@@ -293,6 +293,7 @@ export default function Home() {
                       currency: "CRUSH",
                       comingSoon: true
                     }}
+                    icon={<Coin token="LIVE" scale={0.5}/>}
                     action1Title={ isApproved ? "Fund Wallet" : "Approve LiveWallet"}
                     action2Title="Buy CRUSH"
                     action2Color="primary"
