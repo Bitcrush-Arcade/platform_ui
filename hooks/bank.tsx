@@ -6,7 +6,6 @@ import { useImmer } from 'use-immer'
 import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
 import BigNumber from 'bignumber.js'
-import { toWei } from 'web3-utils'
 
 function useBank(){
   // Get connection
@@ -25,9 +24,9 @@ function useBank(){
     const availableProfit = await bankMethods.availableProfit().call()
     const profitThreshold = await bankMethods.profitThreshold().call()
     setBankInfo( draft => {
-      draft.totalBankroll = totalBankroll
-      draft.profitThreshold = profitThreshold
-      draft.availableProfit = availableProfit
+      draft.totalBankroll = +totalBankroll
+      draft.profitThreshold = +profitThreshold
+      draft.availableProfit = +availableProfit
       draft.thresholdPercent = parseFloat( new BigNumber(availableProfit).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) )
     })
   },[bankMethods, setBankInfo])
@@ -42,10 +41,15 @@ function useBank(){
   const getStakingData = useCallback( async() => {
       if(!stakingMethods) return
       const totalStaked = await stakingMethods.totalStaked().call()
-      // const profits = await stakingMethods.profits(0).call()
+      let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
+      await stakingMethods.profits(0).call({}, (err, result) => {
+        if(err) return
+        profits = result
+      })
+      .catch( e => console.log('error2', e))
       setBankInfo(draft => {
-        draft.totalStaked = totalStaked
-        // draft.profitTotal = profits
+        draft.totalStaked = +totalStaked
+        draft.profitTotal = profits
       })
       
       if(!account) return
@@ -53,9 +57,9 @@ function useBank(){
       const currentStaked = await stakingMethods.stakings(account).call()
 
       setUserInfo( draft => {
-        draft.stakingReward = userRewards
-        draft.staked = currentStaked.stakedAmount
-        draft.stakePercent = new BigNumber(currentStaked.stakedAmount).div( new BigNumber(totalStaked) ).times(100).toNumber()
+        draft.stakingReward = +userRewards
+        draft.staked = +currentStaked.stakedAmount
+        draft.stakePercent = (+currentStaked.stakedAmount)/(+totalStaked || 1) * 100
         draft.edgeReward = 0
       })
 
@@ -68,21 +72,21 @@ function useBank(){
   },[getStakingData, stakingMethods])
 
   // REFETCH DATA EVERY 12 SECONDS
-  useEffect(() => {
-    const interval = setInterval( () => {
-      getBankData()
-      getStakingData()
-    }, 12000)
-
-    return () => clearInterval( interval )
+  const hydrateData = useCallback( () => {
+    getBankData()
+    getStakingData()
   },[getBankData, getStakingData])
+
+  useEffect(() => {
+    const interval = setInterval( hydrateData, 12000)
+    return () => clearInterval( interval )
+  },[hydrateData])
 
 
   return { 
     bankInfo,
     userInfo,
-    getStakingData,
-    getBankData,
+    hydrateData,
     addresses:{
       bank: bankContract.address,
       staking: bankContract.address
@@ -99,7 +103,7 @@ type BankInfo = {
   totalStaked: number,
   availableProfit: number,
   profitThreshold: number,
-  profitTotal: { total: number, remaining: 0 },
+  profitTotal: { total: number, remaining: number },
   profitDistribution: number,
   thresholdPercent: number,
 }
