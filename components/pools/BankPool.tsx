@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
@@ -10,33 +10,97 @@ import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import SmBtn from "components/basics/SmallButton"
-import StakeModal, { StakeOptionsType } from "components/basics/StakeModal"
+import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
 // Icons
 import InvaderIcon from "components/svg/InvaderIcon"
+import useCoin from 'hooks/useCoin'
+import { useTransactionContext } from 'hooks/contextHooks'
+import { currencyFormat } from 'utils/text/text'
+// Libs
+import { toWei } from 'web3-utils'
+import BigNumber from 'bignumber.js'
+import { useWeb3React } from '@web3-react/core'
 
 function BankPool( ) {
   const css = useStyles()
+  const { account } = useWeb3React()
+  const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
+  const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData } = useBank()
+  const { approve, isApproved, getApproved } = useCoin()
 
-  const { bankInfo, userInfo } = useBank()
+  // CHECK ALLOWANCE OF STAKING CONTRACT
+  useEffect(() => {
+    if(!addresses?.staking) return
+    getApproved(addresses.staking)
+  }, [getApproved, addresses])
+
   const [ openStaking, setOpenStaking ] = useState(false)
 
   const stakingOptions : Array<StakeOptionsType> = [
-    // { name: 'Stake', description: 'Wallet', maxValue: userInfo.staked },
-    // { name: 'Withdraw', description: 'Staked', maxValue: userInfo.staked },
-    // { name: 'Transfer', description: 'Rewarded', maxValue: userInfo.stakingReward + userInfo.edgeReward },
     { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
-      maxValue: 12044457798131585796 },
+      maxValue: tokenInfo.weiBalance },
     { name: 'Withdraw', btnText: 'Staked', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
-      maxValue: 150000000000000000 },
+      maxValue: userInfo.staked },
     { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: 14000000000000000000 },
+      maxValue: userInfo.staked },
   ]
-  const submit = ( values, {setSubmitting}) => {
-    console.log('here\'s the values', values)
-    setSubmitting(false)
+  const submit : SubmitFunction = ( values, {setSubmitting}) => {
+    const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
+    if(!stakingMethods) return setSubmitting(false)
+    if(!values.actionType)
+      return stakingMethods.enterStaking(weiValue).send({ from: account })
+        .on('transactionHash', (tx) => {
+          console.log('hash', tx )
+          editTransactions(tx,'pending', { description: `Stake in Bankroll`})
+          setOpenStaking(false)
+        })
+        .on('receipt', ( rc) => {
+          console.log('receipt',rc)
+          editTransactions(rc.transactionHash,'complete')
+          hydrateToken()
+          hydrateData()
+        })
+        .on('error', (error, receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        })
+    const isTransfer = values.actionType === 2
+    return stakingMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
+        setOpenStaking(false)
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        hydrateToken()
+        hydrateData()
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
   }
+
+  const totalBankroll = bankInfo.totalStaked + bankInfo.totalBankroll
+  const usdBankRoll = currencyFormat(tokenInfo.crushUsdPrice * totalBankroll, { decimalsToShow: 2, isWei: true })
+
+  // STAKING INTERACTIONS
+  const depositWithdrawClick = () => {
+    if(!isApproved)
+      return approve(addresses.staking)
+    setOpenStaking(true)
+  }
+
+  const profitDistribution = useMemo(() =>{
+    const reward = bankInfo.profitTotal.total * userInfo.stakePercent
+    if(reward > bankInfo.profitTotal.remaining)
+      return 0
+    return reward
+  },[bankInfo, userInfo])
 
   return (<>
     <Card className={ css.card } background="light">
@@ -64,12 +128,12 @@ function BankPool( ) {
                 {userInfo.staked}
               </Typography>
               <Typography variant="body2" color="textSecondary" paragraph>
-                Your Stake {userInfo.staked / ( bankInfo.bankRoll || 1 )}%
+                Your Stake {userInfo.staked / ( bankInfo.totalStaked || 1 )}%
               </Typography>
             </Grid>
           </Grid>
-          <Button color="primary" onClick={() => setOpenStaking(true)} width="100%">
-            DEPOSIT / WITHDRAW
+          <Button color="primary" onClick={depositWithdrawClick} width="100%">
+            {isApproved ? "DEPOSIT / WITHDRAW" : "Approve CRUSH" }
           </Button>
           <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
             <Grid item>
@@ -110,7 +174,7 @@ function BankPool( ) {
                 Profit Distribution
               </Typography>
               <Typography color="primary" variant="h6" component="div">
-                percent%
+                {bankInfo.profitDistribution*100}%
               </Typography>
             </Grid>
             <Grid item xs={12} sm={'auto'}>
@@ -135,7 +199,9 @@ function BankPool( ) {
                   <Typography>APY Rewards</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography color="primary">CRUSH STAKING REWARD</Typography>
+                  <Typography color="primary">
+                    {currencyFormat(userInfo.stakingReward, { isWei: true })}
+                  </Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography color="primary">
@@ -146,7 +212,8 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography color="primary">CRUSH EDGE REWARD</Typography>
+                  {/* IF REWARD > profit[0].remaining then 0 */}
+                  <Typography color="primary">{currencyFormat(profitDistribution, { isWei: true })}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography color="secondary">
@@ -160,7 +227,7 @@ function BankPool( ) {
                 </Grid>
                 <Grid item>
                   <Typography color="secondary" variant="h5">
-                    TOTALREWARDCRUSH
+                    {currencyFormat( profitDistribution + userInfo.stakingReward, { isWei: true })}
                   </Typography>
                 </Grid>
               </Grid>
@@ -169,7 +236,7 @@ function BankPool( ) {
         </Grid>
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
-          <InvaderLauncher percent={95} crushBuffer={199.5}/>
+          <InvaderLauncher percent={bankInfo.thresholdPercent} crushBuffer={bankInfo.availableProfit}/>
         </Grid>
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
@@ -180,12 +247,12 @@ function BankPool( ) {
                 Total Bankroll:
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                BANKROLLAMOUNT
+                {currencyFormat(totalBankroll, { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                BANKROLLAMOUNT USD
+                {usdBankRoll} USD
               </Typography>
             </Grid>
             <Grid item xs={12} className={ css.invisibleDivider } />
@@ -194,7 +261,7 @@ function BankPool( ) {
                 Total Value Distributed:
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
                 TVLDistributed
               </Typography>
@@ -208,7 +275,7 @@ function BankPool( ) {
                 House Profit Distribution:
               </Typography>
             </Grid>
-            <Grid item>
+            <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
                 ProfitDistributedAmount
               </Typography>
