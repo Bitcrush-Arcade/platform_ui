@@ -89,7 +89,7 @@ function useBank(){
     hydrateData,
     addresses:{
       bank: bankContract.address,
-      staking: bankContract.address
+      staking: stakingContract.address
     },
     bankMethods,
     stakingMethods,
