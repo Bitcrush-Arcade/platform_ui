@@ -123,7 +123,7 @@ function StakeModal( props: StakeModalProps ) {
             variant="outlined"
             component={TextField}
             InputProps={{
-              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxUsed )}>
+              endAdornment: <MButton color="secondary" onClick={ () => sliderChange(null, 100)}>
                 MAX
               </MButton>,
               className: css.textField,
