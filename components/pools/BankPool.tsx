@@ -46,6 +46,7 @@ function BankPool( ) {
     { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
       maxValue: userInfo.staked },
   ]
+
   const submit : SubmitFunction = ( values, {setSubmitting}) => {
     const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
     if(!stakingMethods) return setSubmitting(false)
@@ -95,6 +96,42 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
+  const harvest = (isTransfer: boolean) => {
+    stakingMethods?.claim(isTransfer).send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: 'Harvest Staking Rewards'})
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        hydrateToken()
+        hydrateData()
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
+      })
+  }
+
+  const compound = () => {
+    stakingMethods?.singleCompound().send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: "Compound My Assets" })
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        hydrateData()
+        hydrateToken()
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
+      })
+  }
+
   const profitDistribution = useMemo(() =>{
     const reward = bankInfo.profitTotal.total * userInfo.stakePercent
     if(reward > bankInfo.profitTotal.remaining)
@@ -125,10 +162,10 @@ function BankPool( ) {
                 Staked
               </Typography>
               <Typography variant="h6" component="div" color="primary" className={ css.heavy }>
-                {userInfo.staked}
+                {currencyFormat(userInfo.staked, { isWei: true })}
               </Typography>
               <Typography variant="body2" color="textSecondary" paragraph>
-                Your Stake {userInfo.staked / ( bankInfo.totalStaked || 1 )}%
+                Your Stake {currencyFormat( userInfo.stakePercent , { decimalsToShow: 6 })}%
               </Typography>
             </Grid>
           </Grid>
@@ -137,17 +174,17 @@ function BankPool( ) {
           </Button>
           <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
             <Grid item>
-              <SmBtn color="primary">
+              <SmBtn color="primary" onClick={compound}>
                 Compound
               </SmBtn>
             </Grid>
             <Grid item>
-              <SmBtn color="primary" >
+              <SmBtn color="primary" onClick={() => harvest(false)}>
                 Harvest
               </SmBtn>
             </Grid>
             <Grid item>
-              <SmBtn color="primary">
+              <SmBtn color="primary" onClick={() => harvest(true)}>
                 Transfer
               </SmBtn>
             </Grid>
