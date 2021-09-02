@@ -6,6 +6,8 @@ import { useImmer } from 'use-immer'
 import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
 import BigNumber from 'bignumber.js'
+// Types
+import { RoiProps } from 'components/pools/RoiModal'
 
 function useBank(){
   // Get connection
@@ -16,6 +18,23 @@ function useBank(){
 
   const [ bankInfo, setBankInfo ] = useImmer<BankInfo>(initBank)
   const [ userInfo, setUserInfo ] = useImmer<UserInfo>(initUser)
+
+  const getApyData = () => {
+    if(!chainId) return
+    fetch('/api/getAPY',{
+      method: 'POST',
+      body: JSON.stringify({
+        chainId: chainId || 56,
+        contract: 'bankStaking'
+      })
+    })
+      .then( response => response.json() )
+      .then( data => setBankInfo( draft => {
+        draft.apyPercent = data
+      }))
+  }
+
+  useEffect( () => { getApyData() }, [chainId])
 
   // GET BANK DATA
   const getBankData = useCallback( async() => {
@@ -93,6 +112,7 @@ function useBank(){
     },
     bankMethods,
     stakingMethods,
+    getApyData
   }
 }
 
@@ -106,6 +126,7 @@ type BankInfo = {
   profitTotal: { total: number, remaining: number },
   profitDistribution: number,
   thresholdPercent: number,
+  apyPercent: RoiProps['apyData'],
 }
 const initBank: BankInfo = {
   totalBankroll: 0,
@@ -118,6 +139,7 @@ const initBank: BankInfo = {
   },
   profitDistribution: 0.6,
   thresholdPercent: 0,
+  apyPercent: undefined,
 }
 type UserInfo = {
   staked: number,

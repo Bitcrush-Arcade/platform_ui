@@ -4,6 +4,7 @@ import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
+import IconButton from '@material-ui/core/IconButton'
 import Typography from "@material-ui/core/Typography"
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
@@ -13,11 +14,12 @@ import SmBtn from "components/basics/SmallButton"
 import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Hooks
 import useBank from "hooks/bank"
-// Icons
-import InvaderIcon from "components/svg/InvaderIcon"
 import useCoin from 'hooks/useCoin'
 import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
+// Icons
+import InvaderIcon from "components/svg/InvaderIcon"
+import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
@@ -27,7 +29,7 @@ function BankPool( ) {
   const css = useStyles()
   const { account } = useWeb3React()
   const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
-  const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData } = useBank()
+  const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
 
   // CHECK ALLOWANCE OF STAKING CONTRACT
@@ -195,10 +197,13 @@ function BankPool( ) {
           <Grid container alignItems="center" justifyContent="space-around">
             <Grid item>
               <Typography color="textPrimary" variant="body2">
-                APY
+                APY &nbsp;
+                <IconButton size="small" onClick={getApyData}>
+                  <RefreshIcon fontSize="inherit"/>
+                </IconButton>
               </Typography>
               <Typography color="primary" variant="h6" component="div">
-                percent%
+                {bankInfo.apyPercent?.d365?.percent}
               </Typography>
             </Grid>
             <Grid item>
@@ -221,7 +226,7 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
-                940.2523%
+                {(parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (bankInfo.profitDistribution * 100)}%
               </Typography>
             </Grid>
             <Grid item xs={12}>
