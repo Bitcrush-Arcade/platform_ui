@@ -90,7 +90,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography className={ css.cardTitle }>
-            CRUSH Auto Bounty
+            CRUSH Auto Bounty v1
           </Typography>
         </Grid>
         <Grid item>

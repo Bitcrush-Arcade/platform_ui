@@ -4,7 +4,7 @@ import { fromWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { currencyFormat } from 'utils/text/text'
 import { getContracts } from 'data/contracts'
-import minuteDifference from 'date-fns/differenceInMinutes'
+
 
 let calculatedLast = new Date()
 let previousCalc = undefined
@@ -12,29 +12,26 @@ let previousCalc = undefined
 export default async function getApy(req : NextApiRequest, res: NextApiResponse){
   // Check validity of request
   const body = JSON.parse(req.body || "{}" )
+
   const host = req.headers.host
   const isLocal = host.indexOf('localhost:') > -1
   if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
-  // if( previousCalc && minuteDifference( new Date(), calculatedLast ) < 30 )
-  //   return res.status(304).json(previousCalc)
-  // Fetch current crushPrice
+  
+    // Fetch current crushPrice
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then( r => r.json() )
-
+  
+  const usedContract = body.contract || 'singleAsset'
   const initialStake = 1000 / price.crushUsdPrice 
   // Get info from contract
-  const usedChain = 56//body?.chainId ? parseInt(body.chainId) : 97
+  const usedChain = body?.chainId ? parseInt(body.chainId) : 97
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
-  const contractSetup = getContracts('singleAsset', usedChain )
+  const contractSetup = getContracts( usedContract, usedChain )
   const contract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
 
   const emission = await contract.methods.crushPerBlock().call()
   const totalStaked = fromWei( await contract.methods.totalStaked().call() )
-  // const compounder =  await contract.methods.performanceFeeCompounder().call()
-  // const reserve = await contract.methods.performanceFeeReserve().call()
-  // const burn = await contract.methods.performanceFeeBurn().call()
-  // const divisor = "10000"
 
   const performanceFee = 0.03
   const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).times(100).toNumber()

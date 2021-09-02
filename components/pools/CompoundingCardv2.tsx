@@ -31,7 +31,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const { chainId, account } = useWeb3React()
 
   const { tokenInfo, editTransactions } = useTransactionContext()
-  const stakeContract = getContracts('singleAsset', chainId )
+  const stakeContract = getContracts('bankStaking', chainId )
   const { methods } = useContract( stakeContract.abi, stakeContract.address )
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
@@ -65,11 +65,6 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   }, [rewardToDistribute, tokenInfo])
 
   const claim = () => {
-    if(!showWarning){
-      setShowWarning(true)
-      return
-    }
-    setShowWarning(false)
     methods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
       .on('receipt', rct =>{
@@ -81,8 +76,6 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
       } )
   }
-
-  const exitClaim = () => setShowWarning( false )
 
   return <>
   <Card background="light" shadow="dark" className={ css.claimCard } >
@@ -123,36 +116,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account || showWarning }>
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account }>
             Claim
           </Button>
         </Grid>
       </Grid>
     </CardContent>
   </Card>
-  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
-    <DialogContent>
-      <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
-        Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
-        {'\n'}If you don’t understand, please have the mods explain this to you.
-      </Typography>
-      <Typography align="center" paragraph>
-        Are you sure?
-      </Typography>
-      <Grid container justifyContent="center">
-        <Grid item style={{paddingRight: 8}}>
-          <Button color="secondary" width={120} onClick={claim}>
-            CLAIM
-          </Button>
-        </Grid>
-        <Grid item style={{ paddingLeft: 8}}>
-          <Button color="primary" width={120} onClick={exitClaim}>
-            EXIT
-          </Button>
-        </Grid>
-      </Grid>
-    </DialogContent>
-  </Dialog>
   </>
 }
 

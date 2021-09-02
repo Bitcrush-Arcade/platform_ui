@@ -6,6 +6,7 @@ import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
+import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
@@ -36,7 +37,9 @@ const Mining = () => {
             Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
         />
       </Grid>
-      <Grid item style={{ width: 280}} />
+      <Grid item>
+        <CompoundingCardv2/>
+      </Grid>
       <Grid item xs={12}>
         <BankPool/>
       </Grid>
