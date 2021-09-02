@@ -10,6 +10,7 @@ import Typography from "@material-ui/core/Typography"
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
+import RoiModal from 'components/pools/RoiModal'
 import SmBtn from "components/basics/SmallButton"
 import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Hooks
@@ -18,6 +19,7 @@ import useCoin from 'hooks/useCoin'
 import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 // Icons
+import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
@@ -39,6 +41,9 @@ function BankPool( ) {
   }, [getApproved, addresses])
 
   const [ openStaking, setOpenStaking ] = useState(false)
+  const [ showRoi, setShowRoi ] = useState(false)
+
+  const toggleRoi = () => setShowRoi( p => !p )
 
   const stakingOptions : Array<StakeOptionsType> = [
     { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
@@ -201,6 +206,9 @@ function BankPool( ) {
                 <IconButton size="small" onClick={getApyData}>
                   <RefreshIcon fontSize="inherit"/>
                 </IconButton>
+                <IconButton size="small" onClick={toggleRoi}>
+                  <CalculationIcon fontSize="inherit"/>
+                </IconButton>
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                 {bankInfo.apyPercent?.d365?.percent}
@@ -335,6 +343,13 @@ function BankPool( ) {
       options={ stakingOptions }
       coinInfo={ { symbol: 'CRUSH', name: 'Crush Coin'} }
       onSubmit={ submit }
+    />
+    <RoiModal
+      open={showRoi}
+      onClose={toggleRoi}
+      tokenSymbol="CRUSH"
+      tokenLink={"https://dex.apeswap.finance/#/swap"}
+      apyData={bankInfo.apyPercent}
     />
   </>)
 }
