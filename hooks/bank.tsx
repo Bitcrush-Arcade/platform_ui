@@ -60,15 +60,20 @@ function useBank(){
   const getStakingData = useCallback( async() => {
       if(!stakingMethods) return
       const totalStaked = await stakingMethods.totalStaked().call()
+      const distributedProfit = await stakingMethods.totalProfitDistributed().call()
+
       let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
       await stakingMethods.profits(0).call({}, (err, result) => {
         if(err) return
         profits = result
       })
       .catch( e => console.log('error2', e))
+      
+      
       setBankInfo(draft => {
         draft.totalStaked = +totalStaked
         draft.profitTotal = profits
+        draft.distributedTotal = +distributedProfit
       })
       
       if(!account) return
@@ -126,6 +131,7 @@ type BankInfo = {
   profitTotal: { total: number, remaining: number },
   profitDistribution: number,
   thresholdPercent: number,
+  distributedTotal: number,
   apyPercent: RoiProps['apyData'],
 }
 const initBank: BankInfo = {
@@ -137,6 +143,7 @@ const initBank: BankInfo = {
     total: 0,
     remaining: 0
   },
+  distributedTotal: 0,
   profitDistribution: 0.6,
   thresholdPercent: 0,
   apyPercent: undefined,

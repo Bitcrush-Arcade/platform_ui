@@ -2,7 +2,7 @@
 import CrushToken from 'abi/CrushToken.json'
 import BitcrushStaking_main from 'abi/BitcrushStaking_main.json'
 import BitcrushLiveWallet from 'abi/BitcrushLiveWallet.json'
-import BitcrushStaking from 'abi/BitcrushStaking.json'
+import BitcrushStaking from 'abi/BitcrushStakingv2.json'
 import BitcrushBankroll from 'abi/BitcrushBankroll.json'
 // 
 import { AbiItem } from 'web3-utils'
