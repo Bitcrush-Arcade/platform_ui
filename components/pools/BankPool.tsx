@@ -327,10 +327,10 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                ProfitDistributedAmount
+                {currencyFormat( bankInfo.distributedTotal, { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                PROFITDISTRITBUTED USD
+                {currencyFormat( bankInfo.distributedTotal * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )}
               </Typography>
             </Grid>
           </Grid>
