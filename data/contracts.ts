@@ -37,7 +37,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushLiveWallet.abi,
     },
     97:{
-      address: '0xeee3ebd30186cAAf75C8f0ee5Dd3EC8f26E1FE19',
+      address: '0x3bb942A3B0DdF117f02b9edb33650976f70c1769',
       abi: BitcrushLiveWallet.abi,
     }
   },

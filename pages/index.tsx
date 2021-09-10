@@ -4,6 +4,8 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useImmer } from 'use-immer'
+import format from 'date-fns/format'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
@@ -49,14 +51,12 @@ export default function Home() {
   const [tvl, setTvl ] = useState<number>(0)
   const [staked, setStaked ] = useState<number>(0)
 
-  // LiveWalletCard
-  const [currentBalance, setCurrentBalance] = useState<number>(0) //IN WEI
+  // LiveWalletFns
+  const [currentBalance, setCurrentBalance] = useImmer<{ amount: number, timelock: number }>({ amount: 0, timelock: 0}) //IN WEI
   const [openLwModal, setOpenLwModal] = useState<boolean>(false)
 
-  const lwOptions: Array<StakeOptionsType> = [
-    { name: 'Add Funds', description: 'Add Funds to Live Wallet from CRUSH', btnText: 'Wallet CRUSH', maxValue: tokenInfo.weiBalance },
-    { name: 'Withdraw Funds', description: 'Withdraw funds from Live Wallet to CRUSH', btnText: 'Live Wallet CRUSH', maxValue: currentBalance },
-  ]
+  const timelockInPlace = new Date().getTime()/1000 < currentBalance.timelock
+  console.log(timelockInPlace, new Date().getTime()/1000, currentBalance.timelock)
 
   // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
@@ -109,8 +109,50 @@ export default function Home() {
   // LIVE WALLET Fns
   const getLiveWalletData = useCallback(async () => {
     const lwBalance = await liveWalletMethods.balanceOf( account ).call()
-    setCurrentBalance( new BigNumber(lwBalance).toNumber() )
+    const lwBetAmounts = await liveWalletMethods.betAmounts( account ).call()
+    setCurrentBalance( draft => {
+      draft.amount = new BigNumber(lwBalance).toNumber()
+      draft.timelock = new BigNumber(lwBetAmounts.lockTimeStamp).toNumber()
+    })
   }, [liveWalletMethods, setCurrentBalance, account])
+
+  const superWithdraw = useCallback(( amount: number ) => {
+    if(!account || !liveWalletMethods || !amount ) return
+    console.log('TODO CREATE API FOR SUPERWITHDRAW')
+  },[liveWalletMethods, account])
+
+  // LiveWallet Options
+  const lwOptions: Array<StakeOptionsType> = [
+    { 
+      name: 'Add Funds',
+      description: 'Add Funds to Live Wallet from CRUSH',
+      btnText: 'Wallet CRUSH',
+      maxValue: tokenInfo.weiBalance
+    },
+    { 
+      name: 'Withdraw Funds',
+      description: 'Withdraw funds from Live Wallet to CRUSH',
+      btnText: 'Live Wallet CRUSH',
+      maxValue: currentBalance.amount,
+      onSelectOption: getLiveWalletData,
+      more: function moreDetails ( values ) { 
+        return timelockInPlace ? <>
+        <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
+          Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock), 'yyyy-MM-dd HH:mm')}.
+          <br/>
+          <br/>
+          If you&apos;d like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
+          <SmallBtn onClick={() => superWithdraw(values.stakeAmount)} disabled>
+            {/* Withdraw Now */}
+            COMING SOON
+          </SmallBtn>
+        </Typography>
+      </>
+      : <></>
+    }
+    },
+  ]
+
 
   useEffect( () => {
     if(!liveWalletMethods || !account) return
@@ -282,8 +324,8 @@ export default function Home() {
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: new BigNumber(currentBalance).div( new BigNumber(10).pow(18) ).toNumber(),
-                      subtitle: `$ ${currencyFormat( currentBalance * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
+                      amount: new BigNumber(currentBalance.amount).div( new BigNumber(10).pow(18) ).toNumber(),
+                      subtitle: `$ ${currencyFormat( currentBalance.amount * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
                       currency: "CRUSH",
                     }}
                     rewardInfo={{
