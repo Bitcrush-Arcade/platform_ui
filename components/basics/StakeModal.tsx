@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, ReactNode } from 'react'
 import { Formik, Form, Field } from 'formik'
 import { TextField } from 'formik-material-ui'
 import BigNumber from 'bignumber.js'
@@ -8,6 +8,7 @@ import MButton from "@material-ui/core/Button"
 import Dialog from "@material-ui/core/Dialog"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
+import Skeleton from "@material-ui/lab/Skeleton"
 import Slider from "@material-ui/core/Slider"
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from "@material-ui/core/Typography"
@@ -28,9 +29,13 @@ export type StakeOptionsType = {
   maxValue: number,
   btnText: string,
   description: string,
+  onSelectOption?: () => void,
+  more?: (values: FormValues) => ReactNode
 }
 
-export type SubmitFunction = ( values : { stakeAmount: number, actionType: number }, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
+export type FormValues = { stakeAmount: number, actionType: number }
+
+export type SubmitFunction = ( values : FormValues, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
 
 type StakeModalProps = {
   open: boolean,
@@ -84,7 +89,11 @@ function StakeModal( props: StakeModalProps ) {
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
           setFieldValue('stakeAmount', 0 )
+          options[stakeActionValue]?.onSelectOption && options[stakeActionValue]?.onSelectOption()
         }
+        const maxUsedAvailable = maxUsed ?? false
+        const isMaxAvailable = typeof(maxUsedAvailable) !== 'boolean'
+
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer } alignItems="center">
             {options.map((option, index) => {
@@ -111,7 +120,7 @@ function StakeModal( props: StakeModalProps ) {
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            {options[actionType].btnText} {coinInfo?.symbol}: {currencyFormat( maxUsed || 0, { isWei: true })}
+            {options[actionType].btnText} {coinInfo?.symbol}: {isMaxAvailable ? currencyFormat( maxUsed || 0, { isWei: true }) : <Skeleton/>}
           </Typography>
           <Field
             type="number"
@@ -156,6 +165,7 @@ function StakeModal( props: StakeModalProps ) {
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
             {options[actionType].name} {coinInfo?.symbol}
           </Button>
+          {options[actionType]?.more && options[actionType]?.more(values)}
         </Form>)
         }}
       </Formik>
