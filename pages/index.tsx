@@ -136,17 +136,20 @@ export default function Home() {
       maxValue: currentBalance.amount,
       onSelectOption: getLiveWalletData,
       more: function moreDetails ( values ) { 
-        return <>
+        return timelockInPlace ? <>
         <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
           Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock), 'yyyy-MM-dd HH:mm')}.
           <br/>
           <br/>
           If you&apos;d like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
-          <SmallBtn onClick={() => superWithdraw(values.stakeAmount)}>
-            Withdraw Now
+          <SmallBtn onClick={() => superWithdraw(values.stakeAmount)} disabled>
+            {/* Withdraw Now */}
+            COMING SOON
           </SmallBtn>
         </Typography>
-      </>}
+      </>
+      : <></>
+    }
     },
   ]
 
