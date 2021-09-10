@@ -119,7 +119,7 @@ export default function Home() {
   const superWithdraw = useCallback(( amount: number ) => {
     if(!account || !liveWalletMethods || !amount ) return
     console.log('TODO CREATE API FOR SUPERWITHDRAW')
-  },[liveWalletMethods, getLiveWalletData, account])
+  },[liveWalletMethods, account])
 
   // LiveWallet Options
   const lwOptions: Array<StakeOptionsType> = [
@@ -135,17 +135,18 @@ export default function Home() {
       btnText: 'Live Wallet CRUSH',
       maxValue: currentBalance.amount,
       onSelectOption: getLiveWalletData,
-      more: ( values ) => <>
+      more: function moreDetails ( values ) { 
+        return <>
         <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-          Seems like you've recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock), 'yyyy-MM-dd HH:mm')}.
+          Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock), 'yyyy-MM-dd HH:mm')}.
           <br/>
           <br/>
-          If you'd like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
+          If you&apos;d like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
           <SmallBtn onClick={() => superWithdraw(values.stakeAmount)}>
             Withdraw Now
           </SmallBtn>
         </Typography>
-      </>
+      </>}
     },
   ]
 
