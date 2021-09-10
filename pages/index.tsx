@@ -108,11 +108,13 @@ export default function Home() {
 
   // LIVE WALLET Fns
   const getLiveWalletData = useCallback(async () => {
+    if(!account) return
     const lwBalance = await liveWalletMethods.balanceOf( account ).call()
     const lwBetAmounts = await liveWalletMethods.betAmounts( account ).call()
+    const lwDuration = await liveWalletMethods.lockPeriod().call()
     setCurrentBalance( draft => {
       draft.amount = new BigNumber(lwBalance).toNumber()
-      draft.timelock = new BigNumber(lwBetAmounts.lockTimeStamp).toNumber()
+      draft.timelock = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration).toNumber()
     })
   }, [liveWalletMethods, setCurrentBalance, account])
 
@@ -138,7 +140,7 @@ export default function Home() {
       more: function moreDetails ( values ) { 
         return timelockInPlace ? <>
         <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-          Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock), 'yyyy-MM-dd HH:mm')}.
+          Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock * 1000), 'yyyy MMM dd - h:mm a')}.
           <br/>
           <br/>
           If you&apos;d like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
