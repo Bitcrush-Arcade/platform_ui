@@ -38,7 +38,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true })}
+            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true, decimalsToShow: 4 })}
           </Typography>
         </Grid>
         <Grid item>

@@ -32,7 +32,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo } = useTransactionContext()
+  const { tokenInfo, liveWalletBalance } = useTransactionContext()
 
   const token1Actions = [
     {name:'Deposit', onClick: ()=>console.log('action 1')},
@@ -70,9 +70,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         <Grid item>
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            {/* <Grid item> 
-              <TokenDisplay amount={0.00000448900000} icon={<AccountBalanceWalletIcon/>} color="secondary" actions={token1Actions} />
-            </Grid> */}
+            <Grid item> 
+              <TokenDisplay amount={liveWalletBalance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={token1Actions} />
+            </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" />
             </Grid>

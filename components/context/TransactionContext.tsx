@@ -13,12 +13,14 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
+import BigNumber from 'bignumber.js'
 
 type ContextType = {
   pending: TransactionHash,
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
+  liveWalletBalance: number,
   toggleDarkMode?: () => void,
   isDark: boolean,
   hydrateToken: () => Promise<void>
@@ -39,12 +41,15 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const token = getContracts('crushToken', chainId)
+  const liveWallet = getContracts('liveWallet', chainId)
   const { methods } = useContract(token.abi, token.address )
+  const { methods: lwMethods } = useContract(liveWallet.abi, liveWallet.address )
 
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
+  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWalletBalance"]>( 0 )
   const [hydration, setHydration] = useState<boolean>(false)
   const [ dark, setDark ] = useState<boolean>( true )
 
@@ -53,10 +58,12 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
     const tokenBalance = await methods.balanceOf(account).call()
+    const lwBalance = await lwMethods.balanceOf(account).call()
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
     })
-  },[methods, account, setCoinInfo])
+    setLiveWalletBalance( lwBalance )
+  },[methods, account, setCoinInfo, lwMethods, setLiveWalletBalance])
 
   const getTokenInfo = useCallback( async() => {
     const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
@@ -139,7 +146,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     tokenInfo: coinInfo,
     toggleDarkMode: toggle,
     isDark: dark,
-    hydrateToken: tokenHydration
+    hydrateToken: tokenHydration,
+    liveWalletBalance: liveWalletBalance
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}
