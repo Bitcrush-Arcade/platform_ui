@@ -20,7 +20,7 @@ type ContextType = {
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
-  liveWalletBalance: number,
+  liveWallet: { balance: number, timelock: number },
   toggleDarkMode?: () => void,
   isDark: boolean,
   hydrateToken: () => Promise<void>
@@ -34,6 +34,7 @@ export const TransactionContext = createContext<ContextType>({
   toggleDarkMode: () => {},
   isDark: true,
   hydrateToken: () => Promise.resolve(),
+  liveWallet: { balance: 0, timelock: 0 },
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
@@ -49,7 +50,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
-  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWalletBalance"]>( 0 )
+  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
   const [hydration, setHydration] = useState<boolean>(false)
   const [ dark, setDark ] = useState<boolean>( true )
 
@@ -57,12 +58,31 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
+    let serverBalance = 0
+    
     const tokenBalance = await methods.balanceOf(account).call()
     const lwBalance = await lwMethods.balanceOf(account).call()
+    const lwBetAmounts = await lwMethods.betAmounts( account ).call()
+    const lwDuration = await lwMethods.lockPeriod().call()
+
+    // TODO
+    // COMPARE CURRENT DATE WITH TIMELOCK
+    const timelockEndTime = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration)
+    const timelockActive = timelockEndTime.minus( new Date().getTime()/1000 ).isGreaterThan(0)
+    // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
+    if(timelockActive)
+      await fetch(`http://104.219.251.99:5019/users/wallet/lw/${account}`)
+      .then( r => r.json() )
+      .then( data => { serverBalance = data.user_balance } )
+      .catch( e => console.log( 'error', e))
+    // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
     })
-    setLiveWalletBalance( lwBalance )
+    setLiveWalletBalance( {
+      balance: timelockActive ? serverBalance : lwBalance,
+      timelock: timelockActive ? timelockEndTime.toNumber() : 0
+    })
   },[methods, account, setCoinInfo, lwMethods, setLiveWalletBalance])
 
   const getTokenInfo = useCallback( async() => {
@@ -147,7 +167,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     toggleDarkMode: toggle,
     isDark: dark,
     hydrateToken: tokenHydration,
-    liveWalletBalance: liveWalletBalance
+    liveWallet: liveWalletBalance
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}
