@@ -33,6 +33,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
     <ButtonBase 
       onClick={toggleActions}
       className={ css.button }
+      disabled={!actions || !actions.length}
       ref={btnRef}
     >
       <Grid container alignItems="center" aria-controls="token-menu">
@@ -49,7 +50,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
         </Grid>}
       </Grid>
     </ButtonBase>
-    <Menu
+    {actions && actions.length > 0 && <Menu
       id={`token-menu`}
       open={showActions}
       anchorEl={btnRef.current}
@@ -72,7 +73,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           {action.name}
         </MenuItem>
       })}
-    </Menu>
+    </Menu>}
   </>
 }
 
