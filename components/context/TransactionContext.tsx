@@ -13,7 +13,9 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
+import { servers } from 'utils/servers'
 import BigNumber from 'bignumber.js'
+import { toWei } from 'web3-utils'
 
 type ContextType = {
   pending: TransactionHash,
@@ -51,7 +53,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
-  const [hydration, setHydration] = useState<boolean>(false)
+  const [ hydration, setHydration ] = useState<boolean>(false)
   const [ dark, setDark ] = useState<boolean>( true )
 
   const hydrate = () => setHydration(p => !p)
@@ -71,9 +73,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     const timelockActive = timelockEndTime.minus( new Date().getTime()/1000 ).isGreaterThan(0)
     // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
     if(timelockActive)
-      await fetch(`http://104.219.251.99:5019/users/wallet/lw/${account}`)
+      await fetch(`${servers[process.env.NODE_ENV]}/users/wallet/db/${account}`)
       .then( r => r.json() )
-      .then( data => { serverBalance = data.user_balance } )
+      .then( data => { serverBalance = parseInt( toWei( `${data.user_balance}` ) ) } )
       .catch( e => console.log( 'error', e))
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
