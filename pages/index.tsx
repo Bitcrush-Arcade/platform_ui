@@ -55,7 +55,7 @@ export default function Home() {
   const [currentBalance, setCurrentBalance] = useImmer<{ amount: number, timelock: number }>({ amount: 0, timelock: 0}) //IN WEI
   const [openLwModal, setOpenLwModal] = useState<boolean>(false)
 
-  const timelockInPlace = new Date().getTime()/1000 < currentBalance.timelock
+  const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
 
   // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
@@ -84,6 +84,14 @@ export default function Home() {
           getLiveWalletData()
         })
     }
+    else if(timelockInPlace)
+      return fetch('/api/withdrawForUser',{
+        body: JSON.stringify({
+          chain: chainId,
+          account: account,
+          amount: weiValue,
+        })
+      })
     return liveWalletMethods.withdrawBet( weiValue )
       .send({ from: account })
       .on('transactionHash', (tx) => {
@@ -116,10 +124,6 @@ export default function Home() {
     })
   }, [liveWalletMethods, setCurrentBalance, account])
 
-  const superWithdraw = useCallback(( amount: number ) => {
-    if(!account || !liveWalletMethods || !amount ) return
-    console.log('TODO CREATE API FOR SUPERWITHDRAW')
-  },[liveWalletMethods, account])
 
   // LiveWallet Options
   const lwOptions: Array<StakeOptionsType> = [
@@ -134,11 +138,11 @@ export default function Home() {
       description: 'Withdraw funds from Live Wallet to CRUSH',
       btnText: 'Live Wallet CRUSH',
       maxValue: currentBalance.amount,
-      onSelectOption: getLiveWalletData,
+      onSelectOption: hydrateToken,
       more: function moreDetails ( values ) { 
         return timelockInPlace ? <>
         <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-          0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
+          0.3% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
         </Typography>
       </>
       : <></>
