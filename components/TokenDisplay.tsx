@@ -33,12 +33,13 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
     <ButtonBase 
       onClick={toggleActions}
       className={ css.button }
+      disabled={!actions || !actions.length}
       ref={btnRef}
     >
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true })}
+            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true, decimalsToShow: 4 })}
           </Typography>
         </Grid>
         <Grid item>
@@ -49,7 +50,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
         </Grid>}
       </Grid>
     </ButtonBase>
-    <Menu
+    {actions && actions.length > 0 && <Menu
       id={`token-menu`}
       open={showActions}
       anchorEl={btnRef.current}
@@ -72,7 +73,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           {action.name}
         </MenuItem>
       })}
-    </Menu>
+    </Menu>}
   </>
 }
 

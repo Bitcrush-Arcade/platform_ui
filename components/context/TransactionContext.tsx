@@ -13,12 +13,16 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
+import { servers } from 'utils/servers'
+import BigNumber from 'bignumber.js'
+import { toWei } from 'web3-utils'
 
 type ContextType = {
   pending: TransactionHash,
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
+  liveWallet: { balance: number, timelock: number },
   toggleDarkMode?: () => void,
   isDark: boolean,
   hydrateToken: () => Promise<void>
@@ -32,6 +36,7 @@ export const TransactionContext = createContext<ContextType>({
   toggleDarkMode: () => {},
   isDark: true,
   hydrateToken: () => Promise.resolve(),
+  liveWallet: { balance: 0, timelock: 0 },
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
@@ -39,24 +44,48 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const token = getContracts('crushToken', chainId)
+  const liveWallet = getContracts('liveWallet', chainId)
   const { methods } = useContract(token.abi, token.address )
+  const { methods: lwMethods } = useContract(liveWallet.abi, liveWallet.address )
 
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
-  const [hydration, setHydration] = useState<boolean>(false)
+  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
+  const [ hydration, setHydration ] = useState<boolean>(false)
   const [ dark, setDark ] = useState<boolean>( true )
 
   const hydrate = () => setHydration(p => !p)
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
+    let serverBalance = 0
+    
     const tokenBalance = await methods.balanceOf(account).call()
+    const lwBalance = await lwMethods.balanceOf(account).call()
+    const lwBetAmounts = await lwMethods.betAmounts( account ).call()
+    const lwDuration = await lwMethods.lockPeriod().call()
+
+    // TODO
+    // COMPARE CURRENT DATE WITH TIMELOCK
+    const timelockEndTime = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration)
+    const timelockActive = timelockEndTime.minus( new Date().getTime()/1000 ).isGreaterThan(0)
+    // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
+    if(timelockActive)
+      await fetch(`${servers[process.env.NODE_ENV]}/users/wallet/db/${account}`)
+      .then( r => r.json() )
+      .then( data => { serverBalance = parseInt( toWei( `${data.user_balance}` ) ) } )
+      .catch( e => console.log( 'error', e))
+    // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
     })
-  },[methods, account, setCoinInfo])
+    setLiveWalletBalance( {
+      balance: timelockActive ? serverBalance : lwBalance,
+      timelock: timelockActive ? timelockEndTime.toNumber() : 0
+    })
+  },[methods, account, setCoinInfo, lwMethods, setLiveWalletBalance])
 
   const getTokenInfo = useCallback( async() => {
     const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
@@ -139,7 +168,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     tokenInfo: coinInfo,
     toggleDarkMode: toggle,
     isDark: dark,
-    hydrateToken: tokenHydration
+    hydrateToken: tokenHydration,
+    liveWallet: liveWalletBalance
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}

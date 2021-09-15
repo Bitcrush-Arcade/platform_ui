@@ -5,7 +5,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useImmer } from 'use-immer'
-import format from 'date-fns/format'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
@@ -29,6 +28,7 @@ import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
+import { differenceFromNow } from 'utils/dateFormat'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
@@ -39,7 +39,7 @@ export default function Home() {
   const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
-  const { tokenInfo, editTransactions, hydrateToken } = useTransactionContext()
+  const { tokenInfo, editTransactions, hydrateToken, liveWallet: lwContext } = useTransactionContext()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
@@ -55,8 +55,7 @@ export default function Home() {
   const [currentBalance, setCurrentBalance] = useImmer<{ amount: number, timelock: number }>({ amount: 0, timelock: 0}) //IN WEI
   const [openLwModal, setOpenLwModal] = useState<boolean>(false)
 
-  const timelockInPlace = new Date().getTime()/1000 < currentBalance.timelock
-  console.log(timelockInPlace, new Date().getTime()/1000, currentBalance.timelock)
+  const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
 
   // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
@@ -64,7 +63,6 @@ export default function Home() {
 
   const lwSubmit: SubmitFunction = ( values, form ) => {
     if(!liveWalletMethods) return form.setSubmitting(false)
-    console.log('form submit', values)
     const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
     if(!values.actionType){
       return liveWalletMethods.addbet( weiValue )
@@ -86,6 +84,14 @@ export default function Home() {
           getLiveWalletData()
         })
     }
+    else if(timelockInPlace)
+      return fetch('/api/withdrawForUser',{
+        body: JSON.stringify({
+          chain: chainId,
+          account: account,
+          amount: weiValue,
+        })
+      })
     return liveWalletMethods.withdrawBet( weiValue )
       .send({ from: account })
       .on('transactionHash', (tx) => {
@@ -118,10 +124,6 @@ export default function Home() {
     })
   }, [liveWalletMethods, setCurrentBalance, account])
 
-  const superWithdraw = useCallback(( amount: number ) => {
-    if(!account || !liveWalletMethods || !amount ) return
-    console.log('TODO CREATE API FOR SUPERWITHDRAW')
-  },[liveWalletMethods, account])
 
   // LiveWallet Options
   const lwOptions: Array<StakeOptionsType> = [
@@ -136,18 +138,11 @@ export default function Home() {
       description: 'Withdraw funds from Live Wallet to CRUSH',
       btnText: 'Live Wallet CRUSH',
       maxValue: currentBalance.amount,
-      onSelectOption: getLiveWalletData,
+      onSelectOption: hydrateToken,
       more: function moreDetails ( values ) { 
         return timelockInPlace ? <>
         <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-          Seems like you&apos;ve recently made some bets. Your funds are locked until we sync back up or until {format( new Date(currentBalance.timelock * 1000), 'yyyy MMM dd - h:mm a')}.
-          <br/>
-          <br/>
-          If you&apos;d like to withdraw your funds anyway, a withdrawal fee of 3% is taken and please click here: <br/><br/>
-          <SmallBtn onClick={() => superWithdraw(values.stakeAmount)} disabled>
-            {/* Withdraw Now */}
-            COMING SOON
-          </SmallBtn>
+          0.3% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
         </Typography>
       </>
       : <></>
