@@ -53,10 +53,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
-  const [ hydration, setHydration ] = useState<boolean>(false)
   const [ dark, setDark ] = useState<boolean>( true )
-
-  const hydrate = () => setHydration(p => !p)
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
@@ -71,6 +68,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     // COMPARE CURRENT DATE WITH TIMELOCK
     const timelockEndTime = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration)
     const timelockActive = timelockEndTime.minus( new Date().getTime()/1000 ).isGreaterThan(0)
+    console.log('timelockInfo', timelockActive, new Date(timelockEndTime.toNumber() * 1000))
     // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
     if(timelockActive)
       await fetch(`${servers[process.env.NODE_ENV]}/users/wallet/db/${account}`)
@@ -97,12 +95,12 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   useEffect( () => {
     getTokenInfo()
-  },[ account, hydration, getTokenInfo ])
+  },[ account, getTokenInfo ])
 
   useEffect( ()=>{
-    const interval = setInterval( hydrate, 30000)
+    const interval = setInterval( tokenHydration, 5000)
     return () => clearInterval(interval)
-  },[])
+  },[tokenHydration])
 
   useEffect( () => {
     const savedTheme = window.localStorage.getItem('theme')
