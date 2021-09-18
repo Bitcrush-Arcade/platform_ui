@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
+import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
@@ -20,6 +21,8 @@ import Coin from 'components/tokens/Token2'
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
+// libs
+import { getContracts } from 'data/contracts'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -29,16 +32,25 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { pathname } = useRouter()
+  const { chainId } = useWeb3React()
+  const { address: CrushAddress } = getContracts('crushToken', chainId)
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
   const { tokenInfo, liveWallet } = useTransactionContext()
 
-  const token1Actions = [
-    {name:'Deposit', onClick: ()=>console.log('action 1')},
-    {name:'Widthdraw', onClick: ()=>console.log('action 2')},
-    {name:'View on BSC', onClick: ()=>console.log('action 3')},
-    {name:'History', onClick: ()=>console.log('action 4')},
+  const lwActions = [
+    // {name:'Deposit', onClick: ()=>console.log('action 1')},
+    // {name:'Widthdraw', onClick: ()=>console.log('action 2')},
+    // {name:'View on BSC', onClick: ()=>console.log('action 3')},
+    // {name:'History', onClick: ()=>console.log('action 4')},
+  ]
+
+  const crushActions = [
+    { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
+    { name: 'APE LP', onClick: ()=> window.open(`https://app.apeswap.finance/add/ETH/${CrushAddress}`, '_blank')},
+    { name: 'CROX LP', onClick: ()=> window.open(`https://exchange.croxswap.com/#/add/ETH/${CrushAddress}`,'_blank')},
+    { name: 'BABY LP', onClick: ()=> window.open(`https://exchange.babyswap.finance/#/add/${CrushAddress}/0x55d398326f99059fF775485246999027B3197955`, '_blank')},
   ]
 
   return <AppBar className={css.appBar} variant="outlined" position={ isSm ? "sticky" : "absolute"}>
@@ -71,10 +83,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             <Grid item> 
-              <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={token1Actions} />
+              <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" />
+              <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" actions={crushActions} />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <ConnectButton/>
