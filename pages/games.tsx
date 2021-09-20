@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 // Material
@@ -45,7 +46,7 @@ const featuredGames = [
   }
 ]
 
-const Games = () => {
+const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
 
   const css = useStyles({})
 
@@ -204,6 +205,16 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(4),
   },
 }))
+
+export const getServerSideProps: GetServerSideProps = async() =>{
+
+  return {
+    props:{
+      games: []
+    },
+  }
+}
+
 // TEST GAMES
 const games = [
   {src: '/games/dragon/lucky_macau.png'},
