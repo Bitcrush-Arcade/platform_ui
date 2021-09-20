@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -19,6 +19,8 @@ import GameCard from 'components/basics/GameCard'
 import Button from 'components/basics/GeneralUseButton'
 import SmallButton from 'components/basics/SmallButton'
 import PageContainer from 'components/PageContainer'
+// Utils
+import { flattenObject } from 'utils/objects'
 
 const featuredGames = [
   { 
@@ -56,6 +58,10 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
   const selectedGame = useMemo( () => featuredGames[selectFeaturedGame], [selectFeaturedGame])
 
   const toggleSlide = () => setShowSlide( p => !p )
+
+  useEffect( () => {
+    console.log('props', props)
+  },[props])
 
   const cycleFeatured = () => {
     toggleSlide()
@@ -137,21 +143,21 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         </Grid>
       </Grid>
     </Slide>
-    <div className={ css.otherGamesContainer }>
+    {props.gameTypes.map( (gameType, gameTypeIndex) => props.gamesByType[gameTypeIndex].length > 0 && <div className={ css.otherGamesContainer } key={`games-${gameType}-${gameTypeIndex}`}>
       <Typography variant="h6" paragraph>
-        Featured Partner :: Dragon Gaming :: Coming Soon
+        Featured Partner :: Dragon Gaming :: {gameType}
       </Typography>
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={games.map( (game, gameIdx) => <GameCard key={`other-game-card-${gameIdx}`} imgSrc={game.src}/>)}
+        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url}/>)}
         xs={1}
         sm={1}
         md={2}
         lg={2}
         spacing={3}
       />
-    </div>
+    </div>)}
   </PageContainer>
 }
 
@@ -206,11 +212,36 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
 }))
 
-export const getServerSideProps: GetServerSideProps = async() =>{
+export const getServerSideProps: GetServerSideProps = async(context) =>{
+
+  const { req } = context
+  const host = req.headers.host
+  // TODO -- SET ACTUAL URL FOR PRODUCTION
+  const dragonEndpoint = host.indexOf('localhost') > -1 || host.indexOf('staging') > -1 
+    ? 'https://staging-api.dragongaming.com' 
+    :  'https://staging-api.dragongaming.com';
+  
+  const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      api_key: process.env.DRAGON_KEY
+    })
+  })
+    .then( d => d.json() )
+  
+  const gameTypes = Object.keys(availableGames?.result || {})
+
+  const gamesByType = gameTypes.map( gameType => {
+    return  availableGames?.result[ gameType ].map( game => flattenObject( game, 1 ) )
+  })
 
   return {
     props:{
-      games: []
+      gameTypes: gameTypes,
+      gamesByType: gamesByType
     },
   }
 }
