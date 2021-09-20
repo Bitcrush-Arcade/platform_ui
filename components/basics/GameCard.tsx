@@ -27,8 +27,8 @@ type GameCardProps ={
 
 const useStyles = makeStyles<Theme, GameCardProps>( theme => createStyles({
   card:{
-    width: theme.spacing(30),
-    height: theme.spacing(18),
+    width: 200,
+    height: 150,
     backgroundImage: props => `url(${props.imgSrc})`,
     backgroundSize: 'cover',
     display: 'flex',
