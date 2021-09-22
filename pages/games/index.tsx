@@ -239,7 +239,7 @@ export const getServerSideProps: GetServerSideProps = async(context) =>{
   const { req } = context
   const host = req.headers.host
   // TODO -- SET ACTUAL URL FOR PRODUCTION
-  const dragonEndpoint = host.indexOf('localhost') > -1 || host.indexOf('staging') > -1 
+  const dragonEndpoint = (host.indexOf('localhost') > -1 || host.indexOf('staging') > -1 )
     ? 'https://staging-api.dragongaming.com' 
     :  'https://staging-api.dragongaming.com';
   
@@ -252,7 +252,15 @@ export const getServerSideProps: GetServerSideProps = async(context) =>{
       api_key: process.env.DRAGON_KEY
     })
   })
-    .then( d => d.json() )
+    .then( d => {
+      console.log(d)
+      return d.json()
+    } )
+    .catch( e => {
+      console.log(e)
+      return []
+    })
+  
   
   const gameTypes = Object.keys(availableGames?.result || {})
 
