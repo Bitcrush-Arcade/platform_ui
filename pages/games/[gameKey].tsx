@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // Lodash
@@ -15,6 +15,7 @@ import PageContainer from 'components/PageContainer'
 import GeneralUseButton from 'components/basics/GeneralUseButton'
 // Utils & Types
 import { GameSession } from 'types/games/session'
+import { dragonEp } from 'utils/servers'
 
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
@@ -24,6 +25,7 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
   const { account } = useWeb3React()
 
   const [ gameSession, setGameSession ] = useState<GameSession | null>( null )
+  const [ launchURL, setLaunchURL ] = useState<string | null>( null )
 
   useEffect(() => {
     if(!account || !!gameSession || isBitcrushGame || !game) return
@@ -39,6 +41,13 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
       .then( sessionData => setGameSession( sessionData ) )
 
   },[account, gameSession, setGameSession, isBitcrushGame, game])
+
+  useEffect(() => {
+    if( !gameSession || launchURL ) return
+
+
+
+  },[gameSession, launchURL, setLaunchURL ])
 
   return (
     <PageContainer menuSm={true}>
@@ -96,9 +105,7 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
 
   if(!bitcrushGame){
     
-    const dragonEndpoint = process.env.NODE_ENV == 'development'
-      ? 'https://staging-api.dragongaming.com' //DEV
-      :  'https://staging-api.dragongaming.com'; //PROD
+    const dragonEndpoint = dragonEp[process.env.NODE_ENV]
 
     const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
       method: "POST",
