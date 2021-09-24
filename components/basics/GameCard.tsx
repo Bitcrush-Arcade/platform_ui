@@ -12,7 +12,7 @@ const GameCard = (props: GameCardProps ) => {
 
   return (
     <Card className={css.card}>
-      <ButtonBase className={ css.button } href="https://dragongaming.com/" target=" _blank" >
+      <ButtonBase className={ css.button } href="/games/" target=" _blank">
         <PlayIcon className={ css.playIcon } />
       </ButtonBase>
     </Card>
@@ -22,13 +22,14 @@ const GameCard = (props: GameCardProps ) => {
 export default GameCard
 
 type GameCardProps ={
-  imgSrc: string
+  imgSrc: string,
+  gameKey: string,
 }
 
 const useStyles = makeStyles<Theme, GameCardProps>( theme => createStyles({
   card:{
-    width: theme.spacing(30),
-    height: theme.spacing(18),
+    width: 200,
+    height: 150,
     backgroundImage: props => `url(${props.imgSrc})`,
     backgroundSize: 'cover',
     display: 'flex',
