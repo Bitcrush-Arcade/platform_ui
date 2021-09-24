@@ -43,7 +43,6 @@ export default function Home() {
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
-  // TODO ONCE LIVE remove conditional
   const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
   const { methods: liveWalletMethods } = useContract( liveWallet.abi, liveWallet.address )
   const { methods } = useContract(firstPool.abi, firstPool.address)
@@ -52,7 +51,6 @@ export default function Home() {
   const [staked, setStaked ] = useState<number>(0)
 
   // LiveWalletFns
-  const [currentBalance, setCurrentBalance] = useImmer<{ amount: number, timelock: number }>({ amount: 0, timelock: 0}) //IN WEI
   const [openLwModal, setOpenLwModal] = useState<boolean>(false)
 
   const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
@@ -75,13 +73,12 @@ export default function Home() {
         .on('receipt', ( rc) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
-          getLiveWalletData()
           hydrateToken()
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-          getLiveWalletData()
+          hydrateToken()
         })
     }
     else if(timelockInPlace)
@@ -102,27 +99,14 @@ export default function Home() {
       .on('receipt', ( rc) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
-        getLiveWalletData()
         hydrateToken()
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-        getLiveWalletData()
+        hydrateToken()
       })
   }
-
-  // LIVE WALLET Fns
-  const getLiveWalletData = useCallback(async () => {
-    if(!account) return
-    const lwBalance = await liveWalletMethods.balanceOf( account ).call()
-    const lwBetAmounts = await liveWalletMethods.betAmounts( account ).call()
-    const lwDuration = await liveWalletMethods.lockPeriod().call()
-    setCurrentBalance( draft => {
-      draft.amount = new BigNumber(lwBalance).toNumber()
-      draft.timelock = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration).toNumber()
-    })
-  }, [liveWalletMethods, setCurrentBalance, account])
 
 
   // LiveWallet Options
@@ -137,7 +121,7 @@ export default function Home() {
       name: 'Withdraw Funds',
       description: 'Withdraw funds from Live Wallet to CRUSH',
       btnText: 'Live Wallet CRUSH',
-      maxValue: currentBalance.amount,
+      maxValue: lwContext.balance,
       onSelectOption: hydrateToken,
       more: function moreDetails ( values ) { 
         return timelockInPlace ? <>
@@ -149,19 +133,6 @@ export default function Home() {
     }
     },
   ]
-
-
-  useEffect( () => {
-    if(!liveWalletMethods || !account) return
-    getLiveWalletData()
-  },[account, liveWalletMethods, getLiveWalletData])
-
-  useEffect( () => {
-    // FETCH DATA EVERY 12 SECONDS
-    if(!liveWalletMethods || !account) return
-    const interval = setInterval( () => getLiveWalletData(), 12000 )
-    return () => clearInterval(interval)
-  },[account, liveWalletMethods, getLiveWalletData])
 
   useEffect( () => {
     if(!liveWallet?.address) return
@@ -321,8 +292,8 @@ export default function Home() {
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: new BigNumber(currentBalance.amount).div( new BigNumber(10).pow(18) ).toNumber(),
-                      subtitle: `$ ${currencyFormat( currentBalance.amount * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
+                      amount: new BigNumber(lwContext.balance).div( new BigNumber(10).pow(18) ).toNumber(),
+                      subtitle: `$ ${currencyFormat( lwContext.balance * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
                       currency: "CRUSH",
                     }}
                     rewardInfo={{
