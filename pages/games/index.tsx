@@ -172,18 +172,60 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url}/>)}
+        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey=''/>)}
         xs={1}
         sm={1}
         md={2}
         lg={2}
         spacing={3}
       />
-    </div>)}
+      </div>)}
   </PageContainer>
 }
 
 export default Games
+
+export const getServerSideProps: GetServerSideProps = async(context) =>{
+
+  const { req } = context
+  const host = req.headers.host
+  // TODO -- SET ACTUAL URL FOR PRODUCTION
+  const dragonEndpoint = process.env.NODE_ENV == 'development'
+    ? 'https://staging-api.dragongaming.com' //DEV
+    :  'https://staging-api.dragongaming.com'; //PROD
+  
+  const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      api_key: process.env.DRAGON_KEY
+    })
+  })
+    .then( d => {
+      console.log(d)
+      return d.json()
+    } )
+    .catch( e => {
+      console.log(e)
+      return []
+    })
+  
+  
+  const gameTypes = Object.keys(availableGames?.result || {})
+
+  const gamesByType = gameTypes.map( gameType => {
+    return  availableGames?.result[ gameType ].map( game => flattenObject( game, 1 ) )
+  })
+
+  return {
+    props:{
+      gameTypes: gameTypes,
+      gamesByType: gamesByType,
+    },
+  }
+}
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
   featuredContainer:{
@@ -233,48 +275,6 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(4),
   },
 }))
-
-export const getServerSideProps: GetServerSideProps = async(context) =>{
-
-  const { req } = context
-  const host = req.headers.host
-  // TODO -- SET ACTUAL URL FOR PRODUCTION
-  const dragonEndpoint = (host.indexOf('localhost') > -1 || host.indexOf('staging') > -1 )
-    ? 'https://staging-api.dragongaming.com' 
-    :  'https://staging-api.dragongaming.com';
-  
-  const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
-    method: "POST",
-    headers:{
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      api_key: process.env.DRAGON_KEY
-    })
-  })
-    .then( d => {
-      console.log(d)
-      return d.json()
-    } )
-    .catch( e => {
-      console.log(e)
-      return []
-    })
-  
-  
-  const gameTypes = Object.keys(availableGames?.result || {})
-
-  const gamesByType = gameTypes.map( gameType => {
-    return  availableGames?.result[ gameType ].map( game => flattenObject( game, 1 ) )
-  })
-
-  return {
-    props:{
-      gameTypes: gameTypes,
-      gamesByType: gamesByType
-    },
-  }
-}
 
 // TEST GAMES
 const games = [
