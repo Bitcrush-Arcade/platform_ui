@@ -108,7 +108,6 @@ export default function Home() {
       })
   }
 
-
   // LiveWallet Options
   const lwOptions: Array<StakeOptionsType> = [
     { 

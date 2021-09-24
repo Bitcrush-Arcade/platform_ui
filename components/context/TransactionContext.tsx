@@ -71,10 +71,14 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     console.log('timelockInfo', timelockActive, new Date(timelockEndTime.toNumber() * 1000))
     // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
     if(timelockActive)
-      await fetch(`${servers[process.env.NODE_ENV]}/users/wallet/db/${account}`)
+      await fetch(`/api/db/${account}`)
       .then( r => r.json() )
-      .then( data => { serverBalance = parseInt( toWei( `${data.user_balance}` ) ) } )
-      .catch( e => console.log( 'error', e))
+      .then( data => { 
+        if(data.balancae)
+          serverBalance = parseInt( data.balance ) 
+        else
+          serverBalance = lwBalance
+      })
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
