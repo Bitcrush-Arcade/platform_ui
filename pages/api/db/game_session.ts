@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { toWei } from 'web3-utils'
 import { gameApi } from 'utils/servers'
 
 export default async function getGameSession(req : NextApiRequest, res: NextApiResponse){
@@ -14,7 +13,8 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
   await fetch(`${gameApi[ process.env.NODE_ENV ]}/api/games/generate_session`,{
     method: 'POST',
     headers:{
-      origin: 'http://localhost:3000'
+      origin: 'http://localhost:3000',
+      'Content-Type' : 'application/json'
     },
     body: JSON.stringify({
       wallet_address: wallet,
