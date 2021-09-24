@@ -11,7 +11,11 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
     return
   }
 
-  await fetch(`${servers[ process.env.NODE_ENV ]}/users/wallet/db/${wallet}`)
+  await fetch(`${servers[ process.env.NODE_ENV ]}/users/wallet/db/${wallet}`,{
+    headers:{
+      origin: 'http://localhost:3000'
+    }
+  })
     .then( d => d.json() )
     .then( data => {
       if( data?.statusCode > 200 )
