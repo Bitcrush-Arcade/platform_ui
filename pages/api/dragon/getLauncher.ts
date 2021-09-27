@@ -46,7 +46,6 @@ export default async function getLauncher(req : NextApiRequest, res: NextApiResp
     if( status > 200)
       res.status(400).json( { error: r, message: "Dragon Gaming Error" } )
     else{
-      console.log( r )
       res.status(status).json( { launcherUrl: r.result.launch_url } )
     }
   })
