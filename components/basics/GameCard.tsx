@@ -1,3 +1,4 @@
+import Link from 'next/link'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import ButtonBase from "@material-ui/core/ButtonBase"
@@ -12,9 +13,11 @@ const GameCard = (props: GameCardProps ) => {
 
   return (
     <Card className={css.card}>
-      <ButtonBase className={ css.button } href="/games/" target=" _blank">
-        <PlayIcon className={ css.playIcon } />
-      </ButtonBase>
+      <Link passHref href={`/games/${props.gameKey}`}>
+        <ButtonBase className={ css.button }>
+          <PlayIcon className={ css.playIcon } />
+        </ButtonBase>
+      </Link>
     </Card>
   )
 }

@@ -1,11 +1,10 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Fab from '@material-ui/core/Fab'
 import IconButton from '@material-ui/core/IconButton'
 import Slide from '@material-ui/core/Slide'
 import Grid from "@material-ui/core/Grid"
@@ -172,7 +171,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey=''/>)}
+        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={1}
         md={2}
@@ -204,9 +203,12 @@ export const getServerSideProps: GetServerSideProps = async(context) =>{
     })
   })
     .then( d => {
-      console.log(d)
       return d.json()
     } )
+    .then( data => {
+      console.log( 'response Data', data )
+      return data
+    })
     .catch( e => {
       console.log(e)
       return []
@@ -275,31 +277,3 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(4),
   },
 }))
-
-// TEST GAMES
-const games = [
-  {src: '/games/dragon/lucky_macau.png'},
-  {src: '/games/dragon/mythical_creatures.png'},
-  {src: '/games/dragon/scream.png'},
-  {src: '/games/dragon/the_defenders.png'},
-  {src: '/games/dragon/lucky_macau.png'},
-  {src: '/games/dragon/mythical_creatures.png'},
-  {src: '/games/dragon/scream.png'},
-  {src: '/games/dragon/the_defenders.png'},
-  {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-]
