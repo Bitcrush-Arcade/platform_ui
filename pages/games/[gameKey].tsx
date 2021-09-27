@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // Lodash
@@ -7,6 +7,7 @@ import find from 'lodash/find'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import LinearProgress from "@material-ui/core/LinearProgress"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // BITCRUSH
@@ -42,33 +43,55 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   },[account, gameSession, setGameSession, isBitcrushGame, game])
 
+  const getLauncherUrl = useCallback( async () => {
+    if(!gameSession || !account || !game || launchURL) return
+    await fetch( '/api/dragon/getLauncher' , {
+      method: 'POST',
+      body: JSON.stringify({ game: game, sessionData: gameSession, type: 'desktop'})
+    })
+    .then( r => r.json() )
+    .then( d => setLaunchURL( d.launcherUrl ))
+
+  },[gameSession, account, game, launchURL, setLaunchURL])
+
   useEffect(() => {
-    if( !gameSession || launchURL ) return
+    if( !gameSession || launchURL || isBitcrushGame ) return
+    
+    getLauncherUrl()
 
-
-
-  },[gameSession, launchURL, setLaunchURL ])
+  },[gameSession, launchURL, setLaunchURL, game ])
 
   return (
     <PageContainer menuSm={true}>
       <div className={ css.container}>
-        {isBitcrushGame && account
-          ? <iframe src={game.url} className={ css.iframe } />
-          : <>
+        {!account || !game ? <>
+          <Typography variant="h3" align="center" paragraph>
+            {! account && "Please connect your wallet before playing"}
+            {! game && "This game doesn't seem to be available, please try another one."}
+          </Typography>
+          <Grid container justifyContent="center">
+            <Link passHref href="/games">
+              <GeneralUseButton color="secondary" background="secondary">
+                Go back to Arcade
+              </GeneralUseButton>
+            </Link>
+          </Grid>
+        </>
+        :<>
+        { isBitcrushGame && <iframe src={game.url} className={ css.iframe } /> }
+        { !isBitcrushGame && <>
+          {!launchURL && <>
             <Typography variant="h3" align="center" paragraph>
-              {!account 
-                ? "Please connect your wallet before playing"
-                : "Are you sure this game is available?"}
+              {game.game_title}
             </Typography>
-            <Grid container justifyContent="center">
-              <Link passHref href="/games">
-                <GeneralUseButton color="secondary" background="secondary">
-                  Go back to Arcade
-                </GeneralUseButton>
-              </Link>
-            </Grid>
+          </>}
+          { launchURL 
+          ? <>
+            <iframe src={launchURL} className={css.iframe} />
           </>
-        }
+          : <LinearProgress color="secondary" />}
+        </>}
+        </>}
       </div>
     </PageContainer>
   )
@@ -95,7 +118,7 @@ const useStyles = makeStyles<Theme>(theme => createStyles({
 }))
 
 export const getServerSideProps: GetServerSideProps = async( context ) => {
-  const { req, query } = context
+  const { query } = context
 
   const { gameKey } = query
   const keyName = typeof(gameKey) == 'string' ? gameKey : gameKey.join('')
