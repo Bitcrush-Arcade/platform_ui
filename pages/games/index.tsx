@@ -72,10 +72,6 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
 
   const toggleSlide = () => setShowSlide( p => !p )
 
-  useEffect( () => {
-    console.log('props', props)
-  },[props])
-
   const cycleFeatured = () => {
     toggleSlide()
     setTimeout(() => {
