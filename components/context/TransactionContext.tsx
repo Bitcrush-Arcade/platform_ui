@@ -17,10 +17,17 @@ import { servers } from 'utils/servers'
 import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
 
+type TransactionSubmitData = { 
+  description?: string,
+  errorData?: any,
+  needsReview?: boolean,
+  comment?: string,
+}
+
 type ContextType = {
   pending: TransactionHash,
   completed: TransactionHash,
-  editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => void,
+  editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: TransactionSubmitData ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
   liveWallet: { balance: number, timelock: number },
   toggleDarkMode?: () => void,
@@ -45,7 +52,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const { account, chainId } = useWeb3React()
   const token = getContracts('crushToken', chainId)
   const liveWallet = getContracts('liveWallet', chainId)
-  const { methods } = useContract(token.abi, token.address )
+  const { methods, web3 } = useContract(token.abi, token.address )
   const { methods: lwMethods } = useContract(liveWallet.abi, liveWallet.address )
 
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
@@ -54,6 +61,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
   const [ dark, setDark ] = useState<boolean>( true )
+
+  const [reviewHash, setReviewHash] = useImmer<{ intervalId: any, hashArray: Array<string>}>({ intervalId: null, hashArray: []})
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
@@ -64,11 +73,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     const lwBetAmounts = await lwMethods.betAmounts( account ).call()
     const lwDuration = await lwMethods.lockPeriod().call()
 
-    // TODO
     // COMPARE CURRENT DATE WITH TIMELOCK
     const timelockEndTime = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration)
     const timelockActive = timelockEndTime.minus( new Date().getTime()/1000 ).isGreaterThan(0)
-    console.log('timelockInfo', timelockActive, new Date(timelockEndTime.toNumber() * 1000))
     // IF TIMELOCK ACTIVE THEN GET BALANCE FROM SERVER
     if(timelockActive)
       await fetch(`/api/db/${account}`)
@@ -96,16 +103,16 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     })
     tokenHydration()
   },[setCoinInfo, tokenHydration])
-
+  // Get Token Info
   useEffect( () => {
     getTokenInfo()
   },[ account, getTokenInfo ])
-
+  // Refetch Token and Wallet Info
   useEffect( ()=>{
     const interval = setInterval( tokenHydration, 5000)
     return () => clearInterval(interval)
   },[tokenHydration])
-
+  // set Current Theme
   useEffect( () => {
     const savedTheme = window.localStorage.getItem('theme')
     setDark( savedTheme === "true" )
@@ -116,9 +123,11 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   },[setPendingTransactions])
 
   const edits = useMemo( () => ({
-    pending: (id: string, data?: any) => {
+    pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
         draft[id] = { status: 'pending', description: data?.comment || '' }
+        if(data.needsReview)
+        setReviewHash( draft => { draft.hashArray.push(id) })
       })
     },
     complete: ( id: string, data?: any ) =>{
@@ -129,6 +138,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
         }
       })
       setPendingTransactions( draft => {
+        if(!draft[id]) return
         draft[id].status = 'success'
       })
       clearPending(id)
@@ -142,11 +152,37 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
         }
       })
       setPendingTransactions( draft => {
+        if(!draft[id]) return
         draft[id].status = 'error'
       })
       clearPending(id)
     },
-  }),[setPendingTransactions, setCompleteTransactions, clearPending, pendingTransactions])
+  }),[setPendingTransactions, setCompleteTransactions, clearPending, pendingTransactions, setReviewHash])
+
+  const editTransactions = useCallback( (id: string, type: 'pending' | 'complete' | 'error', data?: TransactionSubmitData ) => {
+    const getFn = edits[type]
+    getFn(id, data)
+  },[edits])
+
+  const checkTransactions = useCallback( (hashArray: Array<string>) => {
+    hashArray.map( async (hash, index) => {
+      console.log( 'toCheck', pendingTransactions[hash] )
+      await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
+        if( !rc || !pendingTransactions[hash] || pendingTransactions[hash]?.status !== 'pending') return
+        pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
+        setReviewHash( draft => {
+          draft.hashArray.splice(index, 1)
+        })
+      })
+    })
+  },[ web3, setReviewHash, editTransactions, pendingTransactions])
+
+  // Review Hashes
+  useEffect( () => {
+    if( reviewHash.hashArray.length == 0 ) return
+    setTimeout(() => checkTransactions( reviewHash.hashArray ), 5000)
+    
+  },[reviewHash, setReviewHash, checkTransactions])
 
   const basicTheme = useMemo( () => getTheme(dark), [dark])
 
@@ -156,11 +192,6 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       localStorage.setItem('theme', String(newVal))
       return newVal
     } )
-  }
-
-  const editTransactions = (id: string, type: 'pending' | 'complete' | 'error', data?: { description?: string, errorData?: any } ) => {
-    const getFn = edits[type]
-    getFn(id, data)
   }
 
   return <TransactionContext.Provider value={{
