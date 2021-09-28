@@ -59,7 +59,7 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
     if( !gameSession || launchURL || isBitcrushGame ) return
     getLauncherUrl()
 
-  },[gameSession, launchURL, setLaunchURL, game, getLauncherUrl ])
+  },[isBitcrushGame, gameSession, launchURL, setLaunchURL, game, getLauncherUrl ])
 
   return (
     <PageContainer menuSm={true}>
