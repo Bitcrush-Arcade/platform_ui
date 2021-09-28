@@ -81,14 +81,21 @@ export default function Home() {
           hydrateToken()
         })
     }
-    else if(timelockInPlace)
+    else if(timelockInPlace){
+      setOpenLwModal( false )
       return fetch('/api/withdrawForUser',{
+        method: 'POST',
         body: JSON.stringify({
           chain: chainId,
           account: account,
           amount: weiValue,
         })
       })
+      .then( response => response.json())
+      .then( data => {
+        editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+      })
+    }
     return liveWalletMethods.withdrawBet( weiValue )
       .send({ from: account })
       .on('transactionHash', (tx) => {
