@@ -23,11 +23,15 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   // START BALANCE
   const ogBalance = await contract.methods.betAmounts(account).call()
   const lockDuration = await contract.methods.lockPeriod().call()
-  const serverBalance = await fetch(`${servers[process.env.NODE_ENV]}/users/wallet/db/${account}`)
+  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/users/wallet/db/${account}`,{
+    headers:{
+      origin: "http://localhost:3000"
+    }
+  })
     .then( r => r.json() )
-    .then( data =>  toWei( `${data.user_balance}` ) )
+    .then( data =>  parseInt(toWei(`${data.user_balance}`)) )
     .catch( e => {
-      res.status(400).json({ message: 'Server Balance is not available'})
+      res.status(400).json({ message: 'Server Balance is not available', error: e})
       return 'Error'
     })
   if( typeof(serverBalance) == 'string' ) return
@@ -46,15 +50,13 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
     data: txData,
     gas: 20000000,
   })
-  await web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-    .on('receipt', r => console.log('onReceipt', r))
-    .catch( e => console.log('error',e))
 
-  // NEW BALANCE
-  const newBalance = await contract.methods.balanceOf(account).call()
-  res.send({ 
-    account: ownerAccount.address,
-    initBalance: ogBalance?.balance,
-    updatedBalance: newBalance
-  })
+  return web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+    .on( 'transactionHash', tx => {
+      res.status(200).send({ txHash: tx})
+    })
+    .catch( e => {
+      console.log('error',e)
+      res.status(400).send({ message: 'Something went wrong with the transaction'})
+    })
 }

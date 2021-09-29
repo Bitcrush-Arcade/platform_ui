@@ -17,6 +17,7 @@ import GeneralUseButton from 'components/basics/GeneralUseButton'
 // Utils & Types
 import { GameSession } from 'types/games/session'
 import { dragonEp } from 'utils/servers'
+import getLauncher from 'pages/api/dragon/getLauncher'
 
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
@@ -56,10 +57,9 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   useEffect(() => {
     if( !gameSession || launchURL || isBitcrushGame ) return
-    
     getLauncherUrl()
 
-  },[gameSession, launchURL, setLaunchURL, game ])
+  },[isBitcrushGame, gameSession, launchURL, setLaunchURL, game, getLauncherUrl ])
 
   return (
     <PageContainer menuSm={true}>
