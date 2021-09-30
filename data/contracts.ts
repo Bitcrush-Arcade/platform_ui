@@ -37,7 +37,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushLiveWallet.abi,
     },
     97:{
-      address: '0x3bb942A3B0DdF117f02b9edb33650976f70c1769',
+      address: '0x7a1636a10017e1d8bC89dcFaf4c187295723E812',
       abi: BitcrushLiveWallet.abi,
     }
   },
@@ -47,7 +47,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushBankroll.abi,
     },
     97:{
-      address: '0x88C01b6b25156727CDcDef016656b7Fd472C51Bd',
+      address: '0xAB9de4ca854952213B577912BF798595EB018c23',
       abi: BitcrushBankroll.abi,
     }
   },
@@ -57,7 +57,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushStaking.abi,
     },
     97:{
-      address: '0x83f47386e243461AAcE9Fd60cCbdF64D8c96731E',
+      address: '0xDE25727a2AFAf892d27F2aCA9C5F9dA7d00BFE82',
       abi: BitcrushStaking.abi,
     }
   }
@@ -71,7 +71,6 @@ export const getContracts = (contract: string, chainId: number ): { address: str
     abi: data?.abi || ''
   }
 }
-
 type ContractSelect = { 
   [key: number]:{
     address: string,
