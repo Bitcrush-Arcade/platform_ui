@@ -37,16 +37,22 @@ function useBank(){
   useEffect( () => { getApyData() }, [chainId])
 
   // GET BANK DATA
-  const getBankData = useCallback( async() => {
+const getBankData = useCallback( async() => {
     if(!bankMethods) return
     const totalBankroll = await bankMethods.totalBankroll().call()
     const availableProfit = await bankMethods.brSinceCompound().call()
+    const negativeProfit = await bankMethods.negativeBrSinceCompound().call()
     const profitThreshold = await bankMethods.profitThreshold().call()
+    const totalProfit = await bankMethods.totalProfit().call()
+    const profitShare = await bankMethods.profitShare().call()
+    const divisor = await bankMethods.DIVISOR().call()
+    const sharePercent = new BigNumber( profitShare ).div( divisor )
     setBankInfo( draft => {
       draft.totalBankroll = +totalBankroll
       draft.profitThreshold = +profitThreshold
-      draft.availableProfit = +availableProfit
-      draft.thresholdPercent = parseFloat( new BigNumber(availableProfit).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) )
+      draft.availableProfit =  new BigNumber(availableProfit).times( sharePercent ).minus(negativeProfit).toNumber()
+      draft.thresholdPercent = parseFloat( new BigNumber(availableProfit).times( sharePercent ).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) )
+      draft.bankDistributed = +totalProfit
     })
   },[bankMethods, setBankInfo])
 
@@ -60,7 +66,9 @@ function useBank(){
   const getStakingData = useCallback( async() => {
       if(!stakingMethods) return
       const totalStaked = await stakingMethods.totalStaked().call()
+      const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
+      const totalClaimed = await stakingMethods.totalClaimed().call()
 
       let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
       await stakingMethods.profits(0).call({}, (err, result) => {
@@ -71,9 +79,9 @@ function useBank(){
       
       
       setBankInfo(draft => {
-        draft.totalStaked = +totalStaked
+        draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.profitTotal = profits
-        draft.distributedTotal = +distributedProfit
+        draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
       })
       
       if(!account) return
@@ -85,6 +93,7 @@ function useBank(){
         draft.staked = +currentStaked.stakedAmount
         draft.stakePercent = (+currentStaked.stakedAmount)/(+totalStaked || 1) * 100
         draft.edgeReward = 0
+        draft.frozenStake = new BigNumber(currentStaked.stakedAmount).div(+totalStaked || 1).times(totalFrozen).toNumber()
       })
 
     },[stakingMethods, setUserInfo, setBankInfo, account],
@@ -131,7 +140,8 @@ type BankInfo = {
   profitTotal: { total: number, remaining: number },
   profitDistribution: number,
   thresholdPercent: number,
-  distributedTotal: number,
+  stakingDistruted: number,
+  bankDistributed: number,
   apyPercent: RoiProps['apyData'],
 }
 const initBank: BankInfo = {
@@ -143,7 +153,8 @@ const initBank: BankInfo = {
     total: 0,
     remaining: 0
   },
-  distributedTotal: 0,
+  stakingDistruted: 0,
+  bankDistributed: 0,
   profitDistribution: 0.6,
   thresholdPercent: 0,
   apyPercent: undefined,
@@ -153,11 +164,13 @@ type UserInfo = {
   stakingReward: number,
   edgeReward: number,
   stakePercent: number,
+  frozenStake: number,
 }
 
 const initUser: UserInfo ={
   staked: 0,
   stakingReward: 0,
   edgeReward: 0,
-  stakePercent: 0
+  stakePercent: 0,
+  frozenStake: 0,
 }
