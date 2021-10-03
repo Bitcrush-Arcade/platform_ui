@@ -53,9 +53,7 @@ const Mining = () => {
             All you need to do it press the Claim button,  and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
-      <Grid item>
-        <CompoundingCard/>
-      </Grid>
+      <Grid item style={{width: 215}}/>
     </Grid>
     <Grid container justifyContent="center" spacing={1} className={ css.section }>
       <Grid item>

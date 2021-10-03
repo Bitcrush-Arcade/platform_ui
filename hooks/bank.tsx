@@ -40,7 +40,7 @@ function useBank(){
   const getBankData = useCallback( async() => {
     if(!bankMethods) return
     const totalBankroll = await bankMethods.totalBankroll().call()
-    const availableProfit = await bankMethods.availableProfit().call()
+    const availableProfit = await bankMethods.brSinceCompound().call()
     const profitThreshold = await bankMethods.profitThreshold().call()
     setBankInfo( draft => {
       draft.totalBankroll = +totalBankroll

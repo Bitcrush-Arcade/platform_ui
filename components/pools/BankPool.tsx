@@ -93,7 +93,7 @@ function BankPool( ) {
       })
   }
 
-  const totalBankroll = bankInfo.totalStaked + bankInfo.totalBankroll
+  const totalBankroll = new BigNumber(bankInfo.totalStaked).plus( new BigNumber(bankInfo.totalBankroll) ).toNumber()
   const usdBankRoll = currencyFormat(tokenInfo.crushUsdPrice * totalBankroll, { decimalsToShow: 2, isWei: true })
 
   // STAKING INTERACTIONS
