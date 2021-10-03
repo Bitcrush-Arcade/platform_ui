@@ -48,8 +48,8 @@ function BankPool( ) {
   const stakingOptions : Array<StakeOptionsType> = [
     { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
       maxValue: tokenInfo.weiBalance },
-    { name: 'Withdraw', btnText: 'Staked', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
-      maxValue: userInfo.staked },
+    { name: 'Withdraw', btnText: 'Max', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
+      maxValue: userInfo.staked - userInfo.frozenStake },
     { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
       maxValue: userInfo.staked },
   ]
@@ -145,8 +145,6 @@ function BankPool( ) {
       return 0
     return reward
   },[bankInfo, userInfo])
-
-  const tvl = new BigNumber(bankInfo.stakingDistruted).plus( new BigNumber( bankInfo.bankDistributed) )
 
   return (<>
     <Card className={ css.card } background="light">
@@ -329,10 +327,10 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat( tvl.toNumber() , { isWei: true })}
+                {currencyFormat( bankInfo.stakingDistruted , { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                {currencyFormat( tvl.times( tokenInfo.crushUsdPrice ).toNumber() , { isWei: true, decimalsToShow: 2} )}
+                {currencyFormat( bankInfo.stakingDistruted * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )}
               </Typography>
             </Grid>
           </Grid>
