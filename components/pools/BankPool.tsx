@@ -146,6 +146,8 @@ function BankPool( ) {
     return reward
   },[bankInfo, userInfo])
 
+  const tvl = new BigNumber(bankInfo.stakingDistruted).plus( new BigNumber( bankInfo.bankDistributed) )
+
   return (<>
     <Card className={ css.card } background="light">
       <Grid container justifyContent="space-evenly">
@@ -179,7 +181,7 @@ function BankPool( ) {
           <Button color="primary" onClick={depositWithdrawClick} width="100%">
             {isApproved ? "DEPOSIT / WITHDRAW" : "Approve CRUSH" }
           </Button>
-          <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
+          {/* <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
             <Grid item>
               <SmBtn color="primary" onClick={compound}>
                 Compound
@@ -195,7 +197,7 @@ function BankPool( ) {
                 Transfer
               </SmBtn>
             </Grid>
-          </Grid>
+          </Grid> */}
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
@@ -304,6 +306,20 @@ function BankPool( ) {
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {usdBankRoll} USD
               </Typography>
+            </Grid>            
+            <Grid item xs={12} className={ css.invisibleDivider } />
+            <Grid item>
+              <Typography>
+                House Profit Distributed:
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="primary" align="right" variant="h6" component="div">
+                {currencyFormat( bankInfo.bankDistributed, { isWei: true })}
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                {currencyFormat( bankInfo.bankDistributed * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )}
+              </Typography>
             </Grid>
             <Grid item xs={12} className={ css.invisibleDivider } />
             <Grid item>
@@ -313,24 +329,10 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                TVLDistributed
+                {currencyFormat( tvl.toNumber() , { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                TVL USD
-              </Typography>
-            </Grid>
-            <Grid item xs={12} className={ css.invisibleDivider } />
-            <Grid item>
-              <Typography>
-                House Profit Distribution:
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat( bankInfo.distributedTotal, { isWei: true })}
-              </Typography>
-              <Typography color="textSecondary" variant="caption" component="div" align="right">
-                {currencyFormat( bankInfo.distributedTotal * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )}
+                {currencyFormat( tvl.times( tokenInfo.crushUsdPrice ).toNumber() , { isWei: true, decimalsToShow: 2} )}
               </Typography>
             </Grid>
           </Grid>
