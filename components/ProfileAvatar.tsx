@@ -22,13 +22,13 @@ const ProfileAvatar = () => {
 
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
-  const { login, logout, account } = useAuthContext()
+  const { login, logout, account, chainId } = useAuthContext()
 
   const { tokenInfo, editTransactions } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
-  const { address: liveWalletAddress, abi: liveAbi } = getContracts('liveWallet', 56)
+  const { address: liveWalletAddress, abi: liveAbi } = getContracts('liveWallet', chainId)
   const { methods: liveMethods } = useContract( liveAbi, liveWalletAddress)
 
   const approve = useCallback(() => {
