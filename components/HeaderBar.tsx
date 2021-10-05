@@ -43,7 +43,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
 
   return <AppBar className={css.appBar} variant="outlined" position={ isSm ? "sticky" : "absolute"}>
     <Toolbar>
-      <Grid container justify="space-between" alignItems="center" className={ css.toolbar }>
+      <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
         {/* LEFT SIDE OF HEADER */}
         <Grid item>
           <Grid container alignItems="center">

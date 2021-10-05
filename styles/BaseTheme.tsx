@@ -1,9 +1,9 @@
-import { createMuiTheme, responsiveFontSizes,  } from '@material-ui/core/styles';
+import { createTheme, responsiveFontSizes,  } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple'
 import grey from '@material-ui/core/colors/grey'
 import teal from '@material-ui/core/colors/teal'
 
-const theme = (isDark?: boolean) => createMuiTheme({
+const theme = (isDark?: boolean) => createTheme({
   palette: {
     primary: {
       main: 'rgb(174,82,227)', // Purple

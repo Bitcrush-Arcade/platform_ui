@@ -74,13 +74,13 @@ const Games = () => {
 
   const LeftScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
-    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    return <Button variant="circular" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
     <ChevronLeft/>
   </Button>
   }
   const RightScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
-    return <Button variant="round" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
+    return <Button variant="circular" size="small" color="primary" onClick={ onClick} disabled={disabled} background="primary">
     <ChevronRight/>
   </Button>
   }
@@ -130,7 +130,7 @@ const Games = () => {
           <div className={ css.featuredTag }>
             <Typography className={ css.tagText }>
               Featured Game
-              {moreFeatured && <IconButton size="small" color="inherit" onClick={cycleFeatured}>
+              {moreFeatured &&<IconButton size="small" color="inherit" onClick={cycleFeatured}>
                 <ChevronRight fontSize="inherit"/>
               </IconButton>}
             </Typography>

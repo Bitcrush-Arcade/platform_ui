@@ -55,7 +55,7 @@ const ProfileAvatar = () => {
 
   return <>
     <IconButton size="small" onClick={toggleDrawer}>
-      <Badge color="secondary" badgeContent=" " variant="dot" overlap="circle">
+      <Badge color="secondary" badgeContent=" " variant="dot" overlap="circular">
         <Avatar src="/invader_zero.png" className={ css.avatar } classes={{img: css.avatarImg}}>
           ?
         </Avatar>
@@ -64,7 +64,7 @@ const ProfileAvatar = () => {
     <Drawer
       anchor="right"
       open={openMenu}
-      onBackdropClick={toggleDrawer}
+      onClose={toggleDrawer}
       PaperProps={{
         className: css.drawer
       }}
