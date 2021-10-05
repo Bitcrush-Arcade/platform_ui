@@ -5,6 +5,7 @@ import Avatar from "@material-ui/core/Avatar"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
 import IconButton from '@material-ui/core/IconButton'
+import Tooltip from "@material-ui/core/Tooltip"
 import Typography from "@material-ui/core/Typography"
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
@@ -20,6 +21,7 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
@@ -103,41 +105,41 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const harvest = (isTransfer: boolean) => {
-    stakingMethods?.claim(isTransfer).send({ from: account })
-      .on('transactionHash', (tx) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: 'Harvest Staking Rewards'})
-      })
-      .on('receipt', ( rc) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
-        hydrateToken()
-        hydrateData()
-      })
-      .on('error', (error, receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
-      })
-  }
+  // const harvest = (isTransfer: boolean) => {
+  //   stakingMethods?.claim(isTransfer).send({ from: account })
+  //     .on('transactionHash', (tx) => {
+  //       console.log('hash', tx )
+  //       editTransactions(tx,'pending', { description: 'Harvest Staking Rewards'})
+  //     })
+  //     .on('receipt', ( rc) => {
+  //       console.log('receipt',rc)
+  //       editTransactions(rc.transactionHash,'complete')
+  //       hydrateToken()
+  //       hydrateData()
+  //     })
+  //     .on('error', (error, receipt) => {
+  //       console.log('error', error, receipt)
+  //       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
+  //     })
+  // }
 
-  const compound = () => {
-    stakingMethods?.singleCompound().send({ from: account })
-      .on('transactionHash', (tx) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: "Compound My Assets" })
-      })
-      .on('receipt', ( rc) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
-        hydrateData()
-        hydrateToken()
-      })
-      .on('error', (error, receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
-      })
-  }
+  // const compound = () => {
+  //   stakingMethods?.singleCompound().send({ from: account })
+  //     .on('transactionHash', (tx) => {
+  //       console.log('hash', tx )
+  //       editTransactions(tx,'pending', { description: "Compound My Assets" })
+  //     })
+  //     .on('receipt', ( rc) => {
+  //       console.log('receipt',rc)
+  //       editTransactions(rc.transactionHash,'complete')
+  //       hydrateData()
+  //       hydrateToken()
+  //     })
+  //     .on('error', (error, receipt) => {
+  //       console.log('error', error, receipt)
+  //       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
+  //     })
+  // }
 
   const profitDistribution = useMemo(() =>{
     const reward = bankInfo.profitTotal.total * userInfo.stakePercent
@@ -154,7 +156,13 @@ function BankPool( ) {
           <Grid container justifyContent="space-between" className={ css.spacing }>
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
-                AUTO BITCRUSH V2
+                AUTO BITCRUSH V2&nbsp;&nbsp;
+                <Tooltip title={`
+                  BankPOOL, Stake your CRUSH here to add to the Bankroll.
+                  MORE INFO NEEDED
+                `}>
+                  <InfoOutlinedIcon/>
+                </Tooltip>
               </Typography>
             </Grid>
             <Grid item>

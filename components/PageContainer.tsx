@@ -80,6 +80,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
       paddingTop: 0,
     },
     paddingLeft: theme.spacing(3),
+    paddingBottom: theme.spacing(4),
     [theme.breakpoints.up('md')]:{
       paddingLeft: props => {
         if( props.menuSm )

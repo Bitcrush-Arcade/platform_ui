@@ -170,8 +170,8 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={1}
-        md={2}
-        lg={2}
+        md={4}
+        lg={5}
         spacing={3}
       />
       </div>)}

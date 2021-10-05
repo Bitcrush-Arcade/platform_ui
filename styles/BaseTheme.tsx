@@ -14,7 +14,7 @@ const theme = (isDark?: boolean) => createTheme({
       dark: 'rgb(9,130,105)'
     },
     background: {
-      default: isDark ? 'rgb(12,15,32)' : 'rgb(222,211,241)',
+      default: isDark ? 'rgb(5,6,16)' : 'rgb(222,211,241)',
       paper: isDark ? 'rgb(27,30,65)' : 'white',
       menu: isDark ? 'rgb(23,24,54)' : 'white',
       highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)',

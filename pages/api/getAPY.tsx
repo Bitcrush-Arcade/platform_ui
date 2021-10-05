@@ -1,8 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+// Date-fns
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
+// Web3
 import Web3 from 'web3'
 import { fromWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
+// Utils
 import { currencyFormat } from 'utils/text/text'
+// Data
 import { getContracts } from 'data/contracts'
 
 
@@ -30,11 +35,23 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const contractSetup = getContracts( usedContract, usedChain )
   const contract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
 
+  let usedEmission;
   const emission = await contract.methods.crushPerBlock().call()
+  // EMISSION FROM BANK = deploymentTimeStamp
+  if( body.isBank ){
+    const bankSetup = getContracts('bankroll', usedChain)
+    const bankContract = await new web3.eth.Contract( bankSetup.abi, bankSetup.address )
+    const deployTime = await bankContract.methods.deploymentTimeStamp().call()
+    const totalProfit = await bankContract.methods.totalProfit().call()
+    usedEmission = new BigNumber( totalProfit ).div( differenceInCalendarDays( new Date(), new Date( +deployTime * 1000)) )
+  }
+  else{
+    usedEmission = emission
+  }
   const totalStaked = fromWei( await contract.methods.totalStaked().call() )
 
   const performanceFee = 0.03
-  const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).times(100).toNumber()
+  const compoundEmitted = new BigNumber(usedEmission).times(1 - performanceFee).times(100).toNumber()
   const totalPool = new BigNumber(totalStaked).toNumber() || new BigNumber( 1000000 ).times( new BigNumber(10).pow(18) ).toNumber()
   let d1 = 0
   let d7 = 0
@@ -62,7 +79,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
       initialStake,
       initialPool: totalPool,
       price: price.crushUsdPrice,
-      crushPerBlock: new BigNumber(emission).div( new BigNumber(10).pow(18) ).toFixed(),
+      crushPerBlock: new BigNumber(usedEmission).div( new BigNumber(10).pow(18) ).toFixed(),
       fees: performanceFee
     },
     d1: {
