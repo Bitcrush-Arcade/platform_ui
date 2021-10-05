@@ -157,7 +157,7 @@ const Menu = ( props: MenuProps) => {
             
             } }>
             <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
-                <List>
+                <List className={ css.list }>
                     {linkItems}
                 </List>
                 <Grid container className={ css.footer } alignItems="center" justifyContent="space-between">
@@ -243,6 +243,10 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         padding: theme.spacing(2),
         paddingTop: 0,
         width: theme.spacing(28)
+    },
+    list:{
+        maxHeight: `calc( 100% - 111px)`,
+        overflowY: 'auto'
     },
     subList: {
         backgroundColor: theme.palette.type =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
