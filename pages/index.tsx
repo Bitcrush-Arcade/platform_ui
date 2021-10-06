@@ -147,29 +147,7 @@ export default function Home() {
                 <Typography variant="h4" align="center" className={ css.announcementTitle }>
                   Announcements
                 </Typography>
-                <Grid container justify="space-evenly" alignItems="center">
-                  <Grid item xs={12} md={5}>
-                    <Image src={`/games/bountyBanner.png`} layout="responsive" width={1260/6} height={432/6} alt={`announcement banner for bitcrush bounty game`}/>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Grid container justify="flex-end">
-                      <Grid item xs={12}>
-                        <Typography style={{ padding: 16, whiteSpace: 'pre-line'}} >
-                          We&apos;re excited to announce our first live game in collaboration with Wizard Financial; “Bitcrush Bounty”!{'\n'}
-                          Compete against other squad members to place the final bid and win the bounty.
-                          Games happen several times daily so be sure to check in often and Crush It!
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Link href="/games" passHref>
-                          <SmallBtn color="secondary" style={{ marginLeft: 'auto'}}>
-                            GO PLAY!
-                          </SmallBtn>
-                        </Link>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
+                <Image src={ isSm ? "/assets/announcements/parrot_partner_mobile.png" : "/assets/announcements/parrot_partner.png"} height={ isSm ? 250 : 720/4} width={isSm ? 300 : 1280/4} layout="responsive"/>
               </CardContent>
             </Card>
             <Grid container justify="space-around" style={{marginTop: 16}}>
