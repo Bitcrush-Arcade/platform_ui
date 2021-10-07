@@ -39,26 +39,29 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const [ showWarning, setShowWarning ] = useState<boolean>(false)
   
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
+
+  const getRewards = useCallback( async () => {
+    return fetch('/api/contracts/compounderCalculator',{
+      method: "POST",
+      body: JSON.stringify({
+        chain: chainId
+      })
+    })
+      .then( res => res.json() )
+      .then( data => {
+        setRewardToDistribute( new BigNumber(data.compounderBounty) )
+      })
+      .catch( e => {
+        console.log(e)
+        setRewardToDistribute( new BigNumber(0) )
+      })
+      .finally( () => setTimeout( toggleHydrate, 5000 ) )
+
+  },[chainId, setRewardToDistribute, toggleHydrate])
   
   useEffect(() => {
-    if(!methods) return
-    async function getRewards(){
-      const totalPool = await methods.totalPool().call()
-      const totalPending = await methods.totalPendingRewards().call()
-      const claimFee = await methods.performanceFeeCompounder().call()
-      const divisor = 10000
-      if( new BigNumber(totalPool).isLessThanOrEqualTo(0) )
-        setRewardToDistribute( new BigNumber(0) )
-      else 
-        setRewardToDistribute( new BigNumber(totalPending).times(claimFee).div(divisor)  )
-    }
     getRewards()
-  },[hydrate,methods])
-
-  useEffect( () => {
-    const hydrateInterval = setInterval( toggleHydrate, 5000 )
-    return () => clearInterval(hydrateInterval)
-  },[setHydrate, toggleHydrate])
+  },[hydrate, getRewards])
 
   const usdReward = useMemo( () => {
     return rewardToDistribute.times(tokenInfo.crushUsdPrice)

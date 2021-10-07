@@ -70,6 +70,14 @@ const getBankData = useCallback( async() => {
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
 
+      let poolStart 
+      try{
+        poolStart = await stakingMethods.deploymentTimeStamp().call()
+      }
+      catch{
+        poolStart = new Date().getTime()/1000 - (20*24*3600)
+      }
+
       let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
       await stakingMethods.profits(0).call({}, (err, result) => {
         if(err) return
@@ -82,6 +90,7 @@ const getBankData = useCallback( async() => {
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.profitTotal = profits
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
+        draft.poolStart = new Date( parseInt(poolStart) * 1000 )
       })
       
       if(!account) return
@@ -143,6 +152,7 @@ type BankInfo = {
   stakingDistruted: number,
   bankDistributed: number,
   apyPercent: RoiProps['apyData'],
+  poolStart: Date | null,
 }
 const initBank: BankInfo = {
   totalBankroll: 0,
@@ -158,6 +168,7 @@ const initBank: BankInfo = {
   profitDistribution: 0.6,
   thresholdPercent: 0,
   apyPercent: undefined,
+  poolStart: null,
 }
 type UserInfo = {
   staked: number,

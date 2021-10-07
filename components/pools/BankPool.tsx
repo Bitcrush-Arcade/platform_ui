@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
@@ -105,48 +106,19 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  // const harvest = (isTransfer: boolean) => {
-  //   stakingMethods?.claim(isTransfer).send({ from: account })
-  //     .on('transactionHash', (tx) => {
-  //       console.log('hash', tx )
-  //       editTransactions(tx,'pending', { description: 'Harvest Staking Rewards'})
-  //     })
-  //     .on('receipt', ( rc) => {
-  //       console.log('receipt',rc)
-  //       editTransactions(rc.transactionHash,'complete')
-  //       hydrateToken()
-  //       hydrateData()
-  //     })
-  //     .on('error', (error, receipt) => {
-  //       console.log('error', error, receipt)
-  //       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
-  //     })
-  // }
-
-  // const compound = () => {
-  //   stakingMethods?.singleCompound().send({ from: account })
-  //     .on('transactionHash', (tx) => {
-  //       console.log('hash', tx )
-  //       editTransactions(tx,'pending', { description: "Compound My Assets" })
-  //     })
-  //     .on('receipt', ( rc) => {
-  //       console.log('receipt',rc)
-  //       editTransactions(rc.transactionHash,'complete')
-  //       hydrateData()
-  //       hydrateToken()
-  //     })
-  //     .on('error', (error, receipt) => {
-  //       console.log('error', error, receipt)
-  //       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
-  //     })
-  // }
-
   const profitDistribution = useMemo(() =>{
     const reward = bankInfo.profitTotal.total * userInfo.stakePercent
     if(reward > bankInfo.profitTotal.remaining)
       return 0
     return reward
   },[bankInfo, userInfo])
+
+  const houseEdgePercent = useMemo(() => {
+    if(!bankInfo.poolStart)
+      return 0
+      // Total_distributed * 365_days / ( Days_since_Start * total_pool )
+    return new BigNumber( bankInfo.bankDistributed ).times( 365 ).div( new BigNumber( bankInfo.totalStaked ).times( differenceInCalendarDays( new Date(), bankInfo.poolStart ) || 1 ).toNumber() || 1  ).toNumber()
+  },[bankInfo])
 
   return (<>
     <Card className={ css.card } background="light">
@@ -187,23 +159,6 @@ function BankPool( ) {
           <Button color="primary" onClick={depositWithdrawClick} width="100%">
             {isApproved ? "DEPOSIT / WITHDRAW" : "Approve CRUSH" }
           </Button>
-          {/* <Grid container spacing={1} justifyContent="space-around" style={{marginTop: 16 }}>
-            <Grid item>
-              <SmBtn color="primary" onClick={compound}>
-                Compound
-              </SmBtn>
-            </Grid>
-            <Grid item>
-              <SmBtn color="primary" onClick={() => harvest(false)}>
-                Harvest
-              </SmBtn>
-            </Grid>
-            <Grid item>
-              <SmBtn color="primary" onClick={() => harvest(true)}>
-                Transfer
-              </SmBtn>
-            </Grid>
-          </Grid> */}
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
@@ -232,7 +187,7 @@ function BankPool( ) {
                 Profit Distribution
               </Typography>
               <Typography color="primary" variant="h6" component="div">
-                {bankInfo.profitDistribution*100}%
+                {(houseEdgePercent*100).toFixed(4)}%
               </Typography>
             </Grid>
             <Grid item xs={12} sm={'auto'}>
@@ -242,7 +197,7 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
-                {(parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (bankInfo.profitDistribution * 100)}%
+                {((parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (houseEdgePercent * 100)).toFixed(2)}%
               </Typography>
             </Grid>
             <Grid item xs={12}>
