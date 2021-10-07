@@ -82,18 +82,20 @@ export default function Home() {
     <meta name="author" content="Bitcrush"/>
   </Head>
       <PageContainer >
-          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500, whiteSpace: 'pre-line' }}>
-            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
+        <h1 style={{marginBottom: 16 , paddingTop: 32,}}>
+            <Typography variant="h5" align="center" component="div" style={{ fontWeight: 200 }}>
               THE FIRST
             </Typography>
-            <Typography variant="h3" component="p" style={{ fontWeight: 500 }}>
+            <Typography variant="h3" align="center" component="div" style={{ fontWeight: 500 }}>
               HYBRID
             </Typography>
-            DEFI CASINO
-            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
+            <Typography variant="h2" align="center" component="div" style={{ fontWeight: 500, fontFamily: 'Zebulon', letterSpacing: 1.2 }}>
+              GAMEFI
+            </Typography>
+            <Typography variant="h5" align="center" component="div" style={{ fontWeight: 200 }}>
               ON BSC
             </Typography>
-          </Typography>
+        </h1>
           <Grid container justify="center">
               <Grid item className={css.gradientContainer}>
                 {gradient}
