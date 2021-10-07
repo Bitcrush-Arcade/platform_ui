@@ -69,7 +69,14 @@ const getBankData = useCallback( async() => {
       const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-      const poolStart = await stakingMethods.deploymentTimeStamp().call()
+
+      let poolStart 
+      try{
+        poolStart = await stakingMethods.deploymentTimeStamp().call()
+      }
+      catch{
+        poolStart = new Date().getTime()/1000 - (20*24*3600)
+      }
 
       let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
       await stakingMethods.profits(0).call({}, (err, result) => {

@@ -117,7 +117,7 @@ function BankPool( ) {
     if(!bankInfo.poolStart)
       return 0
       // Total_distributed * 365_days / ( Days_since_Start * total_pool )
-    return new BigNumber( bankInfo.bankDistributed ).times( 365 ).div( new BigNumber( bankInfo.totalStaked ).times( differenceInCalendarDays( bankInfo.poolStart, new Date() ) || 1 ).toNumber() || 1  ).toNumber()
+    return new BigNumber( bankInfo.bankDistributed ).times( 365 ).div( new BigNumber( bankInfo.totalStaked ).times( differenceInCalendarDays( new Date(), bankInfo.poolStart ) || 1 ).toNumber() || 1  ).toNumber()
   },[bankInfo])
 
   return (<>
@@ -197,7 +197,7 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
-                {(parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (bankInfo.profitDistribution * 100)}%
+                {((parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (houseEdgePercent * 100)).toFixed(2)}%
               </Typography>
             </Grid>
             <Grid item xs={12}>
