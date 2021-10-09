@@ -57,6 +57,12 @@
   font-style: italic;
   src: url('./Zebulon/Zebulon\ Bold\ Italic.ttf');
 }
+@font-face {
+  font-family: 'Zebulon';
+  font-weight: normal;
+  font-style: normal;
+  src: url('./Zebulon/Zebulon.ttf');
+}
 /* OXANIUM */
 @font-face {
   font-family: 'Oxanium';
