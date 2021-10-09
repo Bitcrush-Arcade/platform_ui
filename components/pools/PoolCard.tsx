@@ -243,7 +243,7 @@ const PoolCard = (props: PoolProps) => {
       />
       <CardContent>
         {/* APR */}
-        <Grid container justify="space-between" alignItems="center">
+        <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
               Staked
@@ -288,7 +288,7 @@ const PoolCard = (props: PoolProps) => {
             </IconButton>
           </Grid>
         </Grid>
-        <Grid container justify="space-between" alignItems="flex-end" className={ css.earnings }>
+        <Grid container justifyContent="space-between" alignItems="flex-end" className={ css.earnings }>
           <Grid item>
             <Typography variant="body2" color="textSecondary">
               {coinInfo.symbol} EARNED
@@ -333,7 +333,7 @@ const PoolCard = (props: PoolProps) => {
               <InfoOutlinedIcon color="disabled" fontSize="small"/>
             </Tooltip>
           </Grid>
-          <Grid item xs={6} container alignItems="center" justify="flex-end">
+          <Grid item xs={6} container alignItems="center" justifyContent="flex-end">
             <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
               <Typography variant="body2" color="primary" className={ css.detailsActionText }>
                 Details
@@ -377,7 +377,7 @@ const PoolCard = (props: PoolProps) => {
     <Dialog 
       PaperComponent={FormComponent}
       open={openStakeModal}
-      onBackdropClick={ toggleStakeModal }
+      onClose={ toggleStakeModal }
     >
       <Formik
         initialValues = {{
@@ -496,7 +496,7 @@ const PoolCard = (props: PoolProps) => {
               valueLabelDisplay="on"
             />
           </div>
-          <Grid container justify="space-evenly">
+          <Grid container justifyContent="space-evenly">
             <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
               25%
             </SmallButton>

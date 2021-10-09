@@ -87,7 +87,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   return <>
   <Card background="light" shadow="dark" className={ css.claimCard } >
     <CardContent className={ css.cardContent }>
-      <Grid container justify="space-between" alignItems="center">
+      <Grid container justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography className={ css.cardTitle }>
             CRUSH Auto Bounty
@@ -139,7 +139,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       <Typography align="center" paragraph>
         Are you sure?
       </Typography>
-      <Grid container justify="center">
+      <Grid container justifyContent="center">
         <Grid item style={{paddingRight: 8}}>
           <Button color="secondary" width={120} onClick={claim}>
             CLAIM

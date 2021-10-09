@@ -90,7 +90,7 @@ const Games = () => {
       <meta name="description" content="A BSC hybrid gaming platform"/>
     </Head>
     <Slide in={showSlide} direction="right">
-      <Grid container justify="center" className={ css.featuredContainer } >
+      <Grid container justifyContent="center" className={ css.featuredContainer } >
         <Grid item className={ css.cardContainer } >
             <Card className={ css.featuredCard } background="light">
                 <Grid container direction="row-reverse" alignItems="center" spacing={1}>
@@ -115,7 +115,7 @@ const Games = () => {
                       </Button>
                     </div>
                   </Grid>
-                  {moreFeatured && <Grid item xs={12} container justify="flex-end">
+                  {moreFeatured && <Grid item xs={12} container justifyContent="flex-end">
                     <div style={{ marginLeft: 'auto', marginTop: 8, marginRight: 24}}>
                       <SmallButton size="small" color="secondary" variant="extended" onClick={cycleFeatured}>
                         <Typography variant="caption" color="textPrimary" style={{ fontWeight: 600}}>

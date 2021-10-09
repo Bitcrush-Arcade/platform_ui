@@ -50,7 +50,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
             <Grid item>
               <Button onClick={toggleOpen} className={css.menuOpen}>
                 {svgGradient}{svgGradient2}
-                <MenuIcon fontSize={isSm ? "default" : "large"} className={ css.gradient } />
+                <MenuIcon fontSize={isSm ? "medium" : "large"} className={ css.gradient } />
               </Button>
             </Grid>
             <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
