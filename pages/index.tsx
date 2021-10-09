@@ -96,7 +96,7 @@ export default function Home() {
               ON BSC
             </Typography>
         </h1>
-          <Grid container justify="center">
+          <Grid container justifyContent="center">
               <Grid item className={css.gradientContainer}>
                 {gradient}
                 <InvaderIcon style={{fontSize: 120}} className={ css.gradient }/>
@@ -107,7 +107,7 @@ export default function Home() {
             {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
-                <Grid container justify="space-around">
+                <Grid container justifyContent="space-around">
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" 
                       align={"center"
@@ -144,15 +144,15 @@ export default function Home() {
               </CardContent>
             </Card>
             {/* Announcement Card */}
-            <Card style={{marginTop: 24}}>
+            {/* <Card style={{marginTop: 24}}>
               <CardContent>
                 <Typography variant="h4" align="center" className={ css.announcementTitle }>
                   Announcements
                 </Typography>
                 <Image src={ isSm ? "/assets/announcements/parrot_partner_mobile.png" : "/assets/announcements/parrot_partner.png"} height={ isSm ? 250 : 720/4} width={isSm ? 300 : 1280/4} layout="responsive"/>
               </CardContent>
-            </Card>
-            <Grid container justify="space-around" style={{marginTop: 16}}>
+            </Card> */}
+            <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
@@ -174,7 +174,7 @@ export default function Home() {
                 />
               </Grid>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
-                <Grid container justify="flex-end">
+                <Grid container justifyContent="flex-end">
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
