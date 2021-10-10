@@ -31,7 +31,7 @@ import BigNumber from 'bignumber.js'
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.only('xs') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions } = useTransactionContext()
@@ -111,7 +111,6 @@ export default function Home() {
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" 
                       align={"center"
-                        //isSm ? "center" : "left"
                       }
                       color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}
                     >
@@ -144,14 +143,9 @@ export default function Home() {
               </CardContent>
             </Card>
             {/* Announcement Card */}
-            {/* <Card style={{marginTop: 24}}>
-              <CardContent>
-                <Typography variant="h4" align="center" className={ css.announcementTitle }>
-                  Announcements
-                </Typography>
-                <Image src={ isSm ? "/assets/announcements/parrot_partner_mobile.png" : "/assets/announcements/parrot_partner.png"} height={ isSm ? 250 : 720/4} width={isSm ? 300 : 1280/4} layout="responsive"/>
-              </CardContent>
-            </Card> */}
+            <section style={{ marginTop: 24, width: '100%' }}>
+              <Image src={ isSm ? "/assets/announcements/mobile-yield.png" : "/assets/announcements/banner-yield.png"} height={ isSm ? 250 : 310} width={isSm ? 300 : 1080} layout="responsive"/>
+            </section>
             <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
@@ -203,7 +197,7 @@ export default function Home() {
                 </Grid>
               </Grid>
             </Grid>
-            <Card background="light">
+            <Card background="light" style={{ marginTop: 24}}>
               <CardContent>
                 <Typography align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
                   Our Partners
