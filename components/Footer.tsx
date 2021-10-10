@@ -34,7 +34,7 @@ const Footer = () => {
           <Grid container>
             <Grid item xs={6}>
               <List>
-                {links1.map( link => <LinkItem link={link}/>)}
+                {links1.map( (link, idx) => <LinkItem link={link} key={`footer-column-1-${idx}`}/>)}
                 <ListItem>
                   <Grid container alignItems="center">
                     <IconButton href="https://t.me/Bcarcadechat" component="a" target="_blank" rel="noopener noreferrer" size="small" style={{ marginLeft: -8 }}>
@@ -49,7 +49,7 @@ const Footer = () => {
             </Grid>
             <Grid item xs={6}>
               <List>
-                {links2.map( link => <LinkItem link={link}/>)}
+                {links2.map( (link, idx) => <LinkItem link={link} key={`footer-column-2-${idx}`}/>)}
                 <ListItem>
                   <ListItemText
                     primary={"©2021 COPYRIGHT BITCRUSH ARCADE"}
