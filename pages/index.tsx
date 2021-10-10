@@ -203,6 +203,20 @@ export default function Home() {
                 </Grid>
               </Grid>
             </Grid>
+            <Card background="light">
+              <CardContent>
+                <Typography align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
+                  Our Partners
+                </Typography>
+                <Grid container alignItems="center" justifyContent="space-evenly">
+                  {partners.map( partner => <Grid item>
+                    <a href={partner.href} rel="noopener noreferrer" target="_blank">
+                    <Image src={partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
+                    </a>
+                  </Grid>)}
+                </Grid>
+              </CardContent>
+            </Card>
           </Container>
       </PageContainer>
   </>)
@@ -224,3 +238,57 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
     }
   },
 }))
+
+const partners: PartnerData[] = [
+  {
+    name: 'Apeswap',
+    href: 'https://apeswap.finance/farms',
+    width: 434,
+    height: 116,
+    logo: '/assets/thirdPartyLogos/partners/apeswap-logo.png',
+    factor: 1.5
+  },
+  {
+    name: 'Babyswap',
+    href: 'https://home.babyswap.finance/farms',
+    width: 685,
+    height: 187,
+    logo: '/assets/thirdPartyLogos/partners/babyswap-light.png',
+    factor: 3
+  },
+  {
+    name: 'Wizard Financial',
+    href: 'https://wizard.financial/',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/wizard.png',
+    factor: 2.5
+  },
+  {
+    name: 'Crox Swap',
+    href: 'https://app.croxswap.com/dualfarms',
+    width: 1287,
+    height: 468,
+    logo: '/assets/thirdPartyLogos/partners/crox-swap-dark.png',
+    factor: 8
+  },
+  {
+    name: 'Revolver Token',
+    href: 'https://www.revolvertoken.com/',
+    width: 596,
+    height: 844,
+    logo: '/assets/thirdPartyLogos/partners/revolver-transparent.png',
+    factor: 5.96
+  },
+
+]
+
+type PartnerData = {
+  name: string,
+  href: string, 
+  width: number,
+  height: number,
+  logo: string,
+  logoDark?: string,
+  factor: number,
+}
