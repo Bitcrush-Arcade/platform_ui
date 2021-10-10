@@ -197,7 +197,7 @@ export default function Home() {
                 </Grid>
               </Grid>
             </Grid>
-            <Card background="light" style={{ marginTop: 24}}>
+            {/* <Card background="light" style={{ marginTop: 24}}>
               <CardContent>
                 <Typography align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
                   Our Partners
@@ -210,7 +210,7 @@ export default function Home() {
                   </Grid>)}
                 </Grid>
               </CardContent>
-            </Card>
+            </Card> */}
           </Container>
       </PageContainer>
   </>)
