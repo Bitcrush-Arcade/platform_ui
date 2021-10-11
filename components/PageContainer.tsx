@@ -61,7 +61,7 @@ const PageContainer = ( props: ContainerProps ) => {
         </div>}
       </Container>
     </div>
-    <Footer/>
+    {/* <Footer/> */}
   </div>
 }
 
