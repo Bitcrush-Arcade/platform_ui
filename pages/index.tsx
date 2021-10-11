@@ -10,6 +10,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
@@ -197,20 +198,27 @@ export default function Home() {
                 </Grid>
               </Grid>
             </Grid>
-            {/* <Card background="light" style={{ marginTop: 24}}>
+            <Card background="light" style={{ marginTop: 24}}>
               <CardContent>
-                <Typography align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
+                <Typography paragraph align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
                   Our Partners
                 </Typography>
                 <Grid container alignItems="center" justifyContent="space-evenly">
-                  {partners.map( partner => <Grid item>
-                    <a href={partner.href} rel="noopener noreferrer" target="_blank">
-                    <Image src={partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
-                    </a>
+                  {partners.map( partner => <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
+                      <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                      <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
+                      <Tooltip arrow placement="bottom"
+                        title={<Typography variant="body1">{partner.name}</Typography>}
+                      >
+                        <Typography align="center" variant="body2" noWrap component="div">
+                          {partner.name}
+                        </Typography>
+                      </Tooltip>
+                      </a>
                   </Grid>)}
                 </Grid>
               </CardContent>
-            </Card> */}
+            </Card>
           </Container>
       </PageContainer>
   </>)
@@ -231,24 +239,28 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
       fontSize: theme.typography.h6.fontSize
     }
   },
+  link:{
+    textDecoration: 'none',
+    color: theme.palette.text.primary
+  }
 }))
 
 const partners: PartnerData[] = [
   {
     name: 'Apeswap',
     href: 'https://apeswap.finance/farms',
-    width: 434,
-    height: 116,
-    logo: '/assets/thirdPartyLogos/partners/apeswap-logo.png',
-    factor: 1.5
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/ape-logo.png',
+    factor: 4
   },
   {
     name: 'Babyswap',
     href: 'https://home.babyswap.finance/farms',
-    width: 685,
-    height: 187,
-    logo: '/assets/thirdPartyLogos/partners/babyswap-light.png',
-    factor: 3
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/baby-logo.png',
+    factor: 4
   },
   {
     name: 'Wizard Financial',
@@ -256,23 +268,25 @@ const partners: PartnerData[] = [
     width: 272,
     height: 272,
     logo: '/assets/thirdPartyLogos/partners/wizard.png',
-    factor: 2.5
+    factor: 4
   },
   {
-    name: 'Crox Swap',
+    name: 'CroxSwap',
     href: 'https://app.croxswap.com/dualfarms',
-    width: 1287,
-    height: 468,
-    logo: '/assets/thirdPartyLogos/partners/crox-swap-dark.png',
-    factor: 8
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/crox-light.png',
+    logoDark: '/assets/thirdPartyLogos/partners/crox-dark.png',
+    factor: 4
   },
+
   {
     name: 'Revolver Token',
     href: 'https://www.revolvertoken.com/',
-    width: 596,
-    height: 844,
-    logo: '/assets/thirdPartyLogos/partners/revolver-transparent.png',
-    factor: 5.96
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/revolver-logo.png',
+    factor: 4
   },
 
 ]
