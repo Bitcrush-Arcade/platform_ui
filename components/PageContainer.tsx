@@ -8,6 +8,7 @@ import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/sty
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Container from '@material-ui/core/Container'
 // Components
+import Footer from 'components/Footer'
 import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
 import TxCard from 'components/context/TransactionCard'
@@ -61,6 +62,7 @@ const PageContainer = ( props: ContainerProps ) => {
         </div>}
       </Container>
     </div>
+    {/* <Footer/> */}
   </div>
 }
 
@@ -120,6 +122,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     minHeight: '100vh',
     maxWidth: '100vw',
     position: 'relative',
+    paddingBottom: theme.spacing(3)
   },
 }))
 

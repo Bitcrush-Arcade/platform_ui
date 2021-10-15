@@ -46,26 +46,26 @@ const featuredGames : GameItem[] = [
     alt: 'Dice Invaders Game Demo',
     local: true
   },
-  {
-    name: "Bitcrush Bounty",
-    description: `
-      Compete against other squad members to make the final bid and win the bounty. When the timer reaches zero, the final member bid wins the game,
-      and all the bounty that comes with it!\n
-      60% goes to the winner, 30% rolled over to the next round, 5% goes to Wizard Financial for creating this masterpiece, and 5% goes to Bitcrush Arcade reserve to be burned.`,
-    disabled: false,
-    link: 'https://crush.wizard.financial/',
-    imgSrc: '/games/bountyWinner.png',
-    width: 824/4,
-    height: 640/4,
-    alt: "Dragon\'s Den Game"
-  }
+  // {
+  //   name: "Bitcrush Bounty",
+  //   description: `
+  //     Compete against other squad members to make the final bid and win the bounty. When the timer reaches zero, the final member bid wins the game,
+  //     and all the bounty that comes with it!\n
+  //     60% goes to the winner, 30% rolled over to the next round, 5% goes to Wizard Financial for creating this masterpiece, and 5% goes to Bitcrush Arcade reserve to be burned.`,
+  //   disabled: false,
+  //   link: 'https://crush.wizard.financial/',
+  //   imgSrc: '/games/bountyWinner.png',
+  //   width: 824/4,
+  //   height: 640/4,
+  //   alt: "Dragon\'s Den Game"
+  // }
 ]
 
 const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
 
   const css = useStyles({})
 
-  const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(1)
+  const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(0)
   const [showSlide, setShowSlide] = useState<boolean>(true)
 
   const selectedGame = useMemo( () => featuredGames[selectFeaturedGame], [selectFeaturedGame])
@@ -85,6 +85,8 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
       toggleSlide()
     }, 300)
   }
+
+  const moreFeatured = featuredGames.length > 1
 
   const LeftScroll = (props: {disabled: boolean, onClick: () => void}) => {
     const {disabled, onClick} = props
@@ -137,7 +139,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
                           : featuredButton}
                     </div>
                   </Grid>
-                  <Grid item xs={12} container justifyContent="flex-end">
+                  {moreFeatured && <Grid item xs={12} container justifyContent="flex-end">
                     <div style={{ marginLeft: 'auto', marginTop: 8, marginRight: 24}}>
                       <SmallButton size="small" color="secondary" variant="extended" onClick={cycleFeatured}>
                         <Typography variant="caption" color="textPrimary" style={{ fontWeight: 600}}>
@@ -146,15 +148,15 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
                         <ChevronRight fontSize="inherit" color="inherit" style={{paddingBottom: 4}}/>
                       </SmallButton>
                     </div>
-                  </Grid>
+                  </Grid>}
                 </Grid>
             </Card>
           <div className={ css.featuredTag }>
             <Typography className={ css.tagText }>
               Featured Game
-              <IconButton size="small" color="inherit" onClick={cycleFeatured}>
+              {moreFeatured &&<IconButton size="small" color="inherit" onClick={cycleFeatured}>
                 <ChevronRight fontSize="inherit"/>
-              </IconButton>
+              </IconButton>}
             </Typography>
           </div>
         </Grid>
