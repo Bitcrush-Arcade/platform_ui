@@ -11,6 +11,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
 import Grid from '@material-ui/core/Grid'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
@@ -36,7 +37,7 @@ import { toWei } from 'web3-utils'
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.only('xs') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, hydrateToken, liveWallet: lwContext } = useTransactionContext()
@@ -182,18 +183,20 @@ export default function Home() {
     <meta name="author" content="Bitcrush"/>
   </Head>
       <PageContainer >
-          <Typography variant="h2" align="center" component="h1" style={{ marginBottom: 16 , paddingTop: 32, fontWeight: 500, whiteSpace: 'pre-line' }}>
-            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
+        <h1 style={{marginBottom: 16 , paddingTop: 32,}}>
+            <Typography variant="h5" align="center" component="div" style={{ fontWeight: 200 }}>
               THE FIRST
             </Typography>
-            <Typography variant="h3" component="p" style={{ fontWeight: 500 }}>
+            <Typography variant="h3" align="center" component="div" style={{ fontWeight: 500 }}>
               HYBRID
             </Typography>
-            DEFI CASINO
-            <Typography variant="h5" component="p" style={{ fontWeight: 200 }}>
+            <Typography variant="h2" align="center" component="div" style={{ fontWeight: 500, fontFamily: 'Zebulon', letterSpacing: 1.2 }}>
+              GAMEFI
+            </Typography>
+            <Typography variant="h5" align="center" component="div" style={{ fontWeight: 200 }}>
               ON BSC
             </Typography>
-          </Typography>
+        </h1>
           <Grid container justifyContent="center">
               <Grid item className={css.gradientContainer}>
                 {gradient}
@@ -209,7 +212,6 @@ export default function Home() {
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" 
                       align={"center"
-                        //isSm ? "center" : "left"
                       }
                       color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}
                     >
@@ -242,36 +244,9 @@ export default function Home() {
               </CardContent>
             </Card>
             {/* Announcement Card */}
-            <Card style={{marginTop: 24}}>
-              <CardContent>
-                <Typography variant="h4" align="center" className={ css.announcementTitle }>
-                  Announcements
-                </Typography>
-                <Grid container justifyContent="space-evenly" alignItems="center">
-                  <Grid item xs={12} md={5}>
-                    <Image src={`/games/bountyBanner.png`} layout="responsive" width={1260/6} height={432/6} alt={`announcement banner for bitcrush bounty game`}/>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Grid container justifyContent="flex-end">
-                      <Grid item xs={12}>
-                        <Typography style={{ padding: 16, whiteSpace: 'pre-line'}} >
-                          We&apos;re excited to announce our first live game in collaboration with Wizard Financial; “Bitcrush Bounty”!{'\n'}
-                          Compete against other squad members to place the final bid and win the bounty.
-                          Games happen several times daily so be sure to check in often and Crush It!
-                        </Typography>
-                      </Grid>
-                      <Grid item>
-                        <Link href="/games" passHref>
-                          <SmallBtn color="secondary" style={{ marginLeft: 'auto'}}>
-                            GO PLAY!
-                          </SmallBtn>
-                        </Link>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
+            <section style={{ marginTop: 24, width: '100%' }}>
+              <Image src={ isSm ? "/assets/announcements/mobile-yield.png" : "/assets/announcements/banner-yield.png"} height={ isSm ? 250 : 310} width={isSm ? 300 : 1080} layout="responsive" alt="Announcement Yiel Parrot partnership"/>
+            </section>
             <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
                 <HarvestCard title="Staking Pool" color="primary"
@@ -323,6 +298,27 @@ export default function Home() {
                 </Grid>
               </Grid>
             </Grid>
+            <Card background="light" style={{ marginTop: 24}}>
+              <CardContent>
+                <Typography paragraph align="center" variant="h5" style={{marginTop: 8, textTransform: 'uppercase', fontWeight: 500}}>
+                  Our Partners
+                </Typography>
+                <Grid container alignItems="center" justifyContent="space-evenly">
+                  {partners.map( partner => <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
+                      <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                      <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
+                      <Tooltip arrow placement="bottom"
+                        title={<Typography variant="body1">{partner.name}</Typography>}
+                      >
+                        <Typography align="center" variant="body2" noWrap component="div">
+                          {partner.name}
+                        </Typography>
+                      </Tooltip>
+                      </a>
+                  </Grid>)}
+                </Grid>
+              </CardContent>
+            </Card>
           </Container>
       </PageContainer>
       <StakeModal
@@ -349,4 +345,64 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
       fontSize: theme.typography.h6.fontSize
     }
   },
+  link:{
+    textDecoration: 'none',
+    color: theme.palette.text.primary
+  }
 }))
+
+const partners: PartnerData[] = [
+  {
+    name: 'Apeswap',
+    href: 'https://apeswap.finance/farms',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/ape-logo.png',
+    factor: 4
+  },
+  {
+    name: 'Babyswap',
+    href: 'https://home.babyswap.finance/farms',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/baby-logo.png',
+    factor: 4
+  },
+  {
+    name: 'Wizard Financial',
+    href: 'https://wizard.financial/',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/wizard.png',
+    factor: 4
+  },
+  {
+    name: 'CroxSwap',
+    href: 'https://app.croxswap.com/dualfarms',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/crox-light.png',
+    logoDark: '/assets/thirdPartyLogos/partners/crox-dark.png',
+    factor: 4
+  },
+
+  {
+    name: 'Revolver Token',
+    href: 'https://www.revolvertoken.com/',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/revolver-logo.png',
+    factor: 4
+  },
+
+]
+
+type PartnerData = {
+  name: string,
+  href: string, 
+  width: number,
+  height: number,
+  logo: string,
+  logoDark?: string,
+  factor: number,
+}
