@@ -13,9 +13,7 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
-import { servers } from 'utils/servers'
 import BigNumber from 'bignumber.js'
-import { toWei } from 'web3-utils'
 
 type TransactionSubmitData = { 
   description?: string,
