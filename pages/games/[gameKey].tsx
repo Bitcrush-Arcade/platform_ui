@@ -101,7 +101,7 @@ export default Game
 
 const games:{ [key: string] : { url: string, name: string }} = {
   diceInvaders: {
-    url: 'http://104.219.251.99:5000/',
+    url: 'https://diceinvaders.bitcrush.com/',
     name: 'Dice Invaders'
   }
 }
