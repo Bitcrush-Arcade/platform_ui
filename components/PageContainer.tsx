@@ -7,22 +7,31 @@ import compact from 'lodash/compact'
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Container from '@material-ui/core/Container'
+import Typography from "@material-ui/core/Typography"
 // Components
 import Footer from 'components/Footer'
 import Header from 'components/HeaderBar'
 import Menu from 'components/Menu'
 import TxCard from 'components/context/TransactionCard'
+import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
+import { differenceFromNow } from 'utils/dateFormat'
+import { toWei } from 'web3-utils'
+import BigNumber from 'bignumber.js'
 // Context
 import { useTransactionContext } from 'hooks/contextHooks'
+import { useWeb3React } from '@web3-react/core'
+import { useContract } from 'hooks/web3Hooks'
+import { getContracts } from 'data/contracts'
 
 
 const PageContainer = ( props: ContainerProps ) => {
   
   const { children, menuSm } = props
   
+  const { chainId, account } = useWeb3React()
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   
@@ -31,7 +40,12 @@ const PageContainer = ( props: ContainerProps ) => {
   
   const css = useStyles({ menuToggle, ...props })
 
-  const { pending, completed } = useTransactionContext()
+  const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
+  const { methods: liveWalletMethods } = useContract( liveWallet.abi, liveWallet.address )
+
+  const { pending, completed, lwModalStatus, toggleLwModal, tokenInfo, liveWallet: lwContext, hydrateToken, editTransactions } = useTransactionContext()
+
+  const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
 
   useEagerConnect()
 
@@ -51,6 +65,95 @@ const PageContainer = ( props: ContainerProps ) => {
     return filteredPending
   },[pending, hiddenPending ])
 
+
+    // LiveWallet Options
+    const lwOptions: Array<StakeOptionsType> = [
+      { 
+        name: 'Add Funds',
+        description: 'Add Funds to Live Wallet from CRUSH',
+        btnText: 'Wallet CRUSH',
+        maxValue: tokenInfo.weiBalance
+      },
+      { 
+        name: 'Withdraw Funds',
+        description: 'Withdraw funds from Live Wallet to CRUSH',
+        btnText: 'Live Wallet CRUSH',
+        maxValue: lwContext.balance,
+        onSelectOption: hydrateToken,
+        more: function moreDetails ( values ) { 
+          return timelockInPlace ? <>
+          <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
+            0.3% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
+          </Typography>
+        </>
+        : <></>
+      }
+      },
+    ]
+
+    const lwSubmit: SubmitFunction = ( values, form ) => {
+      if(!liveWalletMethods) return form.setSubmitting(false)
+      const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
+      if(!values.actionType){
+        return liveWalletMethods.addbet( weiValue )
+          .send({ from: account })
+          .on('transactionHash', (tx) => {
+            console.log('hash', tx )
+            editTransactions(tx,'pending', { description: `Add Funds to Live Wallet`})
+            toggleLwModal()
+          })
+          .on('receipt', ( rc) => {
+            console.log('receipt',rc)
+            editTransactions(rc.transactionHash,'complete')
+            hydrateToken()
+          })
+          .on('error', (error, receipt) => {
+            console.log('error', error, receipt)
+            receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+            hydrateToken()
+          })
+      }
+      else if(timelockInPlace){
+        toggleLwModal()
+        return fetch('/api/withdrawForUser',{
+          method: 'POST',
+          body: JSON.stringify({
+            chain: chainId,
+            account: account,
+            amount: weiValue,
+          })
+        })
+        .then( response => response.json())
+        .then( data => {
+          data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+          if(!data.txHash){
+            editTransactions( 'Err........or..', 'pending', {errorData: data.error})
+            setTimeout(
+              () => editTransactions('Err........or..', 'error', { errorData: data.error})
+              , 3000
+            )
+          }
+        })
+      }
+      return liveWalletMethods.withdrawBet( weiValue )
+        .send({ from: account })
+        .on('transactionHash', (tx) => {
+          console.log('hash', tx )
+          editTransactions(tx,'pending', { description: `Withdraw Funds from LiveWallet`})
+          toggleLwModal()
+        })
+        .on('receipt', ( rc) => {
+          console.log('receipt',rc)
+          editTransactions(rc.transactionHash,'complete')
+          hydrateToken()
+        })
+        .on('error', (error, receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          hydrateToken()
+        })
+    }
+
   return <div>
     <div className={ css.fullContainer }>
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
@@ -62,6 +165,12 @@ const PageContainer = ( props: ContainerProps ) => {
         </div>}
       </Container>
     </div>
+    <StakeModal
+      open={lwModalStatus}
+      onClose={toggleLwModal}
+      options={lwOptions}
+      onSubmit={lwSubmit}
+    />
     {/* <Footer/> */}
   </div>
 }

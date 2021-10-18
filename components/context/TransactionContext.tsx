@@ -30,7 +30,9 @@ type ContextType = {
   liveWallet: { balance: number, timelock: number },
   toggleDarkMode?: () => void,
   isDark: boolean,
-  hydrateToken: () => Promise<void>
+  hydrateToken: () => Promise<void>,
+  toggleLwModal: () => void,
+  lwModalStatus: boolean,
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -42,6 +44,8 @@ export const TransactionContext = createContext<ContextType>({
   isDark: true,
   hydrateToken: () => Promise.resolve(),
   liveWallet: { balance: 0, timelock: 0 },
+  toggleLwModal: () => {},
+  lwModalStatus: false,
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
@@ -59,8 +63,11 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
   const [ dark, setDark ] = useState<boolean>( true )
+  const [ lwModal, setLwModal ] = useState<boolean>( false )
 
   const [reviewHash, setReviewHash] = useImmer<{ intervalId: any, hashArray: Array<string>}>({ intervalId: null, hashArray: []})
+
+  const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
@@ -204,7 +211,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     toggleDarkMode: toggle,
     isDark: dark,
     hydrateToken: tokenHydration,
-    liveWallet: liveWalletBalance
+    liveWallet: liveWalletBalance,
+    toggleLwModal,
+    lwModalStatus: lwModal
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}
