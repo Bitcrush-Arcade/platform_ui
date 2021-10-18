@@ -94,7 +94,14 @@ export default function Home() {
       })
       .then( response => response.json())
       .then( data => {
-        editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+        data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+        if(!data.txHash){
+          editTransactions( 'Err........or..', 'pending', {errorData: data.error})
+          setTimeout(
+            () => editTransactions('Err........or..', 'error', { errorData: data.error})
+            , 3000
+          )
+        }
       })
     }
     return liveWalletMethods.withdrawBet( weiValue )

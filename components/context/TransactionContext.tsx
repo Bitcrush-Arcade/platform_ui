@@ -84,6 +84,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
         else
           serverBalance = lwBalance
       })
+      .catch( e =>{
+        console.log('error fetching db balance', e)
+      })
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
@@ -123,7 +126,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const edits = useMemo( () => ({
     pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
-        draft[id] = { status: 'pending', description: data?.comment || '' }
+        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data.errorData }
         if(data.needsReview)
         setReviewHash( draft => { draft.hashArray.push(id) })
       })
@@ -166,6 +169,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     hashArray.map( async (hash, index) => {
       console.log( 'toCheck', pendingTransactions[hash] )
       await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
+        console.log( 'check response', {e, rc})
         if( !rc || !pendingTransactions[hash] || pendingTransactions[hash]?.status !== 'pending') return
         pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
         setReviewHash( draft => {

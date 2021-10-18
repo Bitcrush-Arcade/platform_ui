@@ -31,20 +31,20 @@ export default function TxCard( props: TxCardProps ){
     error: <ErrorIcon className={ css.statusIcon } color="error"/>
   }
   const first = hashes[ keys[0] ]
-
+  const isError = !!first.errorMsg
   return <Card background="dark" className={ css.card } shadow="dark">
     <Grid container alignItems="center" justifyContent="space-between" >
       <Grid item>
-        {usedIcon[ hashes[ keys[0] ].status ] }
+        {usedIcon[ isError ? 'error' : first.status ] }
       </Grid>
       <Grid item>
         <Tooltip arrow
           title={ <Typography variant="caption">
-              { first.description}<br/>{keys[0]}
+              { first.description || first.errorMsg}<br/>{keys[0]}
             </Typography>}
         >
           <Typography noWrap className={ css.description }>
-            { first.description || shortAddress(keys[0])}
+            { first.description || first.errorMsg || shortAddress(keys[0])}
           </Typography>
         </Tooltip>
         <a href={`https://${chainId == 97 ? 'testnet.': ''}bscscan.com/tx/${keys[0]}`} target="_blank" className={ css.link} rel="noreferrer">
