@@ -15,11 +15,9 @@ import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
-import SmallBtn from 'components/basics/SmallButton'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
 import HarvestCard from 'components/pools/HarvestCard'
-import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
 // Context
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
@@ -29,10 +27,8 @@ import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
-import { differenceFromNow } from 'utils/dateFormat'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
-import { toWei } from 'web3-utils'
 
 export default function Home() {
 

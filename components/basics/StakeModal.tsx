@@ -25,6 +25,9 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 import { fromWei } from 'web3-utils'
 import { currencyFormat } from 'utils/text/text'
 
+/**
+  * @param maxValue Make sure this is always in WEI!! 10^18
+ */
 export type StakeOptionsType = {
   name: string,
   maxValue: number,
@@ -71,9 +74,11 @@ function StakeModal( props: StakeModalProps ) {
         onSubmit={onSubmit}
         validate ={ ( values ) => {
           let errors: any = {}
-          if( new BigNumber(values.stakeAmount).isGreaterThan( new BigNumber( fromWei( ""+options[values.actionType].maxValue ) ) ) )
+          const bigValue = new BigNumber(values.stakeAmount)
+          const maxValue = new BigNumber( options[values.actionType].maxValue ).div( new BigNumber(10).pow(18) )
+          if( bigValue.isGreaterThan( maxValue ) )
             errors.stakeAmount = "Insufficient Funds"
-          if(values.stakeAmount <= 0)
+          if( bigValue.isLessThanOrEqualTo( 0 ) )
             errors.stakeAmount = "Invalid Input"
           return errors
         }}
