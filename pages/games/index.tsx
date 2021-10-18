@@ -21,6 +21,8 @@ import SmallButton from 'components/basics/SmallButton'
 import PageContainer from 'components/PageContainer'
 // Utils
 import { flattenObject } from 'utils/objects'
+// Data
+import { dragonEp } from 'utils/servers'
 
 type GameItem = {
   name: string,
@@ -185,11 +187,8 @@ export default Games
 export const getServerSideProps: GetServerSideProps = async(context) =>{
 
   const { req } = context
-  const host = req.headers.host
   // TODO -- SET ACTUAL URL FOR PRODUCTION
-  const dragonEndpoint = process.env.NODE_ENV == 'development'
-    ? 'https://staging-api.dragongaming.com' //DEV
-    :  'https://staging-api.dragongaming.com'; //PROD
+  const dragonEndpoint = dragonEp[process.env.NODE_ENV]; 
   
   const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
     method: "POST",

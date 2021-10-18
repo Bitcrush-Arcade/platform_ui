@@ -3,5 +3,6 @@ export type TransactionHash = {
     status: 'pending' | 'success' | 'error',
     description: string,
     more?: any,
+    errorMsg?: string,
   }
 }

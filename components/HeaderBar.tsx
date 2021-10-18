@@ -37,10 +37,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo, liveWallet } = useTransactionContext()
+  const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
 
   const lwActions = [
-    // {name:'Deposit', onClick: ()=>console.log('action 1')},
+    {name:'Manage', onClick: toggleLwModal },
     // {name:'Widthdraw', onClick: ()=>console.log('action 2')},
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},

@@ -40,106 +40,19 @@ export default function Home() {
   const isSm = useMediaQuery( theme.breakpoints.only('xs') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
-  const { tokenInfo, editTransactions, hydrateToken, liveWallet: lwContext } = useTransactionContext()
+  const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
   const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
-  const { methods: liveWalletMethods } = useContract( liveWallet.abi, liveWallet.address )
   const { methods } = useContract(firstPool.abi, firstPool.address)
 
   const [tvl, setTvl ] = useState<number>(0)
   const [staked, setStaked ] = useState<number>(0)
 
-  // LiveWalletFns
-  const [openLwModal, setOpenLwModal] = useState<boolean>(false)
-
-  const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
-
   // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
   const css = useStyles({ gradientId })
-
-  const lwSubmit: SubmitFunction = ( values, form ) => {
-    if(!liveWalletMethods) return form.setSubmitting(false)
-    const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
-    if(!values.actionType){
-      return liveWalletMethods.addbet( weiValue )
-        .send({ from: account })
-        .on('transactionHash', (tx) => {
-          console.log('hash', tx )
-          editTransactions(tx,'pending', { description: `Add Funds to Live Wallet`})
-          setOpenLwModal(false)
-        })
-        .on('receipt', ( rc) => {
-          console.log('receipt',rc)
-          editTransactions(rc.transactionHash,'complete')
-          hydrateToken()
-        })
-        .on('error', (error, receipt) => {
-          console.log('error', error, receipt)
-          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-          hydrateToken()
-        })
-    }
-    else if(timelockInPlace){
-      setOpenLwModal( false )
-      return fetch('/api/withdrawForUser',{
-        method: 'POST',
-        body: JSON.stringify({
-          chain: chainId,
-          account: account,
-          amount: weiValue,
-        })
-      })
-      .then( response => response.json())
-      .then( data => {
-        editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
-      })
-    }
-    return liveWalletMethods.withdrawBet( weiValue )
-      .send({ from: account })
-      .on('transactionHash', (tx) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: `Withdraw Funds from LiveWallet`})
-        setOpenLwModal(false)
-      })
-      .on('receipt', ( rc) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
-        hydrateToken()
-      })
-      .on('error', (error, receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-        hydrateToken()
-      })
-  }
-
-  // LiveWallet Options
-  const lwOptions: Array<StakeOptionsType> = [
-    { 
-      name: 'Add Funds',
-      description: 'Add Funds to Live Wallet from CRUSH',
-      btnText: 'Wallet CRUSH',
-      maxValue: tokenInfo.weiBalance
-    },
-    { 
-      name: 'Withdraw Funds',
-      description: 'Withdraw funds from Live Wallet to CRUSH',
-      btnText: 'Live Wallet CRUSH',
-      maxValue: lwContext.balance,
-      onSelectOption: hydrateToken,
-      more: function moreDetails ( values ) { 
-        return timelockInPlace ? <>
-        <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-          0.3% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
-        </Typography>
-      </>
-      : <></>
-    }
-    },
-  ]
 
   useEffect( () => {
     if(!liveWallet?.address) return
@@ -289,7 +202,7 @@ export default function Home() {
                     action2Title="Buy CRUSH"
                     action2Color="primary"
                     btn1Props={{
-                      onClick: () => isApproved ? setOpenLwModal(true) : approve(liveWallet.address)
+                      onClick: () => isApproved ? toggleLwModal() : approve(liveWallet.address)
                     }}
                     btn2Props={{
                       href: "https://dex.apeswap.finance/#/swap"
@@ -321,12 +234,6 @@ export default function Home() {
             </Card>
           </Container>
       </PageContainer>
-      <StakeModal
-        open={openLwModal}
-        onClose={() => setOpenLwModal(false)}
-        options={lwOptions}
-        onSubmit={lwSubmit}
-      />
   </>)
 }
 

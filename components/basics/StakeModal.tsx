@@ -22,6 +22,7 @@ import SmallButton from 'components/basics/SmallButton'
 // Icons
 import InvaderIcon from 'components/svg/InvaderIcon'
 // libs
+import { fromWei } from 'web3-utils'
 import { currencyFormat } from 'utils/text/text'
 
 export type StakeOptionsType = {
@@ -70,7 +71,7 @@ function StakeModal( props: StakeModalProps ) {
         onSubmit={onSubmit}
         validate ={ ( values ) => {
           let errors: any = {}
-          if( new BigNumber(values.stakeAmount).isGreaterThan( options[values.actionType].maxValue ) )
+          if( new BigNumber(values.stakeAmount).isGreaterThan( new BigNumber( fromWei( ""+options[values.actionType].maxValue ) ) ) )
             errors.stakeAmount = "Insufficient Funds"
           if(values.stakeAmount <= 0)
             errors.stakeAmount = "Invalid Input"
@@ -78,10 +79,11 @@ function StakeModal( props: StakeModalProps ) {
         }}
         validateOnChange
       >
-      { ({values, setFieldValue, isSubmitting}) =>{
+      { ({values, setFieldValue, isSubmitting, errors}) =>{
         const { actionType, stakeAmount } = values
         const maxUsed = options[actionType].maxValue
         const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
+        const hasErrors = Object.keys( errors ).length > 0
         const sliderChange = (e: any, value: number) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ).toNumber() )
@@ -162,7 +164,7 @@ function StakeModal( props: StakeModalProps ) {
               MAX
             </SmallButton>
           </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
+          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting || hasErrors }>
             {options[actionType].name} {coinInfo?.symbol}
           </Button>
           {options[actionType]?.more && options[actionType]?.more(values)}

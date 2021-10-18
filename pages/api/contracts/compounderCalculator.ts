@@ -16,13 +16,20 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   
   // GET CONTRACT DATA
   const usedChain = parseInt( chain )
-  const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
+  const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-1-s1.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const { address, abi } = getContracts('bankStaking', usedChain)
   
   const { methods } = await new web3.eth.Contract( abi, address )
   // GET INIT VARIABLES
-  const profit = await methods.profits(0).call() // profit[0] => { total, remaining }
+  let profit
+  try {
+    profit = await methods.profits(0).call()
+  }
+  catch{
+    profit = { total: 0, remaining: 0}
+  }
+  // profit[0] => { total, remaining }
   const autoLimit = parseInt( await methods.autoCompoundLimit().call() )
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
   const totalStaked = parseInt( await methods.totalStaked().call() )
@@ -58,7 +65,6 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
 
     stakeReward = stakeReward.plus( reward ).plus( profitToAdd )
   }
-  console.log( stakeReward.toNumber(), compounderFee )
   res.status( 200 ).json({ compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber() })
 
 

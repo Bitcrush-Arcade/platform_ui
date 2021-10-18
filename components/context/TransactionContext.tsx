@@ -30,7 +30,9 @@ type ContextType = {
   liveWallet: { balance: number, timelock: number },
   toggleDarkMode?: () => void,
   isDark: boolean,
-  hydrateToken: () => Promise<void>
+  hydrateToken: () => Promise<void>,
+  toggleLwModal: () => void,
+  lwModalStatus: boolean,
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -42,6 +44,8 @@ export const TransactionContext = createContext<ContextType>({
   isDark: true,
   hydrateToken: () => Promise.resolve(),
   liveWallet: { balance: 0, timelock: 0 },
+  toggleLwModal: () => {},
+  lwModalStatus: false,
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
@@ -59,15 +63,18 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0 } )
   const [ dark, setDark ] = useState<boolean>( true )
+  const [ lwModal, setLwModal ] = useState<boolean>( false )
 
   const [reviewHash, setReviewHash] = useImmer<{ intervalId: any, hashArray: Array<string>}>({ intervalId: null, hashArray: []})
+
+  const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
   const tokenHydration = useCallback( async () => {
     if(!methods || !account) return
     let serverBalance = 0
     
     const tokenBalance = await methods.balanceOf(account).call()
-    const lwBalance = await lwMethods.balanceOf(account).call()
+    const lwBalance = parseInt( await lwMethods.balanceOf(account).call() )
     const lwBetAmounts = await lwMethods.betAmounts( account ).call()
     const lwDuration = await lwMethods.lockPeriod().call()
 
@@ -79,10 +86,13 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       await fetch(`/api/db/${account}`)
       .then( r => r.json() )
       .then( data => { 
-        if(data.balancae)
+        if(data.balance)
           serverBalance = parseInt( data.balance ) 
         else
           serverBalance = lwBalance
+      })
+      .catch( e =>{
+        console.log('error fetching db balance', e)
       })
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
@@ -123,7 +133,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const edits = useMemo( () => ({
     pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
-        draft[id] = { status: 'pending', description: data?.comment || '' }
+        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data.errorData }
         if(data.needsReview)
         setReviewHash( draft => { draft.hashArray.push(id) })
       })
@@ -166,6 +176,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     hashArray.map( async (hash, index) => {
       console.log( 'toCheck', pendingTransactions[hash] )
       await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
+        console.log( 'check response', {e, rc})
         if( !rc || !pendingTransactions[hash] || pendingTransactions[hash]?.status !== 'pending') return
         pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
         setReviewHash( draft => {
@@ -200,7 +211,9 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     toggleDarkMode: toggle,
     isDark: dark,
     hydrateToken: tokenHydration,
-    liveWallet: liveWalletBalance
+    liveWallet: liveWalletBalance,
+    toggleLwModal,
+    lwModalStatus: lwModal
   }}>
     <ThemeProvider theme={basicTheme}>
       {children}
