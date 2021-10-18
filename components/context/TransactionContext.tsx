@@ -67,7 +67,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     let serverBalance = 0
     
     const tokenBalance = await methods.balanceOf(account).call()
-    const lwBalance = await lwMethods.balanceOf(account).call()
+    const lwBalance = parseInt( await lwMethods.balanceOf(account).call() )
     const lwBetAmounts = await lwMethods.betAmounts( account ).call()
     const lwDuration = await lwMethods.lockPeriod().call()
 
