@@ -37,10 +37,10 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   if( typeof(serverBalance) == 'string' ) return
   // CHECK WHICH AMOUNT IS MAX AMOUNT
   const timelockActive =  differenceInSeconds( new Date() , new Date( new BigNumber(ogBalance.lockTimeStamp).plus(lockDuration).times(1000).toNumber() )) > 0
-  const maxWithdrawAmount =  timelockActive ? serverBalance : ogBalance 
+  const maxWithdrawAmount =  timelockActive ? serverBalance : ogBalance.balance 
 
   if( new BigNumber( amount ).isGreaterThan( new BigNumber(maxWithdrawAmount) ) )
-    return res.status(400).send({ message: "Can't withdraw more than max amount available"})
+    return res.status(400).send({ error: "Can't withdraw more than max amount available"})
 
   // Authorize Owner
   const ownerAccount = await web3.eth.accounts.privateKeyToAccount( process.env.OWNER_PKEY)
@@ -51,12 +51,15 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
     gas: 20000000,
   })
 
-  return web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+  let hashSent = false
+
+    return web3.eth.sendSignedTransaction(signedTx.rawTransaction)
     .on( 'transactionHash', tx => {
       res.status(200).send({ txHash: tx})
+      hashSent = true
     })
     .catch( e => {
       console.log('error',e)
-      res.status(400).send({ message: 'Something went wrong with the transaction'})
-    })
+      !hashSent && res.status(400).send({ error: 'Something went wrong with the transaction'})
+    })  
 }
