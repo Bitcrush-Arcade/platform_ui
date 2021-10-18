@@ -79,7 +79,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       await fetch(`/api/db/${account}`)
       .then( r => r.json() )
       .then( data => { 
-        if(data.balancae)
+        if(data.balance)
           serverBalance = parseInt( data.balance ) 
         else
           serverBalance = lwBalance
