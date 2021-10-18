@@ -10,6 +10,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Button from '@material-ui/core/Button'
 import Collapse from '@material-ui/core/Collapse'
 import ClickAwayListener from "@material-ui/core/ClickAwayListener"
+import CircularProgress from "@material-ui/core/CircularProgress"
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Grid from "@material-ui/core/Grid"
@@ -65,13 +66,13 @@ const Menu = ( props: MenuProps) => {
     const isSm = alwaysSm || mediaSm
 
     const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
-    
+
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
         // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
-        { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games' },
+        { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
         // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
@@ -91,12 +92,15 @@ const Menu = ( props: MenuProps) => {
         ] },
     ]
 
+    const [ showLoad, setShowLoad ] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false))
+
     const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false) )
 
     const linkItems = linkArray.map( (link, linkIndex) => {
-        const { name, icon, url_link, subMenu, disabled } = link
+        const { name, icon, url_link, subMenu, disabled, loadOnClick } = link
         const click = (e : any) => {
             e.stopPropagation()
+            !subMenu && setShowLoad( draft => { draft[linkIndex] = !draft[linkIndex] })
             subMenu && setSubMenuOpen( draft => {
                 draft[linkIndex] = !draft[linkIndex]
             } )
@@ -122,6 +126,7 @@ const Menu = ( props: MenuProps) => {
                         primary={<>
                             {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
                             {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
+                            {showLoad[linkIndex] && <CircularProgress size={12}  color="primary" thickness={10} />}
                         </>}
                         primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
                     />
@@ -301,6 +306,7 @@ type LinkItem ={
     icon: JSX.Element | null,
     url_link?: string,
     disabled?: boolean,
+    loadOnClick?: boolean,
     subMenu?: Array< {
         name: string | JSX.Element,
         icon: JSX.Element | null,
