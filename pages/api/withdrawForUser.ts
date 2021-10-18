@@ -23,7 +23,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   // START BALANCE
   const ogBalance = await contract.methods.betAmounts(account).call()
   const lockDuration = await contract.methods.lockPeriod().call()
-  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/users/wallet/db/${account}`,{
+  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/db/${account}`,{
     headers:{
       origin: "http://localhost:3000"
     }
