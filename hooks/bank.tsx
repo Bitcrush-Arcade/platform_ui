@@ -21,16 +21,15 @@ function useBank(){
 
   const getApyData = () => {
     if(!chainId) return
-    fetch('/api/getAPY',{
+    fetch('/api/bankAPY',{
       method: 'POST',
       body: JSON.stringify({
         chainId: chainId || 56,
-        contract: 'bankStaking'
       })
     })
       .then( response => response.json() )
       .then( data => setBankInfo( draft => {
-        draft.apyPercent = data
+        draft.apyPercent = data.compoundRewards
       }))
   }
 
