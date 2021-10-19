@@ -70,7 +70,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
   const tokenHydration = useCallback( async () => {
-    if(!methods || !account) return
+    if(!methods || !account || !lwMethods) return
     let serverBalance = 0
     
     const tokenBalance = await methods.balanceOf(account).call()
@@ -93,14 +93,18 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       })
       .catch( e =>{
         console.log('error fetching db balance', e)
+        serverBalance = -1
       })
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
     })
-    setLiveWalletBalance( {
-      balance: timelockActive ? serverBalance : lwBalance,
-      timelock: timelockActive ? timelockEndTime.toNumber() : 0
+    setLiveWalletBalance( prev => {
+      const timelock = timelockActive ? timelockEndTime.toNumber() : 0
+      return { ...prev,
+        timelock,
+        balance: timelockActive ? (serverBalance > -1 ? serverBalance : prev.balance ) : lwBalance
+      }
     })
   },[methods, account, setCoinInfo, lwMethods, setLiveWalletBalance])
 
@@ -173,17 +177,24 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   },[edits])
 
   const checkTransactions = useCallback( (hashArray: Array<string>) => {
+    const recheckArr =  []
     hashArray.map( async (hash, index) => {
+
+      if(pendingTransactions[hash]?.status !== 'pending') return
       console.log( 'toCheck', pendingTransactions[hash] )
+      
       await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
         console.log( 'check response', {e, rc})
-        if( !rc || !pendingTransactions[hash] || pendingTransactions[hash]?.status !== 'pending') return
+        if( !rc || !pendingTransactions[hash]) return recheckArr.push(pendingTransactions[hash])
         pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
         setReviewHash( draft => {
           draft.hashArray.splice(index, 1)
         })
       })
     })
+    if(recheckArr.length > 0){
+      setTimeout( () => checkTransactions( recheckArr), 5000 )
+    }
   },[ web3, setReviewHash, editTransactions, pendingTransactions])
 
   // Review Hashes
