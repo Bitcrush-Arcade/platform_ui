@@ -10,7 +10,7 @@ import { currencyFormat } from 'utils/text/text'
 // Data
 import { getContracts } from 'data/contracts'
 
-export default async function getApy(req : NextApiRequest, res: NextApiResponse){
+export default async function bankAPY(req : NextApiRequest, res: NextApiResponse){
   // Check validity of request
   const body = JSON.parse(req.body || "{}" )
 
