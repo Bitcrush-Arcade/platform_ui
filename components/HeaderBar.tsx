@@ -40,7 +40,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
 
   const lwActions = [
-    {name:'Manage', onClick: toggleLwModal },
+    {name:'Add/Remove', onClick: toggleLwModal },
     // {name:'Widthdraw', onClick: ()=>console.log('action 2')},
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},

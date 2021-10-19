@@ -41,7 +41,7 @@ const PageContainer = ( props: ContainerProps ) => {
   const css = useStyles({ menuToggle, ...props })
 
   const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
-  const { methods: liveWalletMethods } = useContract( liveWallet.abi, liveWallet.address )
+  const { methods: liveWalletMethods, web3 } = useContract( liveWallet.abi, liveWallet.address )
 
   const { pending, completed, lwModalStatus, toggleLwModal, tokenInfo, liveWallet: lwContext, hydrateToken, editTransactions } = useTransactionContext()
 
@@ -115,25 +115,32 @@ const PageContainer = ( props: ContainerProps ) => {
       }
       else if(timelockInPlace){
         toggleLwModal()
-        return fetch('/api/withdrawForUser',{
-          method: 'POST',
-          body: JSON.stringify({
-            chain: chainId,
-            account: account,
-            amount: weiValue,
-          })
-        })
-        .then( response => response.json())
-        .then( data => {
-          data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
-          if(!data.txHash){
-            editTransactions( 'Err........or..', 'pending', {errorData: data.error})
-            setTimeout(
-              () => editTransactions('Err........or..', 'error', { errorData: data.error})
-              , 3000
-            )
+        const signMessage = web3.utils.toHex("I agree to withdraw early from Livewallet "+values.stakeAmount+" and pay the early withdraw fee")
+        return web3.eth.personal.sign( signMessage, account, "",
+          (e,signature) => {
+            if(e) return
+            fetch('/api/withdrawForUser',{
+              method: 'POST',
+              body: JSON.stringify({
+                chain: chainId,
+                account: account,
+                amount: weiValue,
+              })
+            })
+            .then( response => response.json())
+            .then( data => {
+              data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+              if(!data.txHash){
+                editTransactions( 'Err........or..', 'pending', {errorData: data.error})
+                setTimeout(
+                  () => editTransactions('Err........or..', 'error', { errorData: data.error})
+                  , 3000
+                )
+              }
+            })
           }
-        })
+          )
+        
       }
       return liveWalletMethods.withdrawBet( weiValue )
         .send({ from: account })
