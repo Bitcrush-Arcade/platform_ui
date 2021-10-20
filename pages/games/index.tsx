@@ -186,11 +186,10 @@ export default Games
 
 export const getServerSideProps: GetServerSideProps = async(context) =>{
 
-  const { req } = context
-  // TODO -- SET ACTUAL URL FOR PRODUCTION
-  const dragonEndpoint = dragonEp[process.env.NODE_ENV]; 
+  // const dragonEndpoint = dragonEp.getGames[process.env.NODE_ENV]; 
+  const dragonEndpoint = dragonEp.getGames['production']; 
   
-  const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
+  const availableGames = await fetch( dragonEndpoint ,{
     method: "POST",
     headers:{
       "Content-Type": "application/json"

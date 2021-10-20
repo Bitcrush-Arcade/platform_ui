@@ -128,9 +128,10 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
 
   if(!bitcrushGame){
     
-    const dragonEndpoint = dragonEp[process.env.NODE_ENV]
+    // const dragonEndpoint = dragonEp.getGames[process.env.NODE_ENV]
+    const dragonEndpoint = dragonEp.getGames['production']
 
-    const availableGames = await fetch(`${dragonEndpoint}/v1/games/get-games/`,{
+    const availableGames = await fetch( dragonEndpoint ,{
       method: "POST",
       headers:{
         "Content-Type": "application/json"
