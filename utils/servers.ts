@@ -11,6 +11,12 @@ export const gameApi = {
 }
 
 export const dragonEp = {
-  'development': 'https://staging-api.dragongaming.com',
-  "production": 'https://staging-api.dragongaming.com' // TODO , GET PRODUCTION READY SERVER URL
+  getGames:{
+    development: 'https://staging-api.dragongaming.com/v1/games/get-games/',
+    production: 'https://api.dragongaming.com/v1/games/get-games/' // TODO , GET PRODUCTION READY SERVER URL
+  },
+  getLauncher:{
+    development: 'https://staging-api.dragongaming.com/v1/games/game-launch/',
+    production: 'https://api.dragongaming.com/v1/games/game-launch/' // TODO , GET PRODUCTION READY SERVER URL
+  }
 }
