@@ -84,19 +84,19 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
     },
     d1: {
       return: readableD1,
-      percent: currencyFormat(readableD1 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      percent: readableD1 / initialStake,
     },
     d7: {
       return: readableD7,
-      percent: currencyFormat(readableD7 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      percent: readableD7 / initialStake,
     },
     d30: {
       return: readableD30,
-      percent: currencyFormat(readableD30 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      percent: readableD30 / initialStake,
     },
     d365: {
       return: readableD365,
-      percent: currencyFormat(readableD365 / initialStake * 100, { decimalsToShow: 2}) + '%',
+      percent: readableD365 / initialStake,
     },
   }
   calculatedLast = new Date()

@@ -174,7 +174,7 @@ function BankPool( ) {
                 </IconButton>
               </Typography>
               <Typography color="primary" variant="h6" component="div">
-                {bankInfo.apyPercent?.d365?.percent}
+                {(bankInfo.apyPercent?.d365?.percent * 100).toFixed(4)}
               </Typography>
             </Grid>
             <Grid item>
@@ -197,7 +197,7 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
-                {((parseFloat(bankInfo.apyPercent?.d365?.percent.replace(/[^.\d]/g,'')) || 0) + (houseEdgePercent * 100)).toFixed(2)}%
+                {((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%
               </Typography>
             </Grid>
             <Grid item xs={12}>
