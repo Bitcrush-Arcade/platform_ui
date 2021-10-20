@@ -24,7 +24,7 @@ export default async function getLauncher(req : NextApiRequest, res: NextApiResp
       id: sessionData.account_id,
       username: sessionData.username,
       country: sessionData.country,
-      currency: sessionData.currency,
+      currency: 'Crush',
     }
   }
 
