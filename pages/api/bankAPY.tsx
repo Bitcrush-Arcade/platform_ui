@@ -91,6 +91,8 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const d30Check = 288 * 30
   const maxCompounds = new BigNumber( 288 ).times( 365 )
 
+  const blocksPerCompound = 12 * 5 // BLOCKS PER MINUTE  * 5 MINUTE
+
   const stakingEmission = emission.times( new BigNumber(1).minus( performanceFee ) ).times( new BigNumber(10).pow(18) ).toNumber() // in wei
   for( 
     let compoundBlock = 1;
@@ -98,9 +100,9 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
     compoundBlock++
   ){
 
-    const compoundedTotalStaked = (compoundBlock -1 ) * (stakingEmission + profitEmission) + totalStaked
+    const compoundedTotalStaked = (compoundBlock -1 ) * ((blocksPerCompound * stakingEmission) + profitEmission) + totalStaked
     const poolPercent = (initStake + compoundedReward + houseEdgeProfit )/compoundedTotalStaked 
-    compoundedReward = compoundedReward + ( stakingEmission * poolPercent )
+    compoundedReward = compoundedReward + ( stakingEmission * poolPercent * blocksPerCompound )
     houseEdgeProfit = houseEdgeProfit + ( profitEmission * poolPercent )
     if( compoundBlock == d1Check && !compoundRewards.d1.return ){
       compoundRewards.d1.return = new BigNumber(compoundedReward).div( new BigNumber(10).pow(18)).toNumber()
