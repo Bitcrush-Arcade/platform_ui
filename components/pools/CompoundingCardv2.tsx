@@ -63,10 +63,8 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     getRewards()
   },[hydrate, getRewards])
 
-  const usdReward = useMemo( () => {
-    return rewardToDistribute.times(tokenInfo.crushUsdPrice)
-  }, [rewardToDistribute, tokenInfo])
-
+  const usdReward = rewardToDistribute.times(tokenInfo?.crushUsdPrice || 0)
+  console.log( usdReward, usdReward.toNumber(), rewardToDistribute.toNumber(), tokenInfo.crushUsdPrice )
   const claim = () => {
     methods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
@@ -108,14 +106,14 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
           <Tooltip title={<Typography>
-            {rewardToDistribute.div( new BigNumber(10).pow(18) ).toFixed(18)}
+            {rewardToDistribute.toFixed(18)}
           </Typography>} arrow>
             <Typography color="primary" variant="h5" component="p">
-              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4, isWei: true })}
+              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4, isWei: false })}
             </Typography>
           </Tooltip>
           <Typography color="textSecondary" variant="caption" component="p">
-            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2, isWei: true })}
+            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2, isWei: false })}
           </Typography>
         </Grid>
         <Grid item>
