@@ -25,25 +25,26 @@ const styles = (theme: Theme) => createStyles({
 })
 
 type LauncherSliderProps = {
-  percent: number
+  percent: number,
+  isFrozen?: boolean,
 } & WithStyles <typeof styles> & SliderProps
 
 export default withStyles(styles)( (props: LauncherSliderProps) => {
-  const { percent, ...otherProps } = props
+  const { percent, isFrozen, ...otherProps } = props
   return <Slider {...otherProps}
-    ThumbComponent={ p => <InvaderRocketThumb thumbProps={p} percent={percent}/> }
+    ThumbComponent={ p => <InvaderRocketThumb thumbProps={p} percent={percent} isFrozen={isFrozen} /> }
   />
 })
 
-export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number }) => {
-  const { thumbProps, percent } = allProps
+export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number, isFrozen?: boolean }) => {
+  const { thumbProps, percent, isFrozen } = allProps
   const [ gradient, gradientId ] = invaderGradient()
   const cloudSize = 2 - (percent / 90)
-  const css = useInvaderStyle({ gradientId, cloudSize })
+  const css = useInvaderStyle({ gradientId, cloudSize, isFrozen })
   return(
     <span {...thumbProps}>
       <div style={{position: 'relative'}}>
-        {gradient}
+        { gradient }
         <InvaderIcon color="secondary" className={ css.gradient } style={{position: 'absolute',left: -30, bottom: -10}}/>
       </div>
       <div style={{position: 'relative'}}>
@@ -57,9 +58,9 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number 
     </span>
 )}
 
-const useInvaderStyle = makeStyles<Theme, { gradientId: string, cloudSize: number }>( theme => createStyles({
+const useInvaderStyle = makeStyles<Theme, { gradientId: string, cloudSize: number, isFrozen?: boolean }>( theme => createStyles({
   gradient: {
-    fill: props => `url(#${ props.gradientId })`,
+    fill: props => props.isFrozen ? theme.palette.blue.main : `url(#${ props.gradientId })`,
     fontSize: 60,
     zIndex: 50,
   },

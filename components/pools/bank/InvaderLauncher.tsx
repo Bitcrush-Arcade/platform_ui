@@ -12,11 +12,18 @@ import { currencyFormat } from 'utils/text/text'
 type InvaderLauncherProps = {
   percent: number,
   crushBuffer: number,
+  frozen: number,
 }
 
 function InvaderLauncher( props: InvaderLauncherProps ) {
-  const { percent, crushBuffer } = props
+  const { percent, crushBuffer, frozen } = props
   const textProperties:{ color: string, text: string} = useMemo( () => {
+    if( frozen > 0 ){
+      return {
+        color: 'error',
+        text: 'frozen'
+      }
+    }
     if(percent >= 100)
       return {
         color: 'secondary',
@@ -31,7 +38,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
       color: 'error',
       text: 'stalled'
     }
-  },[percent])
+  },[percent, frozen])
   const css = useStyles(textProperties)
   const absBuffer = Math.abs( crushBuffer )
 
@@ -61,6 +68,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
               max={100}
               value={percent || 0}
               percent={percent || 0}
+              isFrozen={ Math.abs(frozen) > 0 }
             />
           </Grid>
           <Grid item xs={6}>
@@ -70,6 +78,9 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
             <Typography className={ css.colorChange }>
               Blastoff {textProperties.text}
             </Typography>
+            {Math.abs(frozen) > 0 && <Typography className={ css.frozen }>
+              Frozen {currencyFormat( Math.abs(frozen) || 0, { decimalsToShow: 0, isWei: true })}
+            </Typography>}
           </Grid>
         </Grid>
       </Grid>
@@ -96,6 +107,9 @@ export default InvaderLauncher
 const useStyles = makeStyles<Theme,{ color: string, text: string }>( theme => createStyles({
   sliderContainer:{
     height: 220,
+  },
+  frozen:{
+    color: theme.palette.blue.main,
   },
   colorChange:{
     color: props => {

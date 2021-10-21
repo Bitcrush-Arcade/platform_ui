@@ -8,6 +8,7 @@ import Grid from "@material-ui/core/Grid"
 import IconButton from '@material-ui/core/IconButton'
 import Tooltip from "@material-ui/core/Tooltip"
 import Typography from "@material-ui/core/Typography"
+import Skeleton from '@material-ui/lab/Skeleton'
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
@@ -150,6 +151,12 @@ function BankPool( ) {
               </Typography>
               <Typography variant="h6" component="div" color="primary" className={ css.heavy }>
                 {currencyFormat(userInfo.staked, { isWei: true })}
+                &nbsp;
+                <Tooltip arrow title={<Typography variant="caption">Frozen Funds</Typography>}>
+                  <Typography component="span" className={ css.frozen }>
+                    ({currencyFormat( userInfo.frozenStake, { isWei: true } )})
+                  </Typography>
+                </Tooltip>
               </Typography>
               <Typography variant="body2" color="textSecondary" paragraph>
                 Your Stake {currencyFormat( userInfo.stakePercent , { decimalsToShow: 6 })}%
@@ -173,9 +180,12 @@ function BankPool( ) {
                   <CalculationIcon fontSize="inherit"/>
                 </IconButton>
               </Typography>
-              <Typography color="primary" variant="h6" component="div">
-                {(bankInfo.apyPercent?.d365?.percent * 100).toFixed(4)}
-              </Typography>
+                <Typography color="primary" variant="h6" component="div">
+                  { bankInfo.apyPercent ? 
+                    `${(bankInfo.apyPercent?.d365?.percent * 100).toFixed(4)}%`
+                    : <Skeleton/>
+                  }
+                </Typography>
             </Grid>
             <Grid item>
               <Typography color="primary" variant="h6" component="div">
@@ -187,7 +197,10 @@ function BankPool( ) {
                 Profit Distribution
               </Typography>
               <Typography color="primary" variant="h6" component="div">
-                {(houseEdgePercent*100).toFixed(4)}%
+                  { bankInfo.apyPercent ? 
+                    `${((bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%`
+                    : <Skeleton/>
+                  }
               </Typography>
             </Grid>
             <Grid item xs={12} sm={'auto'}>
@@ -197,7 +210,10 @@ function BankPool( ) {
             </Grid>
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
-                {((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%
+                  { bankInfo.apyPercent ? 
+                    `${((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%`
+                    : <Skeleton/>
+                  }
               </Typography>
             </Grid>
             <Grid item xs={12}>
@@ -249,7 +265,7 @@ function BankPool( ) {
         </Grid>
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
-          <InvaderLauncher percent={bankInfo.thresholdPercent} crushBuffer={bankInfo.availableProfit}/>
+          <InvaderLauncher percent={bankInfo.thresholdPercent} crushBuffer={bankInfo.availableProfit} frozen={ bankInfo.totalFrozen }/>
         </Grid>
         {/* BANKROLL INFO */}
         <Grid item xs={12} md={5}>
@@ -364,6 +380,9 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     backgroundColor: theme.palette.primary.main,
     marginTop: theme.spacing(2),
     marginBottom: theme.spacing(2),
+  },
+  frozen:{
+    color: theme.palette.blue.main,
   },
   invisibleDivider:{
     height: theme.spacing(2)
