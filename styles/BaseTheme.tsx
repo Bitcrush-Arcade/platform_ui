@@ -37,6 +37,9 @@ const theme = (isDark?: boolean) => createTheme({
       dark: 'rgb(34,35,63)',
       main: 'rgb(174,82,227)',
     },
+    blue: {
+      main: 'rgb(86,166,246)'
+    },
     type: isDark ? 'dark' : 'light',
   },
   typography:{

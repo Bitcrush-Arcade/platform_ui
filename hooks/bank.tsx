@@ -86,6 +86,7 @@ const getBankData = useCallback( async() => {
       
       
       setBankInfo(draft => {
+        draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.profitTotal = profits
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
@@ -141,6 +142,7 @@ const getBankData = useCallback( async() => {
 export default useBank
 
 type BankInfo = {
+  totalFrozen: number,
   totalBankroll: number,
   totalStaked: number,
   availableProfit: number,
@@ -154,6 +156,7 @@ type BankInfo = {
   poolStart: Date | null,
 }
 const initBank: BankInfo = {
+  totalFrozen: 0,
   totalBankroll: 0,
   totalStaked: 0,
   availableProfit: 0,
