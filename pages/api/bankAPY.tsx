@@ -47,8 +47,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   // Bankroll
   const totalProfit = new BigNumber( await bankContract.methods.totalProfit().call() )
   // TotalProfit / ( days Since ContractLaunch ) / 288 claims per day
-  const profitEmission = totalProfit.div( differenceInCalendarDays( new Date(), new Date( deployTime.times(1000).toNumber() ) ) ).div( 288 ).toNumber()
-
+  const profitEmission = totalProfit.isGreaterThan(0) ? totalProfit.div( differenceInCalendarDays( new Date(), new Date( deployTime.times(1000).toNumber() ) ) ).div( 288 ).toNumber() : 0
   const compoundRewards = {
     d1: {
       return: 0,
@@ -93,7 +92,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
 
   const blocksPerCompound = 12 * 5 // BLOCKS PER MINUTE  * 5 MINUTE
 
-  const stakingEmission = emission.times( new BigNumber(1).minus( performanceFee ) ).times( new BigNumber(10).pow(18) ).toNumber() // in wei
+  const stakingEmission = emission.times( new BigNumber(1).minus( performanceFee ) ).toNumber() // in wei
   for( 
     let compoundBlock = 1;
     maxCompounds.isGreaterThanOrEqualTo(compoundBlock);
@@ -131,5 +130,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   res.status(200).json({
     compoundRewards,
     initStake,
+    stakingEmission,
+    profitEmission
   })
 }
