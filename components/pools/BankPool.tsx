@@ -152,11 +152,11 @@ function BankPool( ) {
               <Typography variant="h6" component="div" color="primary" className={ css.heavy }>
                 {currencyFormat(userInfo.staked, { isWei: true })}
                 &nbsp;
-                <Tooltip arrow title={<Typography variant="caption">Frozen Funds</Typography>}>
+                { userInfo.frozenStake > 0 && <Tooltip arrow title={<Typography variant="caption">Frozen Funds</Typography>}>
                   <Typography component="span" className={ css.frozen }>
                     ({currencyFormat( userInfo.frozenStake, { isWei: true } )})
                   </Typography>
-                </Tooltip>
+                </Tooltip>}
               </Typography>
               <Typography variant="body2" color="textSecondary" paragraph>
                 Your Stake {currencyFormat( userInfo.stakePercent , { decimalsToShow: 6 })}%
