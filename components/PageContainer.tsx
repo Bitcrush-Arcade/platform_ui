@@ -20,6 +20,8 @@ import { useEagerConnect } from 'hooks/web3Hooks'
 import { differenceFromNow } from 'utils/dateFormat'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
+// Hooks
+import useCoin from 'hooks/useCoin'
 // Context
 import { useTransactionContext } from 'hooks/contextHooks'
 import { useWeb3React } from '@web3-react/core'
@@ -34,7 +36,7 @@ const PageContainer = ( props: ContainerProps ) => {
   const { chainId, account } = useWeb3React()
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
-  
+  const { isApproved, getApproved, approve } = useCoin()
   const [menuToggle, setMenuToggle] = useState<boolean>( menuSm ? false : !isSm )
   const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
   
@@ -48,6 +50,11 @@ const PageContainer = ( props: ContainerProps ) => {
   const timelockInPlace = new Date().getTime()/1000 < lwContext.timelock
 
   useEagerConnect()
+
+  useEffect( () => {
+    if(!liveWalletMethods)
+    getApproved( liveWallet.address )
+  },[liveWalletMethods, liveWallet])
 
   const toggleMenu = () => setMenuToggle( p => !p )
 
@@ -177,8 +184,8 @@ const PageContainer = ( props: ContainerProps ) => {
       onClose={toggleLwModal}
       options={lwOptions}
       onSubmit={lwSubmit}
-      // needsApprove={ !lwContext.isApproved }
-      // onApprove={ lwContext.approve }
+      needsApprove={ !isApproved }
+      onApprove={ () => approve(liveWallet.address) }
       coinInfo={{
         symbol: 'CRUSH',
         name: 'Crush Coin',
