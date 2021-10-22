@@ -54,7 +54,7 @@ const PageContainer = ( props: ContainerProps ) => {
   useEffect( () => {
     if(!liveWalletMethods)
     getApproved( liveWallet.address )
-  },[liveWalletMethods, liveWallet])
+  },[liveWalletMethods, liveWallet, getApproved])
 
   const toggleMenu = () => setMenuToggle( p => !p )
 
