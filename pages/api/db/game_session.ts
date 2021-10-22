@@ -27,7 +27,7 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
     .then( data => {
       console.log(data)
       if( data?.statusCode > 200 )
-        res.status(503).json({ message: 'Database is not responding'})
+        res.status(503).json({ message: 'Database is not responding', e: data})
       else
         res.status(200).json(data)
     } )
