@@ -10,7 +10,7 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
     return
   }
 
-  await fetch(`${gameApi[ process.env.NODE_ENV ]}/api/dragon/games/generate_session`,{
+  await fetch(`${process.env.GAMES_API}/dragon/games/generate_session`,{
     method: 'POST',
     headers:{
       origin: 'http://localhost:3000',
@@ -21,8 +21,11 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
       country: country
     })
   })
-    .then( d => d.json() )
+    .then( d =>{
+      console.log(d)
+      return d.json() })
     .then( data => {
+      console.log(data)
       if( data?.statusCode > 200 )
         res.status(503).json({ message: 'Database is not responding'})
       else
