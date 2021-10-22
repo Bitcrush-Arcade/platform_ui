@@ -65,7 +65,13 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
 
     stakeReward = stakeReward.plus( reward ).plus( profitToAdd )
   }
-  res.status( 200 ).json({ compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber() })
+  res.status( 200 ).json({ 
+    compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber(),
+    logs:{
+      baseReward: stakeReward.times(compounderFee).toNumber(),
+      stakeReward: stakeReward.toNumber(),
+    }
+  })
 
 
 }
