@@ -107,12 +107,7 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const profitDistribution = useMemo(() =>{
-    const reward = bankInfo.profitTotal.total * userInfo.stakePercent
-    if(reward > bankInfo.profitTotal.remaining)
-      return 0
-    return reward
-  },[bankInfo, userInfo])
+  const profitDistribution = bankInfo.availableProfit * (userInfo.stakePercent / 100)
 
   const houseEdgePercent = useMemo(() => {
     if(!bankInfo.poolStart)
