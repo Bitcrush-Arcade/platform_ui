@@ -35,7 +35,7 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   const totalStaked = parseInt( await methods.totalStaked().call() )
   let addressesLength 
   try {
-    addressesLength = await methods.indexesLength().call()
+    addressesLength = parseInt( await methods.indexesLength().call() )
   }
   catch{
     addressesLength = 3
@@ -51,7 +51,7 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   // CALCULATE REWARDS
   let stakeReward = new BigNumber(0)
   let remainingProfit = new BigNumber(profit.remaining)
-
+  console.log('------------')
   for( let i = startIndex; i < batchLimit; i++){
     const indexedAddress = await methods.addressIndexes( i ).call()
     const reward = await methods.pendingReward( indexedAddress ).call()
@@ -64,6 +64,14 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
     remainingProfit = remainingProfit.minus(profitToAdd)
 
     stakeReward = stakeReward.plus( reward ).plus( profitToAdd )
+    console.log({
+      i,
+      indexedAddress,
+      reward,
+      stakings,
+      addressesLength,
+      batchLimit,
+    })
   }
   res.status( 200 ).json({ 
     compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber(),

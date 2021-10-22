@@ -120,7 +120,7 @@ const getBankData = useCallback( async() => {
   },[getBankData, getStakingData])
 
   useEffect(() => {
-    const interval = setInterval( hydrateData, 12000)
+    const interval = setInterval( hydrateData, 5000)
     return () => clearInterval( interval )
   },[hydrateData])
 
