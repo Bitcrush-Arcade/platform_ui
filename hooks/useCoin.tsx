@@ -13,7 +13,7 @@ const useCoin = (coinAddress?: string) => {
 
   const { address: crushAddress, abi: crushAbi } = getContracts('crushToken', chainId)
   const tokenAddress = coinAddress || crushAddress
-  const { methods: coinMethods } = useContract( crushAbi, tokenAddress)
+  const { methods: coinMethods, web3 } = useContract( crushAbi, tokenAddress)
 
   const [isApproved, setIsApproved] = useState<boolean>(false)
 
@@ -24,6 +24,7 @@ const useCoin = (coinAddress?: string) => {
     }
     const allowance = await coinMethods.allowance(account,contractToCheck).call()
     setIsApproved( allowance >= (amountToCheck ?? 1) )
+    return allowance >= (amountToCheck ?? 1)
   },[coinMethods, account])
 
   const approve = useCallback( (contractToApprove: string, approveAmount?: number ) => {
@@ -49,7 +50,9 @@ const useCoin = (coinAddress?: string) => {
   return{
     approve,
     getApproved,
-    isApproved
+    isApproved,
+    coinMethods,
+    web3
   }
 }
 

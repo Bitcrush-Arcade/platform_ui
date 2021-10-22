@@ -177,6 +177,13 @@ const PageContainer = ( props: ContainerProps ) => {
       onClose={toggleLwModal}
       options={lwOptions}
       onSubmit={lwSubmit}
+      needsApprove={ !lwContext.isApproved }
+      onApprove={ lwContext.approve }
+      coinInfo={{
+        symbol: 'CRUSH',
+        name: 'Crush Coin',
+        decimals: 18
+      }}
     />
     {/* <Footer/> */}
   </div>
