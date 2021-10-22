@@ -10,7 +10,7 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
     return
   }
 
-  await fetch(`${gameApi[ process.env.NODE_ENV ]}/api/games/generate_session`,{
+  await fetch(`${gameApi[ process.env.NODE_ENV ]}/api/dragon/games/generate_session`,{
     method: 'POST',
     headers:{
       origin: 'http://localhost:3000',
