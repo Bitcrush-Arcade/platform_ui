@@ -34,7 +34,7 @@ export type StakeOptionsType = {
   btnText: string,
   description: string,
   onSelectOption?: () => void,
-  more?: (values: FormValues) => ReactNode
+  more?: (values: FormValues) => ReactNode,
 }
 
 export type FormValues = { stakeAmount: number, actionType: number }
@@ -46,11 +46,13 @@ type StakeModalProps = {
   onClose: () => void,
   options: Array<StakeOptionsType>,
   onSubmit: SubmitFunction,
-  coinInfo?: { symbol: string, name: string, decimals?: number }
+  needsApprove?: boolean,
+  coinInfo?: { symbol: string, name: string, decimals?: number },
+  onApprove?: () => void,
 }
 
 function StakeModal( props: StakeModalProps ) {
-  const {open, onClose, options, onSubmit, coinInfo } = props
+  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove} = props
   const css = useStyles({})
 
   const InfoText = () => {
@@ -71,7 +73,7 @@ function StakeModal( props: StakeModalProps ) {
           stakeAmount: 0,
           actionType: 0
         }}
-        onSubmit={onSubmit}
+        onSubmit={ (vals, ops) => needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)}
         validate ={ ( values ) => {
           let errors: any = {}
           const bigValue = new BigNumber(values.stakeAmount)
@@ -169,8 +171,13 @@ function StakeModal( props: StakeModalProps ) {
               MAX
             </SmallButton>
           </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting || hasErrors }>
-            {options[actionType].name} {coinInfo?.symbol}
+          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting || hasErrors }
+            onClick={ e => { 
+              if(!needsApprove) return
+              e.preventDefault()
+              onApprove && onApprove()
+          }}>
+            {`${ needsApprove ? "Approve" : options[actionType].name } ${coinInfo?.symbol}`}
           </Button>
           {options[actionType]?.more && options[actionType]?.more(values)}
         </Form>)
