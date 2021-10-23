@@ -272,7 +272,7 @@ const PoolCard = (props: PoolProps) => {
                 <Grid item style={{paddingRight: 8}}>
                   { apyData?.d365?.percent 
                     ? <Typography color="primary" variant="body2" className={ css.percent }>
-                        {apyData?.d365?.percent || '--%'}
+                        {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
                       </Typography>
                     : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
                   }
