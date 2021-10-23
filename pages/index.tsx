@@ -260,7 +260,7 @@ export default function Home() {
                 Gambling should be for entertainment purposes and Bitsler is focused on offering you the best gaming experience. However, for a small number of people, gambling can cause problems. Bitsler is committed to support responsible gaming, so we would like to make you aware of the risks too.
                 {'\n'}
                 Test to see if you have a gambling problem{'\n'}
-                It's important to know if gambling is causing you or others around you harm. Please have a look at the following questions:{'\n'}
+                It&apos;s important to know if gambling is causing you or others around you harm. Please have a look at the following questions:{'\n'}
                 {'\n'}
                 - Do you ever gamble more than you can afford to lose?{'\n'}
                 - Do you find it hard to manage or stop your gambling?{'\n'}
