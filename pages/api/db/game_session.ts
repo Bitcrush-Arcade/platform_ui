@@ -31,5 +31,8 @@ export default async function getGameSession(req : NextApiRequest, res: NextApiR
       else
         res.status(200).json(data)
     } )
+    .catch( e => {
+      res.status(500).json({ message: 'Failure', e})
+    })
 
 }
