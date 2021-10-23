@@ -10,6 +10,7 @@ import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/sty
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
+import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
@@ -18,7 +19,8 @@ import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
 import HarvestCard from 'components/pools/HarvestCard'
-// Context
+// Hooks & Context
+import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
@@ -37,6 +39,7 @@ export default function Home() {
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
+  const { bankInfo } = useBank()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
@@ -60,7 +63,7 @@ export default function Home() {
     const getTvl = async () => {
       const totalStaked = await methods.totalStaked().call()
       const accountStake = await methods.stakings(account).call()
-      setTvl( new BigNumber(totalStaked).div( new BigNumber(10).pow(18) ).toNumber() )
+      setTvl( new BigNumber(totalStaked).toNumber() )
       setStaked( new BigNumber(accountStake?.stakedAmount || 0).div( new BigNumber(10).pow(18) ).toNumber() )
     }
     getTvl()
@@ -84,6 +87,12 @@ export default function Home() {
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
   },[methods, router, staked, account, editTransactions])
+
+  const v1Distributed = new BigNumber(1766900).times( new BigNumber(10).pow(18)).toNumber()
+
+  const totalValueLocked = tvl + bankInfo.totalStaked
+  const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
+  const totalDistributed = bankInfo.stakingDistruted + v1Distributed
 
   return (<>
   <Head>
@@ -127,28 +136,36 @@ export default function Home() {
                       Total Value Locked
                     </Typography>
                     <Typography variant="h4" component="div" align={"center"}>
-                      {currencyFormat(tvl,{ decimalsToShow: 0})}
+                      {currencyFormat( totalValueLocked ,{ decimalsToShow: 0, isWei: true})}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" component="div" align={"center"}>
+                      USD&nbsp;{currencyFormat( totalValueLocked*tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true})}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/> */}
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Max Win
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {/* {currencyFormat(maxWin,{ decimalsToShow: 0})} */}
-                      COMING SOON
+                      {currencyFormat( maxWin ,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" component="div" align="center">
+                      USD&nbsp;{currencyFormat( maxWin * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true })}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/>
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align={isSm ? "center" : "right"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Shared
                     </Typography>
                     <Typography variant="h4" component="div" align={isSm ? "center" : "right"}>
-                      {currencyFormat(totalValueShared,{ decimalsToShow: 0})}
+                      {currencyFormat(totalDistributed,{ decimalsToShow: 0, isWei: true })}
                     </Typography>
-                  </Grid> */}
+                    <Typography variant="body2" color="textSecondary" component="div" align={isSm ? "center" : "right"}>
+                      USD&nbsp;{currencyFormat( totalDistributed * tokenInfo.crushUsdPrice,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
