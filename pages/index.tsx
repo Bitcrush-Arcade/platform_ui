@@ -18,12 +18,14 @@ import Typography from '@material-ui/core/Typography'
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
+import Button from 'components/basics/GeneralUseButton'
 import HarvestCard from 'components/pools/HarvestCard'
 // Hooks & Context
 import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
@@ -192,6 +194,11 @@ export default function Home() {
                   btn1Props={{
                     disabled: !account,
                   }}
+                  action2Title="Staking 2.0"
+                  action2Color="secondary"
+                  btn2Props={{
+                    href: '/mining'
+                  }}
                 />
               </Grid>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
@@ -245,6 +252,40 @@ export default function Home() {
                 </Grid>
               </CardContent>
             </Card>
+            
+            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary">
+              Self BlackList&nbsp;
+              <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+                title={<Typography style={{maxWidth: '100%', maxHeight: 500, overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
+                Gambling should be for entertainment purposes and Bitsler is focused on offering you the best gaming experience. However, for a small number of people, gambling can cause problems. Bitsler is committed to support responsible gaming, so we would like to make you aware of the risks too.
+                {'\n'}
+                Test to see if you have a gambling problem{'\n'}
+                It's important to know if gambling is causing you or others around you harm. Please have a look at the following questions:{'\n'}
+                {'\n'}
+                - Do you ever gamble more than you can afford to lose?{'\n'}
+                - Do you find it hard to manage or stop your gambling?{'\n'}
+                - Do you neglect work, studies, family, friends or personal needs because of gambling?{'\n'}
+                - Does gambling make you feel worried, irritable or depressed?{'\n'}
+                - Do you need to gamble with larger amounts of money to get the same level of excitement?{'\n'}
+                {'\n'}
+                If you have answered yes to any of these questions, you may have a gambling problem. We recommend looking at the following sites that can provide help and advice:
+                {'\n'}{'\n'}
+
+                Self-exclusion{'\n'}
+                If you think gambling is causing problems, it might be best to exclude yourself from gambling. We can block your account for 6 hours, 24 hours, 3 days, 1 week, 2 weeks, 1 month, 3 months or 6 months on your request. Please contact our support for self-exclusion and our trained staff will help you.{'\n'}
+                {'\n'}
+                Underage gambling{'\n'}
+                Bitsler only accepts players over 18 years of age. We make it perfectly clear in our Terms and Conditions that you must be over 18 years of age and require explicit consent at the registration. Underage players will have their accounts permanently blocked and their winnings forfeited.{'\n'}
+                  {'\n'}
+                If you are an adult player on Bitsler and there are any underage members in your household, please be responsible for protecting your computer and login details. You could also use internet filters to reduce the chance of underage gambling in your home like CyberPatrol and Net Nanny.{'\n'}
+                {'\n'}
+                Questions?{'\n'}
+                For any other questions regarding responsible gaming please contact our support.{'\n'}
+                </Typography>}
+              >
+                <InfoIcon/>
+              </Tooltip>
+            </Button>
           </Container>
       </PageContainer>
   </>)
@@ -268,7 +309,11 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
   link:{
     textDecoration: 'none',
     color: theme.palette.text.primary
-  }
+  },
+  tooltip:{
+    width: '80vw',
+    maxWidth: 900,
+  },
 }))
 
 const partners: PartnerData[] = [
