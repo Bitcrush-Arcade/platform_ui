@@ -37,7 +37,7 @@ import BigNumber from 'bignumber.js'
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.only('xs') )
+  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
@@ -140,7 +140,7 @@ export default function Home() {
                     <Typography variant="h4" component="div" align={"center"}>
                       {currencyFormat( totalValueLocked ,{ decimalsToShow: 0, isWei: true})}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="div" align={"center"}>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align={"center"}>
                       USD&nbsp;{currencyFormat( totalValueLocked*tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true})}
                     </Typography>
                   </Grid>
@@ -152,7 +152,7 @@ export default function Home() {
                     <Typography variant="h4" component="div" align="center">
                       {currencyFormat( maxWin ,{ decimalsToShow: 2, isWei: true })}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="div" align="center">
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
                       USD&nbsp;{currencyFormat( maxWin * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true })}
                     </Typography>
                   </Grid>
