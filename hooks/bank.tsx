@@ -68,7 +68,8 @@ const getBankData = useCallback( async() => {
       const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-
+      const pendingStaked = await stakingMethods.pendingStakedValue().call()
+      const batchIndex = await stakingMethods.batchStartingIndex().call()
       let poolStart 
       try{
         poolStart = await stakingMethods.deploymentTimeStamp().call()
@@ -88,6 +89,7 @@ const getBankData = useCallback( async() => {
       setBankInfo(draft => {
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
+        draft.pendingStaked = new BigNumber( pendingStaked ).toNumber()
         draft.profitTotal = profits
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
         draft.poolStart = new Date( parseInt(poolStart) * 1000 )
@@ -96,13 +98,14 @@ const getBankData = useCallback( async() => {
       if(!account) return
       const userRewards = await stakingMethods.pendingReward(account).call()
       const currentStaked = await stakingMethods.stakings(account).call()
-
+      const totalStakedVerified = (+totalStaked || 1) + ( +currentStaked.index > (+batchIndex) ? +pendingStaked : 0 )
+      const stakedPercent = (+currentStaked.stakedAmount)/( totalStakedVerified )
       setUserInfo( draft => {
         draft.stakingReward = +userRewards
         draft.staked = +currentStaked.stakedAmount
-        draft.stakePercent = (+currentStaked.stakedAmount)/(+totalStaked || 1) * 100
+        draft.stakePercent = stakedPercent * 100
         draft.edgeReward = 0
-        draft.frozenStake = new BigNumber(currentStaked.stakedAmount).div(+totalStaked || 1).times(totalFrozen).toNumber()
+        draft.frozenStake = new BigNumber(stakedPercent).times(totalFrozen).toNumber()
       })
 
     },[stakingMethods, setUserInfo, setBankInfo, account],
@@ -152,6 +155,7 @@ type BankInfo = {
   thresholdPercent: number,
   stakingDistruted: number,
   bankDistributed: number,
+  pendingStaked: number,
   apyPercent: RoiProps['apyData'],
   poolStart: Date | null,
 }
@@ -165,6 +169,7 @@ const initBank: BankInfo = {
     total: 0,
     remaining: 0
   },
+  pendingStaked: 0,
   stakingDistruted: 0,
   bankDistributed: 0,
   profitDistribution: 0.6,
