@@ -27,7 +27,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then( r => r.json() )
   
   const usedContract = body.contract || 'singleAsset'
-  const initialStake = 1000 / price.crushUsdPrice 
+  const initialStake = new BigNumber(1000).div( price.crushUsdPrice ).times( new BigNumber(10).pow(18)).toNumber()
   // Get info from contract
   const usedChain = body?.chainId ? parseInt(body.chainId) : 97
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
@@ -35,23 +35,11 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const contractSetup = getContracts( usedContract, usedChain )
   const contract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
 
-  let usedEmission;
   const emission = await contract.methods.crushPerBlock().call()
-  // EMISSION FROM BANK = deploymentTimeStamp
-  if( body.isBank ){
-    const bankSetup = getContracts('bankroll', usedChain)
-    const bankContract = await new web3.eth.Contract( bankSetup.abi, bankSetup.address )
-    const deployTime = await bankContract.methods.deploymentTimeStamp().call()
-    const totalProfit = await bankContract.methods.totalProfit().call()
-    usedEmission = new BigNumber( totalProfit ).div( differenceInCalendarDays( new Date(), new Date( +deployTime * 1000)) )
-  }
-  else{
-    usedEmission = emission
-  }
   const totalStaked = fromWei( await contract.methods.totalStaked().call() )
 
   const performanceFee = 0.03
-  const compoundEmitted = new BigNumber(usedEmission).times(1 - performanceFee).times(100).toNumber()
+  const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).toNumber()
   const totalPool = new BigNumber(totalStaked).toNumber() || new BigNumber( 1000000 ).times( new BigNumber(10).pow(18) ).toNumber()
   let d1 = 0
   let d7 = 0
@@ -60,8 +48,8 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const maxNumber = max.toNumber()
   let previousReward = 0
   for(let j= 1; j <= maxNumber; j ++ ){
-    const EmitBlockTotal = compoundEmitted / ( totalPool + (compoundEmitted * ( j - 1 )))
-    const reward = (initialStake + previousReward) * EmitBlockTotal
+    const EmitBlockTotal = compoundEmitted / ( totalPool + (compoundEmitted * ( j - 1 )*60))
+    const reward = (initialStake + previousReward) * EmitBlockTotal*60
     previousReward += reward
     if( j == (1 * 288) && !d1 )
       d1 = previousReward
@@ -79,24 +67,24 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
       initialStake,
       initialPool: totalPool,
       price: price.crushUsdPrice,
-      crushPerBlock: new BigNumber(usedEmission).div( new BigNumber(10).pow(18) ).toFixed(),
+      crushPerBlock: new BigNumber(emission).div( new BigNumber(10).pow(18) ).toFixed(),
       fees: performanceFee
     },
     d1: {
       return: readableD1,
-      percent: readableD1 / initialStake,
+      percent: d1 / initialStake,
     },
     d7: {
       return: readableD7,
-      percent: readableD7 / initialStake,
+      percent: d7 / initialStake,
     },
     d30: {
       return: readableD30,
-      percent: readableD30 / initialStake,
+      percent: d30 / initialStake,
     },
     d365: {
       return: readableD365,
-      percent: readableD365 / initialStake,
+      percent: previousReward / initialStake,
     },
   }
   calculatedLast = new Date()
