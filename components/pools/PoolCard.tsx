@@ -231,9 +231,9 @@ const PoolCard = (props: PoolProps) => {
   return <>
     <Card background="light" className={ css.card } >
       <CardHeader classes={{ action: css.headerAction }}
-        title="Auto Bitcrush"
+        title="Bitcrush Pool"
         titleTypographyProps={{ className: css.headerTitle }}
-        subheader="Automatic restaking"
+        subheader="Manual Compounding"
         subheaderTypographyProps={{ variant: 'body2' }}
         action={
           <Avatar className={css.avatar}>
@@ -272,7 +272,7 @@ const PoolCard = (props: PoolProps) => {
                 <Grid item style={{paddingRight: 8}}>
                   { apyData?.d365?.percent 
                     ? <Typography color="primary" variant="body2" className={ css.percent }>
-                        {apyData?.d365?.percent || '--%'}
+                        {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
                       </Typography>
                     : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
                   }
@@ -326,39 +326,24 @@ const PoolCard = (props: PoolProps) => {
             <Tooltip arrow
               title={
                 <Typography className={ css.tooltip }>
-                  {infoText || "Any funds you stake in this pool will be automagically harvested and restaked (compounded) for you"}
+                  {infoText || ""}
                 </Typography>
               }
             >
               <InfoOutlinedIcon color="disabled" fontSize="small"/>
             </Tooltip>
           </Grid>
-          <Grid item xs={6} container alignItems="center" justifyContent="flex-end">
+          {/* <Grid item xs={6} container alignItems="center" justifyContent="flex-end">
             <ButtonBase onClick={ () => setDetailOpen( p => !p )}>
               <Typography variant="body2" color="primary" className={ css.detailsActionText }>
                 Details
               </Typography>
               <ArrowIcon fontSize="small" color={detailOpen ? "primary" : "disabled"} style={{ transform: `rotate(${ detailOpen ? "180deg" : "0deg"})`}}/>
             </ButtonBase>
-          </Grid>
-          <Grid item xs={12}>
+          </Grid> */}
+          {/* <Grid item xs={12}>
             <Collapse in={detailOpen}>
               <Grid container alignItems="flex-end" style={{marginTop: 24}}>
-                {/* <Grid item xs={12}>
-                  <Typography variant="body2" color="primary" style={{ fontWeight: 600 }}>
-                    {coinInfo.symbol} Profit Earned
-                  </Typography>
-                </Grid> */}
-                {/* <Grid item xs={6}>
-                  <Tooltip title={currencyFormat(userProfit || 0, { isWei: true})}>
-                    <Typography noWrap style={{ maxWidth: '95%'}}>
-                      {currencyFormat(userProfit || 0, { isWei: true})}
-                    </Typography>
-                  </Tooltip>
-                  <Typography color="textSecondary" variant="caption">
-                    USD {currencyFormat((userProfit || 0)*tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2})}
-                  </Typography>
-                </Grid> */}
                 <Grid item xs={12}>
                   <Typography variant="caption" style={{ whiteSpace: 'pre-line' }}>
                     0.5% unstaking fee if withdrawn within 72h.{'\n'}
@@ -367,7 +352,7 @@ const PoolCard = (props: PoolProps) => {
                 </Grid>
               </Grid>
             </Collapse>
-          </Grid>
+          </Grid> */}
         </Grid>
       </CardActions>
     </Card>

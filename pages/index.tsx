@@ -10,6 +10,7 @@ import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/sty
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
+import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
@@ -17,11 +18,14 @@ import Typography from '@material-ui/core/Typography'
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
+import Button from 'components/basics/GeneralUseButton'
 import HarvestCard from 'components/pools/HarvestCard'
-// Context
+// Hooks & Context
+import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
@@ -33,10 +37,11 @@ import BigNumber from 'bignumber.js'
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.only('xs') )
+  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
+  const { bankInfo } = useBank()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
@@ -60,7 +65,7 @@ export default function Home() {
     const getTvl = async () => {
       const totalStaked = await methods.totalStaked().call()
       const accountStake = await methods.stakings(account).call()
-      setTvl( new BigNumber(totalStaked).div( new BigNumber(10).pow(18) ).toNumber() )
+      setTvl( new BigNumber(totalStaked).toNumber() )
       setStaked( new BigNumber(accountStake?.stakedAmount || 0).div( new BigNumber(10).pow(18) ).toNumber() )
     }
     getTvl()
@@ -84,6 +89,12 @@ export default function Home() {
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
   },[methods, router, staked, account, editTransactions])
+
+  const v1Distributed = new BigNumber(1766900).times( new BigNumber(10).pow(18)).toNumber()
+
+  const totalValueLocked = tvl + bankInfo.totalStaked
+  const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
+  const totalDistributed = bankInfo.stakingDistruted + v1Distributed
 
   return (<>
   <Head>
@@ -127,28 +138,36 @@ export default function Home() {
                       Total Value Locked
                     </Typography>
                     <Typography variant="h4" component="div" align={"center"}>
-                      {currencyFormat(tvl,{ decimalsToShow: 0})}
+                      {currencyFormat( totalValueLocked ,{ decimalsToShow: 0, isWei: true})}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align={"center"}>
+                      USD&nbsp;{currencyFormat( totalValueLocked*tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true})}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/> */}
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Max Win
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {/* {currencyFormat(maxWin,{ decimalsToShow: 0})} */}
-                      COMING SOON
+                      {currencyFormat( maxWin ,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
+                      USD&nbsp;{currencyFormat( maxWin * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true })}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/>
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align={isSm ? "center" : "right"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Shared
                     </Typography>
                     <Typography variant="h4" component="div" align={isSm ? "center" : "right"}>
-                      {currencyFormat(totalValueShared,{ decimalsToShow: 0})}
+                      {currencyFormat(totalDistributed,{ decimalsToShow: 0, isWei: true })}
                     </Typography>
-                  </Grid> */}
+                    <Typography variant="body2" color="textSecondary" component="div" align={isSm ? "center" : "right"}>
+                      USD&nbsp;{currencyFormat( totalDistributed * tokenInfo.crushUsdPrice,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -174,6 +193,11 @@ export default function Home() {
                   firstAction={harvestAll}
                   btn1Props={{
                     disabled: !account,
+                  }}
+                  action2Title="Staking 2.0"
+                  action2Color="secondary"
+                  btn2Props={{
+                    href: '/mining'
                   }}
                 />
               </Grid>
@@ -228,6 +252,40 @@ export default function Home() {
                 </Grid>
               </CardContent>
             </Card>
+            
+            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary">
+              Self BlackList&nbsp;
+              <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+                title={<Typography style={{maxWidth: '100%', maxHeight: 500, overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
+                Gambling should be for entertainment purposes and Bitsler is focused on offering you the best gaming experience. However, for a small number of people, gambling can cause problems. Bitsler is committed to support responsible gaming, so we would like to make you aware of the risks too.
+                {'\n'}
+                Test to see if you have a gambling problem{'\n'}
+                It's important to know if gambling is causing you or others around you harm. Please have a look at the following questions:{'\n'}
+                {'\n'}
+                - Do you ever gamble more than you can afford to lose?{'\n'}
+                - Do you find it hard to manage or stop your gambling?{'\n'}
+                - Do you neglect work, studies, family, friends or personal needs because of gambling?{'\n'}
+                - Does gambling make you feel worried, irritable or depressed?{'\n'}
+                - Do you need to gamble with larger amounts of money to get the same level of excitement?{'\n'}
+                {'\n'}
+                If you have answered yes to any of these questions, you may have a gambling problem. We recommend looking at the following sites that can provide help and advice:
+                {'\n'}{'\n'}
+
+                Self-exclusion{'\n'}
+                If you think gambling is causing problems, it might be best to exclude yourself from gambling. We can block your account for 6 hours, 24 hours, 3 days, 1 week, 2 weeks, 1 month, 3 months or 6 months on your request. Please contact our support for self-exclusion and our trained staff will help you.{'\n'}
+                {'\n'}
+                Underage gambling{'\n'}
+                Bitsler only accepts players over 18 years of age. We make it perfectly clear in our Terms and Conditions that you must be over 18 years of age and require explicit consent at the registration. Underage players will have their accounts permanently blocked and their winnings forfeited.{'\n'}
+                  {'\n'}
+                If you are an adult player on Bitsler and there are any underage members in your household, please be responsible for protecting your computer and login details. You could also use internet filters to reduce the chance of underage gambling in your home like CyberPatrol and Net Nanny.{'\n'}
+                {'\n'}
+                Questions?{'\n'}
+                For any other questions regarding responsible gaming please contact our support.{'\n'}
+                </Typography>}
+              >
+                <InfoIcon/>
+              </Tooltip>
+            </Button>
           </Container>
       </PageContainer>
   </>)
@@ -251,7 +309,11 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
   link:{
     textDecoration: 'none',
     color: theme.palette.text.primary
-  }
+  },
+  tooltip:{
+    width: '80vw',
+    maxWidth: 900,
+  },
 }))
 
 const partners: PartnerData[] = [

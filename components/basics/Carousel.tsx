@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, ReactNode, forwardRef, useImperativeHandle, useLayoutEffect } from 'react'
-
+import compact from 'lodash/compact'
 // Material
 import {makeStyles, Theme, createStyles} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
@@ -96,11 +96,11 @@ export type CarouselHandles = {
 const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) => {
 
   const { items, xs = 1, sm, md, lg, spacing, LeftScroll, RightScroll } = props
-
+  const reviewedItems = compact(items)
   const smVal = sm ?? xs
   const mdVal = md ?? sm ?? xs
   const lgVal = lg ?? md ?? sm ?? xs
-  const count = items.length
+  const count = reviewedItems.length
   const css = useStyles({ ...props, sm: smVal, md: mdVal, lg: lgVal })
   const [minScroll, setMinScroll] = useState<boolean>(true)
   const [maxScroll, setMaxScroll] = useState<boolean>(false)
@@ -156,7 +156,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
     carouselRef.current.scrollLeft -= Math.floor(width / count)
   }
 
-  const shownItems = items.map( (item, itemIndex) => {
+  const shownItems = reviewedItems.map( (item, itemIndex) => {
     return( <CarouselItem {...props} item={item} key={`carousel-item-${itemIndex}`} containerWidth={containerWidth} />
     )
   })

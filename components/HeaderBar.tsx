@@ -49,7 +49,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const crushActions = [
     { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
     { name: 'APE LP', onClick: ()=> window.open(`https://app.apeswap.finance/add/ETH/${CrushAddress}`, '_blank')},
-    { name: 'CROX LP', onClick: ()=> window.open(`https://exchange.croxswap.com/#/add/ETH/${CrushAddress}`,'_blank')},
+    { name: 'PANCAKE LP', onClick: ()=> window.open(`https://pancakeswap.finance/add/0x0Ef0626736c2d484A792508e99949736D0AF807e/BNB`,'_blank')},
     { name: 'BABY LP', onClick: ()=> window.open(`https://exchange.babyswap.finance/#/add/${CrushAddress}/0x55d398326f99059fF775485246999027B3197955`, '_blank')},
   ]
 
