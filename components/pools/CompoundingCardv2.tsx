@@ -36,8 +36,6 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
   const [hydrate, setHydrate] = useState<boolean>(false)
 
-  const [ showWarning, setShowWarning ] = useState<boolean>(false)
-  
   const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
 
   const getRewards = useCallback( async () => {
@@ -64,7 +62,6 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
   },[hydrate, getRewards])
 
   const usdReward = rewardToDistribute.times(tokenInfo?.crushUsdPrice || 0)
-  console.log( usdReward, usdReward.toNumber(), rewardToDistribute.toNumber(), tokenInfo.crushUsdPrice )
   const claim = () => {
     methods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
