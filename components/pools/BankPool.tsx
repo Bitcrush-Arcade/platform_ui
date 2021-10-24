@@ -178,7 +178,7 @@ function BankPool( ) {
               </Typography>
                 <Typography color="primary" variant="h6" component="div">
                   { bankInfo.apyPercent ? 
-                    `${(bankInfo.apyPercent?.d365?.percent * 100).toFixed(4)}%`
+                    `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 4})}%`
                     : <Skeleton/>
                   }
                 </Typography>
@@ -194,7 +194,7 @@ function BankPool( ) {
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                   { bankInfo.apyPercent ? 
-                    `${((bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%`
+                    `${currencyFormat(((bankInfo.apyPercent?.b365?.percent )*100), { decimalsToShow: 4 })}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -207,7 +207,7 @@ function BankPool( ) {
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
                   { bankInfo.apyPercent ? 
-                    `${((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100).toFixed(4)}%`
+                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100, { decimalsToShow: 4})}%`
                     : <Skeleton/>
                   }
               </Typography>
