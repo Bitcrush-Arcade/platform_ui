@@ -27,6 +27,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
+import { bankStakingInfo } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
@@ -73,6 +74,7 @@ function BankPool( ) {
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
           hydrateData()
+          getApyData()
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
@@ -90,6 +92,7 @@ function BankPool( ) {
         editTransactions(rc.transactionHash,'complete')
         hydrateToken()
         hydrateData()
+        getApyData()
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
@@ -107,15 +110,8 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const profitDistribution = bankInfo.availableProfit * (userInfo.stakePercent / 100)
-
-  const houseEdgePercent = useMemo(() => {
-    if(!bankInfo.poolStart)
-      return 0
-      // Total_distributed * 365_days / ( Days_since_Start * total_pool )
-    return new BigNumber( bankInfo.bankDistributed ).times( 365 ).div( new BigNumber( bankInfo.totalStaked ).times( differenceInCalendarDays( new Date(), bankInfo.poolStart ) || 1 ).toNumber() || 1  ).toNumber()
-  },[bankInfo])
-
+  const profitDistribution = (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
+  
   return (<>
     <Card className={ css.card } background="light">
       <Grid container justifyContent="space-evenly">
@@ -125,10 +121,13 @@ function BankPool( ) {
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2&nbsp;&nbsp;
-                <Tooltip title={`
-                  BankPOOL, Stake your CRUSH here to add to the Bankroll.
-                  MORE INFO NEEDED
-                `}>
+                <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+                  title={
+                    <Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
+                      {bankStakingInfo}
+                    </Typography>
+                  }
+                >
                   <InfoOutlinedIcon/>
                 </Tooltip>
               </Typography>
@@ -147,9 +146,9 @@ function BankPool( ) {
               <Typography variant="h6" component="div" color="primary" className={ css.heavy }>
                 {currencyFormat(userInfo.staked, { isWei: true })}
                 &nbsp;
-                { userInfo.frozenStake > 0 && <Tooltip arrow title={<Typography variant="caption">Frozen Funds</Typography>}>
+                { userInfo.frozenStake > 0 && <Tooltip arrow title={<Typography variant="caption" style={{ whiteSpace: 'pre-line'}}>Frozen Funds{'\n'}{currencyFormat( userInfo.frozenStake, { isWei: true } )}</Typography>}>
                   <Typography component="span" className={ css.frozen }>
-                    ({currencyFormat( userInfo.frozenStake, { isWei: true } )})
+                    ({currencyFormat( userInfo.frozenStake, { isWei: true, decimalsToShow: 4 } )})
                   </Typography>
                 </Tooltip>}
               </Typography>
@@ -236,7 +235,6 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  {/* IF REWARD > profit[0].remaining then 0 */}
                   <Typography color="primary">{currencyFormat(profitDistribution, { isWei: true })}</Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -396,5 +394,9 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   spacing:{
     marginBottom: theme.spacing(2),
-  }
+  },
+  tooltip:{
+    width: '80vw',
+    maxWidth: 900,
+  },
 }))

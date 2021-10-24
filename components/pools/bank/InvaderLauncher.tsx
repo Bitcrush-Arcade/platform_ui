@@ -40,7 +40,6 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
     }
   },[percent, frozen])
   const css = useStyles(textProperties)
-  const absBuffer = Math.abs( crushBuffer )
 
   return (<div>
     <Grid container justifyContent="space-between" alignItems="stretch">
@@ -73,7 +72,7 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
           </Grid>
           <Grid item xs={6}>
             <Typography className={ css.colorChange }>
-              {absBuffer > 0 && (crushBuffer > 0 ? '+' : '-')} {currencyFormat(Math.abs(crushBuffer) || 0, { decimalsToShow: 0, isWei: true })} CRUSH
+              {currencyFormat( crushBuffer || 0, { decimalsToShow: 0, isWei: true, showPositive: true })} CRUSH
             </Typography>
             <Typography className={ css.colorChange }>
               Blastoff {textProperties.text}

@@ -52,9 +52,8 @@ const PageContainer = ( props: ContainerProps ) => {
   useEagerConnect()
 
   useEffect( () => {
-    if(!liveWalletMethods)
     getApproved( liveWallet.address )
-  },[liveWalletMethods, liveWallet, getApproved])
+  },[ liveWallet, getApproved ])
 
   const toggleMenu = () => setMenuToggle( p => !p )
 
@@ -90,7 +89,7 @@ const PageContainer = ( props: ContainerProps ) => {
         more: function moreDetails ( values ) { 
           return timelockInPlace ? <>
           <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-            0.3% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
+            0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
           </Typography>
         </>
         : <></>

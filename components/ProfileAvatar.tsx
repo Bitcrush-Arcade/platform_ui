@@ -125,7 +125,7 @@ const ProfileAvatar = () => {
         >
           <ListItemText
             primary={"Blacklist Self"}
-            secondary={"Disable myself from using the live wallet"}
+            secondary={"Exclude myself from depositing to the live wallet"}
           />
         </ListItem>}
       </List>

@@ -2,12 +2,16 @@ import BigNumber from "bignumber.js"
 /* 
 * Receives a number as Eth (normal) or gwei and transforms it into human readable currency
 */
-export const currencyFormat = ( amount: number | string, options?:{isWei?: boolean, decimalsToShow?: number } ) => {
-  const { isWei = false, decimalsToShow } = options || {}
+export const currencyFormat = ( amount: number | string, options?:{isWei?: boolean, decimalsToShow?: number, showPositive?: boolean } ) => {
+  const { isWei = false, decimalsToShow, showPositive } = options || {}
+  const bigNum = new BigNumber( amount )
+  
+  const sign = bigNum.isNegative()
+  const absVal = bigNum.abs()
 
   const numberAsString = (isWei
-    ? new BigNumber(amount).div( new BigNumber(10).pow(18) )
-    : new BigNumber(amount) ).toFixed(18)
+    ? absVal.div( new BigNumber(10).pow(18) )
+    : absVal ).toFixed(18)
   const [integers, decimals] = numberAsString.split('.')
   const splitIntegers = integers.split('')
   const integerAmount = integers.split('').length
@@ -44,7 +48,7 @@ export const currencyFormat = ( amount: number | string, options?:{isWei?: boole
   const decimalString = decimalsToShow === 0 ? '' : `.${finalDecimals.join('')}`
 
   
-  return `${joinIntegers || '0'}${decimalString}`
+  return `${sign ? '- ': (showPositive ? '+ ' : '')} ${joinIntegers || '0'}${decimalString}`
 }
 
 /*
