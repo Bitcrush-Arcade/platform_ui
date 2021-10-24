@@ -25,7 +25,7 @@ const useCoin = (coinAddress?: string) => {
     const allowance = await coinMethods.allowance(account,contractToCheck).call()
     setIsApproved( allowance >= (amountToCheck ?? 1) )
     return allowance >= (amountToCheck ?? 1)
-  },[coinMethods, account])
+  },[coinMethods, account, setIsApproved])
 
   const approve = useCallback( (contractToApprove: string, approveAmount?: number ) => {
     if(!coinMethods) return
