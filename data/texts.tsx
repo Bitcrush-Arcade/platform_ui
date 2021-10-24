@@ -1,4 +1,6 @@
 import Link from '@material-ui/core/Link'
+import Typography from '@material-ui/core/Typography'
+
 export const blacklistExplanation = <>{`
   Bitcrush.com is committed to support responsible gaming, so we added a Self Blacklist function to our contract that allows you to blacklist yourself from making deposits to the Live Wallet for gameplay. 
 
@@ -33,3 +35,33 @@ export const blacklistExplanation = <>{`
   Questions?
   For any other questions regarding responsible gaming please contact our support.
 `}</>
+
+export const bankStakingInfo = <>
+{`
+  By entering this pool you agree that in circumstances of drawdown due to player wins, a portion of this pool could be frozen temporarily until losses are recouped. For taking on a higher risk, we share 60% of all game profits with stakers of this pool. 
+
+  For a breakdown of the Staking Pool and risks associated, please read this article or ask the community:
+`}<Link color="secondary" href="https://bitcrusharcade.medium.com/flight-of-the-navigator-update-v11-7b151272b8c1" rel="nonreferrer noopener">Flight of the Navigator Update v11</Link>{`
+
+  This pool is auto-compounded with a 3% management fee. The breakdown is as follows
+
+  .1% - Auto-Compound Bounty to the caller of the function.
+  1% Burn of total pending compound. 
+  1.9% Platform Reserve Fee. 
+
+  To keep compound gas fees low, rewards are paid out in batches (groups) of stakers at a time. This means that calling an auto-compound function may or may not distribute your own rewards depending where you are in the queue. However you may call the function and claim the bounty as many times as you like. This will ensure that all users are paid out in a timely fashion, including yourself. Either way, you will get your rewards distributed. 
+
+  Profit Distribution has 4 states. 
+
+`}<Typography display="inline" color="secondary">Blastoff Ready (Green))</Typography>{` - Ready for profit distribution
+`}<Typography display="inline" style={{color: 'yellow'}}>Blastoff Pending (Yellow)</Typography>{` - Almost past the profit threshold and will be ready      soon.
+`}<Typography display="inline" color="error">Blastoff Stalled (Red)</Typography>{` – No profit to distribute/in a loss cycle
+`}<Typography display="inline" style={{color: 'rgb(86,166,246)'}}>Frozen (Blue)</Typography>{` – Funds are frozen based on staked %.
+
+  If funds are frozen, APY is still distributed based on full staked amount, and auto-compound can be called any time. 
+
+  Withdrawing funds automatically withdraws your APY rewards, but not pending profits. Be sure your profits are claimed before withdrawing or they will be lost. 
+
+  0.5% unstaking fee if withdrawn within 72h.
+`}
+</>

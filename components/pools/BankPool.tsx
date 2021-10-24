@@ -27,6 +27,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
+import { bankStakingInfo } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
@@ -118,10 +119,13 @@ function BankPool( ) {
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2&nbsp;&nbsp;
-                <Tooltip title={`
-                  BankPOOL, Stake your CRUSH here to add to the Bankroll.
-                  MORE INFO NEEDED
-                `}>
+                <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+                  title={
+                    <Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
+                      {bankStakingInfo}
+                    </Typography>
+                  }
+                >
                   <InfoOutlinedIcon/>
                 </Tooltip>
               </Typography>
@@ -388,5 +392,9 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   spacing:{
     marginBottom: theme.spacing(2),
-  }
+  },
+  tooltip:{
+    width: '80vw',
+    maxWidth: 900,
+  },
 }))
