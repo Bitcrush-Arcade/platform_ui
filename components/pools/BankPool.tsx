@@ -74,6 +74,7 @@ function BankPool( ) {
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
           hydrateData()
+          getApyData()
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
@@ -91,6 +92,7 @@ function BankPool( ) {
         editTransactions(rc.transactionHash,'complete')
         hydrateToken()
         hydrateData()
+        getApyData()
       })
       .on('error', (error, receipt) => {
         console.log('error', error, receipt)
