@@ -107,15 +107,8 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const profitDistribution = bankInfo.availableProfit * (userInfo.stakePercent / 100)
-
-  const houseEdgePercent = useMemo(() => {
-    if(!bankInfo.poolStart)
-      return 0
-      // Total_distributed * 365_days / ( Days_since_Start * total_pool )
-    return new BigNumber( bankInfo.bankDistributed ).times( 365 ).div( new BigNumber( bankInfo.totalStaked ).times( differenceInCalendarDays( new Date(), bankInfo.poolStart ) || 1 ).toNumber() || 1  ).toNumber()
-  },[bankInfo])
-
+  const profitDistribution = (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
+  
   return (<>
     <Card className={ css.card } background="light">
       <Grid container justifyContent="space-evenly">
@@ -236,7 +229,6 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  {/* IF REWARD > profit[0].remaining then 0 */}
                   <Typography color="primary">{currencyFormat(profitDistribution, { isWei: true })}</Typography>
                 </Grid>
                 <Grid item xs={12}>
