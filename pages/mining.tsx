@@ -59,7 +59,7 @@ const Mining = () => {
     </Grid>
     <Grid container justifyContent="center" spacing={1} className={ css.section }>
       <Grid item>
-        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!"/>
       </Grid>
     </Grid>
   </PageContainer>
