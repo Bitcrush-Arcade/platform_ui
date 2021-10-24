@@ -173,7 +173,7 @@ const Menu = ( props: MenuProps) => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="body2" color="textPrimary">
-                                    $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 2 })}
+                                    $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 3 })}
                                 </Typography>
                             </Grid>
                         </Grid>
