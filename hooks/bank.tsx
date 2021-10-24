@@ -46,11 +46,12 @@ const getBankData = useCallback( async() => {
     const profitShare = await bankMethods.profitShare().call()
     const divisor = await bankMethods.DIVISOR().call()
     const sharePercent = new BigNumber( profitShare ).div( divisor )
+    const calculatedProfit = new BigNumber(availableProfit).times( sharePercent ).minus(negativeProfit).toNumber()
     setBankInfo( draft => {
       draft.totalBankroll = +totalBankroll
       draft.profitThreshold = +profitThreshold
-      draft.availableProfit =  new BigNumber(availableProfit).times( sharePercent ).minus(negativeProfit).toNumber()
-      draft.thresholdPercent = parseFloat( new BigNumber(availableProfit).times( sharePercent ).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) )
+      draft.availableProfit =  calculatedProfit
+      draft.thresholdPercent = calculatedProfit >= 0 ? parseFloat( new BigNumber(availableProfit).times( sharePercent ).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) ) : 0
       draft.bankDistributed = +totalProfit
     })
   },[bankMethods, setBankInfo])
