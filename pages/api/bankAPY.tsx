@@ -11,6 +11,7 @@ import { currencyFormat } from 'utils/text/text'
 import { getContracts } from 'data/contracts'
 
 export default async function bankAPY(req : NextApiRequest, res: NextApiResponse){
+  BigNumber.config({ DECIMAL_PLACES: 18 })
   // Check validity of request
   const body = JSON.parse(req.body || "{}" )
 
@@ -47,7 +48,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   // Bankroll
   const totalProfit = new BigNumber( await bankContract.methods.totalProfit().call() )
   // TotalProfit / ( days Since ContractLaunch ) / 288 claims per day
-  const profitEmission = totalProfit.isGreaterThan(0) ? totalProfit.div( differenceInCalendarDays( new Date(), new Date( deployTime.times(1000).toNumber() ) ) ).div( 288 ).toNumber() : 0
+  const profitEmission = totalProfit.isGreaterThan(0) ? totalProfit.div( differenceInCalendarDays( new Date(), new Date( deployTime.times(1000).toNumber() ) ) || 1 ).div( 288 ).toNumber() : 0
   const compoundRewards = {
     d1: {
       return: 0,
@@ -101,8 +102,8 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
 
     const compoundedTotalStaked = (compoundBlock -1 ) * ((blocksPerCompound * stakingEmission) + profitEmission) + totalStaked
     const poolPercent = (initStake + compoundedReward + houseEdgeProfit )/compoundedTotalStaked 
-    compoundedReward = compoundedReward + ( stakingEmission * poolPercent * blocksPerCompound )
-    houseEdgeProfit = houseEdgeProfit + ( profitEmission * poolPercent )
+    compoundedReward += ( stakingEmission * poolPercent * blocksPerCompound )
+    houseEdgeProfit += ( profitEmission * poolPercent )
     if( compoundBlock == d1Check && !compoundRewards.d1.return ){
       compoundRewards.d1.return = new BigNumber(compoundedReward).div( new BigNumber(10).pow(18)).toNumber()
       compoundRewards.d1.percent = compoundedReward / initStake
