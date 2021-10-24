@@ -51,7 +51,7 @@ const getBankData = useCallback( async() => {
       draft.totalBankroll = +totalBankroll
       draft.profitThreshold = +profitThreshold
       draft.availableProfit =  calculatedProfit
-      draft.thresholdPercent = calculatedProfit >= 0 ? parseFloat( new BigNumber(availableProfit).times( sharePercent ).div( new BigNumber(profitThreshold) ).times(100).toFixed(2) ) : 0
+      draft.thresholdPercent = calculatedProfit >= 0 ? new BigNumber(calculatedProfit).times(100).div(profitThreshold).toNumber(): 0
       draft.bankDistributed = +totalProfit
     })
   },[bankMethods, setBankInfo])
@@ -79,12 +79,12 @@ const getBankData = useCallback( async() => {
         poolStart = new Date().getTime()/1000 - (20*24*3600)
       }
 
-      let profits:{ total: number, remaining: number} = { total: 0, remaining: 0}
+      let profits:{ total: number, remaining: number} | null = null
       await stakingMethods.profits(0).call({}, (err, result) => {
         if(err) return
         profits = result
       })
-      .catch( e => console.log('error2', e))
+      .catch( e => console.log('profits[0] returns null'))
       
       
       setBankInfo(draft => {
@@ -151,7 +151,7 @@ type BankInfo = {
   totalStaked: number,
   availableProfit: number,
   profitThreshold: number,
-  profitTotal: { total: number, remaining: number },
+  profitTotal: { total: number, remaining: number } | null,
   profitDistribution: number,
   thresholdPercent: number,
   stakingDistruted: number,
