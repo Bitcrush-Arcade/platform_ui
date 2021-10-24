@@ -32,9 +32,12 @@ const Mining = () => {
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Galactic Mining"
-          description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
-            Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
-            Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
+          description={`Stake CRUSH to earn APY as well as a share of the House Profit Distribution.
+          Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games to scale.
+          Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking. Please read through the information card or ask the community if you have any questions.
+          
+          You can help the community by calling the auto Compound function and earning a bounty % of the entire pending reward amount.
+          All you need to do it press the Claim button, and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
       <Grid item>
@@ -48,9 +51,8 @@ const Mining = () => {
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Mining Pool"
-          description={`Stake CRUSH coins in our single asset staking pool to earn APY that is Auto Compounded.
-            You can help the community by calling the auto Compound function and earning a bounty % of the entire pending reward amount. 
-            All you need to do it press the Claim button,  and watch the rewards compound for everyone staked in the pool.`}
+          description={`Stake CRUSH coins in our single asset staking pool to earn APY.
+          No risk pool - Manual Compound.`}
         />
       </Grid>
       <Grid item style={{width: 215}}/>
