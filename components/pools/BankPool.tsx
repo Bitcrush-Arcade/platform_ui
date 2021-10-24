@@ -110,7 +110,9 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const profitDistribution = (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
+  const profitDistribution = bankInfo.profitTotal
+    ? bankInfo.profitTotal.total >= 0 ? bankInfo.profitTotal.total * userInfo.stakePercent / 100 : 0
+    : (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
   
   return (<>
     <Card className={ css.card } background="light">
@@ -288,7 +290,7 @@ function BankPool( ) {
                 {currencyFormat( bankInfo.bankDistributed, { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                {currencyFormat( bankInfo.bankDistributed * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )}
+                {currencyFormat( bankInfo.bankDistributed * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )} USD
               </Typography>
             </Grid>
             <Grid item xs={12} className={ css.invisibleDivider } />
@@ -302,7 +304,7 @@ function BankPool( ) {
                 {currencyFormat( bankInfo.stakingDistruted , { isWei: true })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                {currencyFormat( bankInfo.stakingDistruted * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )}
+                {currencyFormat( bankInfo.stakingDistruted * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )} USD
               </Typography>
             </Grid>
           </Grid>
