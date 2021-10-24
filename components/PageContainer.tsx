@@ -52,9 +52,8 @@ const PageContainer = ( props: ContainerProps ) => {
   useEagerConnect()
 
   useEffect( () => {
-    if(!liveWalletMethods)
     getApproved( liveWallet.address )
-  },[liveWalletMethods, liveWallet, getApproved])
+  },[ liveWallet, getApproved ])
 
   const toggleMenu = () => setMenuToggle( p => !p )
 
