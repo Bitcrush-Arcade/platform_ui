@@ -147,9 +147,9 @@ function BankPool( ) {
               <Typography variant="h6" component="div" color="primary" className={ css.heavy }>
                 {currencyFormat(userInfo.staked, { isWei: true })}
                 &nbsp;
-                { userInfo.frozenStake > 0 && <Tooltip arrow title={<Typography variant="caption">Frozen Funds</Typography>}>
+                { userInfo.frozenStake > 0 && <Tooltip arrow title={<Typography variant="caption" style={{ whiteSpace: 'pre-line'}}>Frozen Funds{'\n'}{currencyFormat( userInfo.frozenStake, { isWei: true } )}</Typography>}>
                   <Typography component="span" className={ css.frozen }>
-                    ({currencyFormat( userInfo.frozenStake, { isWei: true } )})
+                    ({currencyFormat( userInfo.frozenStake, { isWei: true, decimalsToShow: 4 } )})
                   </Typography>
                 </Tooltip>}
               </Typography>
