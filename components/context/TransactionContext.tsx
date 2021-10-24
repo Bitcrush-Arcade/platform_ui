@@ -111,7 +111,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const getTokenInfo = useCallback( async() => {
     const crushPrice = await fetch('/api/getPrice').then( res => res.json() )
     setCoinInfo( draft => {
-      draft.crushUsdPrice = crushPrice?.crushUsdPrice || 0
+      draft.crushUsdPrice = +crushPrice?.crushUsdPrice || 0
     })
     tokenHydration()
   },[setCoinInfo, tokenHydration])
