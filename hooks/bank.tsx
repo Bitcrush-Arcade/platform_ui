@@ -51,7 +51,7 @@ const getBankData = useCallback( async() => {
       draft.totalBankroll = +totalBankroll
       draft.profitThreshold = +profitThreshold
       draft.availableProfit =  calculatedProfit
-      draft.thresholdPercent = calculatedProfit >= 0 ? new BigNumber(calculatedProfit).times(100).div(profitThreshold).toNumber(): 0
+      draft.thresholdPercent = calculatedProfit >= 0 ? new BigNumber(calculatedProfit).times(100).div( sharePercent.times(profitThreshold) ).toNumber(): 0
       draft.bankDistributed = +totalProfit
     })
   },[bankMethods, setBankInfo])
