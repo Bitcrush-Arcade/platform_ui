@@ -91,7 +91,7 @@ const getBankData = useCallback( async() => {
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.pendingStaked = new BigNumber( pendingStaked ).toNumber()
-        draft.profitTotal = { total: +profits.total, remaining: +profits.remaining}
+        draft.profitTotal = { total: +(profits?.total || '0'), remaining: +(profits?.remaining || '0' )}
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
         draft.poolStart = new Date( parseInt(poolStart) * 1000 )
       })
