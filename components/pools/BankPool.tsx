@@ -110,7 +110,7 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const profitDistribution = bankInfo.profitTotal
+  const profitDistribution = (bankInfo.profitTotal?.remaining || 0) > 0 
     ? bankInfo.profitTotal.total >= 0 ? bankInfo.profitTotal.total * userInfo.stakePercent / 100 : 0
     : (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
   
