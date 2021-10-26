@@ -135,6 +135,14 @@ const PageContainer = ( props: ContainerProps ) => {
             })
             .then( response => response.json())
             .then( data => {
+              // check if gameplay has happened in the past minute
+              if( data.timelock ){
+                editTransactions('withdrawError','pending', { comment: 'Withdrawals are delayed for 90 seconds after gameplay ends. Please try again shortly'});
+                setTimeout(() => {
+                  editTransactions('withdrawError', 'error',{ errorData: 'Withdrawals are delayed for 90 seconds after gameplay ends. Please try again shortly'})
+                },3000)
+                return
+              }
               data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
               if(!data.txHash){
                 editTransactions( 'Err........or..', 'pending', {errorData: data.error})
