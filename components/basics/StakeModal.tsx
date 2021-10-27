@@ -174,7 +174,7 @@ function StakeModal( props: StakeModalProps ) {
               MAX
             </SmallButton>
           </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={disableAction || isSubmitting || hasErrors }
+          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
             onClick={ e => { 
               if(!needsApprove) return
               e.preventDefault()
