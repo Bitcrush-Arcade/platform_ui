@@ -73,6 +73,20 @@ const PageContainer = ( props: ContainerProps ) => {
     return filteredPending
   },[pending, hiddenPending ])
 
+  const withdrawDetails = (vals) => {
+    return timelockInPlace ? <>
+          <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
+            0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }.
+            <br/>
+            {activeTimelock && <>
+              {"Withdraws are disabled for 90 seconds after gameplay, please try again shortly."}
+              </>
+            }
+          </Typography>
+        </>
+        : <></>
+  }
+
 
     // LiveWallet Options
     const lwOptions: Array<StakeOptionsType> = [
@@ -89,23 +103,13 @@ const PageContainer = ( props: ContainerProps ) => {
         maxValue: lwContext.balance,
         onSelectOption: hydrateToken,
         disableAction: activeTimelock,
-        more: function moreDetails ( values ) { 
-          return timelockInPlace ? <>
-          <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-            0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
-            {activeTimelock && <>
-              {"Withdraws are disabled for 90 seconds after gameplay, prlease try again shortly."}
-              </>
-            }
-          </Typography>
-        </>
-        : <></>
-      }
+        more: withdrawDetails
       },
     ]
 
     const stakeModalActionSelected = async ( action: number)=> {
-      const serverResponse = await fetch(`/api/db/play_timelock_active`,{
+      if(!timelockInPlace) return false
+      const quickWithdrawLock = await fetch(`/api/db/play_timelock_active`,{
           method: "POST",
           headers:{
             origin: "http://localhost:3000"
@@ -123,11 +127,9 @@ const PageContainer = ( props: ContainerProps ) => {
         .catch( e => {
           return 'Error'
       })
-      setActiveTimelock( p => serverResponse.timelock 
-        &&  new BigNumber(serverResponse.timelock)
-              .plus( 90000 )
-              .isGreaterThan( new Date().getTime() )
-      )
+      console.log({ quickWithdrawLock })
+      if(typeof(quickWithdrawLock) == 'string') return true
+      setActiveTimelock( p => quickWithdrawLock )
 
     }
 
