@@ -86,7 +86,7 @@ const PageContainer = ( props: ContainerProps ) => {
         name: 'Withdraw Funds',
         description: 'Withdraw funds from Live Wallet to CRUSH',
         btnText: 'Live Wallet CRUSH',
-        maxValue: 100000000000000000,//lwContext.balance,
+        maxValue: lwContext.balance,
         onSelectOption: hydrateToken,
         disableAction: activeTimelock,
         more: function moreDetails ( values ) { 
@@ -105,22 +105,24 @@ const PageContainer = ( props: ContainerProps ) => {
     ]
 
     const stakeModalActionSelected = async ( action: number)=> {
-      console.log('stakeModalAction')
-      const serverResponse = { timelock: new Date().getTime() }
-      // const serverResponse = await fetch(`${servers[ process.env.NODE_ENV ]}/ROUTE TO TIMELOCK`,{
-      //     method: "POST",
-      //     headers:{
-      //       origin: "http://localhost:3000"
-      //     },
-      //     body: JSON.stringify({
-      //       account: account
-      //     })
-      //   })
-      //   .then( r => r.status == 200 && r.json() )
-      //   .then( d => d?.timeStamp || 0)
-      //   .catch( e => {
-      //     return 'Error'
-      // })
+      const serverResponse = await fetch(`/api/db/play_timelock_active`,{
+          method: "POST",
+          headers:{
+            origin: "http://localhost:3000"
+          },
+          body: JSON.stringify({
+            account: account
+          })
+        })
+        .then( r =>  r.json() )
+        .then( d => {
+          if(d.error)
+            return true
+          return d?.lockWithdraw || false
+        })
+        .catch( e => {
+          return 'Error'
+      })
       setActiveTimelock( p => serverResponse.timelock 
         &&  new BigNumber(serverResponse.timelock)
               .plus( 90000 )
