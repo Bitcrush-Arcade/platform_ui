@@ -17,29 +17,18 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   if(!amount || !account || !chain)
     return res.status(400).send({ message: 'Invalid Request'})
 
-  // const gameLock = await fetch(`${servers[ process.env.NODE_ENV ]}/ROUTE TO TIMELOCK`,{
-  //     method: "POST",
-  //     headers:{
-  //       origin: "http://localhost:3000"
-  //     },
-  //     body: JSON.stringify({
-  //       account: account
-  //     })
-  //   })
-  //   .then( r => r.status == 200 && r.json() )
-  //   .then( d => d?.timeStamp || 0)
-  //   .catch( e => {
-  //     return 'Error'
-  //   })
-  // if( isNaN(gameLock) ){
-  //   res.status(500).json({ message: 'Cant get timelock'})
-  //   return
-  // }
-  // gamelock + 1 min in ms
-  // if( new BigNumber(gameLock).plus( 60000 ).isLessThan( new Date().getTime())  ){
-    res.status(200).json({ timelock: true })
+  const host = req.headers.host
+  const isLocal = host.indexOf('localhost:') > -1
+
+  const lock = await fetch(`http${isLocal ? '' : 's'}://${host}/api/db/play_timelock_active`,{
+    method: 'POST',
+    body: JSON.stringify({ account: account })
+  }).then( r => r.json() )
+
+  if(lock.lockWithdraw){
+    res.status(200).json({ message: 'Withdraw locked for 90 secs, please try later', timelock: lock.lockWithdraw })
     return
-  // }
+  }
 
   // SETUP BLOCKCHAIN
   const provider =  chain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s3.binance.org:8545/'
