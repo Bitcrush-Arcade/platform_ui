@@ -6,22 +6,20 @@ const playTimelockActive = async(req: NextApiRequest, res: NextApiResponse)=>{
   const { account } = JSON.parse(req.body)
   if(req.method !=='POST' || !account )
     res.status(400).json({ error: 'Invalid Request' })
-
   const timeStamp = await fetch( `${process.env.GAMES_API}/dragon/games/getRequestTime`,{
     method: 'POST',
     headers:{
-      origin: 'localhost:3000'
+      origin: 'localhost:3000',
+      "Content-Type": "application/json"
     },
     body: JSON.stringify({ account: account })
   })
     .then( r => {
-      console.log(r)
       if(r.status == 200)
         return r.json()
       return { timeStamp: 'error'}
     } )
     .then( d => {
-      console.log(d)
       const typeofTimestamp = typeof(d.timeStamp)
       switch(typeofTimestamp){
         case 'number':
@@ -30,7 +28,6 @@ const playTimelockActive = async(req: NextApiRequest, res: NextApiResponse)=>{
             return false
       }
     })
-  console.log(timeStamp)
   if( isNaN(timeStamp) ) 
     return res.status(503).json({ origin: 'Game Server', more: 'something Off with server' })
 
