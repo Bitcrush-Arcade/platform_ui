@@ -102,7 +102,7 @@ const PageContainer = ( props: ContainerProps ) => {
         btnText: 'Live Wallet CRUSH',
         maxValue: lwContext.balance,
         onSelectOption: hydrateToken,
-        disableAction: activeTimelock,
+        disableAction: timelockInPlace && activeTimelock,
         more: withdrawDetails
       },
     ]
