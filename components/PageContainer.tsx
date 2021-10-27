@@ -17,6 +17,7 @@ import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
+import { servers } from 'utils/servers'
 import { differenceFromNow } from 'utils/dateFormat'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
@@ -38,6 +39,7 @@ const PageContainer = ( props: ContainerProps ) => {
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { isApproved, getApproved, approve } = useCoin()
   const [menuToggle, setMenuToggle] = useState<boolean>( menuSm ? false : !isSm )
+  const [ activeTimelock, setActiveTimelock ] = useState<boolean>(false);
   const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
   
   const css = useStyles({ menuToggle, ...props })
@@ -84,18 +86,49 @@ const PageContainer = ( props: ContainerProps ) => {
         name: 'Withdraw Funds',
         description: 'Withdraw funds from Live Wallet to CRUSH',
         btnText: 'Live Wallet CRUSH',
-        maxValue: lwContext.balance,
+        maxValue: 100000000000000000,//lwContext.balance,
         onSelectOption: hydrateToken,
+        disableAction: activeTimelock,
         more: function moreDetails ( values ) { 
           return timelockInPlace ? <>
           <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
             0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }
+            {activeTimelock && <>
+              {"Withdraws are disabled for 90 seconds after gameplay, prlease try again shortly."}
+              </>
+            }
           </Typography>
         </>
         : <></>
       }
       },
     ]
+
+    const stakeModalActionSelected = async ( action: number)=> {
+      console.log('stakeModalAction')
+      const serverResponse = { timelock: new Date().getTime() }
+      // const serverResponse = await fetch(`${servers[ process.env.NODE_ENV ]}/ROUTE TO TIMELOCK`,{
+      //     method: "POST",
+      //     headers:{
+      //       origin: "http://localhost:3000"
+      //     },
+      //     body: JSON.stringify({
+      //       account: account
+      //     })
+      //   })
+      //   .then( r => r.status == 200 && r.json() )
+      //   .then( d => d?.timeStamp || 0)
+      //   .catch( e => {
+      //     return 'Error'
+      // })
+      setActiveTimelock( p => serverResponse.timelock 
+        &&  new BigNumber(serverResponse.timelock)
+              .plus( 90000 )
+              .isGreaterThan( new Date().getTime() )
+      )
+
+    }
+
 
     const lwSubmit: SubmitFunction = ( values, form ) => {
       if(!liveWalletMethods) return form.setSubmitting(false)
@@ -198,6 +231,7 @@ const PageContainer = ( props: ContainerProps ) => {
         name: 'Crush Coin',
         decimals: 18
       }}
+      onActionSelected={stakeModalActionSelected}
     />
     {/* <Footer/> */}
   </div>
