@@ -32,6 +32,7 @@ export default function TxCard( props: TxCardProps ){
   }
   const first = hashes[ keys[0] ]
   const isError = !!first.errorMsg
+  const validKey = /^0x([A-Fa-f0-9]{64})$/.test(keys[0])
   return <Card background="dark" className={ css.card } shadow="dark">
     <Grid container alignItems="center" justifyContent="space-between" >
       <Grid item>
@@ -47,11 +48,11 @@ export default function TxCard( props: TxCardProps ){
             { first.description || first.errorMsg || shortAddress(keys[0])}
           </Typography>
         </Tooltip>
-        <a href={`https://${chainId == 97 ? 'testnet.': ''}bscscan.com/tx/${keys[0]}`} target="_blank" className={ css.link} rel="noreferrer">
+        {validKey && <a href={`https://${chainId == 97 ? 'testnet.': ''}bscscan.com/tx/${keys[0]}`} target="_blank" className={ css.link} rel="noreferrer">
           <Typography color="secondary" variant="caption">
             view on BSCscan <LaunchIcon fontSize="inherit"/>
           </Typography>
-        </a>
+        </a>}
       </Grid>
       <Grid item>
         <IconButton size="small" onClick={() => onClose(keys[0])}>

@@ -56,7 +56,7 @@ function BankPool( ) {
     { name: 'Withdraw', btnText: 'Max', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
       maxValue: userInfo.staked - userInfo.frozenStake },
     { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: userInfo.staked },
+      maxValue: userInfo.staked - userInfo.frozenStake },
   ]
 
   const submit : SubmitFunction = ( values, {setSubmitting}) => {

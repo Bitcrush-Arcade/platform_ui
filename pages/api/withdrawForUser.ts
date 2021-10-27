@@ -8,12 +8,27 @@ import { getContracts } from 'data/contracts'
 import { servers } from 'utils/servers'
 import { toWei } from 'web3-utils'
 
+BigNumber.config({ DECIMAL_PLACES: 18 })
+
 export default async function withdrawForUser( req: NextApiRequest, res: NextApiResponse){
 
   const bodyData: { amount?: number, account?: string, chain?: number } = JSON.parse(req.body || '{}')
-  const { amount = 100, account = "0x7Ff20b4E1Ad27C5266a929FC87b00F5cCB456374", chain = 97 } = bodyData
-  if(!bodyData.amount || !bodyData.account || !bodyData.chain)
+  const { amount, account, chain } = bodyData
+  if(!amount || !account || !chain)
     return res.status(400).send({ message: 'Invalid Request'})
+
+  const host = req.headers.host
+  const isLocal = host.indexOf('localhost:') > -1
+
+  const lock = await fetch(`http${isLocal ? '' : 's'}://${host}/api/db/play_timelock_active`,{
+    method: 'POST',
+    body: JSON.stringify({ account: account })
+  }).then( r => r.json() )
+
+  if(lock.lockWithdraw){
+    res.status(200).json({ message: 'Withdraw locked for 90 secs, please try later', timelock: lock.lockWithdraw })
+    return
+  }
 
   // SETUP BLOCKCHAIN
   const provider =  chain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s3.binance.org:8545/'

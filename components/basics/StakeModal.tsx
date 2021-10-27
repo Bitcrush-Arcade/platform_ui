@@ -35,6 +35,7 @@ export type StakeOptionsType = {
   description: string,
   onSelectOption?: () => void,
   more?: (values: FormValues) => ReactNode,
+  disableAction?: boolean,
 }
 
 export type FormValues = { stakeAmount: number, actionType: number }
@@ -49,10 +50,11 @@ type StakeModalProps = {
   needsApprove?: boolean,
   coinInfo?: { symbol: string, name: string, decimals?: number },
   onApprove?: () => void,
+  onActionSelected?: (actionType: number) => void,
 }
 
 function StakeModal( props: StakeModalProps ) {
-  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove} = props
+  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected} = props
   const css = useStyles({})
 
   const InfoText = () => {
@@ -88,7 +90,7 @@ function StakeModal( props: StakeModalProps ) {
       >
       { ({values, setFieldValue, isSubmitting, errors}) =>{
         const { actionType, stakeAmount } = values
-        const maxUsed = options[actionType].maxValue
+        const {maxValue: maxUsed, disableAction} = options[actionType]
         const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
         const hasErrors = Object.keys( errors ).length > 0
         const sliderChange = (e: any, value: number) => {
@@ -99,6 +101,7 @@ function StakeModal( props: StakeModalProps ) {
           setFieldValue('actionType', stakeActionValue )
           setFieldValue('stakeAmount', 0 )
           options[stakeActionValue]?.onSelectOption && options[stakeActionValue]?.onSelectOption()
+          onActionSelected && onActionSelected( stakeActionValue )
         }
         const maxUsedAvailable = maxUsed ?? false
         const isMaxAvailable = typeof(maxUsedAvailable) !== 'boolean'
@@ -171,7 +174,7 @@ function StakeModal( props: StakeModalProps ) {
               MAX
             </SmallButton>
           </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting || hasErrors }
+          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
             onClick={ e => { 
               if(!needsApprove) return
               e.preventDefault()
