@@ -109,10 +109,6 @@ function BankPool( ) {
       return approve(addresses.staking)
     setOpenStaking(true)
   }
-
-  const profitDistribution = (bankInfo.profitTotal?.remaining || 0) > 0 
-    ? bankInfo.profitTotal.total >= 0 ? bankInfo.profitTotal.total * userInfo.stakePercent / 100 : 0
-    : (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
   
   return (<>
     <Card className={ css.card } background="light">
@@ -237,7 +233,7 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography color="primary">{currencyFormat(profitDistribution, { isWei: true })}</Typography>
+                  <Typography color="primary">{currencyFormat(userInfo.edgeReward,{ isWei: true})}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography color="secondary">
@@ -251,7 +247,7 @@ function BankPool( ) {
                 </Grid>
                 <Grid item>
                   <Typography color="secondary" variant="h5">
-                    {currencyFormat( profitDistribution + userInfo.stakingReward, { isWei: true })}
+                    {currencyFormat( userInfo.edgeReward + userInfo.stakingReward, { isWei: true })}
                   </Typography>
                 </Grid>
               </Grid>
@@ -261,7 +257,7 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={bankInfo.thresholdPercent}
+            percent={bankInfo.thresholdPercent == 0 && bankInfo.profitTotal.remaining > 0 ? 100 : bankInfo.thresholdPercent }
             crushBuffer={bankInfo.availableProfit}
             frozen={ bankInfo.totalFrozen }
           />
