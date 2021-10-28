@@ -33,13 +33,18 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   const autoLimit = parseInt( await methods.autoCompoundLimit().call() )
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
   const totalStaked = parseInt( await methods.totalStaked().call() )
+  const lastAutoBlock = await methods.lastAutoCompoundBlock().call()
   let addressesLength 
   try {
     addressesLength = parseInt( await methods.indexesLength().call() )
   }
   catch{
-    addressesLength = 3
+    addressesLength = 0
   }
+  if(!addressesLength)
+    return res.status( 200 ).json({ 
+      compounderBounty: 0,
+    })
   
   const compounderFee = parseInt( await methods.performanceFeeCompounder().call()) / 10000
 
@@ -54,9 +59,9 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   for( let i = startIndex; i < batchLimit; i++){
     const indexedAddress = await methods.addressIndexes( i ).call()
     const reward = await methods.pendingReward( indexedAddress ).call()
-    const stakings = await methods.stakings( indexedAddress ).call()
-
-    const calcShare = new BigNumber(profit.total).times(stakings.stakedAmount).div( totalStaked )
+    const { stakedAmount,  lastStaking, lastBlockCompounded} = await methods.stakings( indexedAddress ).call()
+    const recentStaked = new BigNumber( lastBlockCompounded).isGreaterThan(lastAutoBlock)
+    const calcShare = new BigNumber(profit.total).times( recentStaked ? lastStaking : stakedAmount).div( totalStaked )
     const profitToAdd = calcShare.isGreaterThan( remainingProfit )
       ? remainingProfit
       : calcShare
