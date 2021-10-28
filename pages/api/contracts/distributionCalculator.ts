@@ -29,9 +29,9 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     profit = { total: 0, remaining: 0}
   }
   // profit[0] => { total, remaining }
+
   const userStakings = await methods.stakings(account).call()
   const { index: userIndex } = userStakings || {}
-  const autoLimit = parseInt( await methods.autoCompoundLimit().call() )
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
   const totalStaked = parseInt( await methods.totalStaked().call() )
   let addressesLength 
@@ -39,22 +39,15 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     addressesLength = parseInt( await methods.indexesLength().call() )
   }
   catch{
-    addressesLength = 3
+    addressesLength = 0
   }
   
-  const compounderFee = parseInt( await methods.performanceFeeCompounder().call()) / 10000
-
-  const calcLimit = startIndex + autoLimit
-  const batchLimit = addressesLength <= autoLimit || calcLimit >= addressesLength
-  ? addressesLength
-  : calcLimit
-  
   // CALCULATE REWARDS
-  let stakeReward = new BigNumber(0)
+  let userProfit = new BigNumber(0)
   let remainingProfit = new BigNumber(profit.remaining)
-  for( let i = startIndex; i < batchLimit; i++){
-    const indexedAddress = await methods.addressIndexes( i ).call()
-    const reward = await methods.pendingReward( indexedAddress ).call()
+  for( let i = startIndex; i < (addressesLength + startIndex); i++){
+    const reviewedIndex = i >= addressesLength ? addressesLength - i : i
+    const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
     const stakings = await methods.stakings( indexedAddress ).call()
 
     const calcShare = new BigNumber(profit.total).times(stakings.stakedAmount).div( totalStaked )
@@ -62,11 +55,17 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
       ? remainingProfit
       : calcShare
     remainingProfit = remainingProfit.minus(profitToAdd)
+    if( reviewedIndex == parseInt(userIndex) ){
+      userProfit = profitToAdd
+      break
+    }
+    if(remainingProfit.isLessThanOrEqualTo(0)){
+      break
+    }
 
-    stakeReward = stakeReward.plus( reward ).plus( profitToAdd )
   }
   res.status( 200 ).json({ 
-    compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber(),
+    userProfit: userProfit.toNumber()
   })
 
 
