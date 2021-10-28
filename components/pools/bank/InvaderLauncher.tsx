@@ -72,7 +72,10 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
           </Grid>
           <Grid item xs={6}>
             <Typography className={ css.colorChange }>
-              {currencyFormat( crushBuffer || 0, { decimalsToShow: 0, isWei: true, showPositive: true })} CRUSH
+              { (crushBuffer || 0 ) >= 0 
+                ? `${currencyFormat( (percent || 0) > 100 ? 100 : (percent || 0 ), { decimalsToShow: 0 })}%`
+                : `${currencyFormat( crushBuffer || 0, { decimalsToShow: 0, isWei: true } ) } CRUSH`
+              }
             </Typography>
             <Typography className={ css.colorChange }>
               Blastoff {textProperties.text}
