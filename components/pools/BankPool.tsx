@@ -38,7 +38,13 @@ function BankPool( ) {
   const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
   const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
-
+  useEffect( () => {
+    if(!getApyData) return
+    const interval = setInterval( () => getApyData(), 30000)
+    return () => {
+      clearInterval( interval )
+    }
+  },[getApyData])
   // CHECK ALLOWANCE OF STAKING CONTRACT
   useEffect(() => {
     if(!addresses?.staking) return
