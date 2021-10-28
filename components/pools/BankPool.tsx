@@ -59,7 +59,7 @@ function BankPool( ) {
     { name: 'Withdraw',
       btnText: 'Max',
       description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
-      more: (vals) => {
+      more: function moreDetails(vals) {
         return userInfo.frozenStake > 0 
         ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
             Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
