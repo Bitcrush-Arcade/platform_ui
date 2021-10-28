@@ -193,7 +193,7 @@ function BankPool( ) {
                   <CalculationIcon fontSize="inherit"/>
                 </IconButton>
               </Typography>
-                <Typography color="primary" variant="h6" component="div">
+                <Typography color="primary" variant="h6" component="div" className={ bankInfo.totalFrozen ? css.siren : "" }>
                   { bankInfo.apyPercent ? 
                     `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 4})}%`
                     : <Skeleton/>
@@ -352,6 +352,17 @@ function BankPool( ) {
 export default BankPool
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
+  "@keyframes apySiren":{
+    "0%": { color: theme.palette.primary.main },
+    "50%": { color: theme.palette.error.main },
+    "100%": { color: theme.palette.primary.main },
+  },
+  siren:{
+    animationName: '$apySiren',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
+  },
   actionBtns:{
     marginTop: theme.spacing(2)
   },
