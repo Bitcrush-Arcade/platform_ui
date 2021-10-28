@@ -37,7 +37,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushLiveWallet.abi,
     },
     97:{
-      address: '0xe369aDa3BAb4d0a6E325Ba7E6eAC0EA85D03604c',
+      address: '0xBc94953BF2fdA781809C8131a07619219a2c3BFf',
       abi: BitcrushLiveWallet.abi,
     }
   },
@@ -47,7 +47,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushBankroll.abi,
     },
     97:{
-      address: '0xDc912E85bBBaCAAdbA88935a26f110F808f31E75',
+      address: '0x45b8509028DDbee73A251C11c18026f60E9e5bcc',
       abi: BitcrushBankroll.abi,
     }
   },
@@ -57,7 +57,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushStaking.abi,
     },
     97:{
-      address: '0x174e6B28DE9dA15Be6C872D99Eb77008Dc3b9f23',
+      address: '0x70c3453F4675Dbf24A4792C0256461a9e8AF3c0b',
       abi: BitcrushStaking.abi,
     }
   }
