@@ -106,7 +106,7 @@ const getBankData = useCallback( async() => {
       }
       const userRewards = await stakingMethods.pendingReward(account).call()
       const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
-      const totalStakedVerified = (+totalStaked || 1) + ( (+currentStaked.index) >= (+batchIndex) ? +pendingStaked : 0 )
+      const totalStakedVerified = (+totalStaked || 1) + ( (+currentStaked.index) < (+batchIndex) ? +pendingStaked : 0 )
       const stakedPercent = (+currentStaked.stakedAmount)/( totalStakedVerified )
       
       const edgeRewardCalculated = await fetch('/api/contracts/distributionCalculator',{
