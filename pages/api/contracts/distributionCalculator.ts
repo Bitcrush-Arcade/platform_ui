@@ -29,11 +29,6 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     profit = { total: 0, remaining: 0}
   }
   // profit[0] => { total, remaining }
-
-  const userStakings = await methods.stakings(account).call()
-  const { index: userIndex } = userStakings || {}
-  const startIndex = parseInt( await methods.batchStartingIndex().call() )
-  const totalStaked = parseInt( await methods.totalStaked().call() )
   let addressesLength 
   try {
     addressesLength = parseInt( await methods.indexesLength().call() )
@@ -41,6 +36,14 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
   catch{
     addressesLength = 0
   }
+  if(!addressesLength)
+    return res.status(200).json({ userProfit: 0 })
+    
+  const userStakings = await methods.stakings(account).call()
+  const { index: userIndex } = userStakings || {}
+  const startIndex = parseInt( await methods.batchStartingIndex().call() )
+  const totalStaked = parseInt( await methods.totalStaked().call() )
+  const lastAutoBlock = await methods.lastAutoCompoundBlock().call()
   
   // CALCULATE REWARDS
   let userProfit = new BigNumber(0)
@@ -48,9 +51,9 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
   for( let i = startIndex; i < (addressesLength + startIndex); i++){
     const reviewedIndex = i >= addressesLength ? addressesLength - i : i
     const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
-    const stakings = await methods.stakings( indexedAddress ).call()
-
-    const calcShare = new BigNumber(profit.total).times(stakings.stakedAmount).div( totalStaked )
+    const { stakedAmount,  lastStaking, lastBlockCompounded} = await methods.stakings( indexedAddress ).call()
+    const recentStaked = new BigNumber( lastBlockCompounded).isGreaterThan(lastAutoBlock)
+    const calcShare = new BigNumber(profit.total).times( recentStaked ? lastStaking : stakedAmount).div( totalStaked )
     const profitToAdd = calcShare.isGreaterThan( remainingProfit )
       ? remainingProfit
       : calcShare

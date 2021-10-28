@@ -45,6 +45,8 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const actualTotalStaked = new BigNumber( await stakingContract.methods.totalStaked().call() )
   const totalStaked = (actualTotalStaked.isEqualTo( 0 ) ? new BigNumber( 1000000 ).times( new BigNumber(10).pow(18) ) : actualTotalStaked).toNumber()
   const deployTime = new BigNumber( await stakingContract.methods.deploymentTimeStamp().call() )
+  const boost = new BigNumber( await stakingContract.methods.apyBoost().call() )
+  const hasFrozen = new BigNumber( await stakingContract.methods.totalFrozen().call() ).isGreaterThan(0)
   // Bankroll
   const totalProfit = new BigNumber( await bankContract.methods.totalProfit().call() )
   // TotalProfit / ( days Since ContractLaunch ) / 288 claims per day
@@ -93,7 +95,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
 
   const blocksPerCompound = 12 * 5 // BLOCKS PER MINUTE  * 5 MINUTE
 
-  const stakingEmission = emission.times( new BigNumber(1).minus( performanceFee ) ).toNumber() // in wei
+  const stakingEmission = emission.times( hasFrozen ? boost.div(stakingDivisor).plus(1) : 1).times( new BigNumber(1).minus( performanceFee ) ).toNumber() // in wei
   for( 
     let compoundBlock = 1;
     maxCompounds.isGreaterThanOrEqualTo(compoundBlock);

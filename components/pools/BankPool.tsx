@@ -51,12 +51,29 @@ function BankPool( ) {
   const toggleRoi = () => setShowRoi( p => !p )
 
   const stakingOptions : Array<StakeOptionsType> = [
-    { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
-      maxValue: tokenInfo.weiBalance },
-    { name: 'Withdraw', btnText: 'Max', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
-      maxValue: userInfo.staked - userInfo.frozenStake },
-    { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: userInfo.staked - userInfo.frozenStake },
+    { name: 'Stake',
+      btnText: 'Wallet',
+      description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
+      maxValue: tokenInfo.weiBalance
+    },
+    { name: 'Withdraw',
+      btnText: 'Max',
+      description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
+      more: (vals) => {
+        return userInfo.frozenStake > 0 
+        ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+            Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+            Withdraw is locked to once every 3 hours.
+          </Typography>
+        : null
+      },
+      maxValue: userInfo.staked - userInfo.frozenStake
+    },
+    { name: 'Transfer',
+      btnText: 'Rewarded',
+      description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
+      maxValue: userInfo.staked - userInfo.frozenStake
+    },
   ]
 
   const submit : SubmitFunction = ( values, {setSubmitting}) => {
@@ -176,7 +193,7 @@ function BankPool( ) {
                   <CalculationIcon fontSize="inherit"/>
                 </IconButton>
               </Typography>
-                <Typography color="primary" variant="h6" component="div">
+                <Typography color="primary" variant="h6" component="div" className={ bankInfo.totalFrozen ? css.siren : "" }>
                   { bankInfo.apyPercent ? 
                     `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 4})}%`
                     : <Skeleton/>
@@ -261,7 +278,7 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={bankInfo.thresholdPercent == 0 && bankInfo.profitTotal?.remaining > 0 ? 100 : bankInfo.thresholdPercent }
+            percent={bankInfo.thresholdPercent == 0 && (bankInfo.profitTotal?.remaining || 0) > 0 ? 100 : bankInfo.thresholdPercent }
             crushBuffer={bankInfo.availableProfit}
             frozen={ bankInfo.totalFrozen }
           />
@@ -335,6 +352,17 @@ function BankPool( ) {
 export default BankPool
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
+  "@keyframes apySiren":{
+    "0%": { color: theme.palette.primary.main },
+    "50%": { color: theme.palette.error.main },
+    "100%": { color: theme.palette.primary.main },
+  },
+  siren:{
+    animationName: '$apySiren',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
+  },
   actionBtns:{
     marginTop: theme.spacing(2)
   },
