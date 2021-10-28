@@ -51,12 +51,29 @@ function BankPool( ) {
   const toggleRoi = () => setShowRoi( p => !p )
 
   const stakingOptions : Array<StakeOptionsType> = [
-    { name: 'Stake', btnText: 'Wallet', description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
-      maxValue: tokenInfo.weiBalance },
-    { name: 'Withdraw', btnText: 'Max', description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
-      maxValue: userInfo.staked - userInfo.frozenStake },
-    { name: 'Transfer', btnText: 'Rewarded', description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: userInfo.staked - userInfo.frozenStake },
+    { name: 'Stake',
+      btnText: 'Wallet',
+      description: 'Stake your CRUSH into the Bankroll for APY rewards and house profit.',
+      maxValue: tokenInfo.weiBalance
+    },
+    { name: 'Withdraw',
+      btnText: 'Max',
+      description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
+      more: (vals) => {
+        return userInfo.frozenStake > 0 
+        ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+            Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+            Withdraw is locked to once every 3 hours.
+          </Typography>
+        : null
+      },
+      maxValue: userInfo.staked - userInfo.frozenStake
+    },
+    { name: 'Transfer',
+      btnText: 'Rewarded',
+      description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
+      maxValue: userInfo.staked - userInfo.frozenStake
+    },
   ]
 
   const submit : SubmitFunction = ( values, {setSubmitting}) => {
@@ -261,7 +278,7 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={bankInfo.thresholdPercent == 0 && bankInfo.profitTotal.remaining > 0 ? 100 : bankInfo.thresholdPercent }
+            percent={bankInfo.thresholdPercent == 0 && (bankInfo.profitTotal?.remaining || 0) > 0 ? 100 : bankInfo.thresholdPercent }
             crushBuffer={bankInfo.availableProfit}
             frozen={ bankInfo.totalFrozen }
           />
