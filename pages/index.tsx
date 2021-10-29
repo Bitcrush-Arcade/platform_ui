@@ -291,7 +291,7 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary">
+            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary" onClick={lwContext.selfBlacklist}>
               Self BlackList&nbsp;
               <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
                 title={<Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
