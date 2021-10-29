@@ -199,12 +199,18 @@ function BankPool( ) {
                   <CalculationIcon fontSize="inherit"/>
                 </IconButton>
               </Typography>
-                <Typography color="primary" variant="h6" component="div" className={ bankInfo.totalFrozen ? css.siren : "" }>
+              <Tooltip arrow
+                title={ <Typography>During frozen times, APY rewards increased by 25%</Typography>} 
+                disableHoverListener={!bankInfo.totalFrozen}
+                disableTouchListener={!bankInfo.totalFrozen}
+              >
+                <Typography color="primary" variant="h6" component="div" className={(bankInfo.totalFrozen && bankInfo.apyPercent) ? css.siren : "" }>
                   { bankInfo.apyPercent ? 
                     `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 4})}%`
                     : <Skeleton/>
                   }
                 </Typography>
+              </Tooltip>
             </Grid>
             <Grid item>
               <Typography color="primary" variant="h6" component="div">
