@@ -46,28 +46,37 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
   const lastAutoBlock = await methods.lastAutoCompoundBlock().call()
   
   // CALCULATE REWARDS
+  let userStakedReward = new BigNumber(0)
   let userProfit = new BigNumber(0)
   let remainingProfit = new BigNumber(profit.remaining)
   for( let i = startIndex; i < (addressesLength + startIndex); i++){
     const reviewedIndex = i >= addressesLength ? addressesLength - i : i
     const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
+    
+    const stakerReward = new BigNumber(await methods.pendingReward( indexedAddress ).call())
+    
+    if( reviewedIndex == parseInt(userIndex) ){
+      userStakedReward = userStakedReward.plus(stakerReward)
+    }
+    if(remainingProfit.isLessThanOrEqualTo(0)){
+      continue
+    }
+    
     const { stakedAmount,  lastStaking, lastBlockCompounded} = await methods.stakings( indexedAddress ).call()
     const recentStaked = new BigNumber( lastBlockCompounded).isGreaterThan(lastAutoBlock)
     const calcShare = new BigNumber(profit.total).times( recentStaked ? lastStaking : stakedAmount).div( totalStaked )
     const profitToAdd = calcShare.isGreaterThan( remainingProfit )
-      ? remainingProfit
-      : calcShare
+    ? remainingProfit
+    : calcShare
     remainingProfit = remainingProfit.minus(profitToAdd)
     if( reviewedIndex == parseInt(userIndex) ){
-      userProfit = profitToAdd
-      break
-    }
-    if(remainingProfit.isLessThanOrEqualTo(0)){
+      userProfit = userProfit.plus(profitToAdd)
       break
     }
 
   }
   res.status( 200 ).json({ 
+    userStakedReward: userStakedReward.toNumber(),
     userProfit: userProfit.toNumber()
   })
 
