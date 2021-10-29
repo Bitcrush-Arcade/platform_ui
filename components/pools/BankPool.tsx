@@ -204,9 +204,9 @@ function BankPool( ) {
                 disableHoverListener={!bankInfo.totalFrozen}
                 disableTouchListener={!bankInfo.totalFrozen}
               >
-                <Typography color="primary" variant="h6" component="div" className={(bankInfo.totalFrozen && bankInfo.apyPercent) ? css.siren : "" }>
+                <Typography color="primary" variant="h6" component="div" className={`${css.apyPercent} ${(bankInfo.totalFrozen && bankInfo.apyPercent) ? css.siren : ""}` }>
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 4})}%`
+                    `${currencyFormat(bankInfo.apyPercent?.d365?.percent * 100, { decimalsToShow: 2})}%`
                     : <Skeleton/>
                   }
                 </Typography>
@@ -223,7 +223,7 @@ function BankPool( ) {
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat(((bankInfo.apyPercent?.b365?.percent )*100), { decimalsToShow: 4 })}%`
+                    `${currencyFormat(((bankInfo.apyPercent?.b365?.percent )*100), { decimalsToShow: 2 })}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -236,7 +236,7 @@ function BankPool( ) {
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100, { decimalsToShow: 4})}%`
+                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100, { decimalsToShow: 2})}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -254,7 +254,7 @@ function BankPool( ) {
                 </Grid>
                 <Grid item>
                   <Typography color="primary">
-                    {currencyFormat(userInfo.stakingReward, { isWei: true })}
+                    {currencyFormat(userInfo.stakingReward, { isWei: true, decimalsToShow: 4 })}
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -266,7 +266,7 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography color="primary">{currencyFormat(profitDistribution,{ isWei: true})}</Typography>
+                  <Typography color="primary">{currencyFormat(profitDistribution,{ isWei: true, decimalsToShow: 4 })}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography color="secondary">
@@ -280,7 +280,7 @@ function BankPool( ) {
                 </Grid>
                 <Grid item>
                   <Typography color="secondary" variant="h5">
-                    {currencyFormat( profitDistribution + userInfo.stakingReward, { isWei: true })}
+                    {currencyFormat( profitDistribution + userInfo.stakingReward, { isWei: true, decimalsToShow: 4  })}
                   </Typography>
                 </Grid>
               </Grid>
@@ -290,7 +290,7 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={bankInfo.thresholdPercent == 0 && (bankInfo.profitTotal?.remaining || 0) > 0 ? 100 : bankInfo.thresholdPercent }
+            percent={bankInfo.thresholdPercent == 0 && new BigNumber(bankInfo.availableProfit).isGreaterThan(0.00009) && (bankInfo.profitTotal?.remaining || 0) > 0 ? 100 : bankInfo.thresholdPercent }
             crushBuffer={bankInfo.availableProfit}
             frozen={ bankInfo.totalFrozen }
           />
@@ -306,7 +306,7 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat(totalBankroll, { isWei: true })}
+                {currencyFormat(totalBankroll, { isWei: true, decimalsToShow: 4  })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {usdBankRoll} USD
@@ -320,7 +320,7 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat( bankInfo.bankDistributed, { isWei: true })}
+                {currencyFormat( bankInfo.bankDistributed, { isWei: true, decimalsToShow: 4  })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {currencyFormat( bankInfo.bankDistributed * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2} )} USD
@@ -334,7 +334,7 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat( bankInfo.stakingDistruted , { isWei: true })}
+                {currencyFormat( bankInfo.stakingDistruted , { isWei: true, decimalsToShow: 4  })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {currencyFormat( bankInfo.stakingDistruted * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )} USD
@@ -369,13 +369,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
       fontSize: theme.typography.h4.fontSize,
       color: theme.palette.primary.main,
     },
-    "25%": { 
+    "50%": { 
       color: 'pink',
       fontSize: `calc(${theme.typography.h4.fontSize} * 1.05)`,
     },
     "75%": { 
       color: theme.palette.secondary.light,
-      fontSize: `calc(${theme.typography.h4.fontSize} * 1.05)`,
     },
     "100%": { 
       fontSize: theme.typography.h4.fontSize,
@@ -390,6 +389,9 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   actionBtns:{
     marginTop: theme.spacing(2)
+  },
+  apyPercent:{
+    height: `calc(${theme.typography.h4.fontSize} * 1.05)`
   },
   avatar:{
     backgroundColor: theme.palette.primary.main,
