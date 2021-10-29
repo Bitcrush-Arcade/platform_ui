@@ -359,9 +359,22 @@ export default BankPool
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
   "@keyframes apySiren":{
-    "0%": { color: theme.palette.primary.main },
-    "50%": { color: theme.palette.error.main },
-    "100%": { color: theme.palette.primary.main },
+    "0%": { 
+      fontSize: theme.typography.h4.fontSize,
+      color: theme.palette.primary.main,
+    },
+    "25%": { 
+      color: 'pink',
+      fontSize: `calc(${theme.typography.h4.fontSize} * 1.05)`,
+    },
+    "75%": { 
+      color: theme.palette.secondary.light,
+      fontSize: `calc(${theme.typography.h4.fontSize} * 1.05)`,
+    },
+    "100%": { 
+      fontSize: theme.typography.h4.fontSize,
+      color: theme.palette.primary.main,
+    },
   },
   siren:{
     animationName: '$apySiren',
