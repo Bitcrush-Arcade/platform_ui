@@ -307,7 +307,7 @@ const PoolCard = (props: PoolProps) => {
           </Grid>
         </Grid>
         <Button width="100%" color="primary" onClick={cardPreStake} solidDisabledText
-          disabled={!contractAddress || items.totalPool == 0}
+          disabled={ !contractAddress }
         >
           { account 
               ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
@@ -382,7 +382,7 @@ const PoolCard = (props: PoolProps) => {
       <Formik
         initialValues = {{
           stakeAmount: 0,
-          actionType: false
+          actionType: items.totalPool !== 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
           const { stakeAmount, actionType } = values
@@ -452,7 +452,7 @@ const PoolCard = (props: PoolProps) => {
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer }>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)}>
+              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0}>
                 STAKE
               </MButton>
             </Grid>
