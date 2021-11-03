@@ -4,7 +4,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useImmer } from 'use-immer'
+import Carousel from 'react-material-ui-carousel'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
@@ -29,6 +29,7 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
+import highlightedAnnouncements, { width as imgWidth, height as imgHeight, mobileHeight, mobileWidth } from 'data/announcements'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
 import { blacklistExplanation } from 'data/texts'
@@ -96,6 +97,40 @@ export default function Home() {
   const totalValueLocked = tvl + bankInfo.totalStaked
   const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
   const totalDistributed = bankInfo.stakingDistruted + v1Distributed
+  
+  /**
+   * @description This helps for announcemnts that have special effects internally.
+   */
+  const clickAnnouncement = (name: string) => {
+    console.log('annoucement', name)
+  }
+
+  const announcements = highlightedAnnouncements.map( (annoucement, aIndex) => {
+    const { name, img, imgMobile, link, target, rel } = annoucement
+    const externalLink = link.indexOf('/') !== 0
+
+    const mainImg = <a key={`announcement-imgButton-${aIndex}`}
+      href={externalLink ? link : undefined}
+      target={externalLink ? target : undefined}
+      rel={externalLink ? rel : undefined}
+      onClick={ () => clickAnnouncement(name) }
+    >
+      <Image 
+        src={ isSm ? img : imgMobile || img}
+        height={ isSm ? mobileHeight : imgHeight}
+        width={isSm ? mobileWidth : imgWidth}
+        layout="responsive"
+        alt={name}
+      />
+    </a>
+
+
+    return link && !externalLink
+      ? <Link passHref href={link} key={`announcement-link-button-${aIndex}`}>
+          {mainImg}
+        </Link>
+      : mainImg
+  })
 
   return (<>
   <Head>
@@ -174,7 +209,9 @@ export default function Home() {
             </Card>
             {/* Announcement Card */}
             <section style={{ marginTop: 24, width: '100%' }}>
-              <Image src={ isSm ? "/assets/announcements/mobile-yield.png" : "/assets/announcements/banner-yield.png"} height={ isSm ? 250 : 310} width={isSm ? 300 : 1080} layout="responsive" alt="Announcement Yiel Parrot partnership"/>
+              <Carousel animation="slide" interval={5000} stopAutoPlayOnHover navButtonsAlwaysVisible>
+                {announcements}
+              </Carousel>
             </section>
             <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
@@ -254,7 +291,7 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary">
+            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary" onClick={lwContext.selfBlacklist}>
               Self BlackList&nbsp;
               <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
                 title={<Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">

@@ -27,7 +27,7 @@ type ContextType = {
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: TransactionSubmitData ) => void,
   tokenInfo: { weiBalance: number , crushUsdPrice: number},
-  liveWallet: { balance: number, timelock: number },
+  liveWallet: { balance: number, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
   hydrateToken: () => Promise<void>,
@@ -43,7 +43,7 @@ export const TransactionContext = createContext<ContextType>({
   toggleDarkMode: () => {},
   isDark: true,
   hydrateToken: () => Promise.resolve(),
-  liveWallet: { balance: 0, timelock: 0 },
+  liveWallet: { balance: 0, timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
 })
@@ -214,6 +214,21 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     } )
   }
 
+  const selfBlacklist = useCallback(() => {
+    lwMethods.blacklistSelf().send({ from: account })
+      .on('transactionHash', (tx) => {
+        editTransactions(tx, 'pending', { description: "Self Blacklist"})
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  }, [ lwMethods, account, editTransactions])
+
   return <TransactionContext.Provider value={{
     pending: pendingTransactions,
     completed: completeTransactions,
@@ -222,7 +237,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     toggleDarkMode: toggle,
     isDark: dark,
     hydrateToken: tokenHydration,
-    liveWallet: liveWalletBalance,
+    liveWallet: { ...liveWalletBalance, selfBlacklist },
     toggleLwModal,
     lwModalStatus: lwModal
   }}>

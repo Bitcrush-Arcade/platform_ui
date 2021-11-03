@@ -24,12 +24,10 @@ const ProfileAvatar = () => {
   const css = useStyles({})
   const { login, logout, account, chainId } = useAuthContext()
 
-  const { tokenInfo, editTransactions } = useTransactionContext()
+  const { tokenInfo, editTransactions, liveWallet } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
-  const { address: liveWalletAddress, abi: liveAbi } = getContracts('liveWallet', chainId)
-  const { methods: liveMethods } = useContract( liveAbi, liveWalletAddress)
 
   const approve = useCallback(() => {
     coinMethods.approve( stakingContract, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
@@ -51,21 +49,6 @@ const ProfileAvatar = () => {
     logout()
     login()
   },[logout, login])
-
-  const selfBlacklist = useCallback(() => {
-    liveMethods.blacklistSelf().send({ from: account })
-      .on('transactionHash', (tx) => {
-        editTransactions(tx, 'pending', { description: "Self Blacklist"})
-      })
-      .on('receipt', ( rc) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
-      })
-      .on('error', (error, receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-      })
-  }, [ liveMethods, account, editTransactions])
 
   const hasAccount = Boolean(account)
   const toggleDrawer = () => setOpenMenu( p => !p )
@@ -121,7 +104,7 @@ const ProfileAvatar = () => {
           />
         </ListItem>}
         {hasAccount && <ListItem button
-          onClick={ selfBlacklist }
+          onClick={ liveWallet.selfBlacklist }
         >
           <ListItemText
             primary={"Blacklist Self"}
