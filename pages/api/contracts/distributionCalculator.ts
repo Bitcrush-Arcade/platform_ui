@@ -40,10 +40,9 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     return res.status(200).json({ userProfit: 0, userStakedReward: 0 })
     
   const userStakings = await methods.stakings(account).call()
-  const { index: userIndex } = userStakings || {}
+  const { index: userIndex, shares: userShares } = userStakings || {}
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
   const totalShares = parseInt( await methods.totalShares().call() )
-  
   // CALCULATE REWARDS
   let userStakedReward = new BigNumber(0)
   let userProfit = new BigNumber(0)
@@ -53,7 +52,7 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
     
     const stakerReward = new BigNumber(await methods.pendingReward( indexedAddress ).call())
-    if( reviewedIndex == parseInt(userIndex) ){
+    if( parseInt(userShares) > 0 && reviewedIndex == parseInt(userIndex) ){
       userStakedReward = userStakedReward.plus(stakerReward)
     }
     if(remainingProfit.isLessThanOrEqualTo(0)){
