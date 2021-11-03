@@ -69,7 +69,6 @@ const getBankData = useCallback( async() => {
       const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-      const pendingStaked = await stakingMethods.pendingStakedValue().call()
       const batchIndex = await stakingMethods.batchStartingIndex().call()
       let poolStart 
       try{
@@ -90,7 +89,6 @@ const getBankData = useCallback( async() => {
       setBankInfo(draft => {
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
-        draft.pendingStaked = new BigNumber( pendingStaked ).toNumber()
         draft.profitTotal = profits && { total: +(profits?.total || '0'), remaining: +(profits?.remaining || '0' )} || null
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
         draft.poolStart = new Date( parseInt(poolStart) * 1000 )
@@ -105,8 +103,7 @@ const getBankData = useCallback( async() => {
         addressesLength = 0
       }
       const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
-      const totalStakedVerified = (+totalStaked || 1) + ( (+currentStaked.index) < (+batchIndex) ? +pendingStaked : 0 )
-      const stakedPercent = (+currentStaked.stakedAmount)/( totalStakedVerified )
+      const stakedPercent = (+currentStaked.stakedAmount)/( +totalStaked )
       
       const reward = await fetch('/api/contracts/distributionCalculator',{
         method: 'POST',
@@ -169,7 +166,6 @@ type BankInfo = {
   thresholdPercent: number,
   stakingDistruted: number,
   bankDistributed: number,
-  pendingStaked: number,
   apyPercent: RoiProps['apyData'],
   poolStart: Date | null,
 }
@@ -183,7 +179,6 @@ const initBank: BankInfo = {
     total: 0,
     remaining: 0
   },
-  pendingStaked: 0,
   stakingDistruted: 0,
   bankDistributed: 0,
   profitDistribution: 0.6,
