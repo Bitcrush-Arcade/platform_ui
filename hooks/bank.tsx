@@ -103,7 +103,7 @@ const getBankData = useCallback( async() => {
         addressesLength = 0
       }
       const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
-      const stakedPercent = (+currentStaked.stakedAmount)/( +totalStaked )
+      const stakedPercent = (+currentStaked?.stakedAmount || 0)/( +totalStaked || 1 )
       
       const reward = await fetch('/api/contracts/distributionCalculator',{
         method: 'POST',

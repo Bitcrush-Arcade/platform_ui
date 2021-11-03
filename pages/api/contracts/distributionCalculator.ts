@@ -37,13 +37,12 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     addressesLength = 0
   }
   if(!addressesLength)
-    return res.status(200).json({ userProfit: 0 })
+    return res.status(200).json({ userProfit: 0, userStakedReward: 0 })
     
   const userStakings = await methods.stakings(account).call()
   const { index: userIndex } = userStakings || {}
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
-  const totalStaked = parseInt( await methods.totalStaked().call() )
-  const lastAutoBlock = await methods.lastAutoCompoundBlock().call()
+  const totalShares = parseInt( await methods.totalShares().call() )
   
   // CALCULATE REWARDS
   let userStakedReward = new BigNumber(0)
@@ -54,7 +53,6 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
     const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
     
     const stakerReward = new BigNumber(await methods.pendingReward( indexedAddress ).call())
-    
     if( reviewedIndex == parseInt(userIndex) ){
       userStakedReward = userStakedReward.plus(stakerReward)
     }
@@ -62,9 +60,8 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
       continue
     }
     
-    const { stakedAmount,  lastStaking, lastBlockCompounded} = await methods.stakings( indexedAddress ).call()
-    const recentStaked = new BigNumber( lastBlockCompounded).isGreaterThan(lastAutoBlock)
-    const calcShare = new BigNumber(profit.total).times( recentStaked ? lastStaking : stakedAmount).div( totalStaked )
+    const { shares } = await methods.stakings( indexedAddress ).call()
+    const calcShare = new BigNumber(profit.total).times( shares ).div( totalShares )
     const profitToAdd = calcShare.isGreaterThan( remainingProfit )
     ? remainingProfit
     : calcShare
@@ -76,7 +73,7 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
 
   }
   res.status( 200 ).json({ 
-    userStakedReward: userStakedReward.toNumber(),
+    userStakedReward: userStakedReward?.toNumber(),
     userProfit: userProfit.toNumber()
   })
 
