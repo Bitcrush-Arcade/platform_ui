@@ -116,9 +116,9 @@ export default function Home() {
       onClick={ () => clickAnnouncement(name) }
     >
       <Image 
-        src={ isSm ? img : imgMobile || img}
+        src={ !isSm ? img : imgMobile || img}
         height={ isSm ? mobileHeight : imgHeight}
-        width={isSm ? mobileWidth : imgWidth}
+        width={ isSm ? mobileWidth : imgWidth}
         layout="responsive"
         alt={name}
       />
