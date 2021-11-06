@@ -44,20 +44,18 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
   const totalShares = parseInt( await methods.totalShares().call() )
   // CALCULATE REWARDS
-  let userStakedReward = new BigNumber(0)
   let userProfit = new BigNumber(0)
   let remainingProfit = new BigNumber(profit.remaining)
+
+  if( parseInt(userShares) == 0 ){
+    res.status( 200 ).json({ 
+      userProfit: 0
+    })
+    return
+  }
   for( let i = startIndex; i < (addressesLength + startIndex); i++){
     const reviewedIndex = i >= addressesLength ? addressesLength - i : i
     const indexedAddress = await methods.addressIndexes( reviewedIndex ).call()
-    
-    const stakerReward = new BigNumber(await methods.pendingReward( indexedAddress ).call())
-    if( parseInt(userShares) > 0 && reviewedIndex == parseInt(userIndex) ){
-      userStakedReward = userStakedReward.plus(stakerReward)
-    }
-    if(remainingProfit.isLessThanOrEqualTo(0)){
-      continue
-    }
     
     const { shares } = await methods.stakings( indexedAddress ).call()
     const calcShare = new BigNumber(profit.total).times( shares ).div( totalShares )
@@ -69,10 +67,8 @@ const calculateDistribution = async(req: NextApiRequest, res: NextApiResponse)=>
       userProfit = userProfit.plus(profitToAdd)
       break
     }
-
   }
   res.status( 200 ).json({ 
-    userStakedReward: userStakedReward?.toNumber(),
     userProfit: userProfit.toNumber()
   })
 
