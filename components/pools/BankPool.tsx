@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
-import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
+import { useState, useEffect } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
