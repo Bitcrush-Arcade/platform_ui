@@ -10,6 +10,17 @@ class MyDocument extends Document {
         <Head>
           {/* Add external scripts here */}
           <link rel="stylesheet" href="/fonts/fonts.css"/>
+          <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHLPYG3GMV"></script>
+          <script
+            dangerouslySetInnerHTML={ { __html:`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', 'G-FHLPYG3GMV');
+            `}}
+          >
+          </script>
         </Head>
         <body style={{margin: 0}}>
           <Main />

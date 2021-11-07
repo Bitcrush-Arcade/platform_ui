@@ -38,8 +38,8 @@ type GameItem = {
 
 const featuredGames : GameItem[] = [
   { 
-    name: 'Dice Invaders',
-    description: 'Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
+    name: 'Dice Invaders - Beta',
+    description: 'Dice Invaders [BETA] is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
     disabled: false,
     link: '/games/diceInvaders',
     imgSrc: '/games/dice_invaders_pv.png',
