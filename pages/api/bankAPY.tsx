@@ -3,10 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 // Web3
 import Web3 from 'web3'
-import { fromWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 // Utils
-import { currencyFormat } from 'utils/text/text'
 // Data
 import { getContracts } from 'data/contracts'
 
@@ -26,7 +24,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const initStake = new BigNumber( 1000 ).div( price.crushUsdPrice ).times( new BigNumber(10).pow(18) ).toNumber()
 
   const usedChain = body.chainId ? parseInt( body.chainId ) : 97
-  const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
+  const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-1-s1.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   // Contract Setup
     // Bankroll Staking

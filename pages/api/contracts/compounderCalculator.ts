@@ -21,18 +21,9 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   const { address, abi } = getContracts('bankStaking', usedChain)
   
   const { methods } = await new web3.eth.Contract( abi, address )
-  // GET INIT VARIABLES
-  let profit
-  try {
-    profit = await methods.profits(0).call()
-  }
-  catch{
-    profit = { total: 0, remaining: 0}
-  }
   // profit[0] => { total, remaining }
   const autoLimit = parseInt( await methods.autoCompoundLimit().call() )
   const startIndex = parseInt( await methods.batchStartingIndex().call() )
-  const totalShares = parseInt( await methods.totalShares().call() )
   let addressesLength 
   try {
     addressesLength = parseInt( await methods.indexesLength().call() )
@@ -54,18 +45,11 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   
   // CALCULATE REWARDS
   let stakeReward = new BigNumber(0)
-  let remainingProfit = new BigNumber(profit.remaining)
   for( let i = startIndex; i < batchLimit; i++){
     const indexedAddress = await methods.addressIndexes( i ).call()
     const reward = await methods.pendingReward( indexedAddress ).call()
-    const { shares } = await methods.stakings( indexedAddress ).call()
-    const calcShare = new BigNumber(profit.total).times( shares ).div( totalShares )
-    const profitToAdd = calcShare.isGreaterThan( remainingProfit )
-      ? remainingProfit
-      : calcShare
-    remainingProfit = remainingProfit.minus(profitToAdd)
-
-    stakeReward = stakeReward.plus( reward ).plus( profitToAdd )
+    const calcShare = new BigNumber( await methods.pendingProfits( indexedAddress ).call() )
+    stakeReward = stakeReward.plus( reward ).plus( calcShare )
   }
   res.status( 200 ).json({ 
     compounderBounty: stakeReward.times(compounderFee).div( new BigNumber(10).pow(18) ).toNumber(),

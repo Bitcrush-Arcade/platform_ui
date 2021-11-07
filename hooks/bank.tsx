@@ -69,7 +69,6 @@ const getBankData = useCallback( async() => {
       const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-      const batchIndex = await stakingMethods.batchStartingIndex().call()
       let poolStart 
       try{
         poolStart = await stakingMethods.deploymentTimeStamp().call()
@@ -77,19 +76,11 @@ const getBankData = useCallback( async() => {
       catch{
         poolStart = new Date().getTime()/1000 - (20*24*3600)
       }
-
-      let profits:{ total: number, remaining: number} | null = null
-      await stakingMethods.profits(0).call({}, (err, result) => {
-        if(err) return
-        profits = result
-      })
-      .catch( e => console.log('profits[0] returns null'))
       
       
       setBankInfo(draft => {
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
-        draft.profitTotal = profits && { total: +(profits?.total || '0'), remaining: +(profits?.remaining || '0' )} || null
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
         draft.poolStart = new Date( parseInt(poolStart) * 1000 )
       })
@@ -105,15 +96,11 @@ const getBankData = useCallback( async() => {
       const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
       const stakedPercent = (+currentStaked?.stakedAmount || 0)/( +totalStaked || 1 )
       const userStakingReward = +(await stakingMethods.pendingReward(account).call())
-      const reward = await fetch('/api/contracts/distributionCalculator',{
-        method: 'POST',
-        body: JSON.stringify({ account, chain: chainId})
-      })
-        .then( resp => resp.json() )
+      const profitReward = +(await stakingMethods.pendingProfits(account).call())
         
       setUserInfo( draft => {
         draft.stakingReward = userStakingReward
-        draft.edgeReward = +reward.userProfit
+        draft.edgeReward = profitReward
         draft.staked = +currentStaked.stakedAmount
         draft.stakePercent = stakedPercent * 100
         draft.frozenStake = new BigNumber(stakedPercent).times(totalFrozen).toNumber()
@@ -161,7 +148,6 @@ type BankInfo = {
   totalStaked: number,
   availableProfit: number,
   profitThreshold: number,
-  profitTotal: { total: number, remaining: number } | null,
   profitDistribution: number,
   thresholdPercent: number,
   stakingDistruted: number,
@@ -175,10 +161,6 @@ const initBank: BankInfo = {
   totalStaked: 0,
   availableProfit: 0,
   profitThreshold: 0,
-  profitTotal: {
-    total: 0,
-    remaining: 0
-  },
   stakingDistruted: 0,
   bankDistributed: 0,
   profitDistribution: 0.6,
