@@ -80,7 +80,7 @@ const getBankData = useCallback( async() => {
       
       
       setBankInfo(draft => {
-        draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( 0 )
+        draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( 0.001 )
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
