@@ -285,8 +285,8 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={bankInfo.thresholdPercent == 0 && new BigNumber(bankInfo.availableProfit).isGreaterThan(0.00009) && (bankInfo.profitTotal?.remaining || 0) > 0 ? 100 : bankInfo.thresholdPercent }
-            crushBuffer={bankInfo.availableProfit}
+            percent={ bankInfo.thresholdPercent }
+            crushBuffer={ bankInfo.availableProfit }
             frozen={ bankInfo.totalFrozen }
           />
         </Grid>
