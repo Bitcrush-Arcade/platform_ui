@@ -69,7 +69,6 @@ const getBankData = useCallback( async() => {
       const totalFrozen = await stakingMethods.totalFrozen().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-      const batchIndex = await stakingMethods.batchStartingIndex().call()
       let poolStart 
       try{
         poolStart = await stakingMethods.deploymentTimeStamp().call()
@@ -105,15 +104,11 @@ const getBankData = useCallback( async() => {
       const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
       const stakedPercent = (+currentStaked?.stakedAmount || 0)/( +totalStaked || 1 )
       const userStakingReward = +(await stakingMethods.pendingReward(account).call())
-      const reward = await fetch('/api/contracts/distributionCalculator',{
-        method: 'POST',
-        body: JSON.stringify({ account, chain: chainId})
-      })
-        .then( resp => resp.json() )
+      const profitReward = +(await stakingMethods.pendingProfits(account).call())
         
       setUserInfo( draft => {
         draft.stakingReward = userStakingReward
-        draft.edgeReward = +reward.userProfit
+        draft.edgeReward = profitReward
         draft.staked = +currentStaked.stakedAmount
         draft.stakePercent = stakedPercent * 100
         draft.frozenStake = new BigNumber(stakedPercent).times(totalFrozen).toNumber()
