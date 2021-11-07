@@ -285,7 +285,7 @@ function BankPool( ) {
         {/* INVADER LAUNCHER */}
         <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
           <InvaderLauncher
-            percent={ bankInfo.thresholdPercent }
+            percent={ bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent }
             crushBuffer={ bankInfo.availableProfit }
             frozen={ bankInfo.totalFrozen }
           />

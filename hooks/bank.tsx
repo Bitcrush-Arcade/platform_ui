@@ -67,6 +67,7 @@ const getBankData = useCallback( async() => {
       if(!stakingMethods) return
       const totalStaked = await stakingMethods.totalStaked().call()
       const totalFrozen = await stakingMethods.totalFrozen().call()
+      const profitsClaimed = await stakingMethods.totalProfitsClaimed().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
       let poolStart 
@@ -79,6 +80,7 @@ const getBankData = useCallback( async() => {
       
       
       setBankInfo(draft => {
+        draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( 0 )
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
@@ -148,6 +150,7 @@ type BankInfo = {
   totalStaked: number,
   availableProfit: number,
   profitThreshold: number,
+  profitsPending: boolean,
   profitDistribution: number,
   thresholdPercent: number,
   stakingDistruted: number,
@@ -163,6 +166,7 @@ const initBank: BankInfo = {
   profitThreshold: 0,
   stakingDistruted: 0,
   bankDistributed: 0,
+  profitsPending: false,
   profitDistribution: 0.6,
   thresholdPercent: 0,
   apyPercent: undefined,
