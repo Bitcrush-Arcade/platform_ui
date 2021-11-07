@@ -131,10 +131,6 @@ function BankPool( ) {
       return approve(addresses.staking)
     setOpenStaking(true)
   }
-
-  const profitDistribution = (bankInfo.profitTotal?.remaining || 0) > 0 
-    ? userInfo.edgeReward
-    : (bankInfo.availableProfit >= 0 ? bankInfo.availableProfit : 0) * (userInfo.stakePercent / 100)
   
   return (<>
     <Card className={ css.card } background="light">
@@ -265,7 +261,7 @@ function BankPool( ) {
                   <Typography>Profit Distribution</Typography>
                 </Grid>
                 <Grid item>
-                  <Typography color="primary">{currencyFormat(profitDistribution,{ isWei: true, decimalsToShow: 4 })}</Typography>
+                  <Typography color="primary">{currencyFormat(userInfo.edgeReward,{ isWei: true, decimalsToShow: 4 })}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <Typography color="secondary">
@@ -279,7 +275,7 @@ function BankPool( ) {
                 </Grid>
                 <Grid item>
                   <Typography color="secondary" variant="h5">
-                    {currencyFormat( profitDistribution + userInfo.stakingReward, { isWei: true, decimalsToShow: 4  })}
+                    {currencyFormat( userInfo.edgeReward + userInfo.stakingReward, { isWei: true, decimalsToShow: 4  })}
                   </Typography>
                 </Grid>
               </Grid>
