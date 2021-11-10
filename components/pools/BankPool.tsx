@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import format from 'date-fns/format'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
@@ -132,6 +133,9 @@ function BankPool( ) {
       return approve(addresses.staking)
     setOpenStaking(true)
   }
+
+  const launcherPercent = bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent
+  const activeSiren = userInfo.staked > 0 && launcherPercent >= 100
   
   return (<>
     <Card className={ css.card } background="light">
@@ -182,6 +186,15 @@ function BankPool( ) {
               <Typography variant="body2" color="textSecondary" paragraph>
                 Your Stake {currencyFormat( userInfo.stakePercent , { decimalsToShow: 6 })}%
               </Typography>
+              {userInfo.staked > 0 && 
+                <Tooltip arrow
+                  title={<Typography>Rewards earned since last action on {userInfo.lastAction > 0 ? format( new Date(userInfo.lastAction), 'yyyy-MM-dd HH:mm' ) : 'NEVER'}</Typography>}
+                >
+                  <Typography variant="body1" color="textPrimary">
+                    Rewards Earned USD {currencyFormat( (userInfo.edgeReward + userInfo.stakingReward)*tokenInfo.crushUsdPrice , { decimalsToShow: 3, isWei: true })}
+                  </Typography>
+                </Tooltip>
+              }
             </Grid>
           </Grid>
           <Button color="primary" onClick={depositWithdrawClick} width="100%">
@@ -264,8 +277,15 @@ function BankPool( ) {
                     +
                   </Typography>
                 </Grid>
-                <Grid item>
-                  <Typography>Profit Distribution</Typography>
+                <Grid item style={{ height: 25}}>
+                  <Tooltip title={<Typography style={{padding: 8}}>Claim Profits!</Typography>} 
+                    arrow
+                    disableHoverListener={!activeSiren}
+                    disableTouchListener={!activeSiren}
+                    disableFocusListener={!activeSiren}
+                  >
+                    <Typography className={ activeSiren ? css.profitSiren : '' }>Profit Distribution</Typography>
+                  </Tooltip>
                 </Grid>
                 <Grid item>
                   <Typography color="primary">{currencyFormat(userInfo.edgeReward,{ isWei: true, decimalsToShow: 4 })}</Typography>
@@ -303,7 +323,7 @@ function BankPool( ) {
             />
           </Grid>
           <InvaderLauncher
-            percent={ bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent }
+            percent={ launcherPercent }
             crushBuffer={ bankInfo.availableProfit }
             frozen={ bankInfo.totalFrozen }
           />
@@ -377,6 +397,23 @@ function BankPool( ) {
 export default BankPool
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
+  "@keyframes profitSiren":{
+    "0%": { 
+      fontSize: theme.typography.body1.fontSize,
+      color: theme.palette.common.white,
+    },
+    "50%": { 
+      color: 'teal',
+      fontSize: `calc(${theme.typography.body1.fontSize} * 1.05)`,
+    },
+    "75%": { 
+      color: theme.palette.secondary.light,
+    },
+    "100%": { 
+      fontSize: theme.typography.body1.fontSize,
+      color: theme.palette.common.white,
+    },
+  },
   "@keyframes apySiren":{
     "0%": { 
       fontSize: theme.typography.h4.fontSize,
@@ -393,6 +430,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
       fontSize: theme.typography.h4.fontSize,
       color: theme.palette.primary.main,
     },
+  },
+  profitSiren:{
+    animationName: '$profitSiren',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
   },
   siren:{
     animationName: '$apySiren',
