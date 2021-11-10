@@ -36,7 +36,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const contract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
 
   const emission = await contract.methods.crushPerBlock().call()
-  const totalStaked = fromWei( await contract.methods.totalStaked().call() )
+  const totalStaked = await contract.methods.totalStaked().call()
 
   const performanceFee = 0.03
   const compoundEmitted = new BigNumber(emission).times(1 - performanceFee).toNumber()

@@ -118,7 +118,7 @@ const useStyles = makeStyles<Theme>(theme => createStyles({
 }))
 
 export const getServerSideProps: GetServerSideProps = async( context ) => {
-  const { query } = context
+  const { query, res } = context
 
   const { gameKey } = query
   const keyName = typeof(gameKey) == 'string' ? gameKey : gameKey.join('')
@@ -127,7 +127,14 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
   let otherGame: null | any = null;
 
   if(!bitcrushGame){
-    
+    if( process.env.DOWN_DRAGON !== "0"){
+      return {
+        redirect: {
+          destination: '/maintenance',
+          permanent: false
+        }
+      }
+    }
     // const dragonEndpoint = dragonEp.getGames[process.env.NODE_ENV]
     const dragonEndpoint = dragonEp.getGames['production']
 
@@ -156,6 +163,14 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
         if(gameFound)
           otherGame = gameFound[keyName]
       })
+  }
+  else if( process.env.DOWN_DI !== "0"){
+    return {
+      redirect: {
+        destination: '/maintenance',
+        permanent: false
+      }
+    }
   }
 
 

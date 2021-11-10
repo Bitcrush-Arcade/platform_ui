@@ -1,8 +1,8 @@
 // React
 import { createContext, useEffect, useState, ReactNode, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/router'
 // third party libs
 import { useImmer } from 'use-immer'
-import findIndex from 'lodash/findIndex'
 import { useWeb3React } from '@web3-react/core'
 // Material Theming
 import { ThemeProvider } from '@material-ui/core/styles'
@@ -52,6 +52,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const { children } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
+  const router = useRouter()
   const token = getContracts('crushToken', chainId)
   const liveWallet = getContracts('liveWallet', chainId)
   const { methods, web3 } = useContract(token.abi, token.address )
@@ -119,13 +120,15 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   },[setCoinInfo, tokenHydration])
   // Get Token Info
   useEffect( () => {
-    getTokenInfo()
+    const interval = setInterval(getTokenInfo, 10000)
+    return () => clearInterval(interval)
   },[ account, getTokenInfo ])
   // Refetch Token and Wallet Info
   useEffect( ()=>{
-    const interval = setInterval( tokenHydration, 5000)
+    const refetchInterval = router.asPath.indexOf('/games') == 0 ? 1000 : 5000
+    const interval = setInterval( tokenHydration, refetchInterval)
     return () => clearInterval(interval)
-  },[tokenHydration])
+  },[tokenHydration, router])
   // set Current Theme
   useEffect( () => {
     const savedTheme = window.localStorage.getItem('theme')
