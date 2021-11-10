@@ -400,7 +400,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   "@keyframes profitSiren":{
     "0%": { 
       fontSize: theme.typography.body1.fontSize,
-      color: theme.palette.common.white,
+      color: theme.palette.text.primary,
     },
     "50%": { 
       color: 'teal',
@@ -411,7 +411,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     },
     "100%": { 
       fontSize: theme.typography.body1.fontSize,
-      color: theme.palette.common.white,
+      color: theme.palette.text.primary,
     },
   },
   "@keyframes apySiren":{
