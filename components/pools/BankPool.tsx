@@ -11,6 +11,7 @@ import Skeleton from '@material-ui/lab/Skeleton'
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
+import InfoTooltip from 'components/basics/InfoTooltip'
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import RoiModal from 'components/pools/RoiModal'
 import SmBtn from "components/basics/SmallButton"
@@ -26,7 +27,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
-import { bankStakingInfo } from 'data/texts'
+import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
@@ -141,15 +142,21 @@ function BankPool( ) {
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2&nbsp;&nbsp;
-                <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
-                  title={
+                <InfoTooltip 
+                  tooltipProps={{
+                    interactive: true,
+                    leaveDelay: 1000,
+                    classes: { tooltip: css.tooltip },
+                    placement: "top",
+                    enterTouchDelay: 100,
+                    leaveTouchDelay: 120000,
+                  }}
+                  info={
                     <Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
                       {bankStakingInfo}
                     </Typography>
                   }
-                >
-                  <InfoOutlinedIcon/>
-                </Tooltip>
+                />
               </Typography>
             </Grid>
             <Grid item>
@@ -283,7 +290,18 @@ function BankPool( ) {
           </Grid>
         </Grid>
         {/* INVADER LAUNCHER */}
-        <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
+        <Grid item xs={12} md={5} style={{ overflow: 'hidden'}}>
+          <Grid container alignItems="center" style={{ marginBottom: 32}}>
+            <Grid item xs={12}>
+              <Divider className={ css.divider }/>
+            </Grid>
+            <Typography color="secondary" variant="h6">
+              Profit Distribution Launcher&nbsp;
+            </Typography>
+            <InfoTooltip color="secondary"
+              info={ <Typography style={{ padding: 16, whiteSpace: 'pre-line' }}>{launcherTooltip}</Typography>}
+            />
+          </Grid>
           <InvaderLauncher
             percent={ bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent }
             crushBuffer={ bankInfo.availableProfit }
