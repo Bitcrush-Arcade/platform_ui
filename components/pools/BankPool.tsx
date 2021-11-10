@@ -67,19 +67,41 @@ function BankPool( ) {
       btnText: 'Max',
       description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
       more: function moreDetails(vals) {
-        return userInfo.frozenStake > 0 
-        ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
-            Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
-            Withdraw is locked to once every 3 hours.
-          </Typography>
-        : null
+        return <>
+        <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+          Early withdraw fee of 0.5% if withdrawn before 72 hours.
+        </Typography>
+        {
+          userInfo.frozenStake > 0 
+          ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+              Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+              Withdraw and Transfer are locked to once every 3 hours.
+            </Typography>
+          : null
+        }
+        </>
       },
       maxValue: userInfo.staked - userInfo.frozenStake
     },
     { name: 'Transfer',
       btnText: 'Rewarded',
       description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: userInfo.staked - userInfo.frozenStake
+      maxValue: userInfo.staked - userInfo.frozenStake,
+      more: function moreDetails(vals) {
+        return <>
+        <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+          Early withdraw fee of 0.5% if withdrawn before 72 hours.
+        </Typography>
+        {
+          userInfo.frozenStake > 0 
+          ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+              Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+              Withdraw and Transfer are locked to once every 3 hours.
+            </Typography>
+          : null
+        }
+        </>
+      },
     },
   ]
 
@@ -278,7 +300,7 @@ function BankPool( ) {
                   </Typography>
                 </Grid>
                 <Grid item style={{ height: 25}}>
-                  <Tooltip title={<Typography style={{padding: 8}}>Claim Profits!</Typography>} 
+                  <Tooltip title={<Typography style={{padding: 8}}>Claim Auto Bounty!</Typography>} 
                     arrow
                     disableHoverListener={!activeSiren}
                     disableTouchListener={!activeSiren}
