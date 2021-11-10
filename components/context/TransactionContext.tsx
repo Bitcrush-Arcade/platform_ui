@@ -26,7 +26,7 @@ type ContextType = {
   pending: TransactionHash,
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: TransactionSubmitData ) => void,
-  tokenInfo: { weiBalance: number , crushUsdPrice: number},
+  tokenInfo: { weiBalance: number , crushUsdPrice: number, burned: number},
   liveWallet: { balance: number, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
@@ -39,7 +39,7 @@ export const TransactionContext = createContext<ContextType>({
   pending: {},
   completed: {},
   editTransactions: () => {},
-  tokenInfo: { weiBalance: 0, crushUsdPrice: 0 },
+  tokenInfo: { weiBalance: 0, crushUsdPrice: 0, burned: 0},
   toggleDarkMode: () => {},
   isDark: true,
   hydrateToken: () => Promise.resolve(),
@@ -74,6 +74,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     let serverBalance = 0
     
     const tokenBalance = await methods.balanceOf(account).call()
+    const totalBurned = await methods.tokensBurned().call()
     const lwBalance = parseInt( await lwMethods.balanceOf(account).call() )
     const lwBetAmounts = await lwMethods.betAmounts( account ).call()
     const lwDuration = await lwMethods.lockPeriod().call()
@@ -98,6 +99,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
       draft.weiBalance = tokenBalance
+      draft.burned = new BigNumber(totalBurned).div( 10**18 ).toNumber()
     })
     setLiveWalletBalance( prev => {
       const timelock = timelockActive ? timelockEndTime.toNumber() : 0
