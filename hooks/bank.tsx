@@ -13,7 +13,7 @@ function useBank(){
   // Get connection
   const { chainId, account } = useWeb3React()
   const [ bankContract, stakingContract ] = [ getContracts( 'bankroll', chainId ), getContracts( 'bankStaking', chainId )]
-  const { methods: bankMethods } = useContract( bankContract.abi, bankContract.address )
+  const { methods: bankMethods, web3 } = useContract( bankContract.abi, bankContract.address )
   const { methods: stakingMethods } = useContract( stakingContract.abi, stakingContract.address )
 
   const [ bankInfo, setBankInfo ] = useImmer<BankInfo>(initBank)
@@ -95,10 +95,11 @@ const getBankData = useCallback( async() => {
       catch{
         addressesLength = 0
       }
-      const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
+      const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0, claimedAmount: 0, lastBlockCompounded: 0 }
       const stakedPercent = (+currentStaked?.stakedAmount || 0)/( +totalStaked || 1 )
       const userStakingReward = +(await stakingMethods.pendingReward(account).call())
       const profitReward = +(await stakingMethods.pendingProfits(account).call())
+      const blockTimestamp = +(await web3.eth.getBlock( currentStaked.lastBlockCompounded )).timestamp
         
       setUserInfo( draft => {
         draft.stakingReward = userStakingReward
@@ -106,6 +107,8 @@ const getBankData = useCallback( async() => {
         draft.staked = +currentStaked.stakedAmount
         draft.stakePercent = stakedPercent * 100
         draft.frozenStake = new BigNumber(stakedPercent).times(totalFrozen).toNumber()
+        draft.claimed = new BigNumber( currentStaked.claimedAmount ).div( 10**18 ).toNumber()
+        draft.lastAction = (blockTimestamp)*1000 // converts timestamp to millisecond precision
       })
 
     },[stakingMethods, setUserInfo, setBankInfo, account],
@@ -178,6 +181,8 @@ type UserInfo = {
   edgeReward: number,
   stakePercent: number,
   frozenStake: number,
+  claimed: number,
+  lastAction: number,
 }
 
 const initUser: UserInfo ={
@@ -186,4 +191,6 @@ const initUser: UserInfo ={
   edgeReward: 0,
   stakePercent: 0,
   frozenStake: 0,
+  claimed: 0,
+  lastAction: 0,
 }

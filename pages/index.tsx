@@ -43,7 +43,7 @@ export default function Home() {
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
-  const { bankInfo } = useBank()
+  const { bankInfo, userInfo } = useBank()
   const { approve, getApproved, isApproved } = useCoin()
   // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
@@ -194,6 +194,18 @@ export default function Home() {
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
+                    <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
+                      CRUSH Burned
+                    </Typography>
+                    <Typography variant="h4" component="div" align="center">
+                      {currencyFormat( tokenInfo.burned ,{ decimalsToShow: 0 })}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
+                      USD&nbsp;{currencyFormat( tokenInfo.burned * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2 })}
+                    </Typography>
+                  </Grid>
+                  <Divider orientation="vertical" flexItem/>
+                  <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align={isSm ? "center" : "right"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Shared
                     </Typography>
@@ -249,11 +261,10 @@ export default function Home() {
                       currency: "CRUSH",
                     }}
                     rewardInfo={{
-                      title: "HOUSE Profit Earned",
-                      amount: 0,
-                      subtitle: " --- ",
+                      title: "Total HOUSE Profit Earned",
+                      amount: userInfo.claimed,
+                      subtitle: `$ ${currencyFormat( userInfo.claimed * tokenInfo.crushUsdPrice, { decimalsToShow: 2 } )}`,
                       currency: "CRUSH",
-                      comingSoon: true
                     }}
                     icon={<Coin token="LIVE" scale={0.5}/>}
                     action1Title={ isApproved ? "Add / Remove" : "Approve LiveWallet"}
@@ -275,18 +286,30 @@ export default function Home() {
                   Our Partners
                 </Typography>
                 <Grid container alignItems="center" justifyContent="space-evenly">
-                  {partners.map( partner => <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
-                      <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                  {partners.map( partner => {
+                    const graphics = <>
                       <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
-                      <Tooltip arrow placement="bottom"
-                        title={<Typography variant="body1">{partner.name}</Typography>}
-                      >
-                        <Typography align="center" variant="body2" noWrap component="div">
-                          {partner.name}
-                        </Typography>
-                      </Tooltip>
-                      </a>
-                  </Grid>)}
+                        <Tooltip arrow placement="bottom"
+                          title={<Typography variant="body1">{partner.name}</Typography>}
+                        >
+                          <Typography align="center" variant="body2" noWrap component="div">
+                            {partner.name}
+                          </Typography>
+                        </Tooltip>
+                    </>
+                    return <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
+                      { partner.internal
+                        ? <Link href={partner.href} passHref>
+                            <a target="_self" className={css.link}>
+                              {graphics}
+                            </a>
+                          </Link>
+                        : <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                            {graphics}
+                          </a>
+                      }
+                    </Grid>
+                  })}
                 </Grid>
               </CardContent>
             </Card>
@@ -367,12 +390,29 @@ const partners: PartnerData[] = [
   },
 
   {
-    name: 'Revolver Token',
-    href: 'https://www.revolvertoken.com/',
+    name: 'KnightSwap',
+    href: 'https://app.knightswap.financial/farms',
     width: 272,
     height: 272,
-    logo: '/assets/thirdPartyLogos/partners/revolver-logo.png',
+    logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
+  },
+  {
+    name: 'PearZap',
+    href: 'https://bsc.pearzap.com/the-garden',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
+    factor: 4
+  },
+  {
+    name: 'Dragon Gaming',
+    href: '/games',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/dragon-logo.png',
+    factor: 4,
+    internal: true
   },
 
 ]
@@ -385,4 +425,5 @@ type PartnerData = {
   logo: string,
   logoDark?: string,
   factor: number,
+  internal?: boolean,
 }

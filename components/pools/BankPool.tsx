@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import format from 'date-fns/format'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Avatar from "@material-ui/core/Avatar"
@@ -11,6 +12,7 @@ import Skeleton from '@material-ui/lab/Skeleton'
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
+import InfoTooltip from 'components/basics/InfoTooltip'
 import InvaderLauncher from 'components/pools/bank/InvaderLauncher'
 import RoiModal from 'components/pools/RoiModal'
 import SmBtn from "components/basics/SmallButton"
@@ -26,7 +28,7 @@ import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
 // Libs
-import { bankStakingInfo } from 'data/texts'
+import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
@@ -65,19 +67,41 @@ function BankPool( ) {
       btnText: 'Max',
       description: 'Withdraw your staked CRUSH from Bankroll. Sad to see you go :(',
       more: function moreDetails(vals) {
-        return userInfo.frozenStake > 0 
-        ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
-            Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
-            Withdraw is locked to once every 3 hours.
-          </Typography>
-        : null
+        return <>
+        <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+          Early withdraw fee of 0.5% if withdrawn before 72 hours.
+        </Typography>
+        {
+          userInfo.frozenStake > 0 
+          ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+              Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+              Withdraw and Transfer are locked to once every 3 hours.
+            </Typography>
+          : null
+        }
+        </>
       },
       maxValue: userInfo.staked - userInfo.frozenStake
     },
     { name: 'Transfer',
       btnText: 'Rewarded',
       description: 'Transfer your staked CRUSH to the Live Wallet and gamble for more rewards!',
-      maxValue: userInfo.staked - userInfo.frozenStake
+      maxValue: userInfo.staked - userInfo.frozenStake,
+      more: function moreDetails(vals) {
+        return <>
+        <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+          Early withdraw fee of 0.5% if withdrawn before 72 hours.
+        </Typography>
+        {
+          userInfo.frozenStake > 0 
+          ? <Typography variant="caption" component="div" style={{ marginTop: 24 }}>
+              Withdrawing while funds are frozen has a 15% fee to be added back into bankroll to help unfreeze.
+              Withdraw and Transfer are locked to once every 3 hours.
+            </Typography>
+          : null
+        }
+        </>
+      },
     },
   ]
 
@@ -131,6 +155,9 @@ function BankPool( ) {
       return approve(addresses.staking)
     setOpenStaking(true)
   }
+
+  const launcherPercent = bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent
+  const activeSiren = userInfo.staked > 0 && launcherPercent >= 100
   
   return (<>
     <Card className={ css.card } background="light">
@@ -141,15 +168,21 @@ function BankPool( ) {
             <Grid item>
               <Typography variant="h4" component="div" className={ css.heavier }>
                 AUTO BITCRUSH V2&nbsp;&nbsp;
-                <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
-                  title={
+                <InfoTooltip 
+                  tooltipProps={{
+                    interactive: true,
+                    leaveDelay: 1000,
+                    classes: { tooltip: css.tooltip },
+                    placement: "top",
+                    enterTouchDelay: 100,
+                    leaveTouchDelay: 120000,
+                  }}
+                  info={
                     <Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
                       {bankStakingInfo}
                     </Typography>
                   }
-                >
-                  <InfoOutlinedIcon/>
-                </Tooltip>
+                />
               </Typography>
             </Grid>
             <Grid item>
@@ -175,6 +208,15 @@ function BankPool( ) {
               <Typography variant="body2" color="textSecondary" paragraph>
                 Your Stake {currencyFormat( userInfo.stakePercent , { decimalsToShow: 6 })}%
               </Typography>
+              {userInfo.staked > 0 && 
+                <Tooltip arrow
+                  title={<Typography>Rewards earned since last action on {userInfo.lastAction > 0 ? format( new Date(userInfo.lastAction), 'yyyy-MM-dd HH:mm' ) : 'NEVER'}</Typography>}
+                >
+                  <Typography variant="body1" color="textPrimary">
+                    Rewards Earned USD {currencyFormat( (userInfo.edgeReward + userInfo.stakingReward)*tokenInfo.crushUsdPrice , { decimalsToShow: 3, isWei: true })}
+                  </Typography>
+                </Tooltip>
+              }
             </Grid>
           </Grid>
           <Button color="primary" onClick={depositWithdrawClick} width="100%">
@@ -257,8 +299,15 @@ function BankPool( ) {
                     +
                   </Typography>
                 </Grid>
-                <Grid item>
-                  <Typography>Profit Distribution</Typography>
+                <Grid item style={{ height: 25}}>
+                  <Tooltip title={<Typography style={{padding: 8}}>Claim Auto Bounty!</Typography>} 
+                    arrow
+                    disableHoverListener={!activeSiren}
+                    disableTouchListener={!activeSiren}
+                    disableFocusListener={!activeSiren}
+                  >
+                    <Typography className={ activeSiren ? css.profitSiren : '' }>Profit Distribution</Typography>
+                  </Tooltip>
                 </Grid>
                 <Grid item>
                   <Typography color="primary">{currencyFormat(userInfo.edgeReward,{ isWei: true, decimalsToShow: 4 })}</Typography>
@@ -283,9 +332,20 @@ function BankPool( ) {
           </Grid>
         </Grid>
         {/* INVADER LAUNCHER */}
-        <Grid item xs={12} md={5} style={{ paddingTop: 32, overflow: 'hidden'}}>
+        <Grid item xs={12} md={5} style={{ overflow: 'hidden'}}>
+          <Grid container alignItems="center" style={{ marginBottom: 32}}>
+            <Grid item xs={12}>
+              <Divider className={ css.divider }/>
+            </Grid>
+            <Typography color="secondary" variant="h6">
+              Profit Distribution Launcher&nbsp;
+            </Typography>
+            <InfoTooltip color="secondary"
+              info={ <Typography style={{ padding: 16, whiteSpace: 'pre-line' }}>{launcherTooltip}</Typography>}
+            />
+          </Grid>
           <InvaderLauncher
-            percent={ bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent }
+            percent={ launcherPercent }
             crushBuffer={ bankInfo.availableProfit }
             frozen={ bankInfo.totalFrozen }
           />
@@ -359,6 +419,23 @@ function BankPool( ) {
 export default BankPool
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
+  "@keyframes profitSiren":{
+    "0%": { 
+      fontSize: theme.typography.body1.fontSize,
+      color: theme.palette.text.primary,
+    },
+    "50%": { 
+      color: 'teal',
+      fontSize: `calc(${theme.typography.body1.fontSize} * 1.05)`,
+    },
+    "75%": { 
+      color: theme.palette.secondary.light,
+    },
+    "100%": { 
+      fontSize: theme.typography.body1.fontSize,
+      color: theme.palette.text.primary,
+    },
+  },
   "@keyframes apySiren":{
     "0%": { 
       fontSize: theme.typography.h4.fontSize,
@@ -375,6 +452,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
       fontSize: theme.typography.h4.fontSize,
       color: theme.palette.primary.main,
     },
+  },
+  profitSiren:{
+    animationName: '$profitSiren',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
   },
   siren:{
     animationName: '$apySiren',

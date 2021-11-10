@@ -108,7 +108,7 @@ export default InvaderLauncher
 
 const useStyles = makeStyles<Theme,{ color: string, text: string }>( theme => createStyles({
   sliderContainer:{
-    height: 220,
+    height: 180,
   },
   frozen:{
     color: theme.palette.blue.main,

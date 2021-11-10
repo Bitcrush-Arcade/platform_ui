@@ -65,3 +65,12 @@ export const bankStakingInfo = <>
   0.5% unstaking fee if withdrawn within 72h.
 `}
 </>
+
+export const launcherTooltip = <>
+{`Claiming the CRUSH Auto Bounty when launcher is at 100% distributes game profit to all stakers.
+
+ Profit is paid out in batches, so claiming helps eveyone receive their rewards.
+
+ Any time you see the launcher at 100%, it's time to start claiming!
+`}
+</>
