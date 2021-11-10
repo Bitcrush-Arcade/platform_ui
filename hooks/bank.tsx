@@ -95,7 +95,7 @@ const getBankData = useCallback( async() => {
       catch{
         addressesLength = 0
       }
-      const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0}
+      const currentStaked = addressesLength ? await stakingMethods.stakings(account).call() : { index: 0, stakedAmount: 0, claimedAmount: 0 }
       const stakedPercent = (+currentStaked?.stakedAmount || 0)/( +totalStaked || 1 )
       const userStakingReward = +(await stakingMethods.pendingReward(account).call())
       const profitReward = +(await stakingMethods.pendingProfits(account).call())
@@ -106,6 +106,7 @@ const getBankData = useCallback( async() => {
         draft.staked = +currentStaked.stakedAmount
         draft.stakePercent = stakedPercent * 100
         draft.frozenStake = new BigNumber(stakedPercent).times(totalFrozen).toNumber()
+        draft.claimed = new BigNumber( currentStaked.claimedAmount ).div( 10**18 ).toNumber()
       })
 
     },[stakingMethods, setUserInfo, setBankInfo, account],
@@ -178,6 +179,7 @@ type UserInfo = {
   edgeReward: number,
   stakePercent: number,
   frozenStake: number,
+  claimed: number,
 }
 
 const initUser: UserInfo ={
@@ -186,4 +188,5 @@ const initUser: UserInfo ={
   edgeReward: 0,
   stakePercent: 0,
   frozenStake: 0,
+  claimed: 0,
 }
