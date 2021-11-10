@@ -202,7 +202,6 @@ export const getServerSideProps: GetServerSideProps = async(context) =>{
       return d.json()
     } )
     .then( data => {
-      console.log( 'response Data', data )
       return data
     })
     .catch( e => {
