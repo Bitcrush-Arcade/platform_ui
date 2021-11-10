@@ -60,7 +60,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
-  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0})
+  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0, burned: 0})
   const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0, selfBlacklist: () => {} } )
   const [ dark, setDark ] = useState<boolean>( true )
   const [ lwModal, setLwModal ] = useState<boolean>( false )
