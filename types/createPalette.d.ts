@@ -2,6 +2,7 @@ import {Palette, PaletteColorOptions, PaletteColorOptions, TypeBackground } from
 
 declare module '@material-ui/core/styles/createPalette' {
   interface PaletteOptions{
+    blue?: PaletteColorOptions;
     shadow?: {
       primary: PaletteColorOptions;
       secondary: PaletteColorOptions;
@@ -15,6 +16,7 @@ declare module '@material-ui/core/styles/createPalette' {
       secondary: PaletteColor;
     };
     border: PaletteColor;
+    blue: PaletteColor;
   }
 
   interface TypeBackground{

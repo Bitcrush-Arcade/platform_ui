@@ -54,22 +54,22 @@ const RoiModal = ( props: RoiProps ) => {
       <TableBody>
         <TableRow>
           <TableCell>1d</TableCell>
-          <TableCell align="right">{apyData?.d1?.percent || '-'}</TableCell>
+          <TableCell align="right">{(apyData?.d1?.percent *100).toFixed(2) + ' %'}</TableCell>
           <TableCell align="right">{apyData?.d1?.return && currencyFormat(apyData?.d1?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>7d</TableCell>
-          <TableCell align="right">{apyData?.d7?.percent || '-'}</TableCell>
+          <TableCell align="right">{(apyData?.d7?.percent *100).toFixed(2) + ' %'}</TableCell>
           <TableCell align="right">{apyData?.d7?.return && currencyFormat(apyData?.d7?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>30d</TableCell>
-          <TableCell align="right">{apyData?.d30?.percent || '-'}</TableCell>
+          <TableCell align="right">{(apyData?.d30?.percent *100).toFixed(2) + ' %'}</TableCell>
           <TableCell align="right">{apyData?.d30?.return && currencyFormat(apyData?.d30?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>365d (APY)</TableCell>
-          <TableCell align="right">{apyData?.d365?.percent || '-'}</TableCell>
+          <TableCell align="right">{(apyData?.d365?.percent *100).toFixed(2) + ' %'}</TableCell>
           <TableCell align="right">{apyData?.d365?.return && currencyFormat(apyData?.d365?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
         </TableRow>
       </TableBody>
@@ -101,12 +101,16 @@ export type RoiProps = {
     d7: ROIData,
     d30: ROIData,
     d365: ROIData,
+    b1?: ROIData,
+    b7?: ROIData,
+    b30?: ROIData,
+    b365?: ROIData,
   }
 }
 
 type ROIData = {
   return: number,
-  percent: string,
+  percent: number,
 }
 
 const useStyles = makeStyles<Theme>( theme => createStyles({

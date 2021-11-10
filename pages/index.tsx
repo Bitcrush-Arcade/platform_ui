@@ -4,54 +4,70 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Carousel from 'react-material-ui-carousel'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import CardContent from '@material-ui/core/CardContent'
 import Container from '@material-ui/core/Container'
+import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
-import SmallBtn from 'components/basics/SmallButton'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
+import Button from 'components/basics/GeneralUseButton'
 import HarvestCard from 'components/pools/HarvestCard'
-// Context
+// Hooks & Context
+import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
+import InfoIcon from '@material-ui/icons/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
+import highlightedAnnouncements, { width as imgWidth, height as imgHeight, mobileHeight, mobileWidth } from 'data/announcements'
+import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
+import { blacklistExplanation } from 'data/texts'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
 
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.only('xs') )
+  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
-  const { tokenInfo, editTransactions } = useTransactionContext()
+  const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
+  const { bankInfo, userInfo } = useBank()
+  const { approve, getApproved, isApproved } = useCoin()
+  // Contracts
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
+  const liveWallet = useMemo( () => getContracts('liveWallet', chainId), [chainId])
   const { methods } = useContract(firstPool.abi, firstPool.address)
 
   const [tvl, setTvl ] = useState<number>(0)
   const [staked, setStaked ] = useState<number>(0)
 
+  // ICON GRADIENT
   const [ gradient, gradientId ] = invaderGradient()
   const css = useStyles({ gradientId })
 
   useEffect( () => {
-
+    if(!liveWallet?.address) return
+    getApproved(liveWallet.address)
+  },[liveWallet, getApproved])
+  // STAKED CRUSH
+  useEffect( () => {
     if(!methods) return
     const getTvl = async () => {
       const totalStaked = await methods.totalStaked().call()
       const accountStake = await methods.stakings(account).call()
-      setTvl( new BigNumber(totalStaked).div( new BigNumber(10).pow(18) ).toNumber() )
+      setTvl( new BigNumber(totalStaked).toNumber() )
       setStaked( new BigNumber(accountStake?.stakedAmount || 0).div( new BigNumber(10).pow(18) ).toNumber() )
     }
     getTvl()
@@ -75,6 +91,46 @@ export default function Home() {
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
   },[methods, router, staked, account, editTransactions])
+
+  const v1Distributed = new BigNumber(1766900).times( new BigNumber(10).pow(18)).toNumber()
+
+  const totalValueLocked = tvl + bankInfo.totalStaked
+  const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
+  const totalDistributed = bankInfo.stakingDistruted + v1Distributed
+  
+  /**
+   * @description This helps for announcemnts that have special effects internally.
+   */
+  const clickAnnouncement = (name: string) => {
+    console.log('annoucement', name)
+  }
+
+  const announcements = highlightedAnnouncements.map( (annoucement, aIndex) => {
+    const { name, img, imgMobile, link, target, rel } = annoucement
+    const externalLink = link.indexOf('/') !== 0
+
+    const mainImg = <a key={`announcement-imgButton-${aIndex}`}
+      href={externalLink ? link : undefined}
+      target={externalLink ? target : undefined}
+      rel={externalLink ? rel : undefined}
+      onClick={ () => clickAnnouncement(name) }
+    >
+      <Image 
+        src={ !isSm ? img : imgMobile || img}
+        height={ isSm ? mobileHeight : imgHeight}
+        width={ isSm ? mobileWidth : imgWidth}
+        layout="responsive"
+        alt={name}
+      />
+    </a>
+
+
+    return link && !externalLink
+      ? <Link passHref href={link} key={`announcement-link-button-${aIndex}`}>
+          {mainImg}
+        </Link>
+      : mainImg
+  })
 
   return (<>
   <Head>
@@ -118,34 +174,56 @@ export default function Home() {
                       Total Value Locked
                     </Typography>
                     <Typography variant="h4" component="div" align={"center"}>
-                      {currencyFormat(tvl,{ decimalsToShow: 0})}
+                      {currencyFormat( totalValueLocked ,{ decimalsToShow: 0, isWei: true})}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align={"center"}>
+                      USD&nbsp;{currencyFormat( totalValueLocked*tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true})}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/> */}
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Max Win
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {/* {currencyFormat(maxWin,{ decimalsToShow: 0})} */}
-                      COMING SOON
+                      {currencyFormat( maxWin ,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
+                      USD&nbsp;{currencyFormat( maxWin * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true })}
                     </Typography>
                   </Grid>
-                  {/* <Divider orientation="vertical" flexItem/>
+                  <Divider orientation="vertical" flexItem/>
+                  <Grid item xs={12} md={'auto'}>
+                    <Typography variant="caption" component="div" align="center" color="secondary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
+                      CRUSH Burned
+                    </Typography>
+                    <Typography variant="h4" component="div" align="center">
+                      {currencyFormat( tokenInfo.burned ,{ decimalsToShow: 0 })}
+                    </Typography>
+                    <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
+                      USD&nbsp;{currencyFormat( tokenInfo.burned * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2 })}
+                    </Typography>
+                  </Grid>
+                  <Divider orientation="vertical" flexItem/>
                   <Grid item xs={12} md={'auto'}>
                     <Typography variant="caption" component="div" align={isSm ? "center" : "right"} color="primary" style={{ textTransform: 'uppercase', opacity: 0.9 }}>
                       Total Value Shared
                     </Typography>
                     <Typography variant="h4" component="div" align={isSm ? "center" : "right"}>
-                      {currencyFormat(totalValueShared,{ decimalsToShow: 0})}
+                      {currencyFormat(totalDistributed,{ decimalsToShow: 0, isWei: true })}
                     </Typography>
-                  </Grid> */}
+                    <Typography variant="body2" color="textSecondary" component="div" align={isSm ? "center" : "right"}>
+                      USD&nbsp;{currencyFormat( totalDistributed * tokenInfo.crushUsdPrice,{ decimalsToShow: 2, isWei: true })}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
             {/* Announcement Card */}
             <section style={{ marginTop: 24, width: '100%' }}>
-              <Image src={ isSm ? "/assets/announcements/mobile-yield.png" : "/assets/announcements/banner-yield.png"} height={ isSm ? 250 : 310} width={isSm ? 300 : 1080} layout="responsive" alt="Announcement Yiel Parrot partnership"/>
+              <Carousel animation="slide" interval={5000} stopAutoPlayOnHover navButtonsAlwaysVisible>
+                {announcements}
+              </Carousel>
             </section>
             <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
@@ -166,6 +244,11 @@ export default function Home() {
                   btn1Props={{
                     disabled: !account,
                   }}
+                  action2Title="Staking 2.0"
+                  action2Color="secondary"
+                  btn2Props={{
+                    href: '/mining'
+                  }}
                 />
               </Grid>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 8}}>
@@ -173,23 +256,22 @@ export default function Home() {
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: 0,
-                      subtitle: " --- ",
+                      amount: new BigNumber(lwContext.balance).div( new BigNumber(10).pow(18) ).toNumber(),
+                      subtitle: `$ ${currencyFormat( lwContext.balance * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
                       currency: "CRUSH",
-                      comingSoon: true
                     }}
                     rewardInfo={{
-                      title: "HOUSE Profit Earned",
-                      amount: 0,
-                      subtitle: " --- ",
+                      title: "Total HOUSE Profit Earned",
+                      amount: userInfo.claimed,
+                      subtitle: `$ ${currencyFormat( userInfo.claimed * tokenInfo.crushUsdPrice, { decimalsToShow: 2 } )}`,
                       currency: "CRUSH",
-                      comingSoon: true
                     }}
-                    action1Title="Stake Now"
-                    action2Title="Buy Now"
+                    icon={<Coin token="LIVE" scale={0.5}/>}
+                    action1Title={ isApproved ? "Add / Remove" : "Approve LiveWallet"}
+                    action2Title="Buy CRUSH"
                     action2Color="primary"
                     btn1Props={{
-                      href: "/mining"
+                      onClick: () => isApproved ? toggleLwModal() : approve(liveWallet.address)
                     }}
                     btn2Props={{
                       href: "https://dex.apeswap.finance/#/swap"
@@ -204,21 +286,44 @@ export default function Home() {
                   Our Partners
                 </Typography>
                 <Grid container alignItems="center" justifyContent="space-evenly">
-                  {partners.map( partner => <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
-                      <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                  {partners.map( partner => {
+                    const graphics = <>
                       <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
-                      <Tooltip arrow placement="bottom"
-                        title={<Typography variant="body1">{partner.name}</Typography>}
-                      >
-                        <Typography align="center" variant="body2" noWrap component="div">
-                          {partner.name}
-                        </Typography>
-                      </Tooltip>
-                      </a>
-                  </Grid>)}
+                        <Tooltip arrow placement="bottom"
+                          title={<Typography variant="body1">{partner.name}</Typography>}
+                        >
+                          <Typography align="center" variant="body2" noWrap component="div">
+                            {partner.name}
+                          </Typography>
+                        </Tooltip>
+                    </>
+                    return <Grid item key={`partner-${partner.name}`} style={{ maxWidth: 272/4}}>
+                      { partner.internal
+                        ? <Link href={partner.href} passHref>
+                            <a target="_self" className={css.link}>
+                              {graphics}
+                            </a>
+                          </Link>
+                        : <a href={partner.href} rel="noopener noreferrer" target="_blank" className={css.link}>
+                            {graphics}
+                          </a>
+                      }
+                    </Grid>
+                  })}
                 </Grid>
               </CardContent>
             </Card>
+            
+            <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary" onClick={lwContext.selfBlacklist}>
+              Self BlackList&nbsp;
+              <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+                title={<Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
+                {blacklistExplanation}
+                </Typography>}
+              >
+                <InfoIcon/>
+              </Tooltip>
+            </Button>
           </Container>
       </PageContainer>
   </>)
@@ -242,7 +347,11 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
   link:{
     textDecoration: 'none',
     color: theme.palette.text.primary
-  }
+  },
+  tooltip:{
+    width: '80vw',
+    maxWidth: 900,
+  },
 }))
 
 const partners: PartnerData[] = [
@@ -281,12 +390,29 @@ const partners: PartnerData[] = [
   },
 
   {
-    name: 'Revolver Token',
-    href: 'https://www.revolvertoken.com/',
+    name: 'KnightSwap',
+    href: 'https://app.knightswap.financial/farms',
     width: 272,
     height: 272,
-    logo: '/assets/thirdPartyLogos/partners/revolver-logo.png',
+    logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
+  },
+  {
+    name: 'PearZap',
+    href: 'https://bsc.pearzap.com/the-garden',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
+    factor: 4
+  },
+  {
+    name: 'Dragon Gaming',
+    href: '/games',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/dragon-logo.png',
+    factor: 4,
+    internal: true
   },
 
 ]
@@ -299,4 +425,5 @@ type PartnerData = {
   logo: string,
   logoDark?: string,
   factor: number,
+  internal?: boolean,
 }

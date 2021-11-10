@@ -1,9 +1,10 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
+import Link from 'next/link'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Fab from '@material-ui/core/Fab'
 import IconButton from '@material-ui/core/IconButton'
 import Slide from '@material-ui/core/Slide'
 import Grid from "@material-ui/core/Grid"
@@ -18,17 +19,34 @@ import GameCard from 'components/basics/GameCard'
 import Button from 'components/basics/GeneralUseButton'
 import SmallButton from 'components/basics/SmallButton'
 import PageContainer from 'components/PageContainer'
+// Utils
+import { flattenObject } from 'utils/objects'
+// Data
+import { dragonEp } from 'utils/servers'
 
-const featuredGames = [
+type GameItem = {
+  name: string,
+  description: string,
+  disabled?: boolean,
+  link: string,
+  imgSrc: string,
+  width: number,
+  height: number,
+  alt: string,
+  local?: boolean
+}
+
+const featuredGames : GameItem[] = [
   { 
-    name: 'Dice Invaders',
-    description: 'Dice Invaders is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
-    disabled: true,
-    link: undefined,
+    name: 'Dice Invaders - Beta',
+    description: 'Dice Invaders [BETA] is an updated take on the provably fair dice game. In addition to the traditional over/under style of play, we feature additional inside/outside play, multiple graphic side bets, and separate auto-roll strategies for each parameter individually, all set to a retro gameplay esthetic. ',
+    disabled: false,
+    link: '/games/diceInvaders',
     imgSrc: '/games/dice_invaders_pv.png',
     width: 2358/6,
     height: 1290/6,
-    alt: 'Dice Invaders Game Demo'
+    alt: 'Dice Invaders Game Demo',
+    local: true
   },
   // {
   //   name: "Bitcrush Bounty",
@@ -45,7 +63,7 @@ const featuredGames = [
   // }
 ]
 
-const Games = () => {
+const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
 
   const css = useStyles({})
 
@@ -84,6 +102,17 @@ const Games = () => {
     <ChevronRight/>
   </Button>
   }
+
+  const featuredButton = 
+    <Button width="100%" color="primary" style={{ marginTop: 32 }}
+      disabled={selectedGame.disabled}
+      solidDisabledText
+      href={selectedGame.local ? undefined : selectedGame.link}
+      target={selectedGame.local ? undefined : "_blank"}
+    >
+      {selectedGame.disabled ? "Coming Soon" : "Play Now"}
+    </Button>
+
   return <PageContainer>
      <Head>
       <title>BITCRUSH ARCADE</title>
@@ -105,14 +134,11 @@ const Games = () => {
                       <Typography variant="body2">
                       {selectedGame.description}
                       </Typography>
-                      <Button width="100%" color="primary" style={{ marginTop: 32 }}
-                        disabled={selectedGame.disabled}
-                        solidDisabledText
-                        href={selectedGame.link}
-                        target="_blank"
-                      >
-                        {selectedGame.disabled ? "Coming Soon" : "Play Now"}
-                      </Button>
+                      { selectedGame.local 
+                          ? <Link href={selectedGame.link} passHref>
+                              {featuredButton}
+                            </Link>
+                          : featuredButton}
                     </div>
                   </Grid>
                   {moreFeatured && <Grid item xs={12} container justifyContent="flex-end">
@@ -138,25 +164,65 @@ const Games = () => {
         </Grid>
       </Grid>
     </Slide>
-    <div className={ css.otherGamesContainer }>
+    {props.gameTypes.map( (gameType, gameTypeIndex) => props.gamesByType[gameTypeIndex].length > 0 && <div className={ css.otherGamesContainer } key={`games-${gameType}-${gameTypeIndex}`}>
       <Typography variant="h6" paragraph>
-        Featured Partner :: Dragon Gaming :: Coming Soon
+        Featured Partner :: Dragon Gaming :: {gameType}
       </Typography>
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={games.map( (game, gameIdx) => <GameCard key={`other-game-card-${gameIdx}`} imgSrc={game.src}/>)}
+        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={1}
-        md={2}
-        lg={2}
+        md={4}
+        lg={5}
         spacing={3}
       />
-    </div>
+      </div>)}
   </PageContainer>
 }
 
 export default Games
+
+export const getServerSideProps: GetServerSideProps = async(context) =>{
+
+  // const dragonEndpoint = dragonEp.getGames[process.env.NODE_ENV]; 
+  const dragonEndpoint = dragonEp.getGames['production']; 
+  
+  const availableGames = await fetch( dragonEndpoint ,{
+    method: "POST",
+    headers:{
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      api_key: process.env.DRAGON_KEY
+    })
+  })
+    .then( d => {
+      return d.json()
+    } )
+    .then( data => {
+      return data
+    })
+    .catch( e => {
+      console.log(e)
+      return []
+    })
+  
+  
+  const gameTypes = Object.keys(availableGames?.result || {})
+
+  const gamesByType = gameTypes.map( gameType => {
+    return  availableGames?.result[ gameType ].map( game => flattenObject( game, 1 ) )
+  })
+
+  return {
+    props:{
+      gameTypes: gameTypes,
+      gamesByType: gamesByType,
+    },
+  }
+}
 
 const useStyles = makeStyles<Theme>( theme => createStyles({
   featuredContainer:{
@@ -206,30 +272,3 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(4),
   },
 }))
-// TEST GAMES
-const games = [
-  {src: '/games/dragon/lucky_macau.png'},
-  {src: '/games/dragon/mythical_creatures.png'},
-  {src: '/games/dragon/scream.png'},
-  {src: '/games/dragon/the_defenders.png'},
-  {src: '/games/dragon/lucky_macau.png'},
-  {src: '/games/dragon/mythical_creatures.png'},
-  {src: '/games/dragon/scream.png'},
-  {src: '/games/dragon/the_defenders.png'},
-  {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-  // {src: '/games/dragon/lucky_macau.png'},
-  // {src: '/games/dragon/mythical_creatures.png'},
-  // {src: '/games/dragon/scream.png'},
-  // {src: '/games/dragon/the_defenders.png'},
-]

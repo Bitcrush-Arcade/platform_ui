@@ -6,9 +6,11 @@ import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
+import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
+import BankPool from 'components/pools/BankPool'
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
@@ -29,32 +31,37 @@ const Mining = () => {
     <Grid container justifyContent="space-evenly" className={ css.topSection }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
-          title="Mining Pool"
-          description={`Stake CRUSH coins in our single asset staking pool to earn APY that is Auto Compounded.
-            You can help the community by calling the auto Compound function and earning a bounty % of the entire pending reward amount. 
-            All you need to do it press the Claim button,  and watch the rewards compound for everyone staked in the pool.`}
+          title="Galactic Mining"
+          description={`Stake CRUSH to earn APY as well as a share of the House Profit Distribution.
+          Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games to scale.
+          Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking. Please read through the information card or ask the community if you have any questions.
+          
+          You can help the community by calling the auto Compound function and earning a bounty % of the entire pending reward amount.
+          All you need to do it press the Claim button, and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
       <Grid item>
-        <CompoundingCard/>
+        <CompoundingCardv2/>
       </Grid>
+      <Grid item xs={12}>
+        <BankPool/>
+      </Grid>
+    </Grid>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
+      <Grid item xs={10} sm={8} md={6}>
+        <Descriptor
+          title="Mining Pool"
+          description={`Stake CRUSH coins in our single asset staking pool to earn APY.
+          No risk pool - Manual Compound.`}
+        />
+      </Grid>
+      <Grid item style={{width: 215}}/>
     </Grid>
     <Grid container justifyContent="center" spacing={1} className={ css.section }>
       <Grid item>
-        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address}/>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!"/>
       </Grid>
     </Grid>
-    {/* <Grid container justifyContent="space-evenly" className={ css.section }>
-      <Grid item xs={10} sm={8} md={6}>
-        <Descriptor
-          title="Galactic Mining"
-          description={`Stake CRUSH coins to earn APY as well as part of the House Edge.
-            Staking not only helps stabilize the CRUSH Economy, it also provides Bankroll for the games.
-            Due to the nature of gambling, this is riskier, but result in higher rewards than traditional staking.`}
-        />
-      </Grid>
-      <Grid item style={{ width: 280}} />
-    </Grid> */}
   </PageContainer>
 }
 
@@ -63,7 +70,8 @@ export default Mining
 const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   
   section:{
-    marginTop: theme.spacing(4)
+    marginTop: theme.spacing(4),
+    marginBottom: theme.spacing(4)
   },
   topSection:{
     marginTop: 0,

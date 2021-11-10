@@ -22,9 +22,9 @@ const ProfileAvatar = () => {
 
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
-  const { login, logout, account } = useAuthContext()
+  const { login, logout, account, chainId } = useAuthContext()
 
-  const { tokenInfo, editTransactions } = useTransactionContext()
+  const { tokenInfo, editTransactions, liveWallet } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
@@ -101,6 +101,14 @@ const ProfileAvatar = () => {
           <ListItemText
             primary={"Change Wallet"}
             secondary={"Choose a different wallet type"}
+          />
+        </ListItem>}
+        {hasAccount && <ListItem button
+          onClick={ liveWallet.selfBlacklist }
+        >
+          <ListItemText
+            primary={"Blacklist Self"}
+            secondary={"Exclude myself from depositing to the live wallet"}
           />
         </ListItem>}
       </List>

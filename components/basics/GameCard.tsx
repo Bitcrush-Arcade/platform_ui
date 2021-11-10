@@ -1,6 +1,9 @@
+import Link from 'next/link'
+import { useState } from 'react'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import ButtonBase from "@material-ui/core/ButtonBase"
+import CircularProgress from '@material-ui/core/CircularProgress'
 // Icons
 import PlayIcon from '@material-ui/icons/PlayCircleFilled';
 // Bitcrush
@@ -8,13 +11,17 @@ import Card from 'components/basics/Card'
 
 const GameCard = (props: GameCardProps ) => {
 
-  const css = useStyles(props)
+  const [loading, setLoading] = useState<boolean>(false)
+  const css = useStyles({...props, loading})
+
 
   return (
     <Card className={css.card}>
-      <ButtonBase className={ css.button } href="https://dragongaming.com/" target=" _blank" >
-        <PlayIcon className={ css.playIcon } />
-      </ButtonBase>
+      <Link passHref href={`/games/${props.gameKey}`}>
+        <ButtonBase className={ css.button } onClick={ () => setLoading( true )}>
+          { loading ? <CircularProgress className={ css.playIcon } thickness={10} /> : <PlayIcon className={ css.playIcon } />}
+        </ButtonBase>
+      </Link>
     </Card>
   )
 }
@@ -22,13 +29,14 @@ const GameCard = (props: GameCardProps ) => {
 export default GameCard
 
 type GameCardProps ={
-  imgSrc: string
+  imgSrc: string,
+  gameKey: string,
 }
 
-const useStyles = makeStyles<Theme, GameCardProps>( theme => createStyles({
+const useStyles = makeStyles<Theme, GameCardProps & { loading: boolean } >( theme => createStyles({
   card:{
-    width: theme.spacing(30),
-    height: theme.spacing(18),
+    width: 200,
+    height: 150,
     backgroundImage: props => `url(${props.imgSrc})`,
     backgroundSize: 'cover',
     display: 'flex',
@@ -36,7 +44,7 @@ const useStyles = makeStyles<Theme, GameCardProps>( theme => createStyles({
   button: {
     heigth: '100%',
     width: '100%',
-    opacity: 0,
+    opacity: props => props.loading ? 0.75 : 0,
     '&:hover':{
       background: `linear-gradient( 90deg, ${theme.palette.secondary.main} 0%, ${theme.palette.primary.main} 100%)`,
       opacity: 0.75

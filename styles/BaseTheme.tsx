@@ -1,6 +1,5 @@
 import { createTheme, responsiveFontSizes,  } from '@material-ui/core/styles';
 import deepPurple from '@material-ui/core/colors/deepPurple'
-import grey from '@material-ui/core/colors/grey'
 import teal from '@material-ui/core/colors/teal'
 
 const theme = (isDark?: boolean) => createTheme({
@@ -10,12 +9,12 @@ const theme = (isDark?: boolean) => createTheme({
       dark: deepPurple['A700']
     },
     secondary: {
-      main: teal['A400'],
+      main: isDark ? teal['A400'] : teal['A700'],
       light: 'rgb(27,168,139)', // This is slightly darker than main
       dark: 'rgb(9,130,105)'
     },
     background: {
-      default: isDark ? 'rgb(12,15,32)' : 'rgb(222,211,241)',
+      default: isDark ? 'rgb(5,6,16)' : 'rgb(222,211,241)',
       paper: isDark ? 'rgb(27,30,65)' : 'white',
       menu: isDark ? 'rgb(23,24,54)' : 'white',
       highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)',
@@ -37,6 +36,9 @@ const theme = (isDark?: boolean) => createTheme({
       light: deepPurple['100'],
       dark: 'rgb(34,35,63)',
       main: 'rgb(174,82,227)',
+    },
+    blue: {
+      main: 'rgb(86,166,246)'
     },
     type: isDark ? 'dark' : 'light',
   },

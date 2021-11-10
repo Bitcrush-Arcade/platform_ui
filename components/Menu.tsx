@@ -10,6 +10,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Button from '@material-ui/core/Button'
 import Collapse from '@material-ui/core/Collapse'
 import ClickAwayListener from "@material-ui/core/ClickAwayListener"
+import CircularProgress from "@material-ui/core/CircularProgress"
 import Divider from '@material-ui/core/Divider'
 import Drawer from '@material-ui/core/Drawer'
 import Grid from "@material-ui/core/Grid"
@@ -40,31 +41,38 @@ import { ConditionalLinkWrapper } from 'utils/wrappers'
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
 import UfoIcon from 'components/svg/UfoIcon'
-import Ufo2Icon from 'components/svg/Ufo2Icon'
-import RechargeIcon from 'components/svg/RechargeIcon'
+// import Ufo2Icon from 'components/svg/Ufo2Icon'
+// import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
-import WarpIcon from 'components/svg/WarpIcon'
+// import WarpIcon from 'components/svg/WarpIcon'
 import NightIcon from 'components/svg/Night'
 import DayIcon from 'components/svg/Day'
 
 const hashexScale = 5
 
-const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
-    const { open, toggleOpen } = props
+type MenuProps = {
+    open: boolean,
+    toggleOpen: () => void,
+    alwaysSm?: boolean
+}
+
+const Menu = ( props: MenuProps) => {
+    const { open, toggleOpen, alwaysSm } = props
     const router = useRouter()
-    const css = useStyles({ open })
+    const css = useStyles(props)
     const theme = useTheme()
-    const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+    const mediaSm = useMediaQuery( theme.breakpoints.down('sm') )
+    const isSm = alwaysSm || mediaSm
 
     const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
-    
+
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
         // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
-        { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games' },
+        { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
         // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
@@ -84,18 +92,21 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
         ] },
     ]
 
+    const [ showLoad, setShowLoad ] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false))
+
     const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false) )
 
     const linkItems = linkArray.map( (link, linkIndex) => {
-        const { name, icon, url_link, subMenu, disabled } = link
+        const { name, icon, url_link, subMenu, disabled, loadOnClick } = link
         const click = (e : any) => {
             e.stopPropagation()
+            !subMenu && setShowLoad( draft => { draft[linkIndex] = !draft[linkIndex] })
             subMenu && setSubMenuOpen( draft => {
                 draft[linkIndex] = !draft[linkIndex]
             } )
             !open && toggleOpen()
         }
-        const selected = url_link == router.pathname
+        const selected = url_link == router.pathname || (url_link || '').length > 1 && router.pathname.indexOf(url_link) > -1
         const mainColor = selected ? 'primary' :
             subMenu ? 'secondary' : undefined
         const component = disabled ? 'li' :
@@ -115,6 +126,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                         primary={<>
                             {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined}}/>}
                             {disabled && <Typography variant="caption" className={ css.disabled }>(coming soon)</Typography>}
+                            {showLoad[linkIndex] && <CircularProgress size={12}  color="primary" thickness={10} />}
                         </>}
                         primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
                     />
@@ -150,7 +162,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
             
             } }>
             <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
-                <List>
+                <List className={ css.list }>
                     {linkItems}
                 </List>
                 <Grid container className={ css.footer } alignItems="center" justifyContent="space-between">
@@ -161,7 +173,7 @@ const Menu = ( props: { open: boolean, toggleOpen: () => void }) => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="body2" color="textPrimary">
-                                    $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 2 })}
+                                    $ {currencyFormat( tokenInfo.crushUsdPrice , { decimalsToShow: 3 })}
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -237,6 +249,10 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         paddingTop: 0,
         width: theme.spacing(28)
     },
+    list:{
+        maxHeight: `calc( 100% - 111px)`,
+        overflowY: 'auto'
+    },
     subList: {
         backgroundColor: theme.palette.type =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
         borderBottomLeftRadius: theme.spacing(4),
@@ -290,6 +306,7 @@ type LinkItem ={
     icon: JSX.Element | null,
     url_link?: string,
     disabled?: boolean,
+    loadOnClick?: boolean,
     subMenu?: Array< {
         name: string | JSX.Element,
         icon: JSX.Element | null,

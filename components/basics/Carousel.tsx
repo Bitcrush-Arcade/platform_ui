@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, ReactNode, forwardRef, useImperativeHandle, useLayoutEffect } from 'react'
-
+import compact from 'lodash/compact'
 // Material
 import {makeStyles, Theme, createStyles} from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
@@ -52,23 +52,23 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
   }
 }))
 
-const useGridStyle = makeStyles<Theme, PartialBy<CarouselPropsType, 'items'> & { itemIndex: number, containerWidth: number }>( theme => createStyles({
+const useGridStyle = makeStyles<Theme, PartialBy<CarouselPropsType, 'items'> & { containerWidth: number }>( theme => createStyles({
   itemContainer:{
     // scrollSnapAlign: 'start'
-  },
-  showItem:{
     [theme.breakpoints.only('xs')]:{
-      minWidth: props => `calc( ${props.containerWidth} / ${props.xs})`
+      minWidth: props => `calc( ${props.containerWidth}px / ${props.xs})`
     },
     [theme.breakpoints.only('sm')]:{
-      minWidth: props => `calc( ${props.containerWidth} / ${props.sm})`
+      minWidth: props => `calc( ${props.containerWidth}px / ${props.sm})`
     },
     [theme.breakpoints.only('md')]:{
-      minWidth: props => `calc( ${props.containerWidth} / ${props.md})`
+      minWidth: props => `calc( ${props.containerWidth}px / ${props.md})`
     },
     [theme.breakpoints.up('lg')]:{
-      minWidth: props => `calc( ${props.containerWidth} / ${props.lg})`
+      minWidth: props => `calc( ${props.containerWidth}px / ${props.lg})`
     },
+  },
+  showItem:{
   }
 }))
 
@@ -96,74 +96,68 @@ export type CarouselHandles = {
 const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) => {
 
   const { items, xs = 1, sm, md, lg, spacing, LeftScroll, RightScroll } = props
-
+  const reviewedItems = compact(items)
   const smVal = sm ?? xs
   const mdVal = md ?? sm ?? xs
   const lgVal = lg ?? md ?? sm ?? xs
-  const count = items.length
+  const count = reviewedItems.length
   const css = useStyles({ ...props, sm: smVal, md: mdVal, lg: lgVal })
-  const [shown, setShown] = useState<number>(0)
-  const [scrollPos, setScrollPos] = useState<number>(0)
+  const [minScroll, setMinScroll] = useState<boolean>(true)
   const [maxScroll, setMaxScroll] = useState<boolean>(false)
   const [containerWidth, setContainerWidth] = useState<number>(0)
   const carouselRef = useRef<HTMLDivElement>(null)
   useEffect(()=>{
     setContainerWidth(document.getElementById('carousel-id').clientWidth)
-  },[])
+    const resizeContainer = () => {
+      const getWidth = document.getElementById('carousel-id').clientWidth
+      setContainerWidth( getWidth ) 
+    }
+    window?.addEventListener('resize', resizeContainer )
+    return () => {
+      window.removeEventListener('resize', resizeContainer)
+    }
+  },[setContainerWidth])
   // On resize, reset State
   useLayoutEffect(() => {
     const currentCarouselRef = carouselRef.current
     const snapToGrid = () => {
-      if(!carouselRef.current) return
-      const currentPos = carouselRef.current?.scrollLeft || 0
-      const carouselWidth = carouselRef.current?.scrollWidth || 0
-      const maxRightScroll = currentPos + containerWidth >= carouselWidth
-      setScrollPos(currentPos)
-      setMaxScroll(maxRightScroll)
+      setTimeout( ()=>{
+        if(!carouselRef.current) return
+        const currentPos = carouselRef.current?.scrollLeft || 0
+        const carouselWidth = carouselRef.current?.scrollWidth || 0
+        const itemWidth = parseInt(`${carouselWidth/count}`)
+        
+        const mod = parseInt(`${currentPos%itemWidth}`)
+        console.log( { carouselWidth, itemWidth, currentPos, mod, more:  mod > itemWidth/2, less: mod < itemWidth * 0.9 })
+        if( mod > itemWidth*0.2 && mod < itemWidth * 0.9 ){
+          carouselRef.current.scrollLeft = mod > (itemWidth/2) ? (currentPos + mod) : (currentPos - mod)
+        }
+  
+        setMaxScroll( currentPos + containerWidth >= (carouselWidth - (carouselWidth/count)) )
+        setMinScroll( currentPos < itemWidth)
+      
+      },300)
     }
-    const resetShown = () => setShown( 0 )
-    carouselRef.current?.addEventListener('scroll', snapToGrid)
-    window.addEventListener('resize', resetShown )
+    currentCarouselRef?.addEventListener('scroll', snapToGrid )
     return () => {
-      window.removeEventListener('resize', resetShown )
-      currentCarouselRef?.removeEventListener('scroll', snapToGrid)
+      currentCarouselRef?.removeEventListener('scroll', snapToGrid )
     };
-  }, [containerWidth])
-
-  useEffect(()=>{
-    const timeout = setTimeout(() => {
-      if(!carouselRef.current) return
-      const width = carouselRef.current.scrollWidth
-      const itemWidth = width/count
-      const curPos = carouselRef.current.scrollLeft
-      const mod = curPos%itemWidth
-      const dif = mod - Math.floor(itemWidth/2)
-      if( mod ){
-        carouselRef.current.scrollLeft = mod > (itemWidth/2) ? (curPos + mod) : (curPos - mod)
-      }
-    },200)
-    return () => clearTimeout(timeout)
-  },[scrollPos, count])
+  }, [ containerWidth, count ])
 
   const scrollNext = () => {
     if(!carouselRef.current) return
     const width = carouselRef.current.scrollWidth
-    setShown( prev => prev + 1 )
-    const curPos = carouselRef.current.scrollLeft + width/count
-    const mod = width%curPos
-    carouselRef.current.scrollLeft = mod > (width/count/2) ? curPos + mod : curPos - mod 
+    carouselRef.current.scrollLeft += Math.floor(width/count)
   }
 
   const scrollPrev = () => {
     if(!carouselRef.current) return
     const width = carouselRef.current.scrollWidth
-    setShown( prev => prev - 1 )
-    carouselRef.current.scrollLeft -= width / count
+    carouselRef.current.scrollLeft -= Math.floor(width / count)
   }
 
-  const shownItems = items.map( (item, itemIndex) => {
-    const shownIndex = itemIndex - shown + 1
-    return( <CarouselItem {...props} item={item} shownIndex={shownIndex} key={`carousel-item-${itemIndex}`} containerWidth={containerWidth} />
+  const shownItems = reviewedItems.map( (item, itemIndex) => {
+    return( <CarouselItem {...props} item={item} key={`carousel-item-${itemIndex}`} containerWidth={containerWidth} />
     )
   })
 
@@ -175,8 +169,8 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   
   return (<div className={ css.carouselContainer } id={'carousel-id'}>
     <div className={ `${css.arrows} ${css.leftArrow}` } >
-      {LeftScroll && <LeftScroll disabled={scrollPos <= 0} onClick={scrollPrev}/> 
-      || <IconButton disabled={scrollPos <= 0} onClick={ scrollPrev }>
+      {LeftScroll && <LeftScroll disabled={minScroll} onClick={scrollPrev}/> 
+      || <IconButton disabled={minScroll} onClick={ scrollPrev }>
         <ChevronLeftIcon/>
       </IconButton>}
     </div>
@@ -198,12 +192,12 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
 
 export default Carousel
 
-function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: any, shownIndex: number, containerWidth: number}) {
-  const { item, shownIndex, xs, sm, md, lg, containerWidth } = props
+function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: any, containerWidth: number}) {
+  const { item, xs, sm, md, lg, containerWidth } = props
   const smVal = sm ?? xs
   const mdVal = md ?? sm ?? xs
   const lgVal = lg ?? md ?? sm ?? xs
-  const gridCss = useGridStyle( { xs, sm: smVal, md: mdVal, lg: lgVal, itemIndex: shownIndex, containerWidth: containerWidth})
+  const gridCss = useGridStyle( { xs, sm: smVal, md: mdVal, lg: lgVal, containerWidth: containerWidth})
   return (<Grid item className={ gridCss.itemContainer }>
     <Grid container justifyContent="center" className={gridCss.showItem}>
       <Grid item>
