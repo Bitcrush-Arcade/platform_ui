@@ -156,7 +156,7 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
-  const launcherPercent = bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent
+  const launcherPercent = bankInfo.totalFrozen > 0 ? 0 : (bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent)
   const activeSiren = userInfo.staked > 0 && launcherPercent >= 100
   
   return (<>
