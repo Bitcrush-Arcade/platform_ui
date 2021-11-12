@@ -59,7 +59,7 @@ const Mining = () => {
       </Grid>
       <Grid item style={{width: 215}}/>
     </Grid>
-    <Grid container justifyContent="center" spacing={1} className={ css.section }>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
       <Grid item>
         <PoolCardv2
           abi={prevPool.abi}
