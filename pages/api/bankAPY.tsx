@@ -28,7 +28,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   // Contract Setup
     // Bankroll Staking
-  const contractSetup = getContracts( 'bankStaking', usedChain )
+  const contractSetup = getContracts( body.prev ? 'prevStaking2' : 'bankStaking', usedChain )
   const stakingContract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
     // Bankroll Contract
   const bankSetup = getContracts('bankroll', usedChain)
