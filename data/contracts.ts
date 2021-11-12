@@ -60,6 +60,26 @@ export const contracts : { [key: string] : ContractSelect} = {
       address: '0x534828eDC1994d937d8d8113b3f0da751Cbc5e10',
       abi: BitcrushStaking.abi,
     }
+  },
+  prevLw:{
+    56:{
+      address: '0xCd8AFEfFfd6E5b8cFC6C0c3348d984751496be51',
+      abi: BitcrushLiveWallet.abi,
+    },
+    97:{
+      address: '0x42Da4A343C8C39586c51793bfE6eE65A010E4189',
+      abi: BitcrushLiveWallet.abi,
+    }
+  },
+  prevStaking2:{
+    56:{
+      address: '0x6c337602D418422D71bB64F348B4aEF1e77766e4',
+      abi: BitcrushStaking.abi,
+    },
+    97:{
+      address: '0x534828eDC1994d937d8d8113b3f0da751Cbc5e10',
+      abi: BitcrushStaking.abi,
+    }
   }
 
 }

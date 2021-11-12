@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
@@ -23,6 +23,8 @@ import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
 // libs
 import { getContracts } from 'data/contracts'
+import { useContract } from 'hooks/web3Hooks'
+import BigNumber from 'bignumber.js'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -32,16 +34,62 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { pathname } = useRouter()
-  const { chainId } = useWeb3React()
+  const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
+  const { tokenInfo, liveWallet, toggleLwModal, editTransactions } = useTransactionContext()
+  //---------------------------------------------------------------
+  // Temporary PREV LIVEWALLET FIX
+  //---------------------------------------------------------------
+
+  const [ prevLwData, setPrevLwData ] = useState<{ funds?: string, hasFunds?: boolean }>({})
+  const { address: prevLwAdd, abi: prevLWAbi } = getContracts('prevLw', chainId)
+  const { methods: prevLwMethods } = useContract(prevLWAbi, prevLwAdd)
+
+
+  const getPrevData = useCallback( async () => {
+    if(!prevLwMethods || !account) return
+    const funds = await prevLwMethods.balanceOf(account).call()
+    const fundBig = new BigNumber(funds)
+    setPrevLwData({
+      funds: fundBig.toString(),
+      hasFunds: fundBig.isGreaterThan( 0 )
+    })
+  }, [prevLwMethods, account, setPrevLwData])
+
+  useEffect(() =>{
+    if(!prevLwMethods || !account) return
+    const interval = setInterval( () => getPrevData(), 10000 )
+    return () => clearInterval(interval)
+  },[prevLwMethods, account])
+
+  const withdrawV1 = useCallback( () => {
+    if(!prevLwMethods || !account || !prevLwData.hasFunds ) return console.log('nothing to do here')
+    prevLwMethods.withdrawBet( prevLwData.funds ).send({ from: account })
+    .on('transactionHash', (tx) => {
+      console.log('hash', tx )
+      editTransactions(tx,'pending', { description: `Withdraw from V1 LiveWallet`})
+    })
+    .on('receipt', ( rc) => {
+      console.log('receipt',rc)
+      editTransactions(rc.transactionHash,'complete')
+      getPrevData()
+    })
+    .on('error', (error, receipt) => {
+      console.log('error', error, receipt)
+      receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+    })
+
+  },[ prevLwMethods, account, prevLwData, getPrevData, editTransactions])
+
+  //---------------------------------------------------------------
+  //---------------------------------------------------------------
 
   const lwActions = [
     {name:'Add/Remove', onClick: toggleLwModal },
-    // {name:'Widthdraw', onClick: ()=>console.log('action 2')},
+    {name:'Withdraw v1', onClick: withdrawV1, highlight: prevLwData.hasFunds},
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},
   ]
