@@ -21,10 +21,9 @@ import Coin from 'components/tokens/Token2'
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
+import usePrevLiveWallet from 'hooks/usePrevLw'
 // libs
 import { getContracts } from 'data/contracts'
-import { useContract } from 'hooks/web3Hooks'
-import BigNumber from 'bignumber.js'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -39,57 +38,12 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo, liveWallet, toggleLwModal, editTransactions } = useTransactionContext()
-  //---------------------------------------------------------------
-  // Temporary PREV LIVEWALLET FIX
-  //---------------------------------------------------------------
-
-  const [ prevLwData, setPrevLwData ] = useState<{ funds?: string, hasFunds?: boolean }>({})
-  const { address: prevLwAdd, abi: prevLWAbi } = getContracts('prevLw', chainId)
-  const { methods: prevLwMethods } = useContract(prevLWAbi, prevLwAdd)
-
-
-  const getPrevData = useCallback( async () => {
-    if(!prevLwMethods || !account) return
-    const funds = await prevLwMethods.balanceOf(account).call()
-    const fundBig = new BigNumber(funds)
-    setPrevLwData({
-      funds: fundBig.toString(),
-      hasFunds: fundBig.isGreaterThan( 0 )
-    })
-  }, [prevLwMethods, account, setPrevLwData])
-
-  useEffect(() =>{
-    if(!prevLwMethods || !account) return
-    const interval = setInterval( () => getPrevData(), 10000 )
-    return () => clearInterval(interval)
-  },[prevLwMethods, account])
-
-  const withdrawV1 = useCallback( () => {
-    if(!prevLwMethods || !account || !prevLwData.hasFunds ) return console.log('nothing to do here')
-    prevLwMethods.withdrawBet( prevLwData.funds ).send({ from: account })
-    .on('transactionHash', (tx) => {
-      console.log('hash', tx )
-      editTransactions(tx,'pending', { description: `Withdraw from V1 LiveWallet`})
-    })
-    .on('receipt', ( rc) => {
-      console.log('receipt',rc)
-      editTransactions(rc.transactionHash,'complete')
-      getPrevData()
-    })
-    .on('error', (error, receipt) => {
-      console.log('error', error, receipt)
-      receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-    })
-
-  },[ prevLwMethods, account, prevLwData, getPrevData, editTransactions])
-
-  //---------------------------------------------------------------
-  //---------------------------------------------------------------
+  const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
+  const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
 
   const lwActions = [
     {name:'Add/Remove', onClick: toggleLwModal },
-    {name:'Withdraw v1', onClick: withdrawV1, highlight: prevLwData.hasFunds},
+    {name:'Withdraw v1', onClick: withdrawAll, highlight: hasFunds},
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},
   ]
@@ -130,7 +84,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         <Grid item>
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            <Grid item> 
+            <Grid item className={ css.dropOnSm }> 
               <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
