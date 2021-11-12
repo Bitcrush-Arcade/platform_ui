@@ -21,7 +21,7 @@ import InvaderIcon from 'components/svg/InvaderIcon'
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 import RoiModal, { RoiProps } from 'components/pools/RoiModal'
-import StakeModal, { StakeOptionsType, StakeModalProps } from 'components/basics/StakeModal'
+import StakeModal, { StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal'
 // Libs
 import { useContract } from 'hooks/web3Hooks'
 import { useTransactionContext } from 'hooks/contextHooks'
@@ -30,6 +30,7 @@ import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
+import { toWei } from 'web3-utils'
 
 BigNumber.config({ DECIMAL_PLACES: 18 })
 
@@ -54,7 +55,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
   const [openRoi, setOpenRoi] = useState<boolean>(false)
   const [openStakeModal, setOpenStakeModal] = useState<boolean>(false)
   const { approve, isApproved, getApproved } = useCoin(coinAddress)
-  const { tokenInfo } = useTransactionContext()
+  const { tokenInfo, editTransactions } = useTransactionContext()
 
   const toggleRoi = () => setOpenRoi(p => !p)
   const toggleStakeModal = () => setOpenStakeModal(p => !p)
@@ -73,25 +74,27 @@ const Poolv2 = ( props: PoolCardProps ) => {
     .then( data => setApyInfo( data.compoundRewards ))
   },[setApyInfo, chainId])
 
+  const getPoolData = useCallback( async () =>{
+    if(!poolMethods || !account) return
+    const stakingInfo = await poolMethods.stakings( account ).call()
+    const totalStaked = await poolMethods.totalStaked().call()
+    const apyReward = await poolMethods.pendingReward( account ).call()
+    const profitReward = await poolMethods.pendingProfits( account ).call()
+    const poolReward = await poolMethods.totalPool().call()
+    setPoolData({
+      staked: new BigNumber(stakingInfo.stakedAmount),
+      totalStaked: new BigNumber( totalStaked ),
+      earned: new BigNumber( apyReward ).plus( profitReward ),
+      poolExhausted: new BigNumber(poolReward).isEqualTo(0)
+    })
+  },[poolMethods, account, setPoolData])
+
   useEffect( ()=>{
     if(!poolMethods || !account) return
-    const getPoolData = async () =>{
-      const stakingInfo = await poolMethods.stakings( account ).call()
-      const totalStaked = await poolMethods.totalStaked().call()
-      const apyReward = await poolMethods.pendingReward( account ).call()
-      const profitReward = await poolMethods.pendingProfits( account ).call()
-      const poolReward = await poolMethods.totalPool().call()
-      setPoolData({
-        staked: new BigNumber(stakingInfo.stakedAmount),
-        totalStaked: new BigNumber( totalStaked ),
-        earned: new BigNumber( apyReward ).plus( profitReward ),
-        poolExhausted: new BigNumber(poolReward).isEqualTo(0)
-      })
-    }
     const interval  = setInterval(getPoolData, 3000)
     return () => clearInterval(interval)
 
-  },[poolMethods, setPoolData, account])
+  },[poolMethods, setPoolData, account, getPoolData])
 
   useEffect( () => {
     getApproved && getApproved(address)
@@ -122,8 +125,43 @@ const Poolv2 = ( props: PoolCardProps ) => {
     }
   ]
 
-  const submitFn = ( values ) => {
-    console.log('submit values', values)
+  const submitFn : SubmitFunction = ( values, {setSubmitting}) => {
+    const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
+    if(!poolMethods) return setSubmitting(false)
+    if(!values.actionType)
+      return poolMethods.enterStaking(weiValue).send({ from: account })
+        .on('transactionHash', (tx) => {
+          console.log('hash', tx )
+          editTransactions(tx,'pending', { description: `Stake in Bankroll`})
+        })
+        .on('receipt', ( rc) => {
+          console.log('receipt',rc)
+          editTransactions(rc.transactionHash,'complete')
+          getPoolData()
+          getAPY()
+          toggleStakeModal()
+        })
+        .on('error', (error, receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        })
+    const isTransfer = values.actionType === 2
+    return poolMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
+      .on('transactionHash', (tx) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
+      })
+      .on('receipt', ( rc) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        getPoolData()
+        getAPY()
+        toggleStakeModal()
+      })
+      .on('error', (error, receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
   }
 
   return <>
