@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
@@ -21,6 +21,7 @@ import Coin from 'components/tokens/Token2'
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
+import usePrevLiveWallet from 'hooks/usePrevLw'
 // libs
 import { getContracts } from 'data/contracts'
 
@@ -32,16 +33,17 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('sm'))
   const { pathname } = useRouter()
-  const { chainId } = useWeb3React()
+  const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
   const isGame = pathname.indexOf('/games') > -1
   const imgReducer = isSm ? 26 : 18
   
   const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
+  const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
 
   const lwActions = [
     {name:'Add/Remove', onClick: toggleLwModal },
-    // {name:'Widthdraw', onClick: ()=>console.log('action 2')},
+    {name:'Withdraw v1', onClick: withdrawAll, highlight: hasFunds},
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},
   ]
@@ -82,7 +84,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         <Grid item>
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            <Grid item> 
+            <Grid item className={ css.dropOnSm }> 
               <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>

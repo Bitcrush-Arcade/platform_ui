@@ -230,12 +230,12 @@ export default function Home() {
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
                     title: "CRUSH in Wallet",
-                    amount: tokenInfo.weiBalance/(10 ** 18),
-                    subtitle: `$ ${currencyFormat(tokenInfo.crushUsdPrice * tokenInfo.weiBalance/(10 ** 18), { decimalsToShow: 2})}`,
+                    amount: tokenInfo.weiBalance.div(10 ** 18),
+                    subtitle: `$ ${currencyFormat(tokenInfo.weiBalance.times(tokenInfo.crushUsdPrice).div(10 ** 18).toString(), { decimalsToShow: 2, isWei: true})}`,
                   }}
                   stakedInfo={{
                     title: "CRUSH Staked",
-                    amount: staked,
+                    amount: new BigNumber(staked),
                     subtitle: `$ ${currencyFormat( staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2 })}`,
                   }}
                   action1Title={ !account && 'Connect First' || staked > 0 && "Harvest All" || "Go to Pool"}
@@ -256,13 +256,13 @@ export default function Home() {
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: new BigNumber(lwContext.balance).div( new BigNumber(10).pow(18) ).toNumber(),
-                      subtitle: `$ ${currencyFormat( lwContext.balance * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true } )}`,
+                      amount: new BigNumber(lwContext.balance).div( new BigNumber(10).pow(18) ),
+                      subtitle: `$ ${currencyFormat( lwContext.balance.times(tokenInfo.crushUsdPrice).toString(), { decimalsToShow: 2, isWei: true } )}`,
                       currency: "CRUSH",
                     }}
                     rewardInfo={{
                       title: "Total HOUSE Profit Earned",
-                      amount: userInfo.claimed,
+                      amount: new BigNumber(userInfo.claimed),
                       subtitle: `$ ${currencyFormat( userInfo.claimed * tokenInfo.crushUsdPrice, { decimalsToShow: 2 } )}`,
                       currency: "CRUSH",
                     }}

@@ -13,6 +13,7 @@ import { currencyFormat, shortAddress } from 'utils/text/text'
 import BigNumber from 'bignumber.js'
 // Hooks
 import { useContract } from 'hooks/web3Hooks'
+import usePrevLiveWallet from 'hooks/usePrevLw'
 // Context
 import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
 // data
@@ -24,10 +25,12 @@ const ProfileAvatar = () => {
   const css = useStyles({})
   const { login, logout, account, chainId } = useAuthContext()
 
-  const { tokenInfo, editTransactions, liveWallet } = useTransactionContext()
+  const { tokenInfo, editTransactions, liveWallet, toggleLwModal } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
+
+  const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
 
   const approve = useCallback(() => {
     coinMethods.approve( stakingContract, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
@@ -82,7 +85,7 @@ const ProfileAvatar = () => {
         <ListItem>
           <ListItemText
             primary={ hasAccount 
-              ? currencyFormat(tokenInfo.weiBalance, { isWei: true }) 
+              ? currencyFormat(tokenInfo.weiBalance.toString(), { isWei: true }) 
               : "No data"}
             secondary={"Current CRUSH"}
           />
@@ -102,6 +105,26 @@ const ProfileAvatar = () => {
             primary={"Change Wallet"}
             secondary={"Choose a different wallet type"}
           />
+        </ListItem>}
+        <ListItem button
+          onClick={() => {
+            toggleLwModal()
+            toggleDrawer()
+          }}>
+            <ListItemText
+              primary={"Live Wallet"}
+              secondary={currencyFormat(liveWallet.balance.toString(), {isWei: true})}
+            />
+        </ListItem>
+        {hasFunds && <ListItem button 
+          onClick={ () => {
+            withdrawAll()
+            toggleDrawer()
+          }}>
+            <ListItemText
+              primary={"Withdraw LiveWallet v1"}
+              secondary={"Withdraw all funds from liveWallet v1"}
+            />
         </ListItem>}
         {hasAccount && <ListItem button
           onClick={ liveWallet.selfBlacklist }
@@ -131,5 +154,6 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   },
   drawer:{
     minWidth: 285,
+    maxWidth: 300,
   }
 }))

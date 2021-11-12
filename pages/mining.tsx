@@ -10,6 +10,7 @@ import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
+import PoolCardv2 from 'components/pools/PoolCardv2'
 import BankPool from 'components/pools/BankPool'
 // libs
 import { getContracts } from "data/contracts"
@@ -21,6 +22,7 @@ const Mining = () => {
   const { chainId } = useWeb3React()
 
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
+  const prevPool = useMemo( () => getContracts('prevStaking2', chainId ), [chainId])
   const token = useMemo( () => getContracts('crushToken', chainId ), [chainId])
 
   return <PageContainer background="galactic">
@@ -50,14 +52,22 @@ const Mining = () => {
     <Grid container justifyContent="space-evenly" className={ css.section }>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
-          title="Mining Pool"
+          title="More Pools"
           description={`Stake CRUSH coins in our single asset staking pool to earn APY.
-          No risk pool - Manual Compound.`}
+          No risk pools`}
         />
       </Grid>
       <Grid item style={{width: 215}}/>
     </Grid>
-    <Grid container justifyContent="center" spacing={1} className={ css.section }>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
+      <Grid item>
+        <PoolCardv2
+          abi={prevPool.abi}
+          address={prevPool.address}
+          name="Limited Pool"
+          subtext="Simple Reward APR Pool"
+        />
+      </Grid>
       <Grid item>
         <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!"/>
       </Grid>

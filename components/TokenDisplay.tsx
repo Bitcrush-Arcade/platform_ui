@@ -10,12 +10,13 @@ import Typography from '@material-ui/core/Typography'
 import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
 // utils
 import { currencyFormat } from 'utils/text/text'
+import BigNumber from 'bignumber.js'
 
 type TokenDisplayProps ={
   color: 'primary' | 'secondary',
-  amount: number,
+  amount: BigNumber,
   icon: JSX.Element,
-  actions?: Array< { name: string, onClick?: () => void, url?: string } >,
+  actions?: Array< { name: string, onClick?: () => void, url?: string, highlight?: boolean } >,
   symbol?: string
 }
 
@@ -39,7 +40,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true, decimalsToShow: 4 })}
+            {symbol ? `${symbol} `: ''}{currencyFormat(amount.toString(), { isWei: true, decimalsToShow: 4 })}
           </Typography>
         </Grid>
         <Grid item>
@@ -69,7 +70,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           toggleActions()
         }
 
-        return <MenuItem onClick={ actionFn } key={`action-key-${idx}`}>
+        return <MenuItem onClick={ actionFn } key={`action-key-${idx}`} className={ action.highlight ? css.itemHighlight : ''}>
           {action.name}
         </MenuItem>
       })}
@@ -90,5 +91,26 @@ const useStyles = makeStyles<Theme, { showActions : boolean } & TokenDisplayProp
   },
   menu:{
     boxShadow: ` 0px 10px 60px ${theme.palette.primary.main}`
-  }
+  },
+  "@keyframes fundsInV1":{
+    "0%": { 
+      color: theme.palette.text.primary,
+      fontSize: theme.typography.body1.fontSize,
+    },
+    "50%": { 
+      color: 'red',
+      fontSize: `calc(${theme.typography.body1.fontSize} * 0.95)`,
+    },
+    "100%": { 
+      color: theme.palette.text.primary,
+      fontSize: theme.typography.body1.fontSize,
+    },
+  },
+  itemHighlight:{
+    animationName: '$fundsInV1',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
+    height: 35
+  },
 }))
