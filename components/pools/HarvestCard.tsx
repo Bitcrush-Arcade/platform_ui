@@ -11,6 +11,7 @@ import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 // utils
 import { currencyFormat } from 'utils/text/text'
+import BigNumber from 'bignumber.js'
 
 const PoolCard = (props: PoolCardProps) => {
 
@@ -73,7 +74,7 @@ type PoolCardProps ={
 
 type InfoStakeProps = {
   title: string,
-  amount: number,
+  amount: BigNumber,
   currency?:string,
   subtitle: string,
   color?: 'primary' | 'secondary',
@@ -92,7 +93,7 @@ const InfoMoney = ( props: InfoStakeProps ) => {
         {currency}
         <Typography className={ css.value } display="inline" component="span">
           {comingSoon ? "COMING SOON"
-          : currencyFormat(amount, { decimalsToShow: 4})}
+          : currencyFormat(amount.toString(), { decimalsToShow: 4})}
         </Typography>
       </Typography>
     </div>

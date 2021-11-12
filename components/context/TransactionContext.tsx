@@ -26,8 +26,8 @@ type ContextType = {
   pending: TransactionHash,
   completed: TransactionHash,
   editTransactions: (id: string, type: 'pending' | 'complete' | 'error', data?: TransactionSubmitData ) => void,
-  tokenInfo: { weiBalance: number , crushUsdPrice: number, burned: number},
-  liveWallet: { balance: number, timelock: number, selfBlacklist: () => void },
+  tokenInfo: { weiBalance: BigNumber , crushUsdPrice: number, burned: number},
+  liveWallet: { balance: BigNumber, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
   hydrateToken: () => Promise<void>,
@@ -39,11 +39,11 @@ export const TransactionContext = createContext<ContextType>({
   pending: {},
   completed: {},
   editTransactions: () => {},
-  tokenInfo: { weiBalance: 0, crushUsdPrice: 0, burned: 0},
+  tokenInfo: { weiBalance: new BigNumber(0), crushUsdPrice: 0, burned: 0},
   toggleDarkMode: () => {},
   isDark: true,
   hydrateToken: () => Promise.resolve(),
-  liveWallet: { balance: 0, timelock: 0, selfBlacklist: () => {} },
+  liveWallet: { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
 })
@@ -61,8 +61,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const [ pendingTransactions, setPendingTransactions ] = useImmer<TransactionHash>({})
   const [ completeTransactions, setCompleteTransactions ] = useImmer<TransactionHash>({})
 
-  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance: 0, crushUsdPrice: 0, burned: 0})
-  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: 0, timelock: 0, selfBlacklist: () => {} } )
+  const [ coinInfo, setCoinInfo ] = useImmer<ContextType["tokenInfo"]>({ weiBalance:  new BigNumber(0), crushUsdPrice: 0, burned: 0})
+  const [ liveWalletBalance, setLiveWalletBalance ] = useState<ContextType["liveWallet"]>( { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} } )
   const [ dark, setDark ] = useState<boolean>( true )
   const [ lwModal, setLwModal ] = useState<boolean>( false )
 
@@ -99,14 +99,14 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       })
     // ELSE RETURN CONTRACT BALANCE
     setCoinInfo( draft => {
-      draft.weiBalance = tokenBalance
+      draft.weiBalance = new BigNumber(tokenBalance)
       draft.burned = new BigNumber(totalBurned).div( 10**18 ).toNumber()
     })
     setLiveWalletBalance( prev => {
       const timelock = timelockActive ? timelockEndTime.toNumber() : 0
       return { ...prev,
         timelock,
-        balance: timelockActive ? (serverBalance > -1 ? serverBalance : prev.balance ) : lwBalance
+        balance: new BigNumber(timelockActive ? (serverBalance > -1 ? serverBalance : prev.balance ) : lwBalance)
       }
     })
   },[methods, account, setCoinInfo, lwMethods, setLiveWalletBalance])

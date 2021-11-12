@@ -10,10 +10,11 @@ import Typography from '@material-ui/core/Typography'
 import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
 // utils
 import { currencyFormat } from 'utils/text/text'
+import BigNumber from 'bignumber.js'
 
 type TokenDisplayProps ={
   color: 'primary' | 'secondary',
-  amount: number,
+  amount: BigNumber,
   icon: JSX.Element,
   actions?: Array< { name: string, onClick?: () => void, url?: string, highlight?: boolean } >,
   symbol?: string
@@ -39,7 +40,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {symbol ? `${symbol} `: ''}{currencyFormat(amount, { isWei: true, decimalsToShow: 4 })}
+            {symbol ? `${symbol} `: ''}{currencyFormat(amount.toString(), { isWei: true, decimalsToShow: 4 })}
           </Typography>
         </Grid>
         <Grid item>

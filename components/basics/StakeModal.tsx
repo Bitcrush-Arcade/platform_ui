@@ -30,7 +30,7 @@ import { currencyFormat } from 'utils/text/text'
  */
 export type StakeOptionsType = {
   name: string,
-  maxValue: number,
+  maxValue: BigNumber | number ,
   btnText: string,
   description: string,
   onSelectOption?: () => void,
@@ -38,11 +38,11 @@ export type StakeOptionsType = {
   disableAction?: boolean,
 }
 
-export type FormValues = { stakeAmount: number, actionType: number }
+export type FormValues = { stakeAmount: BigNumber, actionType: number }
 
 export type SubmitFunction = ( values : FormValues, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
 
-type StakeModalProps = {
+export type StakeModalProps = {
   open: boolean,
   onClose: () => void,
   options: Array<StakeOptionsType>,
@@ -52,6 +52,8 @@ type StakeModalProps = {
   onApprove?: () => void,
   onActionSelected?: (actionType: number) => void,
 }
+
+BigNumber.config({ ROUNDING_MODE: 1})
 
 function StakeModal( props: StakeModalProps ) {
   const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected} = props
@@ -72,7 +74,7 @@ function StakeModal( props: StakeModalProps ) {
     >
       <Formik
         initialValues = {{
-          stakeAmount: 0,
+          stakeAmount: new BigNumber(0),
           actionType: 0
         }}
         onSubmit={ (vals, ops) => needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)}
@@ -95,7 +97,7 @@ function StakeModal( props: StakeModalProps ) {
         const hasErrors = Object.keys( errors ).length > 0
         const sliderChange = (e: any, value: number) => {
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
-          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ).toNumber() )
+          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) )
         }
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
@@ -132,7 +134,7 @@ function StakeModal( props: StakeModalProps ) {
             </Grid>
           </Grid>
           <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            {options[actionType].btnText} {coinInfo?.symbol}: {isMaxAvailable ? currencyFormat( maxUsed || 0, { isWei: true }) : <Skeleton/>}
+            {options[actionType].btnText} {coinInfo?.symbol}: {isMaxAvailable ? currencyFormat( maxUsed?.toString() || 0, { isWei: true }) : <Skeleton/>}
           </Typography>
           <Field
             type="number"

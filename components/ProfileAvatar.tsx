@@ -85,7 +85,7 @@ const ProfileAvatar = () => {
         <ListItem>
           <ListItemText
             primary={ hasAccount 
-              ? currencyFormat(tokenInfo.weiBalance, { isWei: true }) 
+              ? currencyFormat(tokenInfo.weiBalance.toString(), { isWei: true }) 
               : "No data"}
             secondary={"Current CRUSH"}
           />
@@ -113,7 +113,7 @@ const ProfileAvatar = () => {
           }}>
             <ListItemText
               primary={"Live Wallet"}
-              secondary={currencyFormat(liveWallet.balance, {isWei: true})}
+              secondary={currencyFormat(liveWallet.balance.toString(), {isWei: true})}
             />
         </ListItem>
         {hasFunds && <ListItem button 
