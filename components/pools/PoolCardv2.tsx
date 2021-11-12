@@ -39,30 +39,21 @@ type PoolCardProps = {
   tokenIcon?: React.ReactNode,
   address: string,
   abi: any,
-  earnedFnName?: string,
-  earnedFn?: (methods: any) => BigNumber,
-  secondaryFn?: {
-    name: string,
-    action: () => void,
-  },
-  apyData:any,
-  refreshApy: () => void,
-  cardOtherActions?: React.ReactNode,
 }
 
 
 const Poolv2 = ( props: PoolCardProps ) => {
 
-  const { name, subtext, tokenIcon, address, abi, apyData, refreshApy} = props
+  const { name, subtext, tokenIcon, address, abi } = props
   const { account, chainId } = useWeb3React()
   const { address: coinAddress } = getContracts('crushToken', chainId)
   const { methods: poolMethods } = useContract(abi, address)
 
-  const [poolData, setPoolData] = useState<{ staked?: BigNumber, totalStaked?: BigNumber, earned?: BigNumber}>({})
+  const [poolData, setPoolData] = useState<{ staked?: BigNumber, totalStaked?: BigNumber, earned?: BigNumber, poolExhausted?: boolean}>({})
   const [apyInfo, setApyInfo] = useState<any>({})
   const [openRoi, setOpenRoi] = useState<boolean>(false)
   const [openStakeModal, setOpenStakeModal] = useState<boolean>(false)
-  const { approve, isApproved } = useCoin(coinAddress)
+  const { approve, isApproved, getApproved } = useCoin(coinAddress)
   const { tokenInfo } = useTransactionContext()
 
   const toggleRoi = () => setOpenRoi(p => !p)
@@ -89,10 +80,12 @@ const Poolv2 = ( props: PoolCardProps ) => {
       const totalStaked = await poolMethods.totalStaked().call()
       const apyReward = await poolMethods.pendingReward( account ).call()
       const profitReward = await poolMethods.pendingProfits( account ).call()
+      const poolReward = await poolMethods.totalPool().call()
       setPoolData({
         staked: new BigNumber(stakingInfo.stakedAmount),
         totalStaked: new BigNumber( totalStaked ),
-        earned: new BigNumber( apyReward ).plus( profitReward )
+        earned: new BigNumber( apyReward ).plus( profitReward ),
+        poolExhausted: new BigNumber(poolReward).isEqualTo(0)
       })
     }
     const interval  = setInterval(getPoolData, 3000)
@@ -101,8 +94,9 @@ const Poolv2 = ( props: PoolCardProps ) => {
   },[poolMethods, setPoolData, account])
 
   useEffect( () => {
-
-  },[getAPY])
+    getApproved && getApproved(address)
+    getAPY && getAPY()
+  },[getAPY,getApproved, address])
 
   const percent = new BigNumber( poolData.staked || 0 ).div( poolData.totalStaked  || 1).toString()
 
@@ -118,6 +112,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
       maxValue: tokenInfo.weiBalance,
       btnText: 'Wallet',
       description: "Stake your CRUSH on this high yield pool",
+      disableAction: poolData.poolExhausted
     },
     {
       name: 'Withdraw',
@@ -210,16 +205,20 @@ const Poolv2 = ( props: PoolCardProps ) => {
               : "Unlock Wallet"}
         </Button>
       </CardContent>
-      <CardActions>
-        <Grid container>
-          <Grid item xs={12}>
-            <Divider style={{marginBottom: 24}}/>
+      { poolData.poolExhausted && 
+        <CardActions>
+          <Grid container>
+            <Grid item xs={12}>
+              <Divider style={{marginBottom: 24}}/>
+            </Grid>
+            <Grid item xs={12} container alignItems="center">
+                  <Typography variant="h6" component="div" color="textSecondary" style={{fontWeight: 600}}>
+                    EXHAUSTED, WITHDRAW NOW
+                  </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={12} container alignItems="center">
-            
-          </Grid>
-        </Grid>
-      </CardActions>
+        </CardActions>
+      }
     </Card>
     <RoiModal
       open={openRoi}
