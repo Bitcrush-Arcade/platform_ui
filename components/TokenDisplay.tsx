@@ -15,6 +15,7 @@ import BigNumber from 'bignumber.js'
 type TokenDisplayProps ={
   color: 'primary' | 'secondary',
   amount: BigNumber,
+  label?: string,
   icon: JSX.Element,
   actions?: Array< { name: string, onClick?: () => void, url?: string, highlight?: boolean } >,
   symbol?: string

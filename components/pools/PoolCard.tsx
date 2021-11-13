@@ -231,7 +231,7 @@ const PoolCard = (props: PoolProps) => {
   return <>
     <Card background="light" className={ css.card } >
       <CardHeader classes={{ action: css.headerAction }}
-        title="Bitcrush Pool"
+        title="Manual CRUSH Pool"
         titleTypographyProps={{ className: css.headerTitle }}
         subheader="Manual Compounding"
         subheaderTypographyProps={{ variant: 'body2' }}

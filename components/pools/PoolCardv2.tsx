@@ -243,7 +243,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
               : "Unlock Wallet"}
         </Button>
       </CardContent>
-      { poolData.poolExhausted && 
+      { true && 
         <CardActions>
           <Grid container>
             <Grid item xs={12}>
@@ -288,7 +288,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   avatar:{
     width: theme.spacing(6),
     height: theme.spacing(6),
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.error.main
   },
   avatarIcon:{
     fontSize: 30,
