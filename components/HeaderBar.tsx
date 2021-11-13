@@ -50,9 +50,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
 
   const crushActions = [
     { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
-    { name: 'APE LP', onClick: ()=> window.open(`https://app.apeswap.finance/add/ETH/${CrushAddress}`, '_blank')},
-    { name: 'PANCAKE LP', onClick: ()=> window.open(`https://pancakeswap.finance/add/0x0Ef0626736c2d484A792508e99949736D0AF807e/BNB`,'_blank')},
-    { name: 'BABY LP', onClick: ()=> window.open(`https://exchange.babyswap.finance/#/add/${CrushAddress}/0x55d398326f99059fF775485246999027B3197955`, '_blank')},
+    { name: 'Knight Farm', onClick: ()=> window.open(`https://app.knightswap.financial/farms`, '_blank')},
+    { name: 'APE Farm', onClick: ()=> window.open(`https://apeswap.finance/farms`, '_blank')},
+    { name: 'CROX Farm', onClick: ()=> window.open(`https://app.croxswap.com/dualfarms`,'_blank')},
+    { name: 'BABY Farm', onClick: ()=> window.open(`https://home.babyswap.finance/farms`, '_blank')},
   ]
 
   return <AppBar className={css.appBar} variant="outlined" position={ isSm ? "sticky" : "absolute"}>

@@ -125,8 +125,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   },[ account, getTokenInfo ])
   // Refetch Token and Wallet Info
   useEffect( ()=>{
-    const refetchInterval = router.asPath.indexOf('/games') == 0 ? 1000 : 5000
-    const interval = setInterval( tokenHydration, refetchInterval)
+    const interval = setInterval( tokenHydration, 5000)
     return () => clearInterval(interval)
   },[tokenHydration, router])
   // set Current Theme

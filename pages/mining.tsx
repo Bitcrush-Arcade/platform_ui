@@ -61,15 +61,27 @@ const Mining = () => {
     </Grid>
     <Grid container justifyContent="space-evenly" className={ css.section }>
       <Grid item>
+        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!"/>
+      </Grid>
+    </Grid>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
+      <Grid item xs={10} sm={8} md={6}>
+        <Descriptor
+          title="Inactive Pools"
+          description={`Stake CRUSH coins in our single asset staking pool to earn APY.
+          No risk pools`}
+        />
+      </Grid>
+      <Grid item style={{width: 215}}/>
+    </Grid>
+    <Grid container justifyContent="space-evenly" className={ css.section }>
+      <Grid item>
         <PoolCardv2
           abi={prevPool.abi}
           address={prevPool.address}
-          name="Limited Pool"
+          name="Expiring SAS Pool"
           subtext="Simple Reward APR Pool"
         />
-      </Grid>
-      <Grid item>
-        <PoolCard abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!"/>
       </Grid>
     </Grid>
   </PageContainer>
