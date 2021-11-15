@@ -60,8 +60,6 @@ export const bankStakingInfo = <>
 
   If funds are frozen, APY is still distributed based on full staked amount, and auto-compound can be called any time. 
 
-  Withdrawing funds automatically withdraws your APY rewards, but not pending profits. Be sure your profits are claimed before withdrawing or they will be lost. 
-
   0.5% unstaking fee if withdrawn within 72h.
 `}
 </>
