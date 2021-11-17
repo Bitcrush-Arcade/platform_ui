@@ -54,6 +54,7 @@ function BankPool( ) {
 
   const [ openStaking, setOpenStaking ] = useState(false)
   const [ showRoi, setShowRoi ] = useState(false)
+  const [ selectedOption, setSelectedOption ] = useState<number|undefined>(undefined)
 
   const toggleRoi = () => setShowRoi( p => !p )
 
@@ -156,6 +157,12 @@ function BankPool( ) {
     setOpenStaking(true)
   }
 
+  useEffect( () => {
+    if(isNaN(selectedOption))
+      return setOpenStaking(false)
+    depositWithdrawClick()
+  },[selectedOption, depositWithdrawClick])
+
   const launcherPercent = bankInfo.totalFrozen > 0 ? 0 : (bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent)
   const activeSiren = userInfo.staked > 0 && launcherPercent >= 100
   
@@ -219,9 +226,28 @@ function BankPool( ) {
               }
             </Grid>
           </Grid>
-          <Button color="primary" onClick={depositWithdrawClick} width="100%">
-            {isApproved ? "DEPOSIT / WITHDRAW" : "Approve CRUSH" }
-          </Button>
+          { isApproved 
+            ? <Grid container justifyContent="center" spacing={2}>
+               <Grid item>
+                 <SmBtn  onClick={ () => setSelectedOption(0)}>
+                   Stake
+                  </SmBtn>
+               </Grid>
+               <Grid item>
+                 <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)}>
+                   Withdraw
+                  </SmBtn>
+               </Grid>
+               <Grid item>
+                 <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(2)}>
+                   Transfer
+                  </SmBtn>
+               </Grid>
+              </Grid>
+            : <Button color="primary" onClick={depositWithdrawClick} width="100%">
+                Approve CRUSH
+              </Button>
+          }
         </Grid>
         {/* STAKE INFORMATION AREA */}
         <Grid item xs={12} md={5} className={ css.secondQuadrant }>
@@ -401,10 +427,14 @@ function BankPool( ) {
     </Card>
     <StakeModal
       open={openStaking}
-      onClose={()=> setOpenStaking(false)}
+      onClose={()=> {
+        setOpenStaking(false)
+        setSelectedOption(undefined)
+      }}
       options={ stakingOptions }
       coinInfo={ { symbol: 'CRUSH', name: 'Crush Coin'} }
       onSubmit={ submit }
+      initAction={selectedOption}
     />
     <RoiModal
       open={showRoi}
