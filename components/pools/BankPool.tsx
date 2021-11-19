@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import format from 'date-fns/format'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
+import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
+import useMediaQuery from '@material-ui/core/useMediaQuery'
 import Avatar from "@material-ui/core/Avatar"
 import Divider from "@material-ui/core/Divider"
 import Grid from "@material-ui/core/Grid"
@@ -27,6 +28,9 @@ import CalculationIcon from 'components/svg/CalculationIcon'
 import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
 import RefreshIcon from '@material-ui/icons/Refresh'
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
 // Libs
 import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
@@ -39,6 +43,8 @@ function BankPool( ) {
   const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
   const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
+  const theme = useTheme()
+  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
   useEffect( () => {
     if(!getApyData) return
     const interval = setInterval( () => getApyData(), 30000)
@@ -228,21 +234,47 @@ function BankPool( ) {
           </Grid>
           { isApproved 
             ? <Grid container justifyContent="center" spacing={2}>
-               <Grid item>
-                 <SmBtn  onClick={ () => setSelectedOption(0)}>
-                   Stake
-                  </SmBtn>
-               </Grid>
-               <Grid item>
-                 <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)}>
-                   Withdraw
-                  </SmBtn>
-               </Grid>
-               <Grid item>
-                 <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(2)}>
-                   Transfer
-                  </SmBtn>
-               </Grid>
+              <Tooltip arrow title={<Typography>Stake</Typography>}>
+                <Grid item xs="auto" md={3}>
+                  { isSm 
+                    ? <SmBtn  onClick={ () => setSelectedOption(0)}>
+                        Stake
+                      </SmBtn>
+                    : <Tooltip arrow title={<Typography style={{padding:16}}>Stake</Typography>}>
+                        <Button onClick={ () => setSelectedOption(0)} color="primary" width="100%">
+                          <AddIcon/>
+                        </Button>
+                      </Tooltip>
+                  }
+                </Grid>
+              </Tooltip>
+              <Tooltip arrow title={<Typography>Withdraw</Typography>}>
+                <Grid item xs="auto" md={3}>
+                    { isSm 
+                      ? <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)} color="secondary">
+                          Withdraw
+                        </SmBtn>
+                      : <Tooltip arrow title={<Typography style={{padding:16}}>Withdraw</Typography>}>
+                          <Button onClick={ () => setSelectedOption(1)} color="secondary" disabled={!userInfo.staked} width="100%">
+                            <RemoveIcon/>
+                          </Button>
+                        </Tooltip>
+                    }
+                </Grid>
+              </Tooltip>
+              <Tooltip arrow title={<Typography>Transfer</Typography>}>
+                <Grid item xs="auto" md={3}>
+                  { isSm 
+                    ? <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)}>
+                        Transfer
+                      </SmBtn>
+                    : 
+                        <Button onClick={ () => setSelectedOption(2)} color="primary" disabled={!userInfo.staked} width="100%">
+                          <SwapHorizIcon/>
+                        </Button>
+                  }
+                </Grid>
+              </Tooltip>
               </Grid>
             : <Button color="primary" onClick={depositWithdrawClick} width="100%">
                 Approve CRUSH
