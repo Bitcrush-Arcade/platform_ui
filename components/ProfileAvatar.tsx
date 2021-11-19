@@ -19,8 +19,8 @@ import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
 // data
 import { getContracts } from 'data/contracts'
 
-const ProfileAvatar = () => {
-
+const ProfileAvatar = ( props: { playing: boolean }) => {
+  const { playing } = props
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
   const { login, logout, account, chainId } = useAuthContext()
@@ -113,7 +113,7 @@ const ProfileAvatar = () => {
           }}>
             <ListItemText
               primary={"Live Wallet"}
-              secondary={currencyFormat(liveWallet.balance.toString(), {isWei: true})}
+              secondary={ playing ? "Game Play Mode" : currencyFormat(liveWallet.balance.toString(), {isWei: true})}
             />
         </ListItem>
         {hasFunds && <ListItem button 

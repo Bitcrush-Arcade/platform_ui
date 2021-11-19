@@ -36,6 +36,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
   const isGame = pathname.indexOf('/games') > -1
+  const isPlaying = pathname === '/games/[gameKey]'
   const imgReducer = isSm ? 26 : 18
   
   const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
@@ -86,7 +87,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             <Grid item className={ css.dropOnSm }> 
-              <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} />
+              <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} label={isPlaying ? "Game Play Mode" : undefined} />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" actions={crushActions} />
@@ -95,7 +96,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               <ConnectButton/>
             </Grid>
             <Grid item>
-              <ProfileAvatar/>
+              <ProfileAvatar playing={isPlaying}/>
             </Grid>
           </Grid>
         </Grid>

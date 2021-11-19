@@ -17,7 +17,6 @@ import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/
 // Hooks
 import { useEagerConnect } from 'hooks/web3Hooks'
 // Utils
-import { servers } from 'utils/servers'
 import { differenceFromNow } from 'utils/dateFormat'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
