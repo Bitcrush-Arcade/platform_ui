@@ -236,10 +236,10 @@ const Poolv2 = ( props: PoolCardProps ) => {
             </Typography>
           </Grid>
         </Grid>
-        <Button width="100%" color="primary" onClick={openStake} solidDisabledText
+        <Button width="100%" color="primary" onClick={openStake} solidDisabledText disabled={!isApproved}
         >
           { account 
-              ? isApproved && "Withdraw NOW"
+              ? "Withdraw NOW"
               : "Unlock Wallet"}
         </Button>
       </CardContent>
