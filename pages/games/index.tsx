@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { InferGetServerSidePropsType } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
+import shuffle from 'lodash/shuffle'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import IconButton from '@material-ui/core/IconButton'
@@ -64,9 +65,9 @@ const featuredGames : GameItem[] = [
 ]
 
 const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
-
+  const { allGames } = props
   const css = useStyles({})
-
+  const gamesOfTheDay = useMemo( () => shuffle(allGames).slice(0,5),[allGames])
   const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(0)
   const [showSlide, setShowSlide] = useState<boolean>(true)
 
@@ -164,27 +165,39 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         </Grid>
       </Grid>
     </Slide>
-    {props.gameTypes.map( (gameType, gameTypeIndex) => props.gamesByType[gameTypeIndex].length > 0 && <div className={ css.otherGamesContainer } key={`games-${gameType}-${gameTypeIndex}`}>
+    <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
       <Typography variant="h6" paragraph>
-        Featured Partner :: Dragon Gaming :: {gameType}
+        Games of the Day
       </Typography>
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={props.gamesByType[gameTypeIndex].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
+        items={gamesOfTheDay.map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={1}
         md={4}
         lg={5}
         spacing={3}
       />
-      </div>)}
+    </div>
+    <div className={ css.otherGamesContainer } key={`all-games-container`}>
+      <Typography variant="h6" paragraph>
+        All Games
+      </Typography>
+      <Grid container justifyContent="space-evenly">
+        { allGames.map( (game, gameIdx) => {
+          return <Grid item key={`all-games-${gameIdx}`} style={{paddingBottom: 16}}>
+            <GameCard imgSrc={game.logos[0].url} gameKey={game.game_name}/>
+          </Grid>
+        })}
+      </Grid>
+    </div>
   </PageContainer>
 }
 
 export default Games
 
-export const getServerSideProps: GetServerSideProps = async(context) =>{
+export const getServerSideProps = async() =>{
 
   // const dragonEndpoint = dragonEp.getGames[process.env.NODE_ENV]; 
   const dragonEndpoint = dragonEp.getGames['production']; 
@@ -212,14 +225,21 @@ export const getServerSideProps: GetServerSideProps = async(context) =>{
   
   const gameTypes = Object.keys(availableGames?.result || {})
 
+  const allGames = []
+
   const gamesByType = gameTypes.map( gameType => {
-    return  availableGames?.result[ gameType ].map( game => flattenObject( game, 1 ) )
+    return  availableGames?.result[ gameType ].map( game => {
+      const flatGame = flattenObject( game, 1 )
+      allGames.push(flatGame)
+      return flatGame
+    } )
   })
 
   return {
     props:{
       gameTypes: gameTypes,
       gamesByType: gamesByType,
+      allGames,
     },
   }
 }

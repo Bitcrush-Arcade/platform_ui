@@ -39,6 +39,7 @@ const useStyles = makeStyles<Theme, GameCardProps & { loading: boolean } >( them
     height: 150,
     backgroundImage: props => `url(${props.imgSrc})`,
     backgroundSize: 'cover',
+    backgroundPosition:'center',
     display: 'flex',
   },
   button: {

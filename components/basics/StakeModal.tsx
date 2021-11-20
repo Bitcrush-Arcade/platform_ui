@@ -44,6 +44,7 @@ export type SubmitFunction = ( values : FormValues, second: { setSubmitting: (ne
 
 export type StakeModalProps = {
   open: boolean,
+  initAction?: number,
   onClose: () => void,
   options: Array<StakeOptionsType>,
   onSubmit: SubmitFunction,
@@ -56,7 +57,7 @@ export type StakeModalProps = {
 BigNumber.config({ ROUNDING_MODE: 1})
 
 function StakeModal( props: StakeModalProps ) {
-  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected} = props
+  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected, initAction} = props
   const css = useStyles({})
 
   const InfoText = () => {
@@ -75,7 +76,7 @@ function StakeModal( props: StakeModalProps ) {
       <Formik
         initialValues = {{
           stakeAmount: new BigNumber(0),
-          actionType: 0
+          actionType: initAction || 0
         }}
         onSubmit={ (vals, ops) => needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)}
         validate ={ ( values ) => {

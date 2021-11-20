@@ -236,14 +236,14 @@ const Poolv2 = ( props: PoolCardProps ) => {
             </Typography>
           </Grid>
         </Grid>
-        <Button width="100%" color="primary" onClick={openStake} solidDisabledText
+        <Button width="100%" color="primary" onClick={openStake} solidDisabledText disabled={!isApproved}
         >
           { account 
-              ? isApproved ? `STAKE CRUSH` : "Enable"
+              ? "Withdraw NOW"
               : "Unlock Wallet"}
         </Button>
       </CardContent>
-      { true && 
+      { poolData.poolExhausted && 
         <CardActions>
           <Grid container>
             <Grid item xs={12}>
@@ -266,6 +266,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
       apyData={apyInfo}
     />
     <StakeModal
+      initAction={1}
       open={openStakeModal}
       onClose={toggleStakeModal}
       options={stakeOptions}

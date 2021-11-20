@@ -23,13 +23,15 @@ type TokenDisplayProps ={
 
 const TokenDisplay = ( props: TokenDisplayProps ) => {
 
-  const { amount, icon, actions, color, symbol } = props
+  const { amount, icon, actions, color, symbol, label } = props
   const [ showActions, setShowActions ] = useState<boolean>(false)
 
   const css = useStyles({ showActions, ...props })
   const toggleActions = () => setShowActions( p => !p )
 
   const btnRef = useRef<HTMLButtonElement>(null)
+
+  const text = label || `${symbol && symbol+' ' || ''}${currencyFormat(amount.toString(), { isWei: true, decimalsToShow: 4 })}`
 
   return <>
     <ButtonBase 
@@ -41,7 +43,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {symbol ? `${symbol} `: ''}{currencyFormat(amount.toString(), { isWei: true, decimalsToShow: 4 })}
+            {text}
           </Typography>
         </Grid>
         <Grid item>
