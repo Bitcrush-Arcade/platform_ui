@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // Lodash
 import find from 'lodash/find'
@@ -22,7 +23,7 @@ import getLauncher from 'pages/api/dragon/getLauncher'
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
   const { isBitcrushGame, game } = props
-
+  const router = useRouter()
   const css = useStyles()
   const { account } = useWeb3React()
 
@@ -36,7 +37,7 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
       method: 'POST',
       body: JSON.stringify({
         wallet: account,
-        country: 'CR'//TODO GET ACTUAL COUNTRY FROM IP ADDRESS
+        country: router.query?.country || 'CR'//TODO GET ACTUAL COUNTRY FROM IP ADDRESS
       })
     })
       .then( d => d.json() )
