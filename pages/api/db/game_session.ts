@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { gameApi } from 'utils/servers'
 
 export default async function getGameSession(req : NextApiRequest, res: NextApiResponse){
   
