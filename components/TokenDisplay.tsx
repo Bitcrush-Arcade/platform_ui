@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import AnimatedNumber from 'animated-number-react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import Avatar from '@material-ui/core/Avatar'
 import ButtonBase from '@material-ui/core/ButtonBase'
 import Grid from '@material-ui/core/Grid'
 import Menu from '@material-ui/core/Menu'
@@ -16,15 +17,18 @@ import BigNumber from 'bignumber.js'
 type TokenDisplayProps ={
   color: 'primary' | 'secondary',
   amount: BigNumber,
-  label?: string,
+  label?: string | React.ReactNode,
   icon: JSX.Element,
   actions?: Array< { name: string, onClick?: () => void, url?: string, highlight?: boolean } >,
-  symbol?: string
+  token?: {
+    icon?:  React.ReactNode,
+    symbol?: string,
+  }
 }
 
 const TokenDisplay = ( props: TokenDisplayProps ) => {
 
-  const { amount, icon, actions, color, symbol, label } = props
+  const { amount, icon, actions, color, token, label } = props
   const [ showActions, setShowActions ] = useState<boolean>(false)
 
   const css = useStyles({ showActions, ...props })
@@ -41,12 +45,19 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       ref={btnRef}
     >
       <Grid container alignItems="center" aria-controls="token-menu">
+        {
+          token?.icon &&
+          <Grid item style={{ paddingRight: 8 }}>
+            <Avatar className={ css.avatarIcon }>
+              {token.icon}
+            </Avatar>
+          </Grid>
+        }
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
             {
               label || 
               <>
-                {symbol && symbol+' ' || ''}
                 <AnimatedNumber
                   value={numberVal}
                   formatValue={ v => currencyFormat(v,{decimalsToShow: 4})}
@@ -124,5 +135,11 @@ const useStyles = makeStyles<Theme, { showActions : boolean } & TokenDisplayProp
     animationTimingFunction: 'linear',
     animationIterationCount:'infinite',
     height: 35
+  },
+  avatarIcon:{
+    width: theme.spacing(4),
+    height: theme.spacing(4),
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white
   },
 }))
