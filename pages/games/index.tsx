@@ -174,8 +174,8 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         RightScroll={RightScroll}
         items={gamesOfTheDay.map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
-        sm={1}
-        md={4}
+        sm={2}
+        md={3}
         lg={5}
         spacing={3}
       />
