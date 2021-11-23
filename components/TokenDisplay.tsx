@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import AnimatedNumber from 'animated-number-react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import ButtonBase from '@material-ui/core/ButtonBase'
@@ -31,8 +32,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
 
   const btnRef = useRef<HTMLButtonElement>(null)
 
-  const text = label || `${symbol && symbol+' ' || ''}${currencyFormat(amount.toString(), { isWei: true, decimalsToShow: 4 })}`
-
+  const numberVal = amount.div(10**18).toString()
   return <>
     <ButtonBase 
       onClick={toggleActions}
@@ -43,7 +43,16 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       <Grid container alignItems="center" aria-controls="token-menu">
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
-            {text}
+            {
+              label || 
+              <>
+                {symbol && symbol+' ' || ''}
+                <AnimatedNumber
+                  value={numberVal}
+                  formatValue={ v => currencyFormat(v,{decimalsToShow: 4})}
+                />
+              </>
+            }
           </Typography>
         </Grid>
         <Grid item>
