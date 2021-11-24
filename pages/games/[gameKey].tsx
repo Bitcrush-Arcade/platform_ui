@@ -8,6 +8,7 @@ import find from 'lodash/find'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import pink from '@material-ui/core/colors/pink'
 import IconButton from '@material-ui/core/IconButton'
 import LinearProgress from "@material-ui/core/LinearProgress"
 import Grid from '@material-ui/core/Grid'
@@ -109,7 +110,7 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
               <div className={css.closeContainer}>
                 <Tooltip title={<Typography>Back to Arcade</Typography>}>
                   <IconButton className={css.closeButton} size="small" onClick={goBack}>
-                    <BackIcon fontSize="inherit" color="error" style={{transform: 'rotate(180deg)'}}/>
+                    <BackIcon fontSize="inherit" style={{transform: 'rotate(180deg)', color: pink.A200}}/>
                   </IconButton>
                 </Tooltip>
               </div>
