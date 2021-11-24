@@ -8,17 +8,19 @@ import find from 'lodash/find'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
+import IconButton from '@material-ui/core/IconButton'
 import LinearProgress from "@material-ui/core/LinearProgress"
 import Grid from '@material-ui/core/Grid'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
+// Icons
+import BackIcon from '@material-ui/icons/PlayCircleFilledOutlined';
 // BITCRUSH
-import Card from 'components/basics/Card'
 import PageContainer from 'components/PageContainer'
 import GeneralUseButton from 'components/basics/GeneralUseButton'
 // Utils & Types
 import { GameSession } from 'types/games/session'
 import { dragonEp } from 'utils/servers'
-import getLauncher from 'pages/api/dragon/getLauncher'
 
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
@@ -62,37 +64,58 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   },[isBitcrushGame, gameSession, launchURL, setLaunchURL, game, getLauncherUrl ])
 
+  const goBack = () => {
+    router.push('/games')
+  }
+
   return (
     <PageContainer menuSm={true}>
       <div className={ css.container}>
-        {!account || !game ? <>
-          <Typography variant="h3" align="center" paragraph>
-            {! account && "Please connect your wallet before playing"}
-            {! game && "This game doesn't seem to be available, please try another one."}
-          </Typography>
-          <Grid container justifyContent="center">
-            <Link passHref href="/games">
-              <GeneralUseButton color="secondary" background="secondary">
-                Go back to Arcade
-              </GeneralUseButton>
-            </Link>
-          </Grid>
-        </>
-        :<>
-        { isBitcrushGame && <iframe src={game.url} className={ css.iframe } /> }
-        { !isBitcrushGame && <>
-          {!launchURL && <>
+        {
+          !account || !game ?
+          <>
             <Typography variant="h3" align="center" paragraph>
-              {game.game_title}
+              {! account && "Please connect your wallet before playing"}
+              {! game && "This game doesn't seem to be available, please try another one."}
             </Typography>
-          </>}
-          { launchURL 
-          ? <>
-            <iframe src={launchURL} className={css.iframe} />
+            <Grid container justifyContent="center">
+              <Link passHref href="/games">
+                <GeneralUseButton color="secondary" background="secondary">
+                  Go back to Arcade
+                </GeneralUseButton>
+              </Link>
+            </Grid>
           </>
-          : <LinearProgress color="secondary" />}
-        </>}
-        </>}
+          :<>
+            { isBitcrushGame && <iframe src={game.url} className={ css.iframe } /> }
+            { 
+              !isBitcrushGame &&
+              <>
+                {
+                  !launchURL &&
+                  <Typography variant="h3" align="center" paragraph>
+                    {game.game_title}
+                  </Typography>
+                }
+                { 
+                  launchURL 
+                  ? <iframe src={launchURL} className={css.iframe} />
+                  : <LinearProgress color="secondary" />
+                }
+              </>
+            }
+            {
+              (isBitcrushGame || launchURL) &&
+              <div className={css.closeContainer}>
+                <Tooltip title={<Typography>Back to Arcade</Typography>}>
+                  <IconButton className={css.closeButton} size="small" onClick={goBack}>
+                    <BackIcon fontSize="inherit" color="error" style={{transform: 'rotate(180deg)'}}/>
+                  </IconButton>
+                </Tooltip>
+              </div>
+            }
+          </>
+        }
       </div>
     </PageContainer>
   )
@@ -114,7 +137,17 @@ const useStyles = makeStyles<Theme>(theme => createStyles({
     border: 'none',
   },
   container:{
-    maxWidth: `calc( 100vw - ${theme.spacing(6)}px )`
+    maxWidth: `calc( 100vw - ${theme.spacing(6)}px )`,
+    position: 'relative',
+  },
+  closeContainer:{
+    position: 'absolute',
+    top: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+  closeButton:{
+    backgroundColor: theme.palette.common.white,
+    fontSize: theme.typography.h2.fontSize
   }
 }))
 

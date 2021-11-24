@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
@@ -24,6 +25,7 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import usePrevLiveWallet from 'hooks/usePrevLw'
 // libs
 import { getContracts } from 'data/contracts'
+import { liveWallets } from 'data/liveWallets'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -35,6 +37,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { pathname } = useRouter()
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
+
+  const [ walletSelected, setWalletSelected ] = useState(liveWallets.crush)
+
   const isGame = pathname.indexOf('/games') > -1
   const isPlaying = pathname === '/games/[gameKey]'
   const imgReducer = isSm ? 26 : 18
@@ -87,10 +92,33 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
           <Grid container alignItems="center">
             {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
             <Grid item className={ css.dropOnSm }> 
-              <TokenDisplay amount={liveWallet.balance} icon={<Coin scale={0.25} token="LIVE" />} color="secondary" actions={lwActions} label={isPlaying ? "Game Play Mode" : undefined} />
+              {/* LIVE WALLET */}
+              <TokenDisplay 
+                amount={liveWallet.balance}
+                icon={<Coin scale={0.25} token="LIVE" />}
+                color="secondary"
+                actions={lwActions}
+                token={ walletSelected }
+                label={ isPlaying 
+                  ? 
+                    <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
+                      Game Mode{'\n'}
+                      <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
+                        CRUSH IT!
+                      </Typography>
+                    </Typography>
+                  : undefined
+                }
+              />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              <TokenDisplay amount={tokenInfo.weiBalance} icon={<Coin scale={0.25}/>} color="primary" actions={crushActions} />
+              {/* CRUSH on Wallet */}
+              <TokenDisplay
+                amount={tokenInfo.weiBalance}
+                icon={<Coin scale={0.25}/>}
+                color="primary"
+                actions={crushActions}
+              />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
               <ConnectButton/>
@@ -140,6 +168,36 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
       paddingBottom: theme.spacing(1),
     }
   },
+  crushIt:{
+    color: 'transparent',
+    backgroundImage: `repeating-linear-gradient(to right,
+      ${theme.palette.primary.light} 0%,
+      ${theme.palette.primary.light} 10%,
+      ${theme.palette.primary.light} 50%,
+      ${theme.palette.error.main} 65%,
+      ${theme.palette.error.main} 75%,
+      ${theme.palette.primary.light} 90%,
+      ${theme.palette.primary.light} 100%
+    )`,
+    backgroundSize: '200% 100%',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    animationName: '$crushing',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
+  },
+  "@keyframes crushing":{
+    "0%": { 
+      backgroundPosition: "0% 0%"
+    },
+    "100%": { 
+      backgroundPosition: "160% 0%"
+    },
+    // "100%": { 
+    //   backgroundPosition: "0% 0%"
+    // },
+  }
 }))
 
 const ConnectButton = () => {
