@@ -18,6 +18,7 @@ import Typography from '@material-ui/core/Typography'
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
 import Coin from 'components/tokens/Token2'
+import Currency from 'components/basics/Currency'
 import Button from 'components/basics/GeneralUseButton'
 import HarvestCard from 'components/pools/HarvestCard'
 // Hooks & Context
@@ -174,10 +175,11 @@ export default function Home() {
                       Total Value Locked
                     </Typography>
                     <Typography variant="h4" component="div" align={"center"}>
-                      {currencyFormat( totalValueLocked ,{ decimalsToShow: 0, isWei: true})}
+                      <Currency value={totalValueLocked} decimals={0} isWei/>
                     </Typography>
                     <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align={"center"}>
-                      USD&nbsp;{currencyFormat( totalValueLocked*tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true})}
+                      USD&nbsp;
+                      <Currency value={totalValueLocked*tokenInfo.crushUsdPrice} decimals={2} isWei/>
                     </Typography>
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
@@ -186,10 +188,11 @@ export default function Home() {
                       Max Win
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {currencyFormat( maxWin ,{ decimalsToShow: 2, isWei: true })}
+                      <Currency value={maxWin} decimals={2} isWei/>
                     </Typography>
                     <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
-                      USD&nbsp;{currencyFormat( maxWin * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2, isWei: true })}
+                      USD&nbsp;
+                      <Currency value={maxWin * tokenInfo.crushUsdPrice} decimals={2} isWei/>
                     </Typography>
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
@@ -198,10 +201,11 @@ export default function Home() {
                       CRUSH Burned
                     </Typography>
                     <Typography variant="h4" component="div" align="center">
-                      {currencyFormat( tokenInfo.burned ,{ decimalsToShow: 0 })}
+                      <Currency value={tokenInfo.burned} decimals={0}/>
                     </Typography>
                     <Typography variant="body2" paragraph={isSm} color="textSecondary" component="div" align="center">
-                      USD&nbsp;{currencyFormat( tokenInfo.burned * tokenInfo.crushUsdPrice ,{ decimalsToShow: 2 })}
+                      USD&nbsp;
+                      <Currency value={tokenInfo.burned * tokenInfo.crushUsdPrice} decimals={2} />
                     </Typography>
                   </Grid>
                   <Divider orientation="vertical" flexItem/>
@@ -210,10 +214,11 @@ export default function Home() {
                       Total Value Shared
                     </Typography>
                     <Typography variant="h4" component="div" align={isSm ? "center" : "right"}>
-                      {currencyFormat(totalDistributed,{ decimalsToShow: 0, isWei: true })}
+                      <Currency value={totalDistributed} decimals={0} isWei/>
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="div" align={isSm ? "center" : "right"}>
-                      USD&nbsp;{currencyFormat( totalDistributed * tokenInfo.crushUsdPrice,{ decimalsToShow: 2, isWei: true })}
+                      USD&nbsp;
+                      <Currency value={totalDistributed * tokenInfo.crushUsdPrice} decimals={2} isWei/>
                     </Typography>
                   </Grid>
                 </Grid>
@@ -230,12 +235,14 @@ export default function Home() {
                 <HarvestCard title="Staking Pool" color="primary"
                   rewardInfo={{
                     title: "CRUSH in Wallet",
-                    amount: tokenInfo.weiBalance.div(10 ** 18),
-                    subtitle: `$ ${currencyFormat(tokenInfo.weiBalance.times(tokenInfo.crushUsdPrice).div(10 ** 18).toString(), { decimalsToShow: 2, isWei: true})}`,
+                    amount: <Currency value={tokenInfo.weiBalance} isWei decimals={4}/>,
+                    subtitle: <>
+                        $ {<Currency value={tokenInfo.weiBalance.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>}
+                      </>,
                   }}
                   stakedInfo={{
                     title: "CRUSH Staked",
-                    amount: new BigNumber(staked),
+                    amount: <Currency value={staked} decimals={4}/>,
                     subtitle: `$ ${currencyFormat( staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2 })}`,
                   }}
                   action1Title={ !account && 'Connect First' || staked > 0 && "Harvest All" || "Go to Pool"}
@@ -256,14 +263,18 @@ export default function Home() {
                   <HarvestCard title="Live Wallet" color="secondary"
                     stakedInfo={{
                       title: "LIVE Wallet Balance",
-                      amount: new BigNumber(lwContext.balance).div( new BigNumber(10).pow(18) ),
-                      subtitle: `$ ${currencyFormat( lwContext.balance.times(tokenInfo.crushUsdPrice).toString(), { decimalsToShow: 2, isWei: true } )}`,
+                      amount: <Currency value={lwContext.balance} isWei decimals={4} />,
+                      subtitle: <>
+                          $ <Currency value={lwContext.balance.times(tokenInfo.crushUsdPrice)} decimals={2} isWei/>
+                        </>,
                       currency: "CRUSH",
                     }}
                     rewardInfo={{
                       title: "Total HOUSE Profit Earned",
-                      amount: new BigNumber(userInfo.claimed),
-                      subtitle: `$ ${currencyFormat( userInfo.claimed * tokenInfo.crushUsdPrice, { decimalsToShow: 2 } )}`,
+                      amount: <Currency value={userInfo.claimed} decimals={4}/>,
+                      subtitle: <>
+                          $ <Currency value={userInfo.claimed * tokenInfo.crushUsdPrice} decimals={2}/>
+                        </>,
                       currency: "CRUSH",
                     }}
                     icon={<Coin token="LIVE" scale={0.5}/>}

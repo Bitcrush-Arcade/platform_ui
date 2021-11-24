@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
+import Currency from 'components/basics/Currency'
 import Card from 'components/basics/Card'
 // utils
 import { currencyFormat } from 'utils/text/text'
@@ -74,9 +75,9 @@ type PoolCardProps ={
 
 type InfoStakeProps = {
   title: string,
-  amount: BigNumber,
+  amount: string | React.ReactNode,
   currency?:string,
-  subtitle: string,
+  subtitle: string | React.ReactNode,
   color?: 'primary' | 'secondary',
   comingSoon?: boolean
 }
@@ -92,8 +93,7 @@ const InfoMoney = ( props: InfoStakeProps ) => {
       <Typography color={color || 'primary'} display="inline" className={ css.currency }>
         {currency}
         <Typography className={ css.value } display="inline" component="span">
-          {comingSoon ? "COMING SOON"
-          : currencyFormat(amount.toString(), { decimalsToShow: 4})}
+          { comingSoon ? "COMING SOON" : amount }
         </Typography>
       </Typography>
     </div>
