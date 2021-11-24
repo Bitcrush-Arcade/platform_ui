@@ -46,7 +46,7 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
       .then( d => d.json() )
       .then( sessionData => setGameSession( sessionData ) )
 
-  },[account, gameSession, setGameSession, isBitcrushGame, game])
+  },[account, gameSession, setGameSession, isBitcrushGame, game, router.query])
 
   const getLauncherUrl = useCallback( async () => {
     if(!gameSession || !account || !game || launchURL) return
