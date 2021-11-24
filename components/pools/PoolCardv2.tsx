@@ -115,7 +115,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
       maxValue: tokenInfo.weiBalance,
       btnText: 'Wallet',
       description: "Stake your CRUSH on this high yield pool",
-      disableAction: poolData.poolExhausted
+      disableAction: true
     },
     {
       name: 'Withdraw',
@@ -145,8 +145,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
-    const isTransfer = values.actionType === 2
-    return poolMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
+    return poolMethods.emergencyWithdraw().send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
@@ -179,7 +178,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
       />
       <CardContent>
         {/* APR */}
-        <Grid container justifyContent="space-between" alignItems="center">
+        {/* <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
               Staked
@@ -222,17 +221,17 @@ const Poolv2 = ( props: PoolCardProps ) => {
               <RefreshIcon fontSize="inherit"/>
             </IconButton>
           </Grid>
-        </Grid>
+        </Grid> */}
         <Grid container justifyContent="space-between" alignItems="flex-end" className={ css.earnings }>
           <Grid item>
             <Typography variant="body2" color="textSecondary">
-              CRUSH EARNED
+              STAKED CRUSH
             </Typography>
             <Typography variant="h5" component="div" color="primary">
-              { currencyFormat( poolData.earned?.toString() || 0 ,{ isWei: true, decimalsToShow: 4}) }
+              { currencyFormat(poolData.staked?.toString() || 0, { isWei: true }) }
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              $&nbsp;{currencyFormat(poolData.earned?.times(tokenInfo.crushUsdPrice).toString() || 0, { isWei: true, decimalsToShow: 3 }) } USD
+              $&nbsp;{currencyFormat(poolData.staked?.times(tokenInfo.crushUsdPrice).toString() || 0, { isWei: true, decimalsToShow: 3 }) } USD
             </Typography>
           </Grid>
         </Grid>
@@ -243,20 +242,18 @@ const Poolv2 = ( props: PoolCardProps ) => {
               : "Unlock Wallet"}
         </Button>
       </CardContent>
-      { poolData.poolExhausted && 
-        <CardActions>
-          <Grid container>
-            <Grid item xs={12}>
-              <Divider style={{marginBottom: 24}}/>
-            </Grid>
-            <Grid item xs={12} container alignItems="center">
-                  <Typography variant="h6" component="div" color="textSecondary" style={{fontWeight: 600}}>
-                    EXHAUSTED, WITHDRAW NOW
-                  </Typography>
-            </Grid>
+      <CardActions>
+        <Grid container>
+          <Grid item xs={12}>
+            <Divider style={{marginBottom: 24}}/>
           </Grid>
-        </CardActions>
-      }
+          <Grid item xs={12} container alignItems="center">
+                <Typography variant="h6" component="div" color="textSecondary" style={{fontWeight: 600}}>
+                  EXHAUSTED, WITHDRAW NOW
+                </Typography>
+          </Grid>
+        </Grid>
+      </CardActions>
     </Card>
     <RoiModal
       open={openRoi}
@@ -310,7 +307,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     color: theme.palette.primary.main
   },
   earnings:{
-    marginTop: theme.spacing(3),
+    marginTop: theme.spacing(0),
     marginBottom: theme.spacing(3),
   },
   detailsActionText:{
