@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import format from 'date-fns/format'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
@@ -157,11 +157,11 @@ function BankPool( ) {
   const usdBankRoll = currencyFormat(tokenInfo.crushUsdPrice * totalBankroll, { decimalsToShow: 2, isWei: true })
 
   // STAKING INTERACTIONS
-  const depositWithdrawClick = () => {
+  const depositWithdrawClick = useCallback(() => {
     if(!isApproved)
       return approve(addresses.staking)
     setOpenStaking(true)
-  }
+  },[isApproved, approve, setOpenStaking, addresses.staking])
 
   useEffect( () => {
     if(isNaN(selectedOption))

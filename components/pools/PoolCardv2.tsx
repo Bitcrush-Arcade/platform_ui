@@ -148,7 +148,7 @@ const Poolv2 = ( props: PoolCardProps ) => {
     return poolMethods.emergencyWithdraw().send({ from: account })
       .on('transactionHash', (tx) => {
         console.log('hash', tx )
-        editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
+        editTransactions(tx,'pending', { description: `Withdraw All from Staking`})
       })
       .on('receipt', ( rc) => {
         console.log('receipt',rc)
@@ -307,7 +307,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     color: theme.palette.primary.main
   },
   earnings:{
-    marginTop: theme.spacing(0),
+    marginTop: 0,
     marginBottom: theme.spacing(3),
   },
   detailsActionText:{
