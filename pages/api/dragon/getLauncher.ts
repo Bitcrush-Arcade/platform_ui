@@ -28,7 +28,6 @@ export default async function getLauncher(req : NextApiRequest, res: NextApiResp
     }
   }
 
-  // const url = `${dragonEp.getLauncher[process.env.NODE_ENV]}`;
   const url = `${dragonEp.getLauncher["production"]}`;
   let status : number;
 
@@ -40,7 +39,6 @@ export default async function getLauncher(req : NextApiRequest, res: NextApiResp
     body: JSON.stringify( urlBuild ),
   } )
   .then( d =>{ 
-    console.log(d)
     status = d.status
     return d.json() 
   })
