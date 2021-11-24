@@ -5,6 +5,7 @@ import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
 // Material
 import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
+import pink from '@material-ui/core/colors/pink'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
@@ -174,8 +175,8 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
       ${theme.palette.primary.light} 0%,
       ${theme.palette.primary.light} 10%,
       ${theme.palette.primary.light} 50%,
-      ${theme.palette.error.main} 65%,
-      ${theme.palette.error.main} 75%,
+      ${pink.A200} 65%,
+      ${pink.A200} 75%,
       ${theme.palette.primary.light} 90%,
       ${theme.palette.primary.light} 100%
     )`,
