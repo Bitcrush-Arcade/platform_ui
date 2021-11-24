@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Grid from '@material-ui/core/Grid'
 import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
@@ -98,7 +99,16 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 color="secondary"
                 actions={lwActions}
                 token={ walletSelected }
-                label={isPlaying ? "Game Play Mode" : undefined}
+                label={ isPlaying 
+                  ? 
+                    <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
+                      Game Mode{'\n'}
+                      <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
+                        CRUSH IT!
+                      </Typography>
+                    </Typography>
+                  : undefined
+                }
               />
             </Grid>
             <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
@@ -158,6 +168,36 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
       paddingBottom: theme.spacing(1),
     }
   },
+  crushIt:{
+    color: 'transparent',
+    backgroundImage: `repeating-linear-gradient(to right,
+      ${theme.palette.primary.light} 0%,
+      ${theme.palette.primary.light} 10%,
+      ${theme.palette.primary.light} 50%,
+      ${theme.palette.error.main} 65%,
+      ${theme.palette.error.main} 75%,
+      ${theme.palette.primary.light} 90%,
+      ${theme.palette.primary.light} 100%
+    )`,
+    backgroundSize: '200% 100%',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    animationName: '$crushing',
+    animationDuration: '1s',
+    animationTimingFunction: 'linear',
+    animationIterationCount:'infinite',
+  },
+  "@keyframes crushing":{
+    "0%": { 
+      backgroundPosition: "0% 0%"
+    },
+    "100%": { 
+      backgroundPosition: "160% 0%"
+    },
+    // "100%": { 
+    //   backgroundPosition: "0% 0%"
+    // },
+  }
 }))
 
 const ConnectButton = () => {
