@@ -231,7 +231,7 @@ export const getServerSideProps = async() =>{
   const gamesByType = compact( gameTypes.map( gameType => {
     return  availableGames?.result[ gameType ].map( game => {
       const flatGame = flattenObject( game, 1 )
-      if(flatGame.game_name.indexOf('roulette')>-1)
+      if(flatGame.game_name.indexOf('roulette')>-1 || flatGame.game_name.indexOf('blackjack') > -1)
         return null
       allGames.push(flatGame)
       return flatGame
