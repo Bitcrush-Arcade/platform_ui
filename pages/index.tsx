@@ -97,7 +97,7 @@ export default function Home() {
 
   const totalValueLocked = tvl + bankInfo.totalStaked
   const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
-  const totalDistributed = bankInfo.stakingDistruted + v1Distributed
+  const totalDistributed = bankInfo.stakingDistributed + v1Distributed
   
   /**
    * @description This helps for announcemnts that have special effects internally.
