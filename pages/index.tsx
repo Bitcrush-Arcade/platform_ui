@@ -408,14 +408,14 @@ const partners: PartnerData[] = [
     logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
   },
-  {
-    name: 'PearZap',
-    href: 'https://bsc.pearzap.com/the-garden',
-    width: 272,
-    height: 272,
-    logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
-    factor: 4
-  },
+  // {
+  //   name: 'PearZap',
+  //   href: 'https://bsc.pearzap.com/the-garden',
+  //   width: 272,
+  //   height: 272,
+  //   logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
+  //   factor: 4
+  // },
   {
     name: 'Dragon Gaming',
     href: '/games',
