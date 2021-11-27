@@ -1,10 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react"
+import { useEffect } from "react"
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Checkbox from '@material-ui/core/Checkbox'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import FormControlLabel from "@material-ui/core/FormControlLabel"
 import Grid from "@material-ui/core/Grid"
 import Typography from "@material-ui/core/Typography"
 import CardContent from "@material-ui/core/CardContent"
@@ -14,66 +10,46 @@ import InfoIcon from '@material-ui/icons/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
+import Currency from 'components/basics/Currency'
 // libs
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
-import { useContract } from "hooks/web3Hooks"
+import useCalculator from 'hooks/compounder/useCalculator'
 // Context
 import { useTransactionContext } from "hooks/contextHooks"
-// data
-import { getContracts } from "data/contracts"
-import BigNumber from 'bignumber.js'
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const css = useStyles({})
 
-  const { chainId, account } = useWeb3React()
+  const { account } = useWeb3React()
 
   const { tokenInfo, editTransactions } = useTransactionContext()
-  const stakeContract = getContracts('bankStaking', chainId )
-  const { methods } = useContract( stakeContract.abi, stakeContract.address )
-  const [rewardToDistribute, setRewardToDistribute ] = useState<BigNumber>( new BigNumber(0) )
-  const [hydrate, setHydrate] = useState<boolean>(false)
+  const { compounderReward, calculate, contractMethods } = useCalculator()
 
-  const toggleHydrate = useCallback(() => setHydrate(p => !p) ,[setHydrate])
+  const usdReward = compounderReward.times(tokenInfo?.crushUsdPrice || 0)
 
-  const getRewards = useCallback( async () => {
-    return fetch('/api/contracts/compounderCalculator',{
-      method: "POST",
-      body: JSON.stringify({
-        chain: chainId
-      })
-    })
-      .then( res => res.json() )
-      .then( data => {
-        setRewardToDistribute( new BigNumber(data.compounderBounty) )
-      })
-      .catch( e => {
-        console.log(e)
-        setRewardToDistribute( new BigNumber(0) )
-      })
-      .finally( () => setTimeout( toggleHydrate, 5000 ) )
-
-  },[chainId, setRewardToDistribute, toggleHydrate])
-  
-  useEffect(() => {
-    getRewards()
-  },[hydrate, getRewards])
-
-  const usdReward = rewardToDistribute.times(tokenInfo?.crushUsdPrice || 0)
   const claim = () => {
-    methods.compoundAll().send({ from: account })
+    contractMethods.compoundAll().send({ from: account })
       .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
       .on('receipt', rct =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
+        calculate()
       })
       .on('error', (error, rct) => {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
-      } )
+        calculate()
+      })
   }
+
+  useEffect( () => {
+    const interval = setInterval( calculate, 10000 )
+    return  () => {
+      clearInterval(interval)
+    }
+  },[calculate])
 
   return <>
   <Card background="light" shadow="dark" className={ css.claimCard } >
@@ -103,18 +79,18 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
           <Tooltip title={<Typography>
-            {rewardToDistribute.toFixed(18)}
+            {compounderReward.toFixed(18)}
           </Typography>} arrow>
             <Typography color="primary" variant="h5" component="p">
-              {currencyFormat(rewardToDistribute.toNumber(), { decimalsToShow: 4, isWei: false })}
+              <Currency value={compounderReward} decimals={4} isWei/>
             </Typography>
           </Tooltip>
           <Typography color="textSecondary" variant="caption" component="p">
-            $&nbsp;{currencyFormat(usdReward.toNumber(), { decimalsToShow: 2, isWei: false })}
+            $&nbsp;<Currency value={usdReward} decimals={2} isWei/>
           </Typography>
         </Grid>
         <Grid item>
-          <Button size="small" width={80} color="primary" onClick={claim} disabled={!methods || !account }>
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account }>
             Claim
           </Button>
         </Grid>
