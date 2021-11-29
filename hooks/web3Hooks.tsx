@@ -92,7 +92,7 @@ export const CONNECTORS: {[connector in ConnectorNames]: any } = {
     qrcode: true,
     pollingInterval: POLLING_INTERVAL
   }),
-  "clover":  new CloverConnector({ supportedChainIds: validChains })
+  "clover":  new CloverConnector({ supportedChainIds: [56] })
 }
 export enum ConnectorNames {
   INJECTED = "injected",
