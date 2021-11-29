@@ -1,13 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 // Next
 import Head from 'next/head'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
+import Switch from '@material-ui/core/Switch'
 // Bitcrush
 import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
-import CompoundingCard from "components/pools/CompoundingCard"
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
 import PoolCardv2 from 'components/pools/PoolCardv2'
@@ -20,6 +20,9 @@ const Mining = () => {
 
   const css = useStyles({})
   const { chainId } = useWeb3React()
+
+  const [showInactive, setShowInactive] = useState<boolean>(false)
+  const toggleInactive = () => setShowInactive( p => !p )
 
   const firstPool = useMemo( () => getContracts('singleAsset', chainId ), [chainId])
   const prevPool = useMemo( () => getContracts('prevStaking2', chainId ), [chainId])
@@ -68,22 +71,27 @@ const Mining = () => {
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
           title="Inactive Pools"
-          description={`Stake CRUSH coins in our single asset staking pool to earn APY.
-          No risk pools`}
+          description={<>
+          {`Empty pools, nothing to do except withdraw.\n`}
+            Hide <Switch value={showInactive} onClick={toggleInactive}/> Show
+          </>}
         />
       </Grid>
       <Grid item style={{width: 215}}/>
     </Grid>
-    <Grid container justifyContent="space-evenly" className={ css.section }>
-      <Grid item>
-        <PoolCardv2
-          abi={prevPool.abi}
-          address={prevPool.address}
-          name="Expiring SAS Pool"
-          subtext="Simple Reward APR Pool"
-        />
+    {
+      showInactive &&
+      <Grid container justifyContent="center" className={ css.section }>
+        <Grid item>
+          <PoolCardv2
+            abi={prevPool.abi}
+            address={prevPool.address}
+            name="Expiring SAS Pool"
+            subtext="Simple Reward APR Pool"
+          />
+        </Grid>
       </Grid>
-    </Grid>
+    }
   </PageContainer>
 }
 
@@ -117,7 +125,7 @@ const useDescriptorStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   },
 }))
 
-const Descriptor = (props: { title: string, description: string }) => {
+const Descriptor = (props: { title: string, description: React.ReactNode }) => {
   const css = useDescriptorStyles({})
   return <div className={ css.textContainer }>
     <Typography variant="h4" component="h1" paragraph>
