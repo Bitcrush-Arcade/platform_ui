@@ -97,7 +97,7 @@ export default function Home() {
 
   const totalValueLocked = tvl + bankInfo.totalStaked
   const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
-  const totalDistributed = bankInfo.stakingDistruted + v1Distributed
+  const totalDistributed = bankInfo.stakingDistributed + v1Distributed
   
   /**
    * @description This helps for announcemnts that have special effects internally.
@@ -408,14 +408,14 @@ const partners: PartnerData[] = [
     logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
   },
-  {
-    name: 'PearZap',
-    href: 'https://bsc.pearzap.com/the-garden',
-    width: 272,
-    height: 272,
-    logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
-    factor: 4
-  },
+  // {
+  //   name: 'PearZap',
+  //   href: 'https://bsc.pearzap.com/the-garden',
+  //   width: 272,
+  //   height: 272,
+  //   logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
+  //   factor: 4
+  // },
   {
     name: 'Dragon Gaming',
     href: '/games',

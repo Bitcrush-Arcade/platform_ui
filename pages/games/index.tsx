@@ -4,6 +4,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import shuffle from 'lodash/shuffle'
+import compact from 'lodash/compact'
 // Material
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
 import IconButton from '@material-ui/core/IconButton'
@@ -227,13 +228,15 @@ export const getServerSideProps = async() =>{
 
   const allGames = []
 
-  const gamesByType = gameTypes.map( gameType => {
+  const gamesByType = compact( gameTypes.map( gameType => {
     return  availableGames?.result[ gameType ].map( game => {
       const flatGame = flattenObject( game, 1 )
+      if(flatGame.game_name.indexOf('roulette')>-1 || flatGame.game_name.indexOf('blackjack') > -1)
+        return null
       allGames.push(flatGame)
       return flatGame
     } )
-  })
+  }))
 
   return {
     props:{

@@ -25,7 +25,7 @@ export default async function getPrice(req : NextApiRequest, res: NextApiRespons
   })
   .then( resp => resp.json() )
   .catch( err => {
-    console.log('exchange Error')
+    console.log('exchange Error', err)
     return { bnbUsdPrice: -1, error: err }
   })
 

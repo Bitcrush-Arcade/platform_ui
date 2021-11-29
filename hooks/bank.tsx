@@ -6,6 +6,7 @@ import { useImmer } from 'use-immer'
 import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
 import BigNumber from 'bignumber.js'
+import { toWei } from 'web3-utils'
 // Types
 import { RoiProps } from 'components/pools/RoiModal'
 
@@ -77,13 +78,17 @@ const getBankData = useCallback( async() => {
       catch{
         poolStart = new Date().getTime()/1000 - (20*24*3600)
       }
-      
+      console.log( {
+        distr: new BigNumber(distributedProfit).toString(),
+        claimed: new BigNumber(profitsClaimed).toString(),
+        diff: new BigNumber( distributedProfit ).minus( profitsClaimed ).toString(),
+      })
       
       setBankInfo(draft => {
-        draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( 0.001 )
+        draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( toWei('0.5') )
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
-        draft.stakingDistruted = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
+        draft.stakingDistributed = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
         draft.poolStart = new Date( parseInt(poolStart) * 1000 )
       })
       
@@ -156,7 +161,7 @@ type BankInfo = {
   profitsPending: boolean,
   profitDistribution: number,
   thresholdPercent: number,
-  stakingDistruted: number,
+  stakingDistributed: number,
   bankDistributed: number,
   apyPercent: RoiProps['apyData'],
   poolStart: Date | null,
@@ -167,7 +172,7 @@ const initBank: BankInfo = {
   totalStaked: 0,
   availableProfit: 0,
   profitThreshold: 0,
-  stakingDistruted: 0,
+  stakingDistributed: 0,
   bankDistributed: 0,
   profitsPending: false,
   profitDistribution: 0.6,

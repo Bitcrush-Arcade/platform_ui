@@ -447,10 +447,10 @@ function BankPool( ) {
             </Grid>
             <Grid item xs={12}>
               <Typography color="primary" align="right" variant="h6" component="div">
-                {currencyFormat( bankInfo.stakingDistruted , { isWei: true, decimalsToShow: 4  })}
+                {currencyFormat( bankInfo.stakingDistributed , { isWei: true, decimalsToShow: 4  })}
               </Typography>
               <Typography color="textSecondary" variant="caption" component="div" align="right">
-                {currencyFormat( bankInfo.stakingDistruted * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )} USD
+                {currencyFormat( bankInfo.stakingDistributed * tokenInfo.crushUsdPrice , { isWei: true, decimalsToShow: 2} )} USD
               </Typography>
             </Grid>
           </Grid>

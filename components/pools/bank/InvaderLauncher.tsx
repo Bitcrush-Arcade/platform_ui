@@ -6,6 +6,7 @@ import Grid from "@material-ui/core/Grid"
 import Slider from "@material-ui/core/Slider"
 import Typography from "@material-ui/core/Typography"
 // Bitcrush
+import Currency from 'components/basics/Currency'
 import LauncherSlider from 'components/pools/bank/LauncherSlider'
 import { currencyFormat } from 'utils/text/text'
 
@@ -74,7 +75,10 @@ function InvaderLauncher( props: InvaderLauncherProps ) {
             <Typography className={ css.colorChange }>
               { (crushBuffer || 0 ) >= 0 
                 ? `${currencyFormat( (percent || 0) > 100 ? 100 : (percent || 0 ), { decimalsToShow: 0 })}%`
-                : `${currencyFormat( crushBuffer || 0, { decimalsToShow: 0, isWei: true } ) } CRUSH`
+                : <>
+                    <Currency value={crushBuffer} decimals={0} isWei/>
+                    &nbsp;CRUSH
+                  </>
               }
             </Typography>
             <Typography className={ css.colorChange }>

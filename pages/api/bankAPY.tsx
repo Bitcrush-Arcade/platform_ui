@@ -42,13 +42,12 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const emission = new BigNumber( await stakingContract.methods.crushPerBlock().call() )
   const actualTotalStaked = new BigNumber( await stakingContract.methods.totalStaked().call() )
   const totalStaked = (actualTotalStaked.isEqualTo( 0 ) ? new BigNumber( 1000000 ).times( new BigNumber(10).pow(18) ) : actualTotalStaked).toNumber()
-  const deployTime = new BigNumber( await stakingContract.methods.deploymentTimeStamp().call() )
   const boost = new BigNumber( await stakingContract.methods.apyBoost().call() )
   const hasFrozen = new BigNumber( await stakingContract.methods.totalFrozen().call() ).isGreaterThan(0)
   // Bankroll
   const totalProfit = new BigNumber( await bankContract.methods.totalProfit().call() )
   // TotalProfit / ( days Since ContractLaunch ) / 288 claims per day
-  const profitEmission = totalProfit.isGreaterThan(0) ? totalProfit.div( differenceInCalendarDays( new Date(), new Date( deployTime.times(1000).toNumber() ) ) || 1 ).div( 288 ).toNumber() : 0
+  const profitEmission = totalProfit.isGreaterThan(0) ? totalProfit.div( differenceInCalendarDays( new Date(), new Date( 1637789460000 ) ) || 1 ).div( 288 ).toNumber() : 0
   const compoundRewards = {
     d1: {
       return: 0,
