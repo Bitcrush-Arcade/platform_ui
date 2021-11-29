@@ -67,7 +67,7 @@ export default function Home() {
     if(!methods) return
     const getTvl = async () => {
       const totalStaked = await methods.totalStaked().call()
-      const accountStake = await methods.stakings(account).call()
+      const accountStake = account ? await methods.stakings(account).call() : {stakedAmount: 0}
       setTvl( new BigNumber(totalStaked).toNumber() )
       setStaked( new BigNumber(accountStake?.stakedAmount || 0).div( new BigNumber(10).pow(18) ).toNumber() )
     }
