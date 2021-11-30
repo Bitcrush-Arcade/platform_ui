@@ -38,13 +38,13 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   // START BALANCE
   const ogBalance = await contract.methods.betAmounts(account).call()
   const lockDuration = await contract.methods.lockPeriod().call()
-  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/db/${account}`,{
+  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/${account}`,{
     headers:{
       origin: "http://localhost:3000"
     }
   })
     .then( r => r.json() )
-    .then( data =>  parseInt(toWei(`${data.user_balance}`)) )
+    .then( data =>  parseInt(toWei(`${data.balance}`)) )
     .catch( e => {
       res.status(400).json({ message: 'Server Balance is not available', error: e})
       return 'Error'

@@ -11,7 +11,7 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
     return
   }
 
-  await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/db/${wallet}`,{
+  await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/${wallet}`,{
     headers:{
       origin: 'http://localhost:3000'
     }
@@ -21,7 +21,10 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
       if( data?.statusCode > 200 )
         res.status(503).json({ message: 'Database is not responding'})
       else
-        res.status(200).json({ balance: toWei(`${data.user_balance || 0}`) })
+        res.status(200).json({ balance: toWei(`${data.balance || 0}`) })
     } )
+    .catch( e =>{
+      res.status(503).json({ error: e, balance: -1 })
+    })
 
 }
