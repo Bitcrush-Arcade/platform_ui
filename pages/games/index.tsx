@@ -66,7 +66,7 @@ const featuredGames : GameItem[] = [
 ]
 
 const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
-  const { allGames } = props
+  const { allGames, gamesByType } = props
   const css = useStyles({})
   const gamesOfTheDay = useMemo( () => shuffle(allGames).slice(0,5),[allGames])
   const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(0)
@@ -181,6 +181,21 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         spacing={3}
       />
     </div>
+    <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
+      <Typography variant="h6" paragraph>
+        Table Games
+      </Typography>
+      <Carousel
+        LeftScroll={LeftScroll}
+        RightScroll={RightScroll}
+        items={gamesByType[1].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
+        xs={1}
+        sm={2}
+        md={3}
+        lg={5}
+        spacing={3}
+      />
+    </div>
     <div className={ css.otherGamesContainer } key={`all-games-container`}>
       <Typography variant="h6" paragraph>
         All Games
@@ -227,12 +242,9 @@ export const getServerSideProps = async() =>{
   const gameTypes = Object.keys(availableGames?.result || {})
 
   const allGames = []
-
   const gamesByType = compact( gameTypes.map( gameType => {
     return  availableGames?.result[ gameType ].map( game => {
       const flatGame = flattenObject( game, 1 )
-      if(flatGame.game_name.indexOf('roulette')>-1 || flatGame.game_name.indexOf('blackjack') > -1)
-        return null
       allGames.push(flatGame)
       return flatGame
     } )
