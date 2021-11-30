@@ -23,5 +23,8 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
       else
         res.status(200).json({ balance: toWei(`${data.balance || 0}`) })
     } )
+    .catch( e => {
+      res.status(500).json({ error: e })
+    })
 
 }
