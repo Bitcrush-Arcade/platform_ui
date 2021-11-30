@@ -44,7 +44,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
     }
   })
     .then( r => r.json() )
-    .then( data =>  parseInt(toWei(`${data.user_balance}`)) )
+    .then( data =>  parseInt(toWei(`${data.balance}`)) )
     .catch( e => {
       res.status(400).json({ message: 'Server Balance is not available', error: e})
       return 'Error'

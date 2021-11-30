@@ -21,7 +21,7 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
       if( data?.statusCode > 200 )
         res.status(503).json({ message: 'Database is not responding'})
       else
-        res.status(200).json({ balance: toWei(`${data.user_balance || 0}`) })
+        res.status(200).json({ balance: toWei(`${data.balance || 0}`) })
     } )
 
 }
