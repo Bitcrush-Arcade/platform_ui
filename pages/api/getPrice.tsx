@@ -10,29 +10,19 @@ export default async function getPrice(req : NextApiRequest, res: NextApiRespons
   const web3 = new Web3( new Web3.providers.HttpProvider('https://bsc-dataseed1.defibit.io/') )
 
   // POOL ADDRESS
-  const contract = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x8A10489f1255fb63217Be4cc96B8F4CD4D42a469')
+  const crushBnb = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x8A10489f1255fb63217Be4cc96B8F4CD4D42a469')
+  const bnbBusd = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16')
 
-  const totalCrush = await contract.methods.getReserves().call()
-
-  const res0 = new BigNumber( totalCrush._reserve0 ).div( new BigNumber(10).pow(18) ) //CRUSH RESERVE AMOUNT
-  const res1 = new BigNumber( totalCrush._reserve1 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
+  const totalCrush = await crushBnb.methods.getReserves().call()
+  const totalBusd = await bnbBusd.methods.getReserves().call()
+  
+  const crush1 = new BigNumber( totalCrush._reserve0 ).div( new BigNumber(10).pow(18) ) //CRUSH RESERVE AMOUNT
+  const bnb1 = new BigNumber( totalCrush._reserve1 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
+  const bnb2 = new BigNumber( totalBusd._reserve0 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
+  const busd2 = new BigNumber( totalBusd._reserve1 ).div( new BigNumber(10).pow(18) ) //BUSD RESERVE AMOUNT
 
   // GET BNB USD price
-  const bnbExchange = await fetch('https://api-bsc.idex.io/v1/exchange',{
-    headers:{
-      method: 'GET'
-    }
-  })
-  .then( resp => resp.json() )
-  .catch( err => {
-    console.log('exchange Error', err)
-    return { bnbUsdPrice: -1, error: err }
-  })
-
-  if(bnbExchange.bnbUsdPrice < 0)
-    return res.status(500).json({ error: "Error fetching bnb/Usd Price", errorResponse: bnbExchange.error })
-
-  const crushUsdPrice = new BigNumber( bnbExchange.bnbUsdPrice ).times( res1.div( res0 ) )
+  const crushUsdPrice = bnb1.times(busd2).div( bnb2.times(crush1) )
 
   return res.status(200).json({ message: 'Success Fetching CrushPrice', crushUsdPrice })
 }
