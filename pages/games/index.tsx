@@ -181,7 +181,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         spacing={3}
       />
     </div>
-    <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
+    {/* <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
       <Typography variant="h6" paragraph>
         Table Games
       </Typography>
@@ -195,7 +195,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         lg={5}
         spacing={3}
       />
-    </div>
+    </div> */}
     <div className={ css.otherGamesContainer } key={`all-games-container`}>
       <Typography variant="h6" paragraph>
         All Games
@@ -243,6 +243,8 @@ export const getServerSideProps = async() =>{
 
   const allGames = []
   const gamesByType = compact( gameTypes.map( (gameType, typeIndex) => {
+    if(typeIndex === 1)
+      return
     return  availableGames?.result[ gameType ].map( game => {
       const flatGame = flattenObject( game, 1 )
       allGames.push(flatGame)
