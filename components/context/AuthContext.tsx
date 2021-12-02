@@ -48,7 +48,7 @@ export const AuthContext = (props: { children: ReactNode }) => {
       }}
     >
       <ListItemAvatar>
-        <Avatar src={wallet.src}>
+        <Avatar src={wallet.src} variant="square">
           <WalletIcon/>
         </Avatar>
       </ListItemAvatar>

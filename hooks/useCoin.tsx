@@ -18,7 +18,7 @@ const useCoin = (coinAddress?: string) => {
   const [isApproved, setIsApproved] = useState<boolean>(false)
 
   const getApproved = useCallback( async (contractToCheck: string, amountToCheck?: number) => {
-    if(!coinMethods){
+    if(!coinMethods || !account){
       setIsApproved(false)
       return
     }
