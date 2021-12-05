@@ -79,7 +79,7 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
         <Grid item xs={12} style={{height: 16}}/>
         <Grid item>
           <Tooltip title={<Typography>
-            {compounderReward.toFixed(18)}
+            <Currency value={compounderReward} decimals={18} isWei/>&nbsp;CRUSH
           </Typography>} arrow>
             <Typography color="primary" variant="h5" component="p">
               <Currency value={compounderReward} decimals={4} isWei/>
