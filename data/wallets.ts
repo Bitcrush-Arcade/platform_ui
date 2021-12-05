@@ -7,6 +7,11 @@ const wallets: Array<WalletDescriptor> = [
     type: ConnectorNames.INJECTED
   },
   {
+    name: "Clover Wallet",
+    src: '/assets/thirdPartyLogos/cloverWallet.png',
+    type: ConnectorNames.CLOVER_WALLET
+  },
+  {
     name: "Wallet Connect",
     src: '/assets/thirdPartyLogos/walletConnect.jpg',
     type: ConnectorNames.WALLET_CONNECT

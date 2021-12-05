@@ -5,6 +5,7 @@ import Web3 from 'web3'
 import { useWeb3React } from '@web3-react/core'
 import { InjectedConnector,  UserRejectedRequestError as UserRejectedRequestErrorInjected } from '@web3-react/injected-connector'
 import { WalletConnectConnector, UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from '@web3-react/walletconnect-connector'
+import { CloverConnector } from '@clover-network/clover-connector'
 // data
 import { getRpcUrl } from 'data/rpc'
 
@@ -23,9 +24,17 @@ export const useAuth = () => {
         console.log('failed activation',error)
         if( error instanceof UserRejectedRequestErrorWalletConnect && connector instanceof WalletConnectConnector)
           connector.walletConnectProvider = null
+        if(error)
+          setTimeout( () => window.localStorage.setItem('connectorId', ''), 1000)
         
       })
-      .then( () => window.localStorage.setItem('connectorId', specifiedConnector || '' ))
+      .then( (c) => {
+        console.log('returned stuff',c)
+        window.localStorage.setItem('connectorId', specifiedConnector || '' )
+      })
+      .catch( e => {
+        console.log('failed to activate', e)
+      })
   },[activate])
 
   const logout = useCallback(() => {
@@ -82,9 +91,11 @@ export const CONNECTORS: {[connector in ConnectorNames]: any } = {
     },
     qrcode: true,
     pollingInterval: POLLING_INTERVAL
-  })
+  }),
+  "clover":  new CloverConnector({ supportedChainIds: [56] })
 }
 export enum ConnectorNames {
   INJECTED = "injected",
-  WALLET_CONNECT="walletConnect"
+  WALLET_CONNECT="walletConnect",
+  CLOVER_WALLET="clover",
 }

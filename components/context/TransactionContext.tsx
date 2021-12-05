@@ -71,14 +71,13 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
   const tokenHydration = useCallback( async () => {
-    if(!methods || !account || !lwMethods) return
     let serverBalance = 0
     
-    const tokenBalance = await methods.balanceOf(account).call()
-    const totalBurned = await methods.tokensBurned().call()
-    const lwBalance = parseInt( await lwMethods.balanceOf(account).call() )
-    const lwBetAmounts = await lwMethods.betAmounts( account ).call()
-    const lwDuration = await lwMethods.lockPeriod().call()
+    const tokenBalance = account && methods ? await methods.balanceOf(account).call() : '0'
+    const totalBurned = methods ? await methods.tokensBurned().call() : '0'
+    const lwBalance = parseInt( (account && lwMethods) ? await lwMethods.balanceOf(account).call() : '0')
+    const lwBetAmounts = lwMethods && account ? await lwMethods.betAmounts( account ).call() : { lockTimeStamp: 0 }
+    const lwDuration = lwMethods ? await lwMethods.lockPeriod().call() : '0'
 
     // COMPARE CURRENT DATE WITH TIMELOCK
     const timelockEndTime = new BigNumber(lwBetAmounts.lockTimeStamp).plus(lwDuration)
