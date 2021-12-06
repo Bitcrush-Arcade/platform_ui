@@ -58,7 +58,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
             {
               label ||
-                <Currency value={amount} isWei decimals={4} />
+                <Currency value={amount.div(10**18).toFixed(18)} decimals={4} />
             }
           </Typography>
         </Grid>
