@@ -66,9 +66,8 @@ const featuredGames : GameItem[] = [
 ]
 
 const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) => {
-  const { allGames, gamesByType } = props
+  const { allGames, gamesByType, popGames } = props
   const css = useStyles({})
-  const gamesOfTheDay = useMemo( () => shuffle(allGames).slice(0,5),[allGames])
   const [selectFeaturedGame, setSelectFeaturedGame] = useState<number>(0)
   const [showSlide, setShowSlide] = useState<boolean>(true)
 
@@ -168,12 +167,12 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
     </Slide>
     <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
       <Typography variant="h6" paragraph>
-        Games of the Day
+        Popular Games
       </Typography>
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={gamesOfTheDay.map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
+        items={popGames.map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={2}
         md={3}
@@ -181,7 +180,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         spacing={3}
       />
     </div>
-    {/* <div className={ css.otherGamesContainer } key={`games-of-the-day-container`}>
+    <div className={ css.otherGamesContainer } key={`table-games-container`}>
       <Typography variant="h6" paragraph>
         Table Games
       </Typography>
@@ -195,7 +194,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
         lg={5}
         spacing={3}
       />
-    </div> */}
+    </div>
     <div className={ css.otherGamesContainer } key={`all-games-container`}>
       <Typography variant="h6" paragraph>
         All Games
@@ -243,8 +242,6 @@ export const getServerSideProps = async() =>{
 
   const allGames = []
   const gamesByType = compact( gameTypes.map( (gameType, typeIndex) => {
-    if(typeIndex === 1)
-      return
     return  availableGames?.result[ gameType ].map( game => {
       const flatGame = flattenObject( game, 1 )
       allGames.push(flatGame)
@@ -257,6 +254,7 @@ export const getServerSideProps = async() =>{
       gameTypes: gameTypes,
       gamesByType: gamesByType,
       allGames,
+      popGames: shuffle(allGames).slice(0,5),
     },
   }
 }
