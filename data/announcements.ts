@@ -23,6 +23,14 @@ const highlightedAnnouncements : Array<Announcement> = [
     target: "_blank",
     rel: "noopener nonreferrer",
   },
+  {
+    name: 'BlockMine Partnership',
+    img: '/assets/announcements/5-blockmin-banner.png',
+    imgMobile: '/assets/announcements/5-blockmin-mobile.png',
+    link: 'https://block-mine.io/pools',
+    target: "_blank",
+    rel: "noopener nonreferrer",
+  },
 ]
 
 export const height= 310
