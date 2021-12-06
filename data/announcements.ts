@@ -3,7 +3,7 @@ const highlightedAnnouncements : Array<Announcement> = [
     name: 'Live Now',
     img: '/assets/announcements/1-live-now-banner.png',
     imgMobile: '/assets/announcements/1-live-now-mobile.png',
-    link: '/games/diceInvaders',
+    link: '/games',
     target: null,
     rel: null,
   },
