@@ -15,14 +15,14 @@ const highlightedAnnouncements : Array<Announcement> = [
     target: null,
     rel: null,
   },
-  // {
-  //   name: 'Pearzap Partnership',
-  //   img: '/assets/announcements/3-pearzap-banner.png',
-  //   imgMobile: '/assets/announcements/3-pearzap-mobile.png',
-  //   link: 'https://bsc.pearzap.com/the-garden',
-  //   target: "_blank",
-  //   rel: "noopener nonreferrer",
-  // },
+  {
+    name: 'Knightswap Partnership',
+    img: '/assets/announcements/4-knightswap-banner.png',
+    imgMobile: '/assets/announcements/4-knightswap-mobile.png',
+    link: 'https://app.knightswap.financial/farms',
+    target: "_blank",
+    rel: "noopener nonreferrer",
+  },
 ]
 
 export const height= 310
