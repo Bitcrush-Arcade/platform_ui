@@ -78,11 +78,6 @@ const getBankData = useCallback( async() => {
       catch{
         poolStart = new Date().getTime()/1000 - (20*24*3600)
       }
-      console.log( {
-        distr: new BigNumber(distributedProfit).toString(),
-        claimed: new BigNumber(profitsClaimed).toString(),
-        diff: new BigNumber( distributedProfit ).minus( profitsClaimed ).toString(),
-      })
       
       setBankInfo(draft => {
         draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( toWei('0.5') )
