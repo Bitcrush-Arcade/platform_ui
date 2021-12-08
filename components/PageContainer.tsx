@@ -110,9 +110,6 @@ const PageContainer = ( props: ContainerProps ) => {
       if(!timelockInPlace) return false
       const quickWithdrawLock = await fetch(`/api/db/play_timelock_active`,{
           method: "POST",
-          headers:{
-            origin: "http://localhost:3000"
-          },
           body: JSON.stringify({
             account: account
           })
@@ -147,6 +144,13 @@ const PageContainer = ( props: ContainerProps ) => {
           .on('receipt', ( rc) => {
             console.log('receipt',rc)
             editTransactions(rc.transactionHash,'complete')
+            fetch('/api/db/deposit',{ 
+              method: 'POST',
+              body: JSON.stringify({ account: account })
+            })
+              .then( r => r.json())
+              .then( c => console.log('response',c))
+              .catch(e => console.log(e))
             hydrateToken()
           })
           .on('error', (error, receipt) => {
