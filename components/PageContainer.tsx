@@ -100,7 +100,7 @@ const PageContainer = ( props: ContainerProps ) => {
         description: 'Withdraw funds from Live Wallet to CRUSH',
         btnText: 'Live Wallet CRUSH',
         maxValue: lwContext.balance,
-        onSelectOption: hydrateToken,
+        onSelectOption: () => hydrateToken(true),
         disableAction: timelockInPlace && activeTimelock,
         more: withdrawDetails
       },

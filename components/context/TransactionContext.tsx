@@ -30,7 +30,7 @@ type ContextType = {
   liveWallet: { balance: BigNumber, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
-  hydrateToken: () => Promise<void>,
+  hydrateToken: (reset?:bool) => Promise<void>,
   toggleLwModal: () => void,
   lwModalStatus: boolean,
 }
@@ -42,7 +42,7 @@ export const TransactionContext = createContext<ContextType>({
   tokenInfo: { weiBalance: new BigNumber(0), crushUsdPrice: 0, burned: 0},
   toggleDarkMode: () => {},
   isDark: true,
-  hydrateToken: () => Promise.resolve(),
+  hydrateToken: (reset?:bool) => Promise.resolve(),
   liveWallet: { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
@@ -70,7 +70,10 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
-  const tokenHydration = useCallback( async () => {
+  const tokenHydration = useCallback( async (reset?:boolean) => {
+    if(reset){
+      setLiveWalletBalance( prev => ({...prev, balance: new BigNumber(0)}))
+    }
     let serverBalance = 0
     
     const tokenBalance = account && methods ? await methods.balanceOf(account).call() : '0'
