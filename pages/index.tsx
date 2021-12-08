@@ -242,8 +242,8 @@ export default function Home() {
                   }}
                   stakedInfo={{
                     title: "CRUSH Staked",
-                    amount: <Currency value={staked} decimals={4}/>,
-                    subtitle: `$ ${currencyFormat( staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2 })}`,
+                    amount: <Currency value={userInfo.staked} isWei decimals={4}/>,
+                    subtitle: `$ ${currencyFormat( userInfo.staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true })}`,
                   }}
                   action1Title={ !account && 'Connect First' || staked > 0 && "Harvest All" || "Go to Pool"}
                   icon={<Coin scale={0.5}/>}
