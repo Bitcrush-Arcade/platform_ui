@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import Web3 from 'web3'
 import { AbiItem } from 'web3-utils'
 import BigNumber from 'bignumber.js'
+import logger from 'utils/logger'
 
 
 
@@ -23,7 +24,7 @@ export default async function getPrice(req : NextApiRequest, res: NextApiRespons
 
   // GET BNB USD price
   const crushUsdPrice = bnb1.times(busd2).div( bnb2.times(crush1) )
-
+  logger.info({crushUsdPrice, crush1, bnb1, bnb2,busd2}, "values for price")
   return res.status(200).json({ message: 'Success Fetching CrushPrice', crushUsdPrice })
 }
 

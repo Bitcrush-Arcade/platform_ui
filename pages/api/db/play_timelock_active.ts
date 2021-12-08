@@ -9,7 +9,6 @@ const playTimelockActive = async(req: NextApiRequest, res: NextApiResponse)=>{
   const timeStamp = await fetch( `${process.env.GAMES_API}/dragon/games/getRequestTime`,{
     method: 'POST',
     headers:{
-      origin: 'localhost:3000',
       "Content-Type": "application/json"
     },
     body: JSON.stringify({ account: account })
