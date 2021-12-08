@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { toWei } from 'web3-utils'
 import { servers } from 'utils/servers'
+import BigNumber from 'bignumber.js'
 
 export default async function getBalance(req : NextApiRequest, res: NextApiResponse){
   const { wallet } = req.query
@@ -18,13 +19,14 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
   })
     .then( d => d.json() )
     .then( data => {
+      console.log(data)
       if( data?.statusCode > 200 )
         res.status(503).json({ message: 'Database is not responding'})
       else
-        res.status(200).json({ balance: toWei(`${data.balance || 0}`) })
+        res.status(200).json({ balance: toWei(`${new BigNumber(data.balance || 0).toFixed(18,1) }`) })
     } )
-    .catch( e => {
-      res.status(500).json({ error: e })
+    .catch( e =>{
+      res.status(503).json({ error: e, balance: -1 })
     })
 
 }

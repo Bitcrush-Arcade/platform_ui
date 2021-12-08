@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react'
-import AnimatedNumber from 'animated-number-react'
 // Material
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Avatar from '@material-ui/core/Avatar'
@@ -7,11 +6,13 @@ import ButtonBase from '@material-ui/core/ButtonBase'
 import Grid from '@material-ui/core/Grid'
 import Menu from '@material-ui/core/Menu'
 import MenuItem from '@material-ui/core/MenuItem'
+import Tooltip from '@material-ui/core/Tooltip'
 import Typography from '@material-ui/core/Typography'
+// Bitcrush
+import Currency from 'components/basics/Currency'
 // Icons
 import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
 // utils
-import { currencyFormat } from 'utils/text/text'
 import BigNumber from 'bignumber.js'
 
 type TokenDisplayProps ={
@@ -36,8 +37,8 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
 
   const btnRef = useRef<HTMLButtonElement>(null)
 
-  const numberVal = amount.div(10**18).toString()
   return <>
+  <Tooltip arrow title={ amount.div(10**18).toFixed(18)} disableFocusListener={!!label} disableHoverListener={!!label} disableTouchListener={!!label}>
     <ButtonBase 
       onClick={toggleActions}
       className={ css.button }
@@ -49,20 +50,15 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           token?.icon &&
           <Grid item style={{ paddingRight: 8 }}>
             <Avatar className={ css.avatarIcon }>
-              {token.icon}
+              {token.icon}                                                      
             </Avatar>
           </Grid>
         }
         <Grid item>
           <Typography variant="body2" color={color} style={{marginRight: 8}}>
             {
-              label || 
-              <>
-                <AnimatedNumber
-                  value={numberVal}
-                  formatValue={ v => currencyFormat(v,{decimalsToShow: 4})}
-                />
-              </>
+              label ||
+                <Currency value={amount.div(10**18).toFixed(18)} decimals={4} />
             }
           </Typography>
         </Grid>
@@ -74,6 +70,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
         </Grid>}
       </Grid>
     </ButtonBase>
+    </Tooltip>
     {actions && actions.length > 0 && <Menu
       id={`token-menu`}
       open={showActions}

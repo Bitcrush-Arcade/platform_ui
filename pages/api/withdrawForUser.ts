@@ -14,6 +14,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
 
   const bodyData: { amount?: number, account?: string, chain?: number } = JSON.parse(req.body || '{}')
   const { amount, account, chain } = bodyData
+  chain == 56 && console.log('Requester',{ amount, account })
   if(!amount || !account || !chain)
     return res.status(400).send({ message: 'Invalid Request'})
 
@@ -24,7 +25,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
     method: 'POST',
     body: JSON.stringify({ account: account })
   }).then( r => r.json() )
-
+  console.log('lock status', lock.lockWithdraw)
   if(lock.lockWithdraw){
     res.status(200).json({ message: 'Withdraw locked for 90 secs, please try later', timelock: lock.lockWithdraw })
     return
@@ -43,17 +44,17 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
       origin: "http://localhost:3000"
     }
   })
-    .then( r => r.json() )
-    .then( data =>  parseInt(toWei(`${data.balance}`)) )
+  .then( r => r.json() )
+  .then( data =>  parseInt(toWei(`${new BigNumber(data.balance).toFixed(18,1)}`)) )
     .catch( e => {
       res.status(400).json({ message: 'Server Balance is not available', error: e})
       return 'Error'
     })
-  if( typeof(serverBalance) == 'string' ) return
+    if( typeof(serverBalance) == 'string' ) return
   // CHECK WHICH AMOUNT IS MAX AMOUNT
   const timelockActive =  differenceInSeconds( new Date() , new Date( new BigNumber(ogBalance.lockTimeStamp).plus(lockDuration).times(1000).toNumber() )) > 0
   const maxWithdrawAmount =  timelockActive ? serverBalance : ogBalance.balance 
-
+  console.log( 'balances', { serverBalance, ogBalance: new BigNumber(ogBalance.balance).div(10**18).toFixed(18,1) })
   if( new BigNumber( amount ).isGreaterThan( new BigNumber(maxWithdrawAmount) ) )
     return res.status(400).send({ error: "Can't withdraw more than max amount available"})
 
