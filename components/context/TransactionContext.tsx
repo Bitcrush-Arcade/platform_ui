@@ -30,7 +30,7 @@ type ContextType = {
   liveWallet: { balance: BigNumber, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
-  hydrateToken: (reset?:bool) => Promise<void>,
+  hydrateToken: (reset?:boolean) => Promise<void>,
   toggleLwModal: () => void,
   lwModalStatus: boolean,
 }
@@ -42,7 +42,7 @@ export const TransactionContext = createContext<ContextType>({
   tokenInfo: { weiBalance: new BigNumber(0), crushUsdPrice: 0, burned: 0},
   toggleDarkMode: () => {},
   isDark: true,
-  hydrateToken: (reset?:bool) => Promise.resolve(),
+  hydrateToken: (reset?:boolean) => Promise.resolve(),
   liveWallet: { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
