@@ -65,10 +65,6 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   },[isBitcrushGame, gameSession, launchURL, setLaunchURL, game, getLauncherUrl ])
 
-  const goBack = () => {
-    router.push('/games')
-  }
-
   return (
     <PageContainer menuSm={true}>
       <div className={ css.container}>
@@ -109,9 +105,11 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
               (isBitcrushGame || launchURL) &&
               <div className={css.closeContainer}>
                 <Tooltip title={<Typography>Back to Arcade</Typography>}>
-                  <IconButton className={css.closeButton} size="small" onClick={goBack}>
-                    <BackIcon fontSize="inherit" style={{transform: 'rotate(180deg)', color: pink.A200}}/>
-                  </IconButton>
+                  <Link passHref href="/games">
+                    <IconButton className={css.closeButton} size="small">
+                      <BackIcon fontSize="inherit" style={{transform: 'rotate(180deg)', color: pink.A200}}/>
+                    </IconButton>
+                  </Link>
                 </Tooltip>
               </div>
             }
