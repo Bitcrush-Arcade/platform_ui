@@ -3,12 +3,12 @@ import { servers } from 'utils/servers'
 import logger from 'utils/logger'
 
 export default async function getDeposit(req : NextApiRequest, res: NextApiResponse){
-  const { account } = JSON.parse(req.body)
+  const { account, amount, negative } = JSON.parse(req.body)
 
-  if(!account || req.method !== 'POST' ){
+  if(!account || req.method !== 'POST' || !amount || typeof(negative) !== "boolean" ){
     logger.error({ account, method: req.method},"Invalid Request")
     res.statusMessage = "Invalid Request"
-    res.status(400).json({ message: 'invalid req'})
+    res.status(400).json({ message: 'invalid req', body: {account, amount, negative }})
     return
   }
 

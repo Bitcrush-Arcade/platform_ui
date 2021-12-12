@@ -40,6 +40,7 @@ const PageContainer = ( props: ContainerProps ) => {
   const [menuToggle, setMenuToggle] = useState<boolean>( menuSm ? false : !isSm )
   const [ activeTimelock, setActiveTimelock ] = useState<boolean>(false);
   const [hiddenPending, setHiddenPending] = useImmer<{ [hash: string] : 'pending' | 'success' | 'error' }>({})
+  const [wfuCalled, setWfuCalled] = useState<{hash: string, amount: string} | null>(null) // amount is string for simplicity in passing values
   
   const css = useStyles({ menuToggle, ...props })
 
@@ -56,12 +57,44 @@ const PageContainer = ( props: ContainerProps ) => {
     getApproved( liveWallet.address )
   },[ liveWallet, getApproved ])
 
+  useEffect( ()=>{
+    if(!wfuCalled) return
+
+    const interval = setInterval( () => {
+      web3.eth.getTransactionReceipt( wfuCalled.hash, (e,rc) => {
+        console.log( 'check Withdraw for User ', wfuCalled.hash, wfuCalled.amount)
+        if(!rc) return
+        if(rc.status){
+          setWfuCalled(null)
+          hydrateToken()
+          fetch('/api/db/deposit',{ 
+            method: 'POST',
+            body: JSON.stringify({ 
+              account: account,
+              amount: wfuCalled.amount,
+              negative: true,
+            })
+          })
+            .then( r => r.json())
+            .then( c => console.log('response',c))
+            .catch(e => console.log(e))
+        }
+      } )
+    }, 5000)
+
+    return () => {
+      clearInterval(interval)
+    }
+
+  },[wfuCalled])
+
   const toggleMenu = () => setMenuToggle( p => !p )
 
   useEffect(()=>{
     if(menuSm) return
     setMenuToggle(!isSm)
   },[isSm, menuSm])
+
   const allHashes = compact( Object.keys(pending).map( hash => hiddenPending[hash] && pending[hash].status == hiddenPending[hash] ? null : pending[hash] ) )
   const shownPending = useMemo( () => {
     const filteredPending = {...pending}
@@ -146,7 +179,11 @@ const PageContainer = ( props: ContainerProps ) => {
             editTransactions(rc.transactionHash,'complete')
             fetch('/api/db/deposit',{ 
               method: 'POST',
-              body: JSON.stringify({ account: account })
+              body: JSON.stringify({ 
+                account: account,
+                amount: values.stakeAmount.toString(),
+                negative: false,
+              })
             })
               .then( r => r.json())
               .then( c => console.log('response',c))
@@ -183,8 +220,11 @@ const PageContainer = ( props: ContainerProps ) => {
                 },3000)
                 return
               }
-              data.txHash && editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
-              if(!data.txHash){
+              if(data.txHash) {
+                editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
+                setWfuCalled({ hash: data.txHash, amount: values.stakeAmount.toString()})
+              }
+              else{
                 editTransactions( 'Err........or..', 'pending', {errorData: data.error})
                 setTimeout(
                   () => editTransactions('Err........or..', 'error', { errorData: data.error})
@@ -207,6 +247,17 @@ const PageContainer = ( props: ContainerProps ) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
+          fetch('/api/db/deposit',{ 
+            method: 'POST',
+            body: JSON.stringify({ 
+              account: account,
+              amount: values.stakeAmount.toString(),
+              negative: true,
+            })
+          })
+            .then( r => r.json())
+            .then( c => console.log('response',c))
+            .catch(e => console.log(e))
         })
         .on('error', (error, receipt) => {
           console.log('error', error, receipt)
