@@ -11,16 +11,21 @@ export default async function getDeposit(req : NextApiRequest, res: NextApiRespo
     res.status(400).json({ message: 'invalid req', body: {account, amount, negative }})
     return
   }
+  const sentData = {
+    wallet_address: account,
+    amount: parseFloat(amount),
+    negative,
+  }
 
-  const deposit = await fetch(`${servers[ process.env.NODE_ENV ]}/dragon/games/deposit`,{
+  const deposit = await fetch(`http://diceinvaders.bitcrush.com:3000/dragon/games/deposit`,{
     method: 'POST',
     headers:{
       'Content-Type': "application/json"
     },
-    body: req.body
+    body: JSON.stringify(sentData)
   })
     .then( data => {
-      logger.info( {account, data}, 'Deposit Database Response')
+      logger.info( {account, amount, negative, data}, 'Deposit Database Response')
       return { msg: 'ok', data }
     } )
     .catch( e =>{
