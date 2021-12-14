@@ -140,7 +140,6 @@ export default HeaderBar
 
 const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradientId2: string}>( (theme: Theme) => createStyles({
   appBar:{
-    zIndex: 1250,
     border: 'none',
     backgroundColor: 'transparent',
     [theme.breakpoints.down('md')]:{
