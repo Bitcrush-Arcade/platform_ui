@@ -80,7 +80,6 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
       onClose={toggleActions}
       anchorOrigin={ { horizontal: 'center', vertical: "bottom" }}
       anchorReference="anchorEl"
-      getContentAnchorEl={null}
       PaperProps={{
         className: css.menu
       }}
