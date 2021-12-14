@@ -1,6 +1,6 @@
 // MaterialUi
-import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
 // BitcrushUI
 import Card from 'components/basics/Card'
 

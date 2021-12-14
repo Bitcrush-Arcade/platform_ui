@@ -1,7 +1,11 @@
 import Image from 'next/image'
 // Material
-import { withStyles, WithStyles, createStyles, Theme, makeStyles } from "@material-ui/core/styles"
-import Slider, { SliderProps } from '@material-ui/core/Slider'
+import { Theme } from "@mui/material/styles";
+import { WithStyles } from '@mui/styles';
+import withStyles from '@mui/styles/withStyles';
+import createStyles from '@mui/styles/createStyles';
+import makeStyles from '@mui/styles/makeStyles';
+import Slider, { SliderProps } from '@mui/material/Slider'
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 
 const styles = (theme: Theme) => createStyles({
@@ -9,7 +13,7 @@ const styles = (theme: Theme) => createStyles({
     width: 20
   },
   track:{
-    width: `${theme.spacing(0.5)}px !important`,
+    width: `${theme.spacing(0.5)} !important`,
     color: (props: LauncherSliderProps) => {
       if(props.percent >= 100)
         return theme.palette.secondary.light
@@ -19,7 +23,7 @@ const styles = (theme: Theme) => createStyles({
     }
   },
   rail:{
-    width: `${theme.spacing(0.5)}px !important`,
+    width: `${theme.spacing(0.5)} !important`,
     color: theme.palette.text.secondary
   },
 })

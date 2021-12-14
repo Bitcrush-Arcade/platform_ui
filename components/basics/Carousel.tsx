@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect, ReactNode, forwardRef, useImperativeHandle, useLayoutEffect } from 'react'
 import compact from 'lodash/compact'
 // Material
-import {makeStyles, Theme, createStyles} from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import IconButton from '@material-ui/core/IconButton'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
 // Icons
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
-import ChevronRightIcon from '@material-ui/icons/ChevronRight'
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   leftArrow:{
@@ -167,27 +169,28 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   }))
 
   
-  return (<div className={ css.carouselContainer } id={'carousel-id'}>
-    <div className={ `${css.arrows} ${css.leftArrow}` } >
-      {LeftScroll && <LeftScroll disabled={minScroll} onClick={scrollPrev}/> 
-      || <IconButton disabled={minScroll} onClick={ scrollPrev }>
-        <ChevronLeftIcon/>
-      </IconButton>}
+  return (
+    <div className={ css.carouselContainer } id={'carousel-id'}>
+      <div className={ `${css.arrows} ${css.leftArrow}` } >
+        {LeftScroll && <LeftScroll disabled={minScroll} onClick={scrollPrev}/> 
+        || <IconButton disabled={minScroll} onClick={ scrollPrev } size="large">
+          <ChevronLeftIcon/>
+        </IconButton>}
+      </div>
+      <Grid container justifyContent="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
+        innerRef={carouselRef}
+      >
+        {shownItems}
+      </Grid>
+      <div className={ `${css.arrows} ${css.rightArrow}` } >
+        {RightScroll 
+        && <RightScroll disabled={maxScroll} onClick={scrollNext}/>
+        ||<IconButton disabled={ maxScroll } onClick={ scrollNext } size="large">
+          <ChevronRightIcon/>
+        </IconButton>}
+      </div>
     </div>
-    <Grid container justifyContent="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
-      innerRef={carouselRef}
-    >
-      {shownItems}
-    </Grid>
-    <div className={ `${css.arrows} ${css.rightArrow}` } >
-      {RightScroll 
-      && <RightScroll disabled={maxScroll} onClick={scrollNext}/>
-      ||<IconButton disabled={ maxScroll } onClick={ scrollNext }>
-        <ChevronRightIcon/>
-      </IconButton>}
-    </div>
-  </div>
-  )
+  );
 })
 
 export default Carousel

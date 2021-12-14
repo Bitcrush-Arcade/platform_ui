@@ -5,31 +5,33 @@ import { useImmer } from 'use-immer'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
 // Material imports
-import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import Button from '@material-ui/core/Button'
-import Collapse from '@material-ui/core/Collapse'
-import ClickAwayListener from "@material-ui/core/ClickAwayListener"
-import CircularProgress from "@material-ui/core/CircularProgress"
-import Divider from '@material-ui/core/Divider'
-import Drawer from '@material-ui/core/Drawer'
-import Grid from "@material-ui/core/Grid"
-import IconButton from "@material-ui/core/IconButton"
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import ListItemText from '@material-ui/core/ListItemText'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
+import { Theme, useTheme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Button from '@mui/material/Button'
+import Collapse from '@mui/material/Collapse'
+import ClickAwayListener from "@mui/material/ClickAwayListener"
+import CircularProgress from "@mui/material/CircularProgress"
+import Divider from '@mui/material/Divider'
+import Drawer from '@mui/material/Drawer'
+import Grid from "@mui/material/Grid"
+import IconButton from "@mui/material/IconButton"
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemIcon from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Paper from '@mui/material/Paper'
+import Typography from '@mui/material/Typography'
 // Icons
-import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
-import GitHubIcon from '@material-ui/icons/GitHub'
-import HomeIcon from '@material-ui/icons/Home'
-import RateReviewIcon from '@material-ui/icons/RateReview';
-import TwitterIcon from '@material-ui/icons/Twitter'
-import TelegramIcon from '@material-ui/icons/Telegram'
-import TrendingUpIcon from '@material-ui/icons/TrendingUp'
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import HomeIcon from '@mui/icons-material/Home'
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import TwitterIcon from '@mui/icons-material/Twitter'
+import TelegramIcon from '@mui/icons-material/Telegram'
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'
 // BitCrush
 // Components
 import Coin from 'components/tokens/Token2'
@@ -62,7 +64,7 @@ const Menu = ( props: MenuProps) => {
     const router = useRouter()
     const css = useStyles(props)
     const theme = useTheme()
-    const mediaSm = useMediaQuery( theme.breakpoints.down('sm') )
+    const mediaSm = useMediaQuery( theme.breakpoints.down('md') )
     const isSm = alwaysSm || mediaSm
 
     const { tokenInfo, toggleDarkMode, isDark } = useTransactionContext()
@@ -235,11 +237,11 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         paddingTop: theme.spacing(1),
         borderTopRightRadius: theme.spacing(3),
         borderBottomRightRadius: theme.spacing(3),
-        borderColor: theme.palette.border[ theme.palette.type ],
+        borderColor: theme.palette.border[ theme.palette.mode ],
         borderWidth: 1,
         borderStyle: 'solid',
         borderLeftStyle: 'none',
-        height: `calc( 100vh - 96px - ${theme.spacing(3)}px )`
+        height: `calc( 100vh - 96px - ${theme.spacing(3)} )`
     },
     footer:{
         position:'absolute',
@@ -254,7 +256,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         overflowY: 'auto'
     },
     subList: {
-        backgroundColor: theme.palette.type =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+        backgroundColor: theme.palette.mode =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
         borderBottomLeftRadius: theme.spacing(4),
         borderTopLeftRadius: theme.spacing(4),
     },
@@ -291,13 +293,13 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     disabled:{
         fontSize: 8,
         textTransform: 'uppercase',
-        color: theme.palette.type =='dark' ? theme.palette.grey[200] : theme.palette.grey[400],
+        color: theme.palette.mode =='dark' ? theme.palette.grey[200] : theme.palette.grey[400],
     },
     subMenu:{
-        color: theme.palette.type =="light" ? theme.palette.secondary.light : theme.palette.secondary.main
+        color: theme.palette.mode =="light" ? theme.palette.secondary.light : theme.palette.secondary.main
     },
     hashexLogo:{
-        filter: `brightness(0) invert(${theme.palette.type =='dark'? '0.75' : '0.05'}) opacity(50%)`
+        filter: `brightness(0) invert(${theme.palette.mode =='dark'? '0.75' : '0.05'}) opacity(50%)`
     }
 }))
 

@@ -7,21 +7,23 @@ import find from 'lodash/find'
 // Web3
 import { useWeb3React } from '@web3-react/core'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import pink from '@material-ui/core/colors/pink'
-import IconButton from '@material-ui/core/IconButton'
-import LinearProgress from "@material-ui/core/LinearProgress"
-import Grid from '@material-ui/core/Grid'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import IconButton from '@mui/material/IconButton'
+import LinearProgress from "@mui/material/LinearProgress"
+import Grid from '@mui/material/Grid'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 // Icons
-import BackIcon from '@material-ui/icons/PlayCircleFilledOutlined';
+import BackIcon from '@mui/icons-material/PlayCircleFilledOutlined';
 // BITCRUSH
 import PageContainer from 'components/PageContainer'
 import GeneralUseButton from 'components/basics/GeneralUseButton'
 // Utils & Types
 import { GameSession } from 'types/games/session'
 import { dragonEp } from 'utils/servers'
+import { pink } from '@mui/material/colors';
 
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
@@ -131,12 +133,12 @@ const games:{ [key: string] : { url: string, name: string }} = {
 
 const useStyles = makeStyles<Theme>(theme => createStyles({
   iframe:{
-    width: `calc((100vw) - ${theme.spacing(6)}px)`,
+    width: `calc((100vw) - ${theme.spacing(6)})`,
     height: 'calc(100vh)',
     border: 'none',
   },
   container:{
-    maxWidth: `calc( 100vw - ${theme.spacing(6)}px )`,
+    maxWidth: `calc( 100vw - ${theme.spacing(6)} )`,
     position: 'relative',
   },
   closeContainer:{

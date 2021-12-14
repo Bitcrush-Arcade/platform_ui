@@ -6,14 +6,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Carousel from 'react-material-ui-carousel'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
-import useMediaQuery from "@material-ui/core/useMediaQuery"
-import CardContent from '@material-ui/core/CardContent'
-import Container from '@material-ui/core/Container'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import { Theme, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from "@mui/material/useMediaQuery"
+import CardContent from '@mui/material/CardContent'
+import Container from '@mui/material/Container'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
@@ -26,7 +28,7 @@ import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
@@ -40,7 +42,7 @@ import BigNumber from 'bignumber.js'
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.down('md') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
@@ -299,7 +301,7 @@ export default function Home() {
                 <Grid container alignItems="center" justifyContent="space-evenly">
                   {partners.map( partner => {
                     const graphics = <>
-                      <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
+                      <Image src={theme.palette.mode == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
                         <Tooltip arrow placement="bottom"
                           title={<Typography variant="body1">{partner.name}</Typography>}
                         >
@@ -345,13 +347,13 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
     fill: props => `url(#${ props.gradientId })`,
   },
   gradientContainer:{
-    background: theme.palette.type == "dark" 
+    background: theme.palette.mode == "dark" 
       ? `radial-gradient( closest-side, ${theme.palette.common.black} 0%, rgba(0,0,0,0) 100%)`
       : `radial-gradient( closest-side,${theme.palette.common.white} 0%, rgba(255,255,255,0) 100%)`
   },
   announcementTitle:{
     marginTop: 16,
-    [theme.breakpoints.down('xs')]:{
+    [theme.breakpoints.down('sm')]:{
       fontSize: theme.typography.h6.fontSize
     }
   },

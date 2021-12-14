@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import format from 'date-fns/format'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import Avatar from "@material-ui/core/Avatar"
-import Divider from "@material-ui/core/Divider"
-import Grid from "@material-ui/core/Grid"
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from "@material-ui/core/Tooltip"
-import Typography from "@material-ui/core/Typography"
-import Skeleton from '@material-ui/lab/Skeleton'
+import { Theme, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Avatar from "@mui/material/Avatar"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import IconButton from '@mui/material/IconButton'
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
+import Skeleton from '@mui/material/Skeleton'
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
@@ -25,12 +27,12 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
-import RefreshIcon from '@material-ui/icons/Refresh'
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
-import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
+import RefreshIcon from '@mui/icons-material/Refresh'
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 // Libs
 import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
@@ -44,7 +46,7 @@ function BankPool( ) {
   const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.down('md') )
   useEffect( () => {
     if(!getApyData) return
     const interval = setInterval( () => getApyData(), 30000)
@@ -582,14 +584,14 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     height: theme.spacing(2)
   },
   secondQuadrant:{
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       marginTop: theme.spacing(2)
     }
   },
   coinText:{
     fontFamily: 'Zebulon',
     letterSpacing: 2,
-    [theme.breakpoints.down('md')]:{
+    [theme.breakpoints.down('lg')]:{
       fontSize: theme.typography.body1.fontSize
     }
   },

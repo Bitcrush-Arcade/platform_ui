@@ -1,12 +1,14 @@
 import { useEffect } from "react"
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Grid from "@material-ui/core/Grid"
-import Typography from "@material-ui/core/Typography"
-import CardContent from "@material-ui/core/CardContent"
-import Tooltip from "@material-ui/core/Tooltip"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import CardContent from "@mui/material/CardContent"
+import Tooltip from "@mui/material/Tooltip"
 // Icons
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
@@ -114,7 +116,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard:{
-    [theme.breakpoints.down(888)]:{
+    [theme.breakpoints.down(undefined)]:{
       marginTop: theme.spacing(4)
     },
     width: 280,

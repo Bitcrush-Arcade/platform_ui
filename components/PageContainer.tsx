@@ -4,10 +4,13 @@ import { useImmer } from 'use-immer'
 // 3p
 import compact from 'lodash/compact'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import Container from '@material-ui/core/Container'
-import Typography from "@material-ui/core/Typography"
+import { Theme, useTheme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Typography from "@mui/material/Typography"
 // Components
 import Footer from 'components/Footer'
 import Header from 'components/HeaderBar'
@@ -31,11 +34,11 @@ import { getContracts } from 'data/contracts'
 
 const PageContainer = ( props: ContainerProps ) => {
   
-  const { children, menuSm } = props
+  const { children, menuSm, background } = props
   
   const { chainId, account } = useWeb3React()
   const theme = useTheme()
-  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
+  const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const { isApproved, getApproved, approve } = useCoin()
   const [menuToggle, setMenuToggle] = useState<boolean>( menuSm ? false : !isSm )
   const [ activeTimelock, setActiveTimelock ] = useState<boolean>(false);
@@ -267,7 +270,37 @@ const PageContainer = ( props: ContainerProps ) => {
     }
 
   return <div>
-    <div className={ css.fullContainer }>
+    <Box 
+      sx={{
+        transition: theme.transitions.create('background', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        backgroundImage: `url(${backgrounds[theme.palette.mode][background || 'default']})`,
+        backgroundSize: 'cover',
+        [theme.breakpoints.down('md')]:{
+          backgroundSize: '200% auto',
+          backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
+        },
+        [theme.breakpoints.down(undefined)]:{
+          backgroundSize: '400% auto',
+          backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
+        },
+        [theme.breakpoints.up('md')]:{
+          backgroundPosition: (background || 'default') == 'default' ? 
+            menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? 12 : 32}px ) top 0`
+            : 'top',
+        },
+        [theme.breakpoints.up('xl')]:{
+          backgroundSize: '120% auto',
+        },
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh',
+        maxWidth: '100vw',
+        position: 'relative',
+        paddingBottom: theme.spacing(3)
+      }}
+    >
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
       <Menu open={menuToggle} toggleOpen={toggleMenu} alwaysSm={menuSm}/>
       <Container maxWidth="xl" className={css.contentContainer}>
@@ -276,7 +309,7 @@ const PageContainer = ( props: ContainerProps ) => {
           <TxCard hashes={shownPending} onClose={ hash => setHiddenPending( draft => { draft[hash] = pending[hash].status } )}/>
         </div>}
       </Container>
-    </div>
+    </Box>
     <StakeModal
       open={lwModalStatus}
       onClose={toggleLwModal}
@@ -307,7 +340,7 @@ type ContainerProps ={
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
   contentContainer:{
     paddingTop: 96,
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       paddingTop: 0,
     },
     paddingLeft: theme.spacing(3),
@@ -325,33 +358,7 @@ const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( 
     }),
   },
   fullContainer:{
-    transition: theme.transitions.create('background', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    backgroundImage: props =>  `url(${backgrounds[theme.palette.type][props.background || 'default']})`,
-    backgroundSize: 'cover',
-    [theme.breakpoints.down('sm')]:{
-      backgroundSize: '200% auto',
-      backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
-    },
-    [theme.breakpoints.down(750)]:{
-      backgroundSize: '400% auto',
-      backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
-    },
-    [theme.breakpoints.up('md')]:{
-      backgroundPosition: props => (props.background || 'default') == 'default' ? 
-        props.menuToggle ? `left calc( 50% + ${ theme.palette.type =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.type =='dark' ? 12 : 32}px ) top 0`
-        : 'top',
-    },
-    [theme.breakpoints.up('xl')]:{
-      backgroundSize: '120% auto',
-    },
-    backgroundRepeat: 'no-repeat',
-    minHeight: '100vh',
-    maxWidth: '100vw',
-    position: 'relative',
-    paddingBottom: theme.spacing(3)
+    
   },
 }))
 

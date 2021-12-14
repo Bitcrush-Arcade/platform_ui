@@ -4,15 +4,16 @@ import { useRouter } from 'next/router'
 import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from '@material-ui/core/styles'
-import pink from '@material-ui/core/colors/pink'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import AppBar from '@material-ui/core/AppBar'
-import Button from '@material-ui/core/Button'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
+import { Theme, useTheme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import AppBar from '@mui/material/AppBar'
+import Button from '@mui/material/Button'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
 // BitCrush
 import TokenDisplay from 'components/TokenDisplay'
 import GeneralButton from 'components/basics/GeneralUseButton'
@@ -27,6 +28,7 @@ import usePrevLiveWallet from 'hooks/usePrevLw'
 // libs
 import { getContracts } from 'data/contracts'
 import { liveWallets } from 'data/liveWallets'
+import { pink } from '@mui/material/colors';
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -34,7 +36,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const [ svgGradient2, gradientId2] = gradient2()
   const css = useStyles({ open, gradientId, gradientId2 })
   const theme = useTheme()
-  const isSm = useMediaQuery(theme.breakpoints.down('sm'))
+  const isSm = useMediaQuery(theme.breakpoints.down('md'))
   const { pathname } = useRouter()
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
@@ -141,14 +143,14 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
     zIndex: 1250,
     border: 'none',
     backgroundColor: 'transparent',
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       backgroundColor: theme.palette.background.header
     }
   },
   menuLogoDivider:{
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(2),
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       marginLeft: theme.spacing(0),
       marginRight: theme.spacing(1),
     }
@@ -157,14 +159,14 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
     fill: props =>  `url(#${ props.open ? props.gradientId : props.gradientId2})`,
   },
   dropOnSm:{
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       display:'none'
     }
   },
   toolbar:{
     paddingTop: theme.spacing(4),
     paddingBottom: 0,
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       paddingTop: theme.spacing(2),
       paddingBottom: theme.spacing(1),
     }

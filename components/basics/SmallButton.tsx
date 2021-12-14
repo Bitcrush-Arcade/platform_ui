@@ -1,6 +1,9 @@
 // Material
-import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles'
-import Fab, {FabProps} from '@material-ui/core/Fab'
+import { Theme } from '@mui/material/styles';
+import { WithStyles } from '@mui/styles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Fab, {FabProps} from '@mui/material/Fab'
 // Libs
 import { styledBy } from 'utils/styles/styling'
 
@@ -23,7 +26,7 @@ const styles = (theme: Theme) => createStyles({
       primary: `inset 0 0 15px rgba(174,82,227,0.65)`,
       secondary:`inset 0 0 15px rgba(29, 233, 182,0.65)`
     }),
-    color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+    color: theme.palette.mode == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
     '&:hover':{
       color: theme.palette.grey[200],
     }

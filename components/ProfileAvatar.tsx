@@ -1,13 +1,15 @@
 import { useState, useCallback } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import Avatar from '@material-ui/core/Avatar'
-import Badge from '@material-ui/core/Badge'
-import Drawer from "@material-ui/core/Drawer"
-import IconButton from "@material-ui/core/IconButton"
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Avatar from '@mui/material/Avatar'
+import Badge from '@mui/material/Badge'
+import Drawer from "@mui/material/Drawer"
+import IconButton from "@mui/material/IconButton"
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemText from '@mui/material/ListItemText'
 // Libs
 import { currencyFormat, shortAddress } from 'utils/text/text'
 import BigNumber from 'bignumber.js'
@@ -148,7 +150,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     borderColor: theme.palette.primary.dark,
   },
   avatarImg:{
-    filter: theme.palette.type == "dark" ? 'invert(1) opacity(35%)' : 'invert(0) opacity(65%)',
+    filter: theme.palette.mode == "dark" ? 'invert(1) opacity(35%)' : 'invert(0) opacity(65%)',
     width: 22,
     height: 16,
   },

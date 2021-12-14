@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 // Next
 import Head from 'next/head'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Switch from '@material-ui/core/Switch'
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Switch from '@mui/material/Switch'
 // Bitcrush
 import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import PageContainer from 'components/PageContainer'
@@ -105,7 +107,7 @@ const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   },
   topSection:{
     marginTop: 0,
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       marginTop: theme.spacing(4)
     },
   },

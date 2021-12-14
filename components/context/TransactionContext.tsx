@@ -5,7 +5,8 @@ import { useRouter } from 'next/router'
 import { useImmer } from 'use-immer'
 import { useWeb3React } from '@web3-react/core'
 // Material Theming
-import { ThemeProvider } from '@material-ui/core/styles'
+import { CacheProvider, EmotionCache } from '@emotion/react';
+import { ThemeProvider, Theme, StyledEngineProvider } from '@mui/material/styles';
 import getTheme from 'styles/BaseTheme'
 // data
 import { getContracts } from 'data/contracts'
@@ -14,6 +15,13 @@ import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
 import BigNumber from 'bignumber.js'
+
+
+declare module '@mui/styles/defaultTheme' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  interface DefaultTheme extends Theme {}
+}
+
 
 type TransactionSubmitData = { 
   description?: string,
@@ -48,8 +56,8 @@ export const TransactionContext = createContext<ContextType>({
   lwModalStatus: false,
 })
 
-export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
-  const { children } = props
+export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCache: EmotionCache })=>{
+  const { children, emotionCache } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const router = useRouter()
@@ -235,21 +243,26 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       })
   }, [ lwMethods, account, editTransactions])
 
-  return <TransactionContext.Provider value={{
-    pending: pendingTransactions,
-    completed: completeTransactions,
-    editTransactions: editTransactions,
-    tokenInfo: coinInfo,
-    toggleDarkMode: toggle,
-    isDark: dark,
-    hydrateToken: tokenHydration,
-    liveWallet: { ...liveWalletBalance, selfBlacklist },
-    toggleLwModal,
-    lwModalStatus: lwModal
-  }}>
-    <ThemeProvider theme={basicTheme}>
-      {children}
-    </ThemeProvider>
-  </TransactionContext.Provider>
+  return (<CacheProvider value={emotionCache}>
+    <TransactionContext.Provider value={{
+      pending: pendingTransactions,
+      completed: completeTransactions,
+      editTransactions: editTransactions,
+      tokenInfo: coinInfo,
+      toggleDarkMode: toggle,
+      isDark: dark,
+      hydrateToken: tokenHydration,
+      liveWallet: { ...liveWalletBalance, selfBlacklist },
+      toggleLwModal,
+      lwModalStatus: lwModal
+    }}>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={basicTheme}>
+          {children}
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </TransactionContext.Provider>
+  </CacheProvider>
+  );
 }
 

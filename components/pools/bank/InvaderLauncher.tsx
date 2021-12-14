@@ -1,10 +1,13 @@
 import { useMemo } from 'react'
 import Image from 'next/image'
 // Material
-import { makeStyles, createStyles, Theme, withStyles } from "@material-ui/core/styles"
-import Grid from "@material-ui/core/Grid"
-import Slider from "@material-ui/core/Slider"
-import Typography from "@material-ui/core/Typography"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import withStyles from '@mui/styles/withStyles';
+import Grid from "@mui/material/Grid"
+import Slider from "@mui/material/Slider"
+import Typography from "@mui/material/Typography"
 // Bitcrush
 import Currency from 'components/basics/Currency'
 import LauncherSlider from 'components/pools/bank/LauncherSlider'
@@ -123,7 +126,7 @@ const useStyles = makeStyles<Theme,{ color: string, text: string }>( theme => cr
         case 'secondary':
           return theme.palette.secondary.main
         case 'yellow':
-          return theme.palette.type == 'dark' ? 'yellow' : theme.palette.primary.main
+          return theme.palette.mode == 'dark' ? 'yellow' : theme.palette.primary.main
         default: 
           return theme.palette.error.main
       }

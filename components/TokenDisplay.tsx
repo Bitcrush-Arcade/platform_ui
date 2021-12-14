@@ -1,17 +1,19 @@
 import { useState, useRef } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import Avatar from '@material-ui/core/Avatar'
-import ButtonBase from '@material-ui/core/ButtonBase'
-import Grid from '@material-ui/core/Grid'
-import Menu from '@material-ui/core/Menu'
-import MenuItem from '@material-ui/core/MenuItem'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Avatar from '@mui/material/Avatar'
+import ButtonBase from '@mui/material/ButtonBase'
+import Grid from '@mui/material/Grid'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 // Bitcrush
 import Currency from 'components/basics/Currency'
 // Icons
-import ArrowDropIcon from '@material-ui/icons/ArrowDropDownCircleOutlined'
+import ArrowDropIcon from '@mui/icons-material/ArrowDropDownCircleOutlined'
 // utils
 import BigNumber from 'bignumber.js'
 

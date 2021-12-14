@@ -1,19 +1,21 @@
 import { Fragment, ReactNode } from 'react'
 import { Formik, Form, Field } from 'formik'
-import { TextField } from 'formik-material-ui'
+import { TextField } from 'formik-mui'
 import BigNumber from 'bignumber.js'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import MButton from "@material-ui/core/Button"
-import Dialog from "@material-ui/core/Dialog"
-import Divider from "@material-ui/core/Divider"
-import Grid from "@material-ui/core/Grid"
-import Skeleton from "@material-ui/lab/Skeleton"
-import Slider from "@material-ui/core/Slider"
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from "@material-ui/core/Typography"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import MButton from "@mui/material/Button"
+import Dialog from "@mui/material/Dialog"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import Skeleton from '@mui/material/Skeleton'
+import Slider from "@mui/material/Slider"
+import Tooltip from '@mui/material/Tooltip'
+import Typography from "@mui/material/Typography"
 // Icons
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
@@ -120,7 +122,7 @@ function StakeModal( props: StakeModalProps ) {
                   </Grid>
                 }
                 <Grid item>
-                  <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "default"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
+                  <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "info"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
                     {name}
                   </MButton>
                 </Grid>
@@ -159,7 +161,9 @@ function StakeModal( props: StakeModalProps ) {
               value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
               onChange={sliderChange}
               step={ 10 }
-              ThumbComponent={p => <InvaderThumb thumbProps={p} percent={percent}/>}
+              components={{
+                Thumb: p => <InvaderThumb thumbProps={p} percent={percent}/>
+              }}
               valueLabelDisplay="on"
             />
           </div>

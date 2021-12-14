@@ -1,20 +1,22 @@
 import { useState, useEffect, useCallback } from  'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import Avatar from '@material-ui/core/Avatar'
-import ButtonBase from "@material-ui/core/ButtonBase"
-import MButton from "@material-ui/core/Button"
-import CardHeader from '@material-ui/core/CardHeader'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import CircularProgress from "@material-ui/core/CircularProgress"
-import Divider from "@material-ui/core/Divider"
-import Grid from '@material-ui/core/Grid'
-import IconButton from "@material-ui/core/IconButton"
-import Skeleton from "@material-ui/lab/Skeleton"
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Avatar from '@mui/material/Avatar'
+import ButtonBase from "@mui/material/ButtonBase"
+import MButton from "@mui/material/Button"
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import CircularProgress from "@mui/material/CircularProgress"
+import Divider from "@mui/material/Divider"
+import Grid from '@mui/material/Grid'
+import IconButton from "@mui/material/IconButton"
+import Skeleton from '@mui/material/Skeleton'
+import Typography from '@mui/material/Typography'
 // Icons
-import RefreshIcon from '@material-ui/icons/Refresh'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
 // BitcrushUI
