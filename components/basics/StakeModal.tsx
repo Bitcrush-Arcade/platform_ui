@@ -11,7 +11,7 @@ import Dialog from "@mui/material/Dialog"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import Skeleton from '@mui/material/Skeleton'
-import Slider from "@mui/material/Slider"
+import Slider, { SliderThumb } from "@mui/material/Slider"
 import Tooltip from '@mui/material/Tooltip'
 import Typography from "@mui/material/Typography"
 // Icons
@@ -24,7 +24,6 @@ import SmallButton from 'components/basics/SmallButton'
 // Icons
 import InvaderIcon from 'components/svg/InvaderIcon'
 // libs
-import { fromWei } from 'web3-utils'
 import { currencyFormat } from 'utils/text/text'
 
 /**
@@ -162,9 +161,8 @@ function StakeModal( props: StakeModalProps ) {
               onChange={sliderChange}
               step={ 10 }
               components={{
-                Thumb: function IThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/> }
+                Thumb: function IThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/> },
               }}
-              valueLabelDisplay="on"
             />
           </div>
           <Grid container justifyContent="space-evenly">
@@ -226,13 +224,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
 const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
   const isMax = allProps.percent.toNumber() === 100
   return(
-    <span {...allProps.thumbProps}>
-      <div style={{position: 'relative'}}>
-        <InvaderIcon color="secondary" style={{position: 'absolute',left: -12, bottom: -10}}/>
-        <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
-          { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
-        </Typography>
-      </div>
-    </span>
+    <SliderThumb {...allProps.thumbProps} sx={{color: 'transparent'}}>
+      {allProps.thumbProps.children}
+      <InvaderIcon color="secondary"/>
+      <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -2 : -8, bottom: -25 }} color="textPrimary" variant="caption">
+        { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
+      </Typography>
+    </SliderThumb>
 )}
 const FormComponent = p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>

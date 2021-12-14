@@ -49,6 +49,7 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number,
   const css = useInvaderStyle({ gradientId, cloudSize, isFrozen })
   return(
     <SliderThumb {...thumbProps} sx={{ zIndex:50, color: 'transparent' }}>
+      {thumbProps.children}
       <div style={{position: 'relative'}}>
         { gradient }
         <InvaderIcon color="secondary" className={ css.gradient } sx={{position: 'absolute',left:-29, bottom: -14, }}/>
