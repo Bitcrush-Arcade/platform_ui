@@ -19,6 +19,7 @@ import Grid from "@mui/material/Grid"
 import IconButton from "@mui/material/IconButton"
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
+import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Paper from '@mui/material/Paper'
@@ -108,7 +109,7 @@ const Menu = ( props: MenuProps) => {
             } )
             !open && toggleOpen()
         }
-        const selected = url_link == router.pathname || (url_link || '').length > 1 && router.pathname.indexOf(url_link) > -1
+        const selected = url_link == router.pathname || url_link && url_link.length > 1 && router.pathname.indexOf(url_link) > -1
         const mainColor = selected ? 'primary' :
             subMenu ? 'secondary' : undefined
         const component = disabled ? 'li' :
@@ -116,11 +117,11 @@ const Menu = ( props: MenuProps) => {
 
         return <Fragment key={`nav-menu-item-${name}`} >
             <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }}>
-                <ListItem 
-                    button={(subMenu || url_link && !disabled) ? true: undefined}
+                <ListItemButton 
                     onClick={ click } component={component}
                     className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
                     disabled={disabled}
+                    sx={{ width: subMenu ? '-webkit-fill-available' : 'auto'}}
                 >
                     <ListItemIcon className={ `${selected ? css.selectedIcon : css.baseIcon } ${css.listIcon}` }>
                         {icon}
@@ -133,27 +134,29 @@ const Menu = ( props: MenuProps) => {
                         </>}
                         primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${ subMenu ? css.subMenu : ''}`  }}
                     />
-                </ListItem>
+                </ListItemButton>
             </ConditionalLinkWrapper>
-            {subMenu && <Collapse in={subMenuOpen[linkIndex]}>
-                <List dense className={css.subList}>
-                    {subMenu.map( sub => {
-                        const isLink = sub.url_link ? true: undefined
-                        return <ListItem
-                            key={`sub-menu-${link.name}-${sub.name}`}
-                            button={isLink}
-                            component={ isLink ? "a" : 'button'}
-                            href={sub.url_link}
-                            target="_blank"
-                        >
-                            <ListItemIcon className={ `${css.listIcon} ${css.baseIcon}` }>
-                                {sub.icon}
-                            </ListItemIcon>
-                            <ListItemText primary={sub.name} primaryTypographyProps={{ variant: 'body1', className: css.menuTextSecondary }}/>
-                        </ListItem>
-                    })}
-                </List>
-            </Collapse>}
+            {subMenu && <ListItem disableGutters>
+                    <Collapse in={subMenuOpen[linkIndex]}  sx={{ width: '-webkit-fill-available'}}>
+                        <List dense className={css.subList}>
+                            {subMenu.map( sub => {
+                                const isLink = sub.url_link ? true: undefined
+                                return <ListItemButton
+                                    key={`sub-menu-${link.name}-${sub.name}`}
+                                    component={ isLink ? "a" : 'button'}
+                                    href={sub.url_link}
+                                    target="_blank"
+                                >
+                                    <ListItemIcon className={ `${css.listIcon} ${css.baseIcon}` }>
+                                        {sub.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={sub.name} primaryTypographyProps={{ variant: 'body1', className: css.menuTextSecondary }}/>
+                                </ListItemButton>
+                            })}
+                        </List>
+                    </Collapse>
+                </ListItem>
+            }
         </Fragment>
     })
 
@@ -298,7 +301,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         color: theme.palette.mode =='dark' ? theme.palette.grey[200] : theme.palette.grey[400],
     },
     subMenu:{
-        color: theme.palette.mode =="light" ? theme.palette.secondary.light : theme.palette.secondary.main
+        color: theme.palette.mode =="light" ? theme.palette.secondary.light : theme.palette.secondary.main,
     },
     hashexLogo:{
         filter: `brightness(0) invert(${theme.palette.mode =='dark'? '0.75' : '0.05'}) opacity(50%)`
