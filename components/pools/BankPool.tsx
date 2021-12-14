@@ -550,7 +550,6 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     },
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
     padding: theme.spacing(2),
   },

@@ -35,8 +35,15 @@ const Mining = () => {
       <title>BITCRUSH - MINING</title>
       <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
     </Head>
-    <Grid container justifyContent="space-evenly" className={ css.topSection }>
-      <Grid item xs={10} sm={8} md={6}>
+    <Grid container justifyContent="space-evenly"
+      sx={ theme => ({
+        mt: 0,
+        [theme.breakpoints.down('md')]:{
+          mt: theme.spacing(4)
+        }
+      })}
+    >
+      <Grid item xs={10} sm={8} md={6} >
         <Descriptor
           title="Galactic Mining"
           description={`Stake CRUSH to earn APY as well as a share of the House Profit Distribution.
@@ -47,10 +54,10 @@ const Mining = () => {
           All you need to do it press the Claim button, and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
-      <Grid item>
+      <Grid item sx={{ pt: { xs: 4, md: 0 }}}>
         <CompoundingCardv2/>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool/>
       </Grid>
     </Grid>
@@ -104,12 +111,6 @@ const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   section:{
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4)
-  },
-  topSection:{
-    marginTop: 0,
-    [theme.breakpoints.down('md')]:{
-      marginTop: theme.spacing(4)
-    },
   },
   
 }))
