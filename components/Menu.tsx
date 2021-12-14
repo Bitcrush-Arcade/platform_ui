@@ -270,7 +270,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
         borderRightStyle: 'solid',
         borderColor: theme.palette.primary.main,
         borderWidth: 4,
-        background: props => props.open ? `linear-gradient(90deg, ${theme.palette.background.highlight} 67%, rgba(0,0,0,0) 95%)` : theme.palette.background.highlight,
+        background: props => props.open ? `linear-gradient(90deg, ${theme.palette.moreBg.highlight} 67%, rgba(0,0,0,0) 95%)` : theme.palette.moreBg.highlight,
     },
     baseItem:{
         borderTopLeftRadius: theme.spacing(2),

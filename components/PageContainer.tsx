@@ -61,7 +61,7 @@ const PageContainer = ( props: ContainerProps ) => {
   },[ liveWallet, getApproved ])
 
   useEffect( ()=>{
-    if(!wfuCalled) return
+    if(!wfuCalled || !account || !web3?.eth || !hydrateToken ) return
 
     const interval = setInterval( () => {
       web3.eth.getTransactionReceipt( wfuCalled.hash, (e,rc) => {
@@ -89,7 +89,7 @@ const PageContainer = ( props: ContainerProps ) => {
       clearInterval(interval)
     }
 
-  },[wfuCalled])
+  },[wfuCalled, account, web3.eth, hydrateToken])
 
   const toggleMenu = () => setMenuToggle( p => !p )
 

@@ -144,7 +144,7 @@ const useStyles = makeStyles<Theme, { open: boolean, gradientId: string, gradien
     border: 'none',
     backgroundColor: 'transparent',
     [theme.breakpoints.down('md')]:{
-      backgroundColor: theme.palette.background.header
+      backgroundColor: theme.palette.moreBg.header
     }
   },
   menuLogoDivider:{

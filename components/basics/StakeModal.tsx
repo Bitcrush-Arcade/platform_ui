@@ -162,7 +162,7 @@ function StakeModal( props: StakeModalProps ) {
               onChange={sliderChange}
               step={ 10 }
               components={{
-                Thumb: p => <InvaderThumb thumbProps={p} percent={percent}/>
+                Thumb: function IThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/> }
               }}
               valueLabelDisplay="on"
             />

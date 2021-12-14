@@ -12,7 +12,7 @@ const Summary = () => {
       </Typography>
 
       <Typography>
-        next draw ->
+        next draw -&gt;
       </Typography>
       <Typography>
         # CURRENT ROUND

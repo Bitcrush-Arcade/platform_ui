@@ -16,13 +16,6 @@ import { useContract } from 'hooks/web3Hooks'
 import { TransactionHash } from 'types/TransactionTypes'
 import BigNumber from 'bignumber.js'
 
-
-declare module '@mui/styles/defaultTheme' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface DefaultTheme extends Theme {}
-}
-
-
 type TransactionSubmitData = { 
   description?: string,
   errorData?: any,

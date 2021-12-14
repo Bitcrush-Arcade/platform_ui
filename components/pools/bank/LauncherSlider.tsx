@@ -38,7 +38,7 @@ type LauncherSliderProps =  LauncherProps & WithStyles <typeof styles> & SliderP
 export default withStyles(styles)( (props: LauncherSliderProps) => {
   const { percent, isFrozen, ...otherProps } = props
   return <Slider {...otherProps}
-    components={{ Thumb: p => <InvaderRocketThumb thumbProps={p} percent={percent} isFrozen={isFrozen} /> }}
+    components={{ Thumb: function RocketThumb (p){ return <InvaderRocketThumb thumbProps={p} percent={percent} isFrozen={isFrozen} />} }}
   />
 })
 
@@ -48,7 +48,7 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number,
   const cloudSize = 2 - (percent / 90)
   const css = useInvaderStyle({ gradientId, cloudSize, isFrozen })
   return(
-    <SliderThumb {...thumbProps} sx={{ zIndex:50, color: ' transparent' }}>
+    <SliderThumb {...thumbProps} sx={{ zIndex:50, color: 'transparent' }}>
       <div style={{position: 'relative'}}>
         { gradient }
         <InvaderIcon color="secondary" className={ css.gradient } sx={{position: 'absolute',left:-29, bottom: -14, }}/>

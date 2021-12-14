@@ -1,6 +1,36 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import { deepPurple, teal } from '@mui/material/colors';
 
+declare module '@mui/material/styles'{
+  interface Palette {
+    blue?: Palette['primary'];
+    menu?: Palette['primary'];
+    shadow?: {
+      primary: Palette['primary'];
+      secondary: Palette['primary'];
+    };
+    border: Palette['primary'];
+    moreBg: {
+      highlight: string;
+      menu: string;
+      header: string;
+    }
+  }
+  interface PaletteOptions {
+    blue?: PaletteOptions['primary'];
+    menu?: PaletteOptions['primary'];
+    shadow?: {
+      primary: PaletteOptions['primary'];
+      secondary: PaletteOptions['primary'];
+    };
+    border: PaletteOptions['primary'];
+    moreBg: {
+      highlight: React.CSSProperties['color']
+      menu: React.CSSProperties['color']
+      header: React.CSSProperties['color']
+    };
+  }
+}
 
 const theme = (isDark?: boolean) => createTheme({
   palette: {
@@ -16,9 +46,11 @@ const theme = (isDark?: boolean) => createTheme({
     background: {
       default: isDark ? 'rgb(5,6,16)' : 'rgb(222,211,241)',
       paper: isDark ? 'rgb(27,30,65)' : 'white',
-      menu: isDark ? 'rgb(23,24,54)' : 'white',
+    },
+    moreBg:{
+      header: isDark ? 'rgb(13,12,44)' : 'rgb(231,171,247)',
       highlight: isDark ? 'rgb(13,12,44)' : 'rgba(214,199,239)',
-      header: isDark ? 'rgb(13,12,44)' : 'rgb(231,171,247)'
+      menu: isDark ? 'rgb(23,24,54)' : 'white',
     },
     info:{
       main: 'rgb(102,105,139)',
@@ -71,29 +103,3 @@ const theme = (isDark?: boolean) => createTheme({
 });
 
 export default function getTheme( isDark?: boolean ) { return responsiveFontSizes( theme(isDark) ) }
-
-declare module '@mui/material/styles'{
-  interface Palette {
-    blue?: Palette['primary'];
-    shadow?: {
-      primary: Palette['primary'];
-      secondary: Palette['primary'];
-    };
-    border: Palette['primary'];
-  }
-  interface PaletteOptions {
-    blue?: PaletteOptions['primary'];
-    shadow?: {
-      primary: PaletteOptions['primary'];
-      secondary: PaletteOptions['primary'];
-    };
-    border: PaletteOptions['primary'];
-  }
-
-  interface TypeBackground{
-    card: string,
-    menu: string,
-    highlight: string,
-    header: string,
-  }
-}
