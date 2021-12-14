@@ -99,7 +99,12 @@ const theme = (isDark?: boolean) => createTheme({
       fontWeight: 200,
       textTransform: 'none',
     }
-  }
+  },
+  components: {
+    MuiPaper: {
+      styleOverrides: { root: { backgroundImage: 'unset' } },
+    },
+  },
 });
 
 export default function getTheme( isDark?: boolean ) { return responsiveFontSizes( theme(isDark) ) }

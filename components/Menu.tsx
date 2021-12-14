@@ -231,7 +231,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
             duration: theme.transitions.duration.leavingScreen,
           }),
         overflowX: 'hidden',
-        backgroundColor: theme.palette.background.menu,
+        backgroundColor: theme.palette.moreBg.menu,
         color: 'white',
         paddingLeft: theme.spacing(1),
         paddingTop: theme.spacing(1),
