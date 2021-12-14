@@ -100,7 +100,7 @@ const Menu = ( props: MenuProps) => {
 
     const linkItems = linkArray.map( (link, linkIndex) => {
         const { name, icon, url_link, subMenu, disabled, loadOnClick } = link
-        const click = (e : any) => {
+        const click = (e : React.MouseEvent<HTMLAnchorElement>) => {
             e.stopPropagation()
             !subMenu && setShowLoad( draft => { draft[linkIndex] = !draft[linkIndex] })
             subMenu && setSubMenuOpen( draft => {
@@ -117,9 +117,10 @@ const Menu = ( props: MenuProps) => {
         return <Fragment key={`nav-menu-item-${name}`} >
             <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }}>
                 <ListItem 
-                    button={subMenu || url_link && !disabled ? true: undefined}
+                    button={(subMenu || url_link && !disabled) ? true: undefined}
                     onClick={ click } component={component}
                     className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
+                    disabled={disabled}
                 >
                     <ListItemIcon className={ `${selected ? css.selectedIcon : css.baseIcon } ${css.listIcon}` }>
                         {icon}
@@ -253,7 +254,8 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     },
     list:{
         maxHeight: `calc( 100% - 111px)`,
-        overflowY: 'auto'
+        overflowY: 'auto',
+        overflowX: 'hidden'
     },
     subList: {
         backgroundColor: theme.palette.mode =="dark" ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
