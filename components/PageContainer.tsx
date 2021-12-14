@@ -303,7 +303,7 @@ const PageContainer = ( props: ContainerProps ) => {
     >
       <Header open={menuToggle} toggleOpen={toggleMenu}/>
       <Menu open={menuToggle} toggleOpen={toggleMenu} alwaysSm={menuSm}/>
-      <Container maxWidth="xl" className={css.contentContainer}>
+      <Container maxWidth={false} className={css.contentContainer}>
         {children}
         {Object.keys(allHashes).length > 0 && <div style={{ position: 'fixed', top: 90, zIndex: 1, left: 'auto', right: '32px'}}>
           <TxCard hashes={shownPending} onClose={ hash => setHiddenPending( draft => { draft[hash] = pending[hash].status } )}/>
