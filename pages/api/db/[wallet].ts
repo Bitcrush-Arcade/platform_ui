@@ -12,7 +12,7 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
     return
   }
 
-  await fetch(`http://diceinvaders.bitcrush.com:3000/dragon/games/get_balance`,{
+  await fetch(`http://diceinvaders.bitcrush.com:3000/dragon/games/get_balance_ui`,{
     method: "POST",
     headers:{
       "Content-Type": "application/json"
