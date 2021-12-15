@@ -12,10 +12,14 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
     return
   }
 
-  await fetch(`${servers[ process.env.NODE_ENV == "test" ? "development" : process.env.NODE_ENV ]}/api/users/wallet/${wallet}`,{
+  await fetch(`http://diceinvaders.bitcrush.com:3000/dragon/games/get_balance`,{
+    method: "POST",
     headers:{
-      origin: 'http://localhost:3000'
-    }
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      wallet_address: wallet
+    })
   })
     .then( d => d.json() )
     .then( data => {
