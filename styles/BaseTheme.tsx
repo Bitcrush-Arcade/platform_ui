@@ -104,6 +104,11 @@ const theme = (isDark?: boolean) => createTheme({
     MuiPaper: {
       styleOverrides: { root: { backgroundImage: 'unset' } },
     },
+    MuiFab:{
+      defaultProps:{
+        variant: 'extended'
+      }
+    }
   },
 });
 

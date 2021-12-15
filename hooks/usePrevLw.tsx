@@ -3,8 +3,10 @@ import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
 import { useTransactionContext } from 'hooks/contextHooks'
 import BigNumber from 'bignumber.js'
+// Types
+import { Receipt } from 'types/PromiEvent'
 
-const usePrevLiveWallet = (data: { account: string, chainId:number }) => {
+const usePrevLiveWallet = (data: { account?: string | null, chainId?:number }) => {
   const {account, chainId} = data
   const { editTransactions } = useTransactionContext()
   //---------------------------------------------------------------
@@ -35,16 +37,16 @@ const usePrevLiveWallet = (data: { account: string, chainId:number }) => {
   const withdrawV1 = useCallback( () => {
     if(!prevLwMethods || !account || !prevLwData.hasFunds ) return console.log('nothing to do here')
     prevLwMethods.withdrawBet( prevLwData.funds ).send({ from: account })
-    .on('transactionHash', (tx) => {
+    .on('transactionHash', (tx: string) => {
       console.log('hash', tx )
       editTransactions(tx,'pending', { description: `Withdraw from V1 LiveWallet`})
     })
-    .on('receipt', ( rc) => {
+    .on('receipt', ( rc: Receipt) => {
       console.log('receipt',rc)
       editTransactions(rc.transactionHash,'complete')
       getPrevData()
     })
-    .on('error', (error, receipt) => {
+    .on('error', (error: any, receipt:Receipt) => {
       console.log('error', error, receipt)
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
     })

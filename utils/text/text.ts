@@ -15,23 +15,23 @@ export const currencyFormat = ( amount: number | string, options?:{isWei?: boole
   const [integers, decimals] = numberAsString.split('.')
   const splitIntegers = integers.split('')
   const integerAmount = integers.split('').length
-  const intGroups = []
+  const intGroups: string[] = []
   for( let i = 0; i < integerAmount; i ++ ){
     const groupLength = intGroups.length
     if(!groupLength || intGroups[0]?.length == 3 )
-      intGroups.unshift( splitIntegers.pop() )
+      intGroups.unshift( splitIntegers.pop()||'' )
     else
       intGroups[0] = splitIntegers.pop() + intGroups[0]
   }
   const joinIntegers = intGroups.join(',')
-  const allDecimals = !isNaN(decimalsToShow) 
+  const allDecimals = !isNaN( Number(decimalsToShow)) 
     ? (decimals || new Array(decimalsToShow).fill(0).join('')).slice(0, decimalsToShow)
     : decimals
 
   const reviewDecimals = (allDecimals || '00').split('')
   const decimalLength  = reviewDecimals.length
   let significantReached = false
-  const finalDecimals = []
+  const finalDecimals: string[] = []
   reviewDecimals.map( (d,i) => {
     const index = decimalLength - 1 - i
     if( 

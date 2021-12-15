@@ -57,7 +57,7 @@ export default function TxCard( props: TxCardProps ){
         </a>}
       </Grid>
       <Grid item>
-        <IconButton size="small" onClick={() => onClose(keys[0])}>
+        <IconButton size="small" onClick={() => onClose && onClose(keys[0])}>
           <HighlightOffIcon className={ css.closeIcon } />
         </IconButton>
       </Grid>

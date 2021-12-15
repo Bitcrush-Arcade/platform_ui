@@ -33,6 +33,7 @@ import { useWeb3React } from '@web3-react/core'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
 import { toWei } from 'web3-utils'
+import { Receipt } from 'types/PromiEvent';
 
 BigNumber.config({ DECIMAL_PLACES: 18 })
 
@@ -132,34 +133,34 @@ const Poolv2 = ( props: PoolCardProps ) => {
     if(!poolMethods) return setSubmitting(false)
     if(!values.actionType)
       return poolMethods.enterStaking(weiValue).send({ from: account })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx:string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Stake in Bankroll`})
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc:Receipt) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           getPoolData()
           getAPY()
           toggleStakeModal()
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error: any, receipt:Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
     return poolMethods.emergencyWithdraw().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: `Withdraw All from Staking`})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc:Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         getPoolData()
         getAPY()
         toggleStakeModal()
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })

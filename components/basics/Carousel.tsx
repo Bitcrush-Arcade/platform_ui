@@ -26,13 +26,13 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       display: (props : CarouselPropsType) => props.xs >= props.items.length ? 'none' : 'block'
     },
     [theme.breakpoints.only('sm')]:{
-      display: (props : CarouselPropsType) => props.sm >= props.items.length ? 'none' : 'block'
+      display: (props : CarouselPropsType) => (props.sm || props.xs) >= props.items.length ? 'none' : 'block'
     },
     [theme.breakpoints.only('md')]:{
-      display: (props : CarouselPropsType) => props.md >= props.items.length ? 'none' : 'block'
+      display: (props : CarouselPropsType) => (props.md || props.sm || props.xs) >= props.items.length ? 'none' : 'block'
     },
     [theme.breakpoints.up('lg')]:{
-      display: (props : CarouselPropsType) => props.lg >= props.items.length ? 'none' : 'block'
+      display: (props : CarouselPropsType) => (props.lg || props.md || props.sm || props.xs) >= props.items.length ? 'none' : 'block'
     },
   },
   carouselContainer: {
@@ -109,9 +109,12 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
   const [containerWidth, setContainerWidth] = useState<number>(0)
   const carouselRef = useRef<HTMLDivElement>(null)
   useEffect(()=>{
-    setContainerWidth(document.getElementById('carousel-id').clientWidth)
+    const carouselElement = document.getElementById('carousel-id')
+    if(!carouselElement) return
+    setContainerWidth(carouselElement.clientWidth)
     const resizeContainer = () => {
-      const getWidth = document.getElementById('carousel-id').clientWidth
+      const getWidth = document.getElementById('carousel-id')?.clientWidth
+      if(!getWidth) return
       setContainerWidth( getWidth ) 
     }
     window?.addEventListener('resize', resizeContainer )
@@ -178,7 +181,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
         </IconButton>}
       </div>
       <Grid container justifyContent="flex-start" alignItems="center" spacing={spacing} className={css.slider} wrap="nowrap"
-        innerRef={carouselRef}
+        ref={carouselRef}
       >
         {shownItems}
       </Grid>

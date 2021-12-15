@@ -4,16 +4,12 @@ const highlightedAnnouncements : Array<Announcement> = [
     img: '/assets/announcements/1-live-now-banner.png',
     imgMobile: '/assets/announcements/1-live-now-mobile.png',
     link: '/games',
-    target: null,
-    rel: null,
   },
   {
     name: 'Staking 2.0',
     img: '/assets/announcements/2-stake-v2-banner.png',
     imgMobile: '/assets/announcements/2-stake-v2-mobile.png',
     link: '/mining',
-    target: null,
-    rel: null,
   },
   {
     name: 'Knightswap Partnership',
@@ -45,6 +41,6 @@ type Announcement = {
   img: string,
   imgMobile: string,
   link: string,
-  target: HTMLAnchorElement['target'] | null,
-  rel: HTMLAnchorElement['rel'] | null
+  target?: HTMLAnchorElement['target'],
+  rel?: HTMLAnchorElement['rel']
 }

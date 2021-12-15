@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 // web3
 import { useWeb3React } from '@web3-react/core'
@@ -15,18 +15,16 @@ import CardHeader from "@mui/material/CardHeader"
 import CardContent from "@mui/material/CardContent"
 import CardActions from "@mui/material/CardActions"
 import CircularProgress from '@mui/material/CircularProgress'
-import Collapse from "@mui/material/Collapse"
 import Dialog from '@mui/material/Dialog'
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import IconButton from '@mui/material/IconButton'
 import Skeleton from '@mui/material/Skeleton'
-import Slider from '@mui/material/Slider'
+import Slider, { SliderThumb } from '@mui/material/Slider'
 import Typography from "@mui/material/Typography"
 import Tooltip from "@mui/material/Tooltip"
 // import TextField from '@mui/material/TextField'
 // Material Icons
-import ArrowIcon from '@mui/icons-material/ArrowDropDownCircleOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh'
 // Bitcrush
@@ -44,6 +42,7 @@ import { useWithWallet } from 'hooks/unlockWithWallet'
 import { useContract } from 'hooks/web3Hooks'
 import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
+import { Receipt } from 'types/PromiEvent'
 
 const PoolCard = (props: PoolProps) => {
   const { abi, tokenAddress, contractAddress, tokenAbi, infoText } = props
@@ -98,16 +97,16 @@ const PoolCard = (props: PoolProps) => {
       setOpenStakeModal( p => !p )
     else{
       coinMethods.approve( contractAddress, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx:string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc:Receipt) => {
           console.log('receipt',rc)
           triggerHydrate()
           editTransactions(rc.transactionHash,'complete')
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error:any, receipt:Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
@@ -118,32 +117,32 @@ const PoolCard = (props: PoolProps) => {
 
   const harvest = () => {
     mainMethods?.claim().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: 'Harvest Rewards'})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc:Receipt) => {
         console.log('receipt',rc)
         triggerHydrate()
         editTransactions(rc.transactionHash,'complete')
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error:any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
       })
   }
   const manualCompound = () => {
     mainMethods?.singleCompound().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: "Compound My Assets" })
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc:Receipt) => {
         console.log('receipt',rc)
         triggerHydrate()
         editTransactions(rc.transactionHash,'complete')
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error:any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
       })
@@ -166,7 +165,7 @@ const PoolCard = (props: PoolProps) => {
 // Hydrate changing Data
   useEffect( ()=>{
     const getPoolData = async () => {
-      if(!coinContract || !account || [56,97].indexOf(chainId) == -1 ) {
+      if(!coinContract || !account || !chainId || [56,97].indexOf(chainId) == -1 ) {
         setItems( draft => {
           draft.balance = 0
           draft.approved = 0
@@ -183,7 +182,7 @@ const PoolCard = (props: PoolProps) => {
       const userInfo = await mainMethods?.stakings(account).call()
       const totalPool = await mainMethods?.totalPool().call()
       const totalStaked = await mainMethods?.totalStaked().call()
-      const pending = await mainMethods?.pendingReward(account).call().catch( err => {console.log('error', err); return 0})
+      const pending = await mainMethods?.pendingReward(account).call().catch( (err:any) => {console.log('error', err); return 0})
       setItems( draft => {
         draft.balance = availTokens
         draft.approved = approved
@@ -220,14 +219,15 @@ const PoolCard = (props: PoolProps) => {
   const InvaderThumb = useCallback( (allProps: {thumbProps: any, percent: BigNumber}) => {
     const isMax = allProps.percent.toNumber() === 100
     return(
-      <span {...allProps.thumbProps}>
+      <SliderThumb {...allProps.thumbProps}>
+        {allProps.thumbProps.children}
         <div style={{position: 'relative'}}>
           <InvaderIcon color="secondary" style={{position: 'absolute',left: -12, bottom: -10}}/>
           <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
             { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
           </Typography>
         </div>
-      </span>
+      </SliderThumb>
   )},[])
 
   return <>
@@ -379,32 +379,32 @@ const PoolCard = (props: PoolProps) => {
           const weiAmount = toWei(`${new BigNumber(stakeAmount).toFixed(18,1)}`)
           if(actionType){
             ( isMax ? mainMethods?.leaveStakingCompletely() : mainMethods?.leaveStaking(weiAmount)).send({ from: account })
-              .on('transactionHash', tx =>{
+              .on('transactionHash', (tx:string) =>{
                 editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
               })
-              .on('receipt', rc => {
+              .on('receipt', (rc:Receipt) => {
                 editTransactions(rc.transactionHash, 'complete')
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
               })
-              .on('error', (error, receipt) => {
+              .on('error', (error:any, receipt:Receipt) => {
                 receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
               })
           }else mainMethods?.enterStaking(weiAmount).send({ from: account })
-            .on('transactionHash', tx =>{
+            .on('transactionHash', (tx:string) =>{
               editTransactions(tx,'pending', { description: "Stake Crush in pool"})
             })
-            .on('receipt', rc => {
+            .on('receipt', (rc:Receipt) => {
               editTransactions(rc.transactionHash, 'complete')
               triggerHydrate()
               openStakeModal && toggleStakeModal()
               setSubmitting(false)
             })
-            .on('error', (error, receipt) => {
+            .on('error', (error:any, receipt:Receipt) => {
               receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
               triggerHydrate()
               openStakeModal && toggleStakeModal()
@@ -428,7 +428,8 @@ const PoolCard = (props: PoolProps) => {
         const { actionType, stakeAmount } = values
         const maxUsed = actionType ? maxStaked : maxBalance
         const percent = new BigNumber( stakeAmount ).div( maxUsed ).times(100)
-        const sliderChange = (e: any, value: number) => {
+        const sliderChange = (e: any, value: number | number[]) => {
+          if(Array.isArray(value)) return
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', newValue)
         }
@@ -439,7 +440,7 @@ const PoolCard = (props: PoolProps) => {
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer }>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0}>
+              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0}>
                 STAKE
               </MButton>
             </Grid>
@@ -447,7 +448,7 @@ const PoolCard = (props: PoolProps) => {
               <Divider orientation="vertical"/>
             </Grid>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ actionType ? "secondary" : "default"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
+              <MButton className={ css.stakeActionBtn } color={ actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
                 WITHDRAW
               </MButton>
             </Grid>
@@ -471,7 +472,7 @@ const PoolCard = (props: PoolProps) => {
                 MAX
               </MButton>,
               className: css.textField,
-              onFocus: e => e.target.select()
+              onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
             }}
           />
           <div className={ css.sliderContainer }>
@@ -479,8 +480,10 @@ const PoolCard = (props: PoolProps) => {
               value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
               onChange={sliderChange}
               step={ 10 }
-              ThumbComponent={p => <InvaderThumb thumbProps={p} percent={percent}/>}
-              valueLabelDisplay="on"
+              components={{
+                Thumb: function NewThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/>} 
+              }}
+              // valueLabelDisplay="on"
             />
           </div>
           <Grid container justifyContent="space-evenly">
@@ -519,7 +522,7 @@ export default PoolCard
 type PoolProps = {
   abi: any,
   contractAddress: string, // address
-  tokenAddress ?: string //address
+  tokenAddress : string //address
   tokenAbi?: any,
   infoText?: string
 }

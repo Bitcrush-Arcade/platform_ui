@@ -189,7 +189,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={gamesByType[1].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
+        items={gamesByType[1].map( (game:any, gameIdx: number) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={2}
         md={3}
@@ -242,9 +242,9 @@ export const getServerSideProps = async() =>{
   
   const gameTypes = Object.keys(availableGames?.result || {})
 
-  const allGames = []
+  const allGames: any[] = []
   const gamesByType = compact( gameTypes.map( (gameType, typeIndex) => {
-    return  availableGames?.result[ gameType ].map( game => {
+    return  availableGames?.result[ gameType ].map( (game:any) => {
       const flatGame = flattenObject( game, 1 )
       allGames.push(flatGame)
       return flatGame

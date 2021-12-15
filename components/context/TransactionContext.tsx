@@ -14,6 +14,7 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
+import { Receipt } from 'types/PromiEvent';
 import BigNumber from 'bignumber.js'
 
 type TransactionSubmitData = { 
@@ -144,8 +145,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
   const edits = useMemo( () => ({
     pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
-        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data.errorData }
-        if(data.needsReview)
+        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data?.errorData }
+        if(data?.needsReview)
         setReviewHash( draft => { draft.hashArray.push(id) })
       })
     },
@@ -184,7 +185,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
   },[edits])
 
   const checkTransactions = useCallback( (hashArray: Array<string>) => {
-    const recheckArr =  []
+    const recheckArr: string[] =  []
     hashArray.map( async (hash, index) => {
 
       if(pendingTransactions[hash]?.status !== 'pending') return
@@ -192,7 +193,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
       
       await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
         console.log( 'check response', {e, rc})
-        if( !rc || !pendingTransactions[hash]) return recheckArr.push(pendingTransactions[hash])
+        if( !rc || !pendingTransactions[hash]) return recheckArr.push(hash)
         pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
         setReviewHash( draft => {
           draft.hashArray.splice(index, 1)
@@ -223,14 +224,14 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
 
   const selfBlacklist = useCallback(() => {
     lwMethods.blacklistSelf().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx: string) => {
         editTransactions(tx, 'pending', { description: "Self Blacklist"})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })

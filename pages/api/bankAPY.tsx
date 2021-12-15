@@ -14,7 +14,7 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   const body = JSON.parse(req.body || "{}" )
 
   const host = req.headers.host
-  const isLocal = host.indexOf('localhost:') > -1
+  const isLocal = (host || '').indexOf('localhost:') > -1
   if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
   
@@ -29,9 +29,13 @@ export default async function bankAPY(req : NextApiRequest, res: NextApiResponse
   // Contract Setup
     // Bankroll Staking
   const contractSetup = getContracts( body.prev ? 'prevStaking2' : 'bankStaking', usedChain )
+  if(!contractSetup.abi)
+    return res.status(400).json({message: 'No contract ABI'})
   const stakingContract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
     // Bankroll Contract
   const bankSetup = getContracts('bankroll', usedChain)
+  if(!bankSetup.abi)
+    return res.status(400).json({message: 'No contract ABI'})
   const bankContract = await new web3.eth.Contract( bankSetup.abi, bankSetup.address )
   // Staking 
   const stakingDivisor = 10000// new BigNumber( await stakingContract.methods.divisor().call() )

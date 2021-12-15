@@ -30,7 +30,7 @@ const RoiModal = ( props: RoiProps ) => {
   return (
     <Dialog
       open={open}
-      PaperComponent={ paperProps => <Card {...paperProps} noBorder className={ css.card } background="light" />}
+      PaperComponent={ paperProps => { const {sx, ...others} = paperProps; return <Card {...others} noBorder className={ css.card } background="light" />}}
       onClose={onClose}
     >
       <Grid container justifyContent="space-between" alignItems="center">
@@ -57,22 +57,22 @@ const RoiModal = ( props: RoiProps ) => {
         <TableBody>
           <TableRow>
             <TableCell>1d</TableCell>
-            <TableCell align="right">{(apyData?.d1?.percent *100).toFixed(2) + ' %'}</TableCell>
+            <TableCell align="right">{((apyData?.d1?.percent || 0) *100).toFixed(2) + ' %'}</TableCell>
             <TableCell align="right">{apyData?.d1?.return && currencyFormat(apyData?.d1?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>7d</TableCell>
-            <TableCell align="right">{(apyData?.d7?.percent *100).toFixed(2) + ' %'}</TableCell>
+            <TableCell align="right">{((apyData?.d7?.percent || 0) *100).toFixed(2) + ' %'}</TableCell>
             <TableCell align="right">{apyData?.d7?.return && currencyFormat(apyData?.d7?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>30d</TableCell>
-            <TableCell align="right">{(apyData?.d30?.percent *100).toFixed(2) + ' %'}</TableCell>
+            <TableCell align="right">{((apyData?.d30?.percent || 0) *100).toFixed(2) + ' %'}</TableCell>
             <TableCell align="right">{apyData?.d30?.return && currencyFormat(apyData?.d30?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>365d (APY)</TableCell>
-            <TableCell align="right">{(apyData?.d365?.percent *100).toFixed(2) + ' %'}</TableCell>
+            <TableCell align="right">{((apyData?.d365?.percent || 0) *100).toFixed(2) + ' %'}</TableCell>
             <TableCell align="right">{apyData?.d365?.return && currencyFormat(apyData?.d365?.return, { decimalsToShow: 2 }) || '-'}</TableCell>
           </TableRow>
         </TableBody>

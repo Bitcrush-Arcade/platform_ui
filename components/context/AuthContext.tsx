@@ -20,7 +20,7 @@ import wallets from 'data/wallets'
 type AuthContextType = {
   login: () => void,
   logout: () => void,
-  account?: string,
+  account?: string | null,
   chainId?: number,
 }
 
@@ -69,7 +69,7 @@ export const AuthContext = (props: { children: ReactNode }) => {
   }
 
   return <Context.Provider value={{ login: checkLogin, logout, account, chainId }}>
-    <Dialog open={openDialog} PaperComponent={ paperProps => <Card {...paperProps} />} onClose={() => setOpenDialog(false)}>
+    <Dialog open={openDialog} PaperComponent={ paperProps => { const {sx, ...others} = paperProps; return<Card {...others} />}} onClose={() => setOpenDialog(false)}>
       <DialogContent>
         <List>
           <ListItem>

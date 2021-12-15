@@ -67,7 +67,7 @@ export const InvaderRocketThumb = (allProps: { thumbProps: any, percent: number,
 
 const useInvaderStyle = makeStyles<Theme, { gradientId: string, cloudSize: number, isFrozen?: boolean }>( theme => createStyles({
   gradient: {
-    fill: props => props.isFrozen ? theme.palette.blue.main : `url(#${ props.gradientId })`,
+    fill: props => props.isFrozen ? theme.palette.blue?.main || 'blue' : `url(#${ props.gradientId })`,
     fontSize: 60,
   },
   blast:{

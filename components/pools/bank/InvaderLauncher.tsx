@@ -118,7 +118,7 @@ const useStyles = makeStyles<Theme,{ color: string, text: string }>( theme => cr
     height: 180,
   },
   frozen:{
-    color: theme.palette.blue.main,
+    color: theme.palette.blue?.main || 'blue',
   },
   colorChange:{
     color: props => {

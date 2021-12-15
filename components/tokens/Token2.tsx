@@ -12,8 +12,8 @@ const Token = (props: TokenImgProps ) => {
   const { scale, token } = props
   const isLive = token === 'LIVE'
   const isMd = useMediaQuery( theme.breakpoints.down('lg') )
-  const width = useMemo( () => ( isLive ? 165 : 107) * scale / ( isMd ? 1.5 : 1 ), [scale, isMd, isLive])
-  const height = useMemo( () => ( isLive ? 95 : 96) * scale / ( isMd ? 1.5 : 1 ), [scale, isMd, isLive])
+  const width = useMemo( () => ( isLive ? 165 : 107) * (scale || 1) / ( isMd ? 1.5 : 1 ), [scale, isMd, isLive])
+  const height = useMemo( () => ( isLive ? 95 : 96) * (scale || 1) / ( isMd ? 1.5 : 1 ), [scale, isMd, isLive])
   return <Image src={`/token/${ !isLive ? "Coins1" : "coin2_wBg"}.png`} width={width} height={height} alt={`Crush Coin${isLive ? ' Live Wallet':''} Image`}/>
 }
 

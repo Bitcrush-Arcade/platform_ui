@@ -38,6 +38,7 @@ import { getContracts } from 'data/contracts'
 import { blacklistExplanation } from 'data/texts'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
+import { Receipt } from 'types/PromiEvent'
 
 export default function Home() {
 
@@ -81,15 +82,15 @@ export default function Home() {
     if( account && !staked)
       return router.push("/mining","/mining",{ shallow: false})
     methods.claim().send({ from: account })
-    .on('transactionHash', (tx) => {
+    .on('transactionHash', (tx:string) => {
       console.log('hash', tx )
       editTransactions(tx,'pending', { description: 'Harvest All Pools' })
     })
-    .on('receipt', ( rc) => {
+    .on('receipt', ( rc:Receipt) => {
       console.log('receipt',rc)
       editTransactions(rc.transactionHash,'complete')
     })
-    .on('error', (error, receipt) => {
+    .on('error', (error:any, receipt:Receipt) => {
       console.log('error', error, receipt)
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
@@ -163,7 +164,7 @@ export default function Home() {
               </Grid>
           </Grid>
           {/* BITCRUSH TVL INFO */}
-          <Container maxWidth="lg">
+          <Container maxWidth={false}>
             {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
@@ -329,7 +330,7 @@ export default function Home() {
             
             <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary" onClick={lwContext.selfBlacklist}>
               Self BlackList&nbsp;
-              <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+              <Tooltip arrow leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
                 title={<Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
                 {blacklistExplanation}
                 </Typography>}

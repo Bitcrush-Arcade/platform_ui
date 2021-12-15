@@ -25,6 +25,7 @@ import { useTransactionContext } from "hooks/contextHooks"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
+import { Receipt } from "types/PromiEvent";
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
@@ -73,12 +74,12 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     }
     setShowWarning(false)
     methods.compoundAll().send({ from: account })
-      .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
-      .on('receipt', rct =>{
+      .on('transactionHash', (tx: string) => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
+      .on('receipt', (rct:Receipt) =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
       })
-      .on('error', (error, rct) => {
+      .on('error', (error: any, rct: Receipt) => {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
       } )
@@ -132,11 +133,11 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       </Grid>
     </CardContent>
   </Card>
-  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
+  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => { const {sx, ...others} = paperProps; return <Card {...others} style={{paddingBottom: 16}}/>}}>
     <DialogContent>
       <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
         Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
-        {'\n'}If you don’t understand, please have the mods explain this to you.
+        {'\n'}If you don&apos;t understand, please have the mods explain this to you.
       </Typography>
       <Typography align="center" paragraph>
         Are you sure?
@@ -172,7 +173,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard:{
-    [theme.breakpoints.down(undefined)]:{
+    [theme.breakpoints.down(888)]:{
       marginTop: theme.spacing(4)
     },
     width: 280,

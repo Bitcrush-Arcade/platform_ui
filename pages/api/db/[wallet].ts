@@ -12,7 +12,7 @@ export default async function getBalance(req : NextApiRequest, res: NextApiRespo
     return
   }
 
-  await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/${wallet}`,{
+  await fetch(`${servers[ process.env.NODE_ENV == "test" ? "development" : process.env.NODE_ENV ]}/api/users/wallet/${wallet}`,{
     headers:{
       origin: 'http://localhost:3000'
     }

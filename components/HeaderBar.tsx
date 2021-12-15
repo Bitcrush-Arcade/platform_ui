@@ -65,7 +65,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     { name: 'BABY Farm', onClick: ()=> window.open(`https://home.babyswap.finance/farms`, '_blank')},
   ]
 
-  return <AppBar className={css.appBar} variant="outlined" position={ isSm ? "sticky" : "absolute"}>
+  return <AppBar className={css.appBar} variant="outlined" elevation={0} position={ isSm ? "sticky" : "absolute"}>
     <Toolbar>
       <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
         {/* LEFT SIDE OF HEADER */}
@@ -207,7 +207,7 @@ const ConnectButton = () => {
 
   const displayAccount = useMemo( () => shortAddress(account || ''),[account])
   
-  return <GeneralButton disabled={!!account } onClick={login} solidDisabledText>
+  return <GeneralButton disabled={!!account } onClick={login} solidDisabledText variant="extended">
     {account 
       ? displayAccount
       : "Connect"

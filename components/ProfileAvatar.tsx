@@ -20,6 +20,8 @@ import usePrevLiveWallet from 'hooks/usePrevLw'
 import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
 // data
 import { getContracts } from 'data/contracts'
+// Types
+import { Receipt } from 'types/PromiEvent'
 
 const ProfileAvatar = ( props: { playing: boolean }) => {
   const { playing } = props
@@ -36,15 +38,15 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
 
   const approve = useCallback(() => {
     coinMethods.approve( stakingContract, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error:any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })
@@ -80,7 +82,7 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
           onClick={ hasAccount ? logout : login }
         >
           <ListItemText
-            primary={ hasAccount ? shortAddress(account) : "Connect"}
+            primary={ hasAccount ? account && shortAddress(account) : "Connect"}
             secondary={ hasAccount ? 'Disconnect' : '' }
           />
         </ListItem>

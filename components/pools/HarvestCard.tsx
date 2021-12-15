@@ -2,7 +2,7 @@
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
-import { FabProps } from '@mui/material/Fab'
+import type { FabProps } from '@mui/material/Fab'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import Divider from '@mui/material/Divider'
@@ -65,8 +65,8 @@ type PoolCardProps ={
   icon?: JSX.Element,
   action1Title: string,
   action2Title?: string,
-  btn1Props?: {href ?: string } & Omit<FabProps, "children">,
-  btn2Props?: {href ?: string } & Omit<FabProps, "children">,
+  btn1Props?: {href ?: string } & Omit<FabProps, "children"|"sx">,
+  btn2Props?: {href ?: string } & Omit<FabProps, "children"|"sx">,
   firstAction?: () => void,
   secondAction?: () => void,
   color?: 'primary' | 'secondary',

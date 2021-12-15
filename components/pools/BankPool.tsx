@@ -38,6 +38,7 @@ import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
+import { Receipt } from 'types/PromiEvent';
 
 function BankPool( ) {
   const css = useStyles()
@@ -119,37 +120,37 @@ function BankPool( ) {
     if(!stakingMethods) return setSubmitting(false)
     if(!values.actionType)
       return stakingMethods.enterStaking(weiValue).send({ from: account })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx:string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Stake in Bankroll`})
           setOpenStaking(false)
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc: Receipt ) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
           hydrateData()
           getApyData()
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error: any, receipt: Receipt ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
     const isTransfer = values.actionType === 2
     return stakingMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
         setOpenStaking(false)
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         hydrateToken()
         hydrateData()
         getApyData()
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })
@@ -166,7 +167,7 @@ function BankPool( ) {
   },[isApproved, approve, setOpenStaking, addresses.staking])
 
   useEffect( () => {
-    if(isNaN(selectedOption))
+    if(isNaN( Number(selectedOption) ))
       return setOpenStaking(false)
     depositWithdrawClick()
   },[selectedOption, depositWithdrawClick])
@@ -185,7 +186,6 @@ function BankPool( ) {
                 AUTO BITCRUSH V2&nbsp;&nbsp;
                 <InfoTooltip 
                   tooltipProps={{
-                    interactive: true,
                     leaveDelay: 1000,
                     classes: { tooltip: css.tooltip },
                     placement: "top",
@@ -242,11 +242,10 @@ function BankPool( ) {
                     ? <SmBtn  onClick={ () => setSelectedOption(0)}>
                         Stake
                       </SmBtn>
-                    : <Tooltip arrow title={<Typography style={{padding:16}}>Stake</Typography>}>
-                        <Button onClick={ () => setSelectedOption(0)} color="primary" width="100%">
-                          <AddIcon/>
-                        </Button>
-                      </Tooltip>
+                    : 
+                      <Button onClick={ () => setSelectedOption(0)} color="primary" width="100%">
+                        <AddIcon/>
+                      </Button>
                   }
                 </Grid>
               </Tooltip>
@@ -256,11 +255,10 @@ function BankPool( ) {
                       ? <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)} color="secondary">
                           Withdraw
                         </SmBtn>
-                      : <Tooltip arrow title={<Typography style={{padding:16}}>Withdraw</Typography>}>
-                          <Button onClick={ () => setSelectedOption(1)} color="secondary" disabled={!userInfo.staked} width="100%">
-                            <RemoveIcon/>
-                          </Button>
-                        </Tooltip>
+                      : 
+                        <Button onClick={ () => setSelectedOption(1)} color="secondary" disabled={!userInfo.staked} width="100%">
+                          <RemoveIcon/>
+                        </Button>
                     }
                 </Grid>
               </Tooltip>
@@ -320,7 +318,7 @@ function BankPool( ) {
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat(((bankInfo.apyPercent?.b365?.percent )*100), { decimalsToShow: 2 })}%`
+                    `${currencyFormat(((bankInfo?.apyPercent?.b365?.percent || 0 )*100), { decimalsToShow: 2 })}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -333,7 +331,7 @@ function BankPool( ) {
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100, { decimalsToShow: 2})}%`
+                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + (bankInfo?.apyPercent?.b365?.percent || 0) )*100, { decimalsToShow: 2})}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -562,7 +560,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   icnBtn:{
     border: `1px solid ${theme.palette.primary.main}`,
     padding: 8,
-    background: `radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%,${theme.palette.shadow.primary.main} 80%, ${theme.palette.shadow.primary.main} 85%)`
+    background: `radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%,${theme.palette.shadow?.primary.main} 80%, ${theme.palette.shadow?.primary.main} 85%)`
   },
   addIcn:{
     borderTopRightRadius: 0,
@@ -577,7 +575,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     marginBottom: theme.spacing(2),
   },
   frozen:{
-    color: theme.palette.blue.main,
+    color: theme.palette.blue?.main,
   },
   invisibleDivider:{
     height: theme.spacing(2)

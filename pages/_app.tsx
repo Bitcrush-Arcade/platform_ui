@@ -12,7 +12,7 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;
 }
 
-function MyApp(props) {
+function MyApp(props:MyAppProps) {
   const { Component, pageProps, emotionCache = clientSideEmotionCache } = props
   return (<ContextProviders emotionCache={emotionCache}>
       <CssBaseline/>

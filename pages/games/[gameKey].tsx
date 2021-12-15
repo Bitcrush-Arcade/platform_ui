@@ -156,7 +156,11 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
   const { query, res } = context
 
   const { gameKey } = query
-  const keyName = typeof(gameKey) == 'string' ? gameKey : gameKey.join('')
+  const keyName = gameKey && (typeof(gameKey) == 'string' ? gameKey : gameKey.join(''))
+  if(!keyName)
+    return {
+      notFound: true
+    }
   const bitcrushGame = games[keyName]
 
   let otherGame: null | any = null;

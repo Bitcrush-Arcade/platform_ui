@@ -30,6 +30,8 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { useWeb3React } from '@web3-react/core'
 import { useContract } from 'hooks/web3Hooks'
 import { getContracts } from 'data/contracts'
+// Types
+import type { Receipt } from 'types/PromiEvent'
 
 
 const PageContainer = ( props: ContainerProps ) => {
@@ -108,7 +110,7 @@ const PageContainer = ( props: ContainerProps ) => {
     return filteredPending
   },[pending, hiddenPending ])
 
-  const withdrawDetails = (vals) => {
+  const withdrawDetails = () => {
     return timelockInPlace ? <>
           <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
             0.5% early withdraw fee if withdrawn before { differenceFromNow(lwContext.timelock) }.
@@ -167,17 +169,17 @@ const PageContainer = ( props: ContainerProps ) => {
 
 
     const lwSubmit: SubmitFunction = ( values, form ) => {
-      if(!liveWalletMethods) return form.setSubmitting(false)
+      if(!liveWalletMethods || !account) return form.setSubmitting(false)
       const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
       if(!values.actionType){
         return liveWalletMethods.addbet( weiValue )
           .send({ from: account })
-          .on('transactionHash', (tx) => {
+          .on('transactionHash', (tx: string) => {
             console.log('hash', tx )
             editTransactions(tx,'pending', { description: `Add Funds to Live Wallet`})
             toggleLwModal()
           })
-          .on('receipt', ( rc) => {
+          .on('receipt', ( rc: Receipt ) => {
             console.log('receipt',rc)
             editTransactions(rc.transactionHash,'complete')
             fetch('/api/db/deposit',{ 
@@ -193,7 +195,7 @@ const PageContainer = ( props: ContainerProps ) => {
               .catch(e => console.log(e))
             hydrateToken()
           })
-          .on('error', (error, receipt) => {
+          .on('error', (error: any, receipt: Receipt) => {
             console.log('error', error, receipt)
             receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
             hydrateToken()
@@ -241,12 +243,12 @@ const PageContainer = ( props: ContainerProps ) => {
       }
       return liveWalletMethods.withdrawBet( weiValue )
         .send({ from: account })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx: string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Withdraw Funds from LiveWallet`})
           toggleLwModal()
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc: Receipt ) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
@@ -262,7 +264,7 @@ const PageContainer = ( props: ContainerProps ) => {
             .then( c => console.log('response',c))
             .catch(e => console.log(e))
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error: any, receipt: Receipt ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
           hydrateToken()
@@ -282,7 +284,7 @@ const PageContainer = ( props: ContainerProps ) => {
           backgroundSize: '200% auto',
           backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
         },
-        [theme.breakpoints.down(undefined)]:{
+        [theme.breakpoints.down(750)]:{
           backgroundSize: '400% auto',
           backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
         },

@@ -19,6 +19,7 @@ import { useWeb3React } from "@web3-react/core"
 import useCalculator from 'hooks/compounder/useCalculator'
 // Context
 import { useTransactionContext } from "hooks/contextHooks"
+import { Receipt } from "types/PromiEvent";
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
@@ -33,13 +34,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const claim = () => {
     contractMethods.compoundAll().send({ from: account })
-      .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
-      .on('receipt', rct =>{
+      .on('transactionHash', (tx:string) => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
+      .on('receipt', (rct: Receipt) =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
         calculate()
       })
-      .on('error', (error, rct) => {
+      .on('error', (error:any, rct:Receipt) => {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
         calculate()
@@ -116,7 +117,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard:{
-    [theme.breakpoints.down(undefined)]:{
+    [theme.breakpoints.down(888)]:{
       marginTop: theme.spacing(4)
     },
     width: 280,

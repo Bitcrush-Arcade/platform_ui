@@ -97,18 +97,23 @@ function StakeModal( props: StakeModalProps ) {
         const {maxValue: maxUsed, disableAction} = options[actionType]
         const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
         const hasErrors = Object.keys( errors ).length > 0
-        const sliderChange = (e: any, value: number) => {
+        const sliderChange = (e: any, value: number | number[]) => {
+          if(Array.isArray(value)) return
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) )
         }
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
           setFieldValue('stakeAmount', 0 )
-          options[stakeActionValue]?.onSelectOption && options[stakeActionValue]?.onSelectOption()
+
+          const selectedAction = options[stakeActionValue]?.onSelectOption
+          selectedAction && selectedAction()
           onActionSelected && onActionSelected( stakeActionValue )
         }
         const maxUsedAvailable = maxUsed ?? false
         const isMaxAvailable = typeof(maxUsedAvailable) !== 'boolean'
+
+        const doMore = options[actionType]?.more
 
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer } alignItems="center">
@@ -152,7 +157,7 @@ function StakeModal( props: StakeModalProps ) {
                 MAX
               </MButton>,
               className: css.textField,
-              onFocus: e => e.target.select()
+              onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
             }}
           />
           <div className={ css.sliderContainer }>
@@ -187,7 +192,7 @@ function StakeModal( props: StakeModalProps ) {
           }}>
             {`${ needsApprove ? "Approve" : options[actionType].name } ${coinInfo?.symbol}`}
           </Button>
-          {options[actionType]?.more && options[actionType]?.more(values)}
+          {doMore && doMore(values)}
         </Form>)
         }}
       </Formik>
@@ -232,4 +237,4 @@ const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
       </Typography>
     </SliderThumb>
 )}
-const FormComponent = p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>
+const FormComponent = (p:any) => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>
