@@ -79,7 +79,10 @@ function StakeModal( props: StakeModalProps ) {
           stakeAmount: new BigNumber(0),
           actionType: initAction || 0
         }}
-        onSubmit={ (vals, ops) => needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)}
+        onSubmit={ (vals, ops) => {
+          console.log('submits', needsApprove)
+          needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)
+        }}
         validate ={ ( values ) => {
           let errors: any = {}
           const bigValue = new BigNumber(values.stakeAmount)
@@ -92,7 +95,7 @@ function StakeModal( props: StakeModalProps ) {
         }}
         validateOnChange
       >
-      { ({values, setFieldValue, isSubmitting, errors}) =>{
+      { ({values, setFieldValue, isSubmitting, errors, handleSubmit}) =>{
         const { actionType, stakeAmount } = values
         const {maxValue: maxUsed, disableAction} = options[actionType]
         const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
@@ -186,7 +189,8 @@ function StakeModal( props: StakeModalProps ) {
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
             onClick={ e => { 
-              if(!needsApprove) return
+              console.log('click the damn thing', needsApprove)
+              if(!needsApprove) return handleSubmit();
               e.preventDefault()
               onApprove && onApprove()
           }}>

@@ -169,6 +169,7 @@ const PageContainer = ( props: ContainerProps ) => {
 
 
     const lwSubmit: SubmitFunction = ( values, form ) => {
+      console.log('does submit')
       if(!liveWalletMethods || !account) return form.setSubmitting(false)
       const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
       if(!values.actionType){
@@ -194,12 +195,15 @@ const PageContainer = ( props: ContainerProps ) => {
               .then( c => console.log('response',c))
               .catch(e => console.log(e))
             hydrateToken()
+            form.setSubmitting(false)
           })
           .on('error', (error: any, receipt: Receipt) => {
             console.log('error', error, receipt)
             receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
             hydrateToken()
+            form.setSubmitting(false)
           })
+          
       }
       else if(timelockInPlace){
         toggleLwModal()
@@ -237,6 +241,7 @@ const PageContainer = ( props: ContainerProps ) => {
                 )
               }
             })
+            .finally(() => form.setSubmitting(false))
           }
           )
         
@@ -263,11 +268,13 @@ const PageContainer = ( props: ContainerProps ) => {
             .then( r => r.json())
             .then( c => console.log('response',c))
             .catch(e => console.log(e))
+            .finally( () => form.setSubmitting(false))
         })
         .on('error', (error: any, receipt: Receipt ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
           hydrateToken()
+          form.setSubmitting(false)
         })
     }
 

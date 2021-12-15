@@ -131,10 +131,12 @@ function BankPool( ) {
           hydrateToken()
           hydrateData()
           getApyData()
+          setSubmitting(false)
         })
         .on('error', (error: any, receipt: Receipt ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          setSubmitting(false)
         })
     const isTransfer = values.actionType === 2
     return stakingMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
@@ -142,6 +144,7 @@ function BankPool( ) {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
         setOpenStaking(false)
+        setSubmitting(false)
       })
       .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
@@ -149,10 +152,12 @@ function BankPool( ) {
         hydrateToken()
         hydrateData()
         getApyData()
+        setSubmitting(false)
       })
       .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        setSubmitting(false)
       })
   }
 
