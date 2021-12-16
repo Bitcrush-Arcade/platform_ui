@@ -1,18 +1,20 @@
 // Next
 import { useRouter } from 'next/router'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import Container from "@material-ui/core/Container"
-import Divider from "@material-ui/core/Divider"
-import Grid from "@material-ui/core/Grid"
-import IconButton from '@material-ui/core/IconButton'
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemText from "@material-ui/core/ListItemText"
+import { Theme, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Container from "@mui/material/Container"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import IconButton from '@mui/material/IconButton'
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemText from "@mui/material/ListItemText"
 // Icons
-import TelegramIcon from '@material-ui/icons/Telegram';
-import TwitterIcon from '@material-ui/icons/Twitter'
+import TelegramIcon from '@mui/icons-material/Telegram';
+import TwitterIcon from '@mui/icons-material/Twitter'
 // Components
 import Logo from 'components/displays/Logo'
 
@@ -23,7 +25,7 @@ const Footer = () => {
   const isGame = router.basePath.indexOf('games') > -1
   const logoRoute = isGame ? '/games' : '/'
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.down('md') )
   const logoFactor = isSm ? 26 : 18
 
   return <footer className={css.footer} >
@@ -142,6 +144,6 @@ const linkStyles = makeStyles<Theme>(theme => createStyles({
   linkText:{
     fontWeight: 500,
     textTransform: 'uppercase',
-    color: theme.palette.type == 'dark' ? theme.palette.text.secondary : theme.palette.text.primary
+    color: theme.palette.mode == 'dark' ? theme.palette.text.secondary : theme.palette.text.primary
   }
 }))

@@ -4,25 +4,30 @@ import { useRouter } from 'next/router'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // Lodash
 import find from 'lodash/find'
-// Web3
-import { useWeb3React } from '@web3-react/core'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import pink from '@material-ui/core/colors/pink'
-import IconButton from '@material-ui/core/IconButton'
-import LinearProgress from "@material-ui/core/LinearProgress"
-import Grid from '@material-ui/core/Grid'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import IconButton from '@mui/material/IconButton'
+import LinearProgress from "@mui/material/LinearProgress"
+import Grid from '@mui/material/Grid'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 // Icons
-import BackIcon from '@material-ui/icons/PlayCircleFilledOutlined';
+import BackIcon from '@mui/icons-material/PlayCircleFilledOutlined';
 // BITCRUSH
 import PageContainer from 'components/PageContainer'
 import GeneralUseButton from 'components/basics/GeneralUseButton'
 // Utils & Types
 import { GameSession } from 'types/games/session'
 import { dragonEp } from 'utils/servers'
+import { pink } from '@mui/material/colors';
+import { useTransactionContext } from 'hooks/contextHooks'
+// Web3
+import { useWeb3React } from '@web3-react/core'
+import Web3 from 'web3'
 
+const web3 = new Web3(Web3.givenProvider)
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
   const { isBitcrushGame, game } = props
@@ -32,19 +37,33 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   const [ gameSession, setGameSession ] = useState<GameSession | null>( null )
   const [ launchURL, setLaunchURL ] = useState<string | null>( null )
+  const [ errorMessage, setErrorMessage ] = useState<string | null>( null )
 
   useEffect(() => {
     if(!account || !!gameSession || isBitcrushGame || !game) return
-
-    fetch('/api/db/game_session',{
-      method: 'POST',
-      body: JSON.stringify({
-        wallet: account,
-        country: router.query?.country || 'CR'//TODO GET ACTUAL COUNTRY FROM IP ADDRESS
-      })
-    })
-      .then( d => d.json() )
-      .then( sessionData => setGameSession( sessionData ) )
+    const textMsg = `I want to play ${game.game_name} with my account ${account}`
+    const signMessage = web3.utils.toHex(textMsg)
+    web3.eth.personal.sign(signMessage, account, "",
+      (e, signature) => {
+        if(e) 
+          return setErrorMessage('Something went wrong with getting session. Please reload to try again')
+        fetch('/api/db/game_session',{
+          method: 'POST',
+          body: JSON.stringify({
+            wallet: account,
+            country: router.query?.country || 'CR',
+            signed: { msg: textMsg, signature: signature}
+          })
+        })
+          .then( d => d.json() )
+          .then( sessionData => setGameSession( sessionData ) )
+          .catch( e => {
+            console.log(e)
+            setErrorMessage(`Something went wrong getting session, contact a Dev code${e.status}`)
+          })
+      }
+    
+    )
 
   },[account, gameSession, setGameSession, isBitcrushGame, game, router.query])
 
@@ -69,11 +88,12 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
     <PageContainer menuSm={true}>
       <div className={ css.container}>
         {
-          !account || !game ?
+          !account || !game || errorMessage ?
           <>
             <Typography variant="h3" align="center" paragraph>
               {! account && "Please connect your wallet before playing"}
               {! game && "This game doesn't seem to be available, please try another one."}
+              {errorMessage}
             </Typography>
             <Grid container justifyContent="center">
               <Link passHref href="/games">
@@ -131,12 +151,12 @@ const games:{ [key: string] : { url: string, name: string }} = {
 
 const useStyles = makeStyles<Theme>(theme => createStyles({
   iframe:{
-    width: `calc((100vw) - ${theme.spacing(6)}px)`,
+    width: `calc((100vw) - ${theme.spacing(6)})`,
     height: 'calc(100vh)',
     border: 'none',
   },
   container:{
-    maxWidth: `calc( 100vw - ${theme.spacing(6)}px )`,
+    maxWidth: `calc( 100vw - ${theme.spacing(6)} )`,
     position: 'relative',
   },
   closeContainer:{
@@ -154,7 +174,11 @@ export const getServerSideProps: GetServerSideProps = async( context ) => {
   const { query, res } = context
 
   const { gameKey } = query
-  const keyName = typeof(gameKey) == 'string' ? gameKey : gameKey.join('')
+  const keyName = gameKey && (typeof(gameKey) == 'string' ? gameKey : gameKey.join(''))
+  if(!keyName)
+    return {
+      notFound: true
+    }
   const bitcrushGame = games[keyName]
 
   let otherGame: null | any = null;

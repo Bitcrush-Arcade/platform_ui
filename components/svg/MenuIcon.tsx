@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const MenuIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 31 31" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <path d="M0,5H5V0H0ZM13,5h5V0H13ZM26,0V5h5V0ZM0,18H5V13H0Zm13,0h5V13H13Zm13,0h5V13H26ZM0,31H5V26H0Zm13,0h5V26H13Zm13,0h5V26H26Z"/>

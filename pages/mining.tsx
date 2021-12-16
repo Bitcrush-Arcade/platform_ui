@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 // Next
 import Head from 'next/head'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Switch from '@material-ui/core/Switch'
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
+import Switch from '@mui/material/Switch'
 // Bitcrush
 import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import PageContainer from 'components/PageContainer'
@@ -33,8 +35,15 @@ const Mining = () => {
       <title>BITCRUSH - MINING</title>
       <meta name="description" content="Mine CRUSH to your heart's content. Keep a look for more Pools to stake on soon"/>
     </Head>
-    <Grid container justifyContent="space-evenly" className={ css.topSection }>
-      <Grid item xs={10} sm={8} md={6}>
+    <Grid container justifyContent="space-evenly"
+      sx={ theme => ({
+        mt: 0,
+        [theme.breakpoints.down('md')]:{
+          mt: theme.spacing(4)
+        }
+      })}
+    >
+      <Grid item xs={10} sm={8} md={6} >
         <Descriptor
           title="Galactic Mining"
           description={`Stake CRUSH to earn APY as well as a share of the House Profit Distribution.
@@ -45,10 +54,10 @@ const Mining = () => {
           All you need to do it press the Claim button, and watch the rewards compound for everyone staked in the pool.`}
         />
       </Grid>
-      <Grid item>
+      <Grid item sx={{ pt: { xs: 4, md: 0 }}}>
         <CompoundingCardv2/>
       </Grid>
-      <Grid item xs={12}>
+      <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool/>
       </Grid>
     </Grid>
@@ -102,12 +111,6 @@ const useStyles = makeStyles<Theme, {}>( (theme) => createStyles({
   section:{
     marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4)
-  },
-  topSection:{
-    marginTop: 0,
-    [theme.breakpoints.down('sm')]:{
-      marginTop: theme.spacing(4)
-    },
   },
   
 }))

@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const TradeIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 19.76 20" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <path d="M6.49,19.36a7.55,7.55,0,0,0,7.13-.56,14.07,14.07,0,0,1-1.94-.23A16.38,16.38,0,0,1,9.51,18a20.35,20.35,0,0,1-4.09-1.78A17.72,17.72,0,0,1,3.55,15a16.37,16.37,0,0,1-1.49-1.27A7.57,7.57,0,0,0,6.49,19.36Z"/>

@@ -1,54 +1,40 @@
 // Material
-import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles'
-import Fab, {FabProps} from '@material-ui/core/Fab'
-// Libs
-import { styledBy } from 'utils/styles/styling'
+import Fab, {FabProps} from '@mui/material/Fab'
+import { styled } from '@mui/system'
 
-export type FabStyles ={
+type FabBasicProps = {
   width?: string | number,
   href?: string,
   target?: string,
   background?: 'default' | 'primary' | 'secondary',
   solidDisabledText?: boolean,
-} & WithStyles< typeof styles > & FabProps
+} & FabProps
 
-
-const styles = (theme:Theme) => createStyles({
-  root:{
-    width: (props : FabStyles) => props.width || null,
-    backgroundColor: styledBy('background',{
-      default: 'transparent',
-      primary: theme.palette.primary.dark,
-      secondary: theme.palette.secondary.dark
-    }),
-    borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].main,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    boxShadow: styledBy('color', {
-      default: `inset 0 0 15px ${theme.palette.shadow.primary.main}`,
-      primary: `inset 0 0 15px ${theme.palette.shadow.primary.main}`,
-      secondary:`inset 0 0 15px rgba(29, 233, 182,0.65)`
-    }),
-    color: theme.palette.type == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
-    '&:hover':{
-      color: props => !props.color ? theme.palette.common.black : theme.palette.grey[200],
-    }
+const BasicButton = styled( Fab ,{
+  shouldForwardProp: prop => prop !== 'width' && prop !== 'background' && prop !== 'solidDisabledText'
+})<FabBasicProps>( ({ theme, width, color, background, solidDisabledText}) => ({
+  width: width || undefined,
+  borderColor: theme.palette[ color || 'primary'].main,
+  background: background === 'primary' && theme.palette.primary.dark || background === 'secondary' && theme.palette.secondary.dark || 'transparent',
+  borderWidth: 1,
+  borderStyle: 'solid',
+  boxShadow: `inset 0 0 15px ${ color == "secondary" && "rgba(29,233,182,0.65)" || theme.palette.shadow?.primary.main}`,
+  color: theme.palette.mode == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+  "&:hover":{
+    color: color ? theme.palette.common.black : theme.palette.grey[200],
   },
-  disabled:{
+  "&.Mui-disabled":{
     backgroundColor: 'transparent !important',
-    color:  props => (props.solidDisabledText && theme.palette.type == 'light') ? `${theme.palette.grey[600]} !important` : `${theme.palette.grey[200]} !important`,
-    boxShadow: (props : FabStyles) => `inset 0 0 15px ${theme.palette[props.color || 'primary'].dark} !important`,
-    borderColor: (props : FabStyles) => theme.palette[props.color || 'primary'].dark,
+    color: theme.palette.grey[ (solidDisabledText && theme.palette.mode == 'light') ? 800 : 200 ],
+    boxShadow: `inset 0 0 15px ${theme.palette[color || 'primary'].dark} !important`,
+    borderColor: theme.palette[color || 'primary'].dark,
   },
-  sizeSmall:{
-    width: (props : FabStyles) => props.width && (typeof(props.width) == 'string' ? props.width : `${props.width}px`) + ' !important' || null,
+  "&.MuiFab-sizeSmall":{
+    width: width && (typeof(width) == 'string' ? width : `${width}px`) + ' !important' || null,
   },
-  extended:{
-    width: (props : FabStyles) => props.width && (typeof(props.width) == 'string' ? props.width : `${props.width}px`) + ' !important' || null,
-  }
-})
+  "&.MuiFab-extended":{
+    width: width && (typeof(width) == 'string' ? width : `${width}px`) + ' !important' || null,
+  },
+}))
 
-export default withStyles(styles)( (props: FabStyles) => {
-  const { solidDisabledText, ...others } = props
-  return <Fab {...others} variant={props.variant || "extended"} component={ props.href ? 'a' : 'button' } target={props.target} />
-})
+export default BasicButton

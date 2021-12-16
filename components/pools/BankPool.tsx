@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import format from 'date-fns/format'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
-import useMediaQuery from '@material-ui/core/useMediaQuery'
-import Avatar from "@material-ui/core/Avatar"
-import Divider from "@material-ui/core/Divider"
-import Grid from "@material-ui/core/Grid"
-import IconButton from '@material-ui/core/IconButton'
-import Tooltip from "@material-ui/core/Tooltip"
-import Typography from "@material-ui/core/Typography"
-import Skeleton from '@material-ui/lab/Skeleton'
+import { Theme, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from '@mui/material/useMediaQuery'
+import Avatar from "@mui/material/Avatar"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import IconButton from '@mui/material/IconButton'
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
+import Skeleton from '@mui/material/Skeleton'
 // Bitcrush
 import Button from "components/basics/GeneralUseButton"
 import Card from "components/basics/Card"
@@ -25,17 +27,18 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { currencyFormat } from 'utils/text/text'
 // Icons
 import CalculationIcon from 'components/svg/CalculationIcon'
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import InvaderIcon from "components/svg/InvaderIcon"
-import RefreshIcon from '@material-ui/icons/Refresh'
-import AddIcon from '@material-ui/icons/Add';
-import RemoveIcon from '@material-ui/icons/Remove';
-import SwapHorizIcon from '@material-ui/icons/SwapHoriz';
+import RefreshIcon from '@mui/icons-material/Refresh'
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 // Libs
 import { bankStakingInfo, launcherTooltip } from 'data/texts'
 import { toWei } from 'web3-utils'
 import BigNumber from 'bignumber.js'
 import { useWeb3React } from '@web3-react/core'
+import { Receipt } from 'types/PromiEvent';
 
 function BankPool( ) {
   const css = useStyles()
@@ -44,7 +47,7 @@ function BankPool( ) {
   const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.down('md') )
   useEffect( () => {
     if(!getApyData) return
     const interval = setInterval( () => getApyData(), 30000)
@@ -117,39 +120,44 @@ function BankPool( ) {
     if(!stakingMethods) return setSubmitting(false)
     if(!values.actionType)
       return stakingMethods.enterStaking(weiValue).send({ from: account })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx:string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Stake in Bankroll`})
           setOpenStaking(false)
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc: Receipt ) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           hydrateToken()
           hydrateData()
           getApyData()
+          setSubmitting(false)
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error: any, receipt: Receipt ) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          setSubmitting(false)
         })
     const isTransfer = values.actionType === 2
     return stakingMethods.leaveStaking(weiValue, isTransfer).send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: isTransfer ? 'Transfer to LiveWallet' :`Withdraw from BankRoll`})
         setOpenStaking(false)
+        setSubmitting(false)
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         hydrateToken()
         hydrateData()
         getApyData()
+        setSubmitting(false)
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        setSubmitting(false)
       })
   }
 
@@ -164,7 +172,7 @@ function BankPool( ) {
   },[isApproved, approve, setOpenStaking, addresses.staking])
 
   useEffect( () => {
-    if(isNaN(selectedOption))
+    if(isNaN( Number(selectedOption) ))
       return setOpenStaking(false)
     depositWithdrawClick()
   },[selectedOption, depositWithdrawClick])
@@ -183,7 +191,6 @@ function BankPool( ) {
                 AUTO BITCRUSH V2&nbsp;&nbsp;
                 <InfoTooltip 
                   tooltipProps={{
-                    interactive: true,
                     leaveDelay: 1000,
                     classes: { tooltip: css.tooltip },
                     placement: "top",
@@ -240,11 +247,10 @@ function BankPool( ) {
                     ? <SmBtn  onClick={ () => setSelectedOption(0)}>
                         Stake
                       </SmBtn>
-                    : <Tooltip arrow title={<Typography style={{padding:16}}>Stake</Typography>}>
-                        <Button onClick={ () => setSelectedOption(0)} color="primary" width="100%">
-                          <AddIcon/>
-                        </Button>
-                      </Tooltip>
+                    : 
+                      <Button onClick={ () => setSelectedOption(0)} color="primary" width="100%">
+                        <AddIcon/>
+                      </Button>
                   }
                 </Grid>
               </Tooltip>
@@ -254,11 +260,10 @@ function BankPool( ) {
                       ? <SmBtn disabled={!userInfo.staked} onClick={ () => setSelectedOption(1)} color="secondary">
                           Withdraw
                         </SmBtn>
-                      : <Tooltip arrow title={<Typography style={{padding:16}}>Withdraw</Typography>}>
-                          <Button onClick={ () => setSelectedOption(1)} color="secondary" disabled={!userInfo.staked} width="100%">
-                            <RemoveIcon/>
-                          </Button>
-                        </Tooltip>
+                      : 
+                        <Button onClick={ () => setSelectedOption(1)} color="secondary" disabled={!userInfo.staked} width="100%">
+                          <RemoveIcon/>
+                        </Button>
                     }
                 </Grid>
               </Tooltip>
@@ -318,7 +323,7 @@ function BankPool( ) {
               </Typography>
               <Typography color="primary" variant="h6" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat(((bankInfo.apyPercent?.b365?.percent )*100), { decimalsToShow: 2 })}%`
+                    `${currencyFormat(((bankInfo?.apyPercent?.b365?.percent || 0 )*100), { decimalsToShow: 2 })}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -331,7 +336,7 @@ function BankPool( ) {
             <Grid item>
               <Typography color="secondary" variant="h4" component="div">
                   { bankInfo.apyPercent ? 
-                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + bankInfo.apyPercent?.b365?.percent )*100, { decimalsToShow: 2})}%`
+                    `${currencyFormat((bankInfo.apyPercent?.d365?.percent + (bankInfo?.apyPercent?.b365?.percent || 0) )*100, { decimalsToShow: 2})}%`
                     : <Skeleton/>
                   }
               </Typography>
@@ -548,7 +553,6 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     },
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: theme.spacing(4),
     marginBottom: theme.spacing(4),
     padding: theme.spacing(2),
   },
@@ -561,7 +565,7 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
   icnBtn:{
     border: `1px solid ${theme.palette.primary.main}`,
     padding: 8,
-    background: `radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%,${theme.palette.shadow.primary.main} 80%, ${theme.palette.shadow.primary.main} 85%)`
+    background: `radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 30%,${theme.palette.shadow?.primary.main} 80%, ${theme.palette.shadow?.primary.main} 85%)`
   },
   addIcn:{
     borderTopRightRadius: 0,
@@ -576,20 +580,20 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     marginBottom: theme.spacing(2),
   },
   frozen:{
-    color: theme.palette.blue.main,
+    color: theme.palette.blue?.main,
   },
   invisibleDivider:{
     height: theme.spacing(2)
   },
   secondQuadrant:{
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       marginTop: theme.spacing(2)
     }
   },
   coinText:{
     fontFamily: 'Zebulon',
     letterSpacing: 2,
-    [theme.breakpoints.down('md')]:{
+    [theme.breakpoints.down('lg')]:{
       fontSize: theme.typography.body1.fontSize
     }
   },

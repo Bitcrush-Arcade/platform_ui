@@ -1,7 +1,7 @@
-import Tooltip, {TooltipProps} from '@material-ui/core/Tooltip'
-import { SvgIconProps } from '@material-ui/core/SvgIcon';
+import Tooltip, {TooltipProps} from '@mui/material/Tooltip'
+import { SvgIconProps } from '@mui/material/SvgIcon';
 // Icon
-import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 type InfoProps ={
   info: TooltipProps['title'],

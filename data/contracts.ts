@@ -84,7 +84,9 @@ export const contracts : { [key: string] : ContractSelect} = {
 
 }
 
-export const getContracts = (contract: string, chainId: number ): { address: string, abi: AbiItem } => {
+export const getContracts = (contract: string, chainId?: number ): { address: string, abi: AbiItem | null } => {
+  if(!chainId)
+    return{ address: '', abi: null}
   const data = contracts[contract][chainId]
   return {
     address: data?.address || '',

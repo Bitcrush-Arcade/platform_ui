@@ -21,7 +21,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
     return res.status(400).send({ message: 'Invalid Request'})
 
   const host = req.headers.host
-  const isLocal = host.indexOf('localhost:') > -1
+  const isLocal = (host||'').indexOf('localhost:') > -1
 
   const lock = await fetch(`http${isLocal ? '' : 's'}://${host}/api/db/play_timelock_active`,{
     method: 'POST',
@@ -39,11 +39,13 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   const provider =  chain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s3.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const setup = getContracts('liveWallet', chain )
+  if(!setup.abi)
+    return res.status(400).json({ error: 'No abi for contract'})
   const contract = await new web3.eth.Contract( setup.abi, setup.address )
   // START BALANCE
   const ogBalance = await contract.methods.betAmounts(account).call()
   const lockDuration = await contract.methods.lockPeriod().call()
-  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV ]}/api/users/wallet/${account}`,{
+  const serverBalance = await fetch(`${servers[ process.env.NODE_ENV === "production" ? "production" : "development" ]}/api/users/wallet/${account}`,{
     headers:{
       origin: "http://localhost:3000"
     }
@@ -66,7 +68,7 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   }
 
   // Authorize Owner
-  const ownerAccount = await web3.eth.accounts.privateKeyToAccount( process.env.OWNER_PKEY)
+  const ownerAccount = await web3.eth.accounts.privateKeyToAccount( process.env.OWNER_PKEY || '' )
   const txData = await contract.methods.withdrawBetForUser(amount, account).encodeABI()
   const signedTx = await ownerAccount.signTransaction({
     to: setup.address,
@@ -75,8 +77,9 @@ export default async function withdrawForUser( req: NextApiRequest, res: NextApi
   })
 
   let hashSent = false
-
-    return web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+  if(!signedTx.rawTransaction)
+    return res.status(400).json({ error: 'no transaction to sign'})
+  return web3.eth.sendSignedTransaction(signedTx.rawTransaction)
     .on( 'transactionHash', tx => {
       logger.info({logdata, tx},"success in creating hash")
       res.status(200).send({ txHash: tx})

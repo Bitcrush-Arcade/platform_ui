@@ -12,13 +12,13 @@ type CurrencyProps = {
 
 const Currency = (props: CurrencyProps) => {
   const { value, decimals, isWei} = props
-  const filter = isWei ? new BigNumber(value).div(10**18).toString() : value
+  const filter = isWei ? new BigNumber(value).div(10**18).toString() : value.toString()
   return <AnimatedNumber
     value={filter}
     formatValue={
-      val => currencyFormat(val, { decimalsToShow: decimals })
+      (val:number) => currencyFormat(val, { decimalsToShow: decimals })
     }
   />
 }
 
-export default Currency
+export default Currency 

@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const RocketIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 25 25" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <path d="M23.75.21,22.23,1.73a15.59,15.59,0,0,0-7.18.61L22.66,10a15.59,15.59,0,0,0,.61-7.18l1.52-1.52a.75.75,0,0,0,0-1,.75.75,0,0,0-1,0Z"/>

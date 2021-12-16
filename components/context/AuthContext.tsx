@@ -1,15 +1,15 @@
 // React
 import { createContext, ReactNode, useState } from "react"
 // Material
-import Avatar from "@material-ui/core/Avatar"
-import Dialog from "@material-ui/core/Dialog"
-import DialogContent from "@material-ui/core/DialogContent"
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemAvatar from "@material-ui/core/ListItemAvatar"
-import ListItemText from "@material-ui/core/ListItemText"
+import Avatar from "@mui/material/Avatar"
+import Dialog from "@mui/material/Dialog"
+import DialogContent from "@mui/material/DialogContent"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemAvatar from "@mui/material/ListItemAvatar"
+import ListItemText from "@mui/material/ListItemText"
 // Material Icons
-import WalletIcon from '@material-ui/icons/AccountBalanceWallet'
+import WalletIcon from '@mui/icons-material/AccountBalanceWallet'
 // Bitcrush
 import Card from 'components/basics/Card'
 // hooks
@@ -20,7 +20,7 @@ import wallets from 'data/wallets'
 type AuthContextType = {
   login: () => void,
   logout: () => void,
-  account?: string,
+  account?: string | null,
   chainId?: number,
 }
 
@@ -69,7 +69,7 @@ export const AuthContext = (props: { children: ReactNode }) => {
   }
 
   return <Context.Provider value={{ login: checkLogin, logout, account, chainId }}>
-    <Dialog open={openDialog} PaperComponent={ paperProps => <Card {...paperProps} />} onClose={() => setOpenDialog(false)}>
+    <Dialog open={openDialog} PaperComponent={ paperProps => { const {sx, ...others} = paperProps; return<Card {...others} />}} onClose={() => setOpenDialog(false)}>
       <DialogContent>
         <List>
           <ListItem>

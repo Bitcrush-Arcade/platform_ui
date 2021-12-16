@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const NightIcon = ( props: SvgIconProps ) => 
 <SvgIcon {...props} viewBox="0 0 21 21" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">

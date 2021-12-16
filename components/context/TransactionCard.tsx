@@ -1,16 +1,18 @@
 import { useMemo } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import IconButton from '@material-ui/core/IconButton'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Grid from "@material-ui/core/Grid"
-import Tooltip from "@material-ui/core/Tooltip"
-import Typography from "@material-ui/core/Typography"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import IconButton from '@mui/material/IconButton'
+import CircularProgress from '@mui/material/CircularProgress'
+import Grid from "@mui/material/Grid"
+import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
 // Icons
-import CheckIcon from '@material-ui/icons/CheckCircleOutline';
-import ErrorIcon from '@material-ui/icons/ErrorOutline'
-import LaunchIcon from '@material-ui/icons/Launch'
-import HighlightOffIcon from '@material-ui/icons/HighlightOff'
+import CheckIcon from '@mui/icons-material/CheckCircleOutline';
+import ErrorIcon from '@mui/icons-material/ErrorOutline'
+import LaunchIcon from '@mui/icons-material/Launch'
+import HighlightOffIcon from '@mui/icons-material/HighlightOff'
 // Bitcrush
 import Card from 'components/basics/Card'
 // libs
@@ -55,7 +57,7 @@ export default function TxCard( props: TxCardProps ){
         </a>}
       </Grid>
       <Grid item>
-        <IconButton size="small" onClick={() => onClose(keys[0])}>
+        <IconButton size="small" onClick={() => onClose && onClose(keys[0])}>
           <HighlightOffIcon className={ css.closeIcon } />
         </IconButton>
       </Grid>

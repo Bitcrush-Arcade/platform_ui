@@ -86,8 +86,8 @@ export const CONNECTORS: {[connector in ConnectorNames]: any } = {
   "injected": new InjectedConnector({ supportedChainIds: validChains}),
   "walletConnect" : new WalletConnectConnector({
     rpc: { 
-      56: getRpcUrl(56),
-      97: getRpcUrl(97)
+      56: getRpcUrl(56) || '',
+      97: getRpcUrl(97) || ''
     },
     qrcode: true,
     pollingInterval: POLLING_INTERVAL
