@@ -4,8 +4,6 @@ import { useRouter } from 'next/router'
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 // Lodash
 import find from 'lodash/find'
-// Web3
-import { useWeb3React } from '@web3-react/core'
 // Material
 import { Theme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -24,7 +22,12 @@ import GeneralUseButton from 'components/basics/GeneralUseButton'
 import { GameSession } from 'types/games/session'
 import { dragonEp } from 'utils/servers'
 import { pink } from '@mui/material/colors';
+import { useTransactionContext } from 'hooks/contextHooks'
+// Web3
+import { useWeb3React } from '@web3-react/core'
+import Web3 from 'web3'
 
+const web3 = new Web3(Web3.givenProvider)
 
 function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
   const { isBitcrushGame, game } = props
@@ -34,19 +37,33 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
 
   const [ gameSession, setGameSession ] = useState<GameSession | null>( null )
   const [ launchURL, setLaunchURL ] = useState<string | null>( null )
+  const [ errorMessage, setErrorMessage ] = useState<string | null>( null )
 
   useEffect(() => {
     if(!account || !!gameSession || isBitcrushGame || !game) return
-
-    fetch('/api/db/game_session',{
-      method: 'POST',
-      body: JSON.stringify({
-        wallet: account,
-        country: router.query?.country || 'CR'//TODO GET ACTUAL COUNTRY FROM IP ADDRESS
-      })
-    })
-      .then( d => d.json() )
-      .then( sessionData => setGameSession( sessionData ) )
+    const textMsg = `I want to play ${game.game_name} with my account ${account}`
+    const signMessage = web3.utils.toHex(textMsg)
+    web3.eth.personal.sign(signMessage, account, "",
+      (e, signature) => {
+        if(e) 
+          return setErrorMessage('Something went wrong with getting session. Please reload to try again')
+        fetch('/api/db/game_session',{
+          method: 'POST',
+          body: JSON.stringify({
+            wallet: account,
+            country: router.query?.country || 'CR',
+            signed: { msg: textMsg, signature: signature}
+          })
+        })
+          .then( d => d.json() )
+          .then( sessionData => setGameSession( sessionData ) )
+          .catch( e => {
+            console.log(e)
+            setErrorMessage(`Something went wrong getting session, contact a Dev code${e.status}`)
+          })
+      }
+    
+    )
 
   },[account, gameSession, setGameSession, isBitcrushGame, game, router.query])
 
@@ -71,11 +88,12 @@ function Game( props: InferGetServerSidePropsType<typeof getServerSideProps> ) {
     <PageContainer menuSm={true}>
       <div className={ css.container}>
         {
-          !account || !game ?
+          !account || !game || errorMessage ?
           <>
             <Typography variant="h3" align="center" paragraph>
               {! account && "Please connect your wallet before playing"}
               {! game && "This game doesn't seem to be available, please try another one."}
+              {errorMessage}
             </Typography>
             <Grid container justifyContent="center">
               <Link passHref href="/games">
