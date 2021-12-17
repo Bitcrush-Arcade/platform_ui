@@ -3,7 +3,7 @@ const highlightedAnnouncements : Array<Announcement> = [
     name: 'Beefy Partnership',
     img: '/assets/announcements/6-beefy-banner.png',
     imgMobile: '/assets/announcements/6-beefy-mobile.png',
-    link: 'https://app.knightswap.financial/farms',
+    link: 'https://app.beefy.finance/',
     target: "_blank",
     rel: "noopener nonreferrer",
   },
