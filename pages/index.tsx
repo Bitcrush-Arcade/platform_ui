@@ -105,11 +105,11 @@ export default function Home() {
   /**
    * @description This helps for announcemnts that have special effects internally.
    */
-  const clickAnnouncement = (name: string) => {
+  const clickAnnouncement = useCallback((name: string) => {
     console.log('annoucement', name)
-  }
+  },[])
 
-  const announcements = highlightedAnnouncements.map( (annoucement, aIndex) => {
+  const announcements = useMemo( () => highlightedAnnouncements.map( (annoucement, aIndex) => {
     const { name, img, imgMobile, link, target, rel } = annoucement
     const externalLink = link.indexOf('/') !== 0
 
@@ -134,7 +134,7 @@ export default function Home() {
           {mainImg}
         </Link>
       : mainImg
-  })
+  }), [highlightedAnnouncements, clickAnnouncement])
 
   return (<>
   <Head>
@@ -229,7 +229,7 @@ export default function Home() {
             </Card>
             {/* Announcement Card */}
             <section style={{ marginTop: 24, width: '100%' }}>
-              <Carousel animation="slide" interval={5000} stopAutoPlayOnHover navButtonsAlwaysVisible>
+              <Carousel>
                 {announcements}
               </Carousel>
             </section>
@@ -411,14 +411,14 @@ const partners: PartnerData[] = [
     logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
   },
-  // {
-  //   name: 'PearZap',
-  //   href: 'https://bsc.pearzap.com/the-garden',
-  //   width: 272,
-  //   height: 272,
-  //   logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
-  //   factor: 4
-  // },
+  {
+    name: 'Beefy Finance',
+    href: 'https://app.beefy.finance/#/bsc',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/beefy.png',
+    factor: 4
+  },
   {
     name: 'Dragon Gaming',
     href: '/games',

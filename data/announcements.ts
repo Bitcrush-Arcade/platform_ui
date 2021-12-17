@@ -1,15 +1,11 @@
 const highlightedAnnouncements : Array<Announcement> = [
   {
-    name: 'Live Now',
-    img: '/assets/announcements/1-live-now-banner.png',
-    imgMobile: '/assets/announcements/1-live-now-mobile.png',
-    link: '/games',
-  },
-  {
-    name: 'Staking 2.0',
-    img: '/assets/announcements/2-stake-v2-banner.png',
-    imgMobile: '/assets/announcements/2-stake-v2-mobile.png',
-    link: '/mining',
+    name: 'Beefy Partnership',
+    img: '/assets/announcements/6-beefy-banner.png',
+    imgMobile: '/assets/announcements/6-beefy-mobile.png',
+    link: 'https://app.knightswap.financial/farms',
+    target: "_blank",
+    rel: "noopener nonreferrer",
   },
   {
     name: 'Knightswap Partnership',
@@ -26,6 +22,18 @@ const highlightedAnnouncements : Array<Announcement> = [
     link: 'https://block-mine.io/pools',
     target: "_blank",
     rel: "noopener nonreferrer",
+  },
+  {
+    name: 'Live Now',
+    img: '/assets/announcements/1-live-now-banner.png',
+    imgMobile: '/assets/announcements/1-live-now-mobile.png',
+    link: '/games',
+  },
+  {
+    name: 'Staking 2.0',
+    img: '/assets/announcements/2-stake-v2-banner.png',
+    imgMobile: '/assets/announcements/2-stake-v2-mobile.png',
+    link: '/mining',
   },
 ]
 
