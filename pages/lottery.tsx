@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography'
 // Bitcrush
 import PageContainer from 'components/PageContainer'
 import SummaryCard from 'components/lottery/SummaryCard'
+import LotteryHistory from 'components/lottery/LotteryHistory'
 
 const Trade = () => {
   return <PageContainer>
@@ -13,6 +14,7 @@ const Trade = () => {
       <meta name="description" content="Lottery Coming Soon"/>
     </Head>
     <SummaryCard/>
+    <LotteryHistory/>
   </PageContainer>
 }
 
