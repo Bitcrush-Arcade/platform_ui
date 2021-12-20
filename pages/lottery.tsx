@@ -1,11 +1,11 @@
 // Next
 import Head from 'next/head'
 // Material
-import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Grid'
 // Bitcrush
+import LotteryHistory from 'components/lottery/LotteryHistory'
 import PageContainer from 'components/PageContainer'
 import SummaryCard from 'components/lottery/SummaryCard'
-import LotteryHistory from 'components/lottery/LotteryHistory'
 
 const Trade = () => {
   return <PageContainer>
@@ -14,7 +14,11 @@ const Trade = () => {
       <meta name="description" content="Lottery Coming Soon"/>
     </Head>
     <SummaryCard/>
-    <LotteryHistory/>
+    <Grid container>
+      <Grid item xs={10} md={6}>
+        <LotteryHistory/>
+      </Grid>
+    </Grid>
   </PageContainer>
 }
 
