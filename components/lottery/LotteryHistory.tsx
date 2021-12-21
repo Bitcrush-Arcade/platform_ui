@@ -1,35 +1,59 @@
 import { useState } from 'react'
 // Material
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 //Bitcrush UI
-import Card from 'components/basics/Card'
-import History from 'components/lottery/LotteryViews/History'
-import Current from 'components/lottery/LotteryViews/Current'
+import BasicButton from 'components/basics/GeneralUseButton';
+import Card from 'components/basics/Card';
+import History from 'components/lottery/LotteryViews/History';
+import Current from 'components/lottery/LotteryViews/Current';
+
+
 
 
 const LotteryHistory = () => {
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
+    const roundsPerPage = 4
 
-    const shownHistoryRounds = testHistoryArray.slice(selectedPage * 5, selectedPage*5 + 5 )
+    const shownHistoryRounds = testHistoryArray.slice(selectedPage * roundsPerPage, (selectedPage + 1)*roundsPerPage)
     const selectTab = ( e:React.SyntheticEvent, v: number) =>{
         setTabSelected(v)
     }
 
     return <>
-    {/*Tab changer*/}
-    <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
-        <Tab label={<Typography variant="body1">CURRENT</Typography>}/>
-        <Tab label={<Typography variant="body1">HISTORY</Typography>}/>
+    
+    <Grid container justifyContent="space-between" alignItems="flex-end">
+        <Grid item sx={{pl:2.5}}>
+            
+                {/*Tab changer*/}
+                <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
+                    <Tab label={<Typography variant="body1">CURRENT</Typography>}/>
+                    <Tab label={<Typography variant="body1">HISTORY</Typography>}/>
+                    
+                </Tabs>
+        </Grid>
+
+        <Grid item sx={{pb:1, pr:1}}>
+            <BasicButton background="primary">BUY MORE</BasicButton>
+        </Grid>
+         
+    </Grid>
         
-    </Tabs>
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current/>}
-        {tabSelected == 1 && <History rounds={shownHistoryRounds}  totalRounds={testHistoryArray.length} currentPageView={selectedPage} onPagination={(p) => setSelectedPage(p)}/>}
+        {tabSelected == 1 && 
+            <History rounds={shownHistoryRounds}
+                totalRounds={testHistoryArray.length} 
+                currentPageView={selectedPage} 
+                onPagination={(p) => setSelectedPage(p)}
+                rowsPerPage={roundsPerPage}
+            />
+        }
     </Card>
     </>
 }
