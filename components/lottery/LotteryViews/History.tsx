@@ -28,24 +28,32 @@ type HistoryViewProps = {
 {/* History table props and formatting */}
 const History = (props: HistoryViewProps) => {
   const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage, onRoundView } = props
-  
+
+  {/*Creating filler array to fill missing rows*/}
   const filler = new Array(rowsPerPage-rounds.length).fill({id: '', date: '-', totalTickets: '', userTickets: ''})
 
-  const tablerows = (rounds.concat(filler)).map( (roundInfo, index) => {
+  {/*History table rows data formatting*/}
+  const tableRows = (rounds.concat(filler)).map( (roundInfo, index) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
-      <TableCell>{ typeof(roundInfo.date) == 'string' ? roundInfo.date : format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
+      <TableCell>
+        { typeof(roundInfo.date) == 'string' ? roundInfo.date : format(roundInfo.date, 'MMMM dd-yyyy')}
+      </TableCell>
       <TableCell align ="right">{roundInfo.totalTickets}</TableCell>
       <TableCell align ="right">
         {roundInfo.userTickets}
         { roundInfo.userTickets && roundInfo.userTickets > 0 &&
-          <IconButton color="primary" onClick={() => onRoundView(roundInfo.id)}>
+            
+            <IconButton color="primary" onClick={() => onRoundView(roundInfo.id)}>
             <RemoveRedEyeIcon />
           </IconButton>
         }
       </TableCell>
     </TableRow>
   })
+
+
+  {/*Building the table with header*/}
   return <Table>
     <TableHead>
       <TableRow>
@@ -56,14 +64,10 @@ const History = (props: HistoryViewProps) => {
         </TableRow>
     </TableHead>
     <TableBody>
-      {tablerows}
+      {tableRows}
       <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
     </TableBody>
   </Table>
 }
-
-// onClick: (event: React.MouseEvent<HTMLDivElement>) => void
-// const testFn = () => { does something } <== () => void
-// onClick={testFn}
 
 export default History
