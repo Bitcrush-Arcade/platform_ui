@@ -27,7 +27,6 @@ const History = (props: HistoryViewProps) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
       <TableCell>{format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
-      {/*<TableCell>{format(roundInfo.date, 'yyyy-MM-dd')}</TableCell>*/}
       <TableCell>{roundInfo.totalTickets}</TableCell>
       <TableCell>{roundInfo.userTickets}</TableCell>
     </TableRow>
