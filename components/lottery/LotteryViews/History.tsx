@@ -20,24 +20,29 @@ type HistoryViewProps = {
   }>,
   totalRounds: number,
   currentPageView: number,
-  onPagination: (newPAage: number) => void,
+  onPagination: (newPage: number) => void,
   rowsPerPage:number,
+  onRoundView:(roundId: number) => void,
 }
 
 {/* History table props and formatting */}
 const History = (props: HistoryViewProps) => {
-  const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage } = props
+  const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage, onRoundView } = props
   
-  const tablerows = (rounds||[]).map( (roundInfo, index) => {
+  const filler = new Array(rowsPerPage-rounds.length).fill({id: '', date: '-', totalTickets: '', userTickets: ''})
+
+  const tablerows = (rounds.concat(filler)).map( (roundInfo, index) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
-      <TableCell>{format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
+      <TableCell>{ typeof(roundInfo.date) == 'string' ? roundInfo.date : format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
       <TableCell align ="right">{roundInfo.totalTickets}</TableCell>
       <TableCell align ="right">
         {roundInfo.userTickets}
-        <IconButton color="primary">
-          <RemoveRedEyeIcon />
-        </IconButton>
+        { roundInfo.userTickets && roundInfo.userTickets > 0 &&
+          <IconButton color="primary" onClick={() => onRoundView(roundInfo.id)}>
+            <RemoveRedEyeIcon />
+          </IconButton>
+        }
       </TableCell>
     </TableRow>
   })
@@ -56,5 +61,9 @@ const History = (props: HistoryViewProps) => {
     </TableBody>
   </Table>
 }
+
+// onClick: (event: React.MouseEvent<HTMLDivElement>) => void
+// const testFn = () => { does something } <== () => void
+// onClick={testFn}
 
 export default History
