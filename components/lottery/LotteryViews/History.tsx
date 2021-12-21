@@ -26,7 +26,8 @@ const History = (props: HistoryViewProps) => {
   const tablerows = (rounds||[]).map( (roundInfo, index) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
-      <TableCell>{format(roundInfo.date, 'yyyy-MM-dd')}</TableCell>
+      <TableCell>{format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
+      {/*<TableCell>{format(roundInfo.date, 'yyyy-MM-dd')}</TableCell>*/}
       <TableCell>{roundInfo.totalTickets}</TableCell>
       <TableCell>{roundInfo.userTickets}</TableCell>
     </TableRow>
@@ -42,7 +43,7 @@ const History = (props: HistoryViewProps) => {
     </TableHead>
     <TableBody>
       {tablerows}
-      <TablePagination rowsPerPage={5} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
+      <TablePagination rowsPerPageOptions={[]} rowsPerPage={5} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
     </TableBody>
   </Table>
 }
