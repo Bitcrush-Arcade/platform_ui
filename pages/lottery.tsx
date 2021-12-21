@@ -10,12 +10,12 @@ import SummaryCard from 'components/lottery/SummaryCard'
 const Trade = () => {
   return <PageContainer>
      <Head>
-      <title>BITCRUSH - Lottery (comingSoon)</title>
-      <meta name="description" content="Lottery Coming Soon"/>
+      <title>BITCRUSH - Lottery</title>
+      <meta name="description" content="The lottery where everyone wins."/>
     </Head>
     <SummaryCard/>
-    <Grid container>
-      <Grid item xs={10} md={6}>
+    <Grid container sx={{mt: 4}}>
+      <Grid item xs={12} md={6}>
         <LotteryHistory/>
       </Grid>
     </Grid>
