@@ -1,6 +1,8 @@
 import useImmer from 'use-immer'
 import format from 'date-fns/format'
 //Material
+import IconButton from '@mui/material/IconButton';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -31,7 +33,12 @@ const History = (props: HistoryViewProps) => {
       <TableCell>{roundInfo.id}</TableCell>
       <TableCell>{format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
       <TableCell align ="right">{roundInfo.totalTickets}</TableCell>
-      <TableCell align ="right">{roundInfo.userTickets}</TableCell>
+      <TableCell align ="right">
+        {roundInfo.userTickets}
+        <IconButton color="primary">
+          <RemoveRedEyeIcon />
+        </IconButton>
+      </TableCell>
     </TableRow>
   })
   return <Table>
