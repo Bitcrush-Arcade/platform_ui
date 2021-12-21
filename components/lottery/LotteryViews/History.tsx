@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 
+{/* History table props */}
 type HistoryViewProps = {
   rounds: Array<{
     id: number,
@@ -18,17 +19,19 @@ type HistoryViewProps = {
   totalRounds: number,
   currentPageView: number,
   onPagination: (newPAage: number) => void,
+  rowsPerPage:number,
 }
 
+{/* History table props and formatting */}
 const History = (props: HistoryViewProps) => {
-  const { rounds, totalRounds, currentPageView, onPagination } = props
+  const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage } = props
   
   const tablerows = (rounds||[]).map( (roundInfo, index) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
       <TableCell>{format(roundInfo.date, 'MMMM dd-yyyy')}</TableCell>
-      <TableCell>{roundInfo.totalTickets}</TableCell>
-      <TableCell>{roundInfo.userTickets}</TableCell>
+      <TableCell align ="right">{roundInfo.totalTickets}</TableCell>
+      <TableCell align ="right">{roundInfo.userTickets}</TableCell>
     </TableRow>
   })
   return <Table>
@@ -38,11 +41,11 @@ const History = (props: HistoryViewProps) => {
         <TableCell>DATE</TableCell>
         <TableCell>TOTAL TICKETS</TableCell>
         <TableCell>USER TICKETS</TableCell>
-      </TableRow>
+        </TableRow>
     </TableHead>
     <TableBody>
       {tablerows}
-      <TablePagination rowsPerPageOptions={[]} rowsPerPage={5} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
+      <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
     </TableBody>
   </Table>
 }
