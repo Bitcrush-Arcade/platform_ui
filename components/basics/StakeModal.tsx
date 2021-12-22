@@ -241,4 +241,4 @@ const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
       </Typography>
     </SliderThumb>
 )}
-const FormComponent = (p:any) => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>
+export const FormComponent = (p:any) => <Card {...p} background="light" sx={{ padding: 4, minWidth: '300px', maxWidth: '360px' }}/>
