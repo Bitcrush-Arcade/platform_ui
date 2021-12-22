@@ -19,9 +19,10 @@ const BasicButton = styled( Fab ,{
   borderWidth: 1,
   borderStyle: 'solid',
   boxShadow: `inset 0 0 15px ${ color == "secondary" && "rgba(29,233,182,0.65)" || theme.palette.shadow?.primary.main}`,
-  color: theme.palette.mode == "dark" ? theme.palette.grey[200] : theme.palette.common.black,
+  color: theme.palette.mode == "dark" || !!background ? theme.palette.grey[200] : theme.palette.common.black,
   "&:hover":{
     color: color ? theme.palette.common.black : theme.palette.grey[200],
+    background: background === 'primary' && theme.palette.primary.light || background === 'secondary' && theme.palette.secondary.light || 'transparent',
   },
   "&.Mui-disabled":{
     backgroundColor: 'transparent !important',
