@@ -22,7 +22,7 @@ const BasicButton = styled( Fab ,{
   color: theme.palette.mode == "dark" || !!background ? theme.palette.grey[200] : theme.palette.common.black,
   "&:hover":{
     color: color ? theme.palette.common.black : theme.palette.grey[200],
-    background: background === 'primary' && theme.palette.primary.light || background === 'secondary' && theme.palette.secondary.light || 'transparent',
+    background: (background === 'primary' || color === "primary") && theme.palette.primary.light || (background === 'secondary' || color === 'secondary') && theme.palette.secondary.light || 'transparent',
   },
   "&.Mui-disabled":{
     backgroundColor: 'transparent !important',
