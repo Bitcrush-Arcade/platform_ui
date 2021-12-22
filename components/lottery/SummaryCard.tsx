@@ -105,17 +105,17 @@ const Summary = () => {
       </div>
     </Stack>
     <CardContent>
-      <Stack direction={{ xs: "column", md: "row"}} justifyContent="space-between" alignItems="center">
+      <Stack direction={{ xs: "column", lg: "row"}} justifyContent="space-between" alignItems="center">
         <div>
           <Typography variant="body2" color="textSecondary">
             PRIZE POT:
           </Typography>
           <Typography variant="h5" color="primary" fontWeight="bold">
-            <Currency value={round.pool} isWei/>&nbsp;CRUSH
+            <Currency value={round.pool} isWei decimals={0}/>&nbsp;CRUSH
           </Typography>
         </div>
         <Stack 
-          direction={{ xs: 'column', md: 'row'}}
+          direction={{ xs: 'column', lg: 'row'}}
           divider={<Divider orientation="vertical" flexItem />}
           alignItems="center"
           spacing={2}
@@ -151,7 +151,7 @@ const Summary = () => {
             </Typography>
           </Typography>
         </Stack>
-        <GButton background="primary">
+        <GButton background="primary" sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}>
           Buy Tickets
         </GButton>
       </Stack>
