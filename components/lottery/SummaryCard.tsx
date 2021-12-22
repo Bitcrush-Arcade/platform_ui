@@ -1,40 +1,82 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import format from 'date-fns/format'
+// OtherLibs
+import BigNumber from 'bignumber.js'
+import Countdown from 'react-countdown'
 // MaterialUi
-import Box from '@mui/material/Box'
 import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
-import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 // Icons
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 // BitcrushUI
+import GButton from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 import Currency from 'components/basics/Currency'
 import SmButton from 'components/basics/SmallButton'
 // hooks
 import { useTransactionContext } from 'hooks/contextHooks'
 // utils
-import { differenceFromNow } from 'utils/dateFormat'
 
-import BigNumber from 'bignumber.js'
 
 const Summary = () => {
   // These will come from props
-  const [round, setRound] = useState({ id: 123, tickets: 3, endTime: new Date().getTime()+(3600*24*1000), pool: new BigNumber(10).pow(23) })
+  const [round, setRound] = useState({ id: 123, tickets: 3, endTime: new Date().getTime()+(3600*24*1000), pool: new BigNumber(10).pow(23), match6: 40000, match5: 20000, match4: 10000, match3: 5000, match2: 3000, match1:2000, noMatch: 2000, burn: new BigNumber(1800).times(10**18) })
+  const burnPercent = 18000
+  const percentBase = 100000
   // Context
   const { tokenInfo } = useTransactionContext()
-
+  
   const [ showDetail, setShowDetail ] = useState<boolean>(false)
   const toggleDetail = () => setShowDetail( p => !p )
+  
+  const matchDisplays = new Array(7).fill(null).map( (x,i) => {
+    let percent: number = 0
+    switch(i){
+      case 6:
+        percent = round.noMatch
+        break
+      case 5:
+        percent = round.match1
+        break
+      case 4:
+        percent = round.match2
+        break
+      case 3:
+        percent = round.match3
+        break
+      case 2:
+        percent = round.match4
+        break
+      case 1:
+        percent = round.match5
+        break
+      case 0:
+        percent = round.match6
+        break
+    }
+    const text = i== 0 ? 'JACKPOT!' : `Match ${6-i}`
+    const crushReward = round.pool.times(percent || 0).div(percentBase)
+    return <Grid item xs={5} md={3} lg={'auto'} key={`match-amounts-${i}`}>
+      <Typography align="center">
+        {text}
+      </Typography>
+      <Typography align="center" variant="h5" color="secondary" fontWeight={600}>
+        <Currency value={crushReward} isWei decimals={0}/>
+      </Typography>
+      <Typography align="center" variant="subtitle2" color="textSecondary">
+        $<Currency value={crushReward.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
+      </Typography>
 
-  const timeDiff = differenceFromNow(round.endTime, 'object')
+    </Grid>
+  } )
 
   return <Card background="dark">
     {/* CARD HEADER */}
     <Grid container justifyContent="space-between" alignItems="center" 
-      sx={{ px: 3, py:1, background: 'rgba(25,10,41,0.7)' }}
+      sx={ theme => ({ px: 3, py:1, background: theme.palette.mode == 'dark' ? 'rgba(25,10,41,0.7)' : 'rgba(25,10,41,0.4)' })}
     >
       <Grid item>
         <Typography color="textSecondary" variant="body2" component="div">
@@ -74,34 +116,56 @@ const Summary = () => {
           <Typography variant="h4" color="secondary" display="inline">
             <sup>$</sup>
             <strong>
-              <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei/>
+              <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
             </strong>
               &nbsp;
-            <Typography display="inline" color="textSecondary">
+            <Typography display="inline" color="primary">
               |
             </Typography>
               &nbsp;
-              {timeDiff.hours > 0 && <>
-                <strong>{timeDiff.hours || ''}</strong>
-                <sub>H</sub>
-              </>}
-              <strong>{timeDiff.minutes || '0'}</strong>
-              <sub>M</sub>
-              <strong>{timeDiff.seconds || '0'}</strong>
-              <sub>S</sub>
+            </Typography>
+            <Typography color="secondary" variant="h5" display="inline">
+              <Countdown
+                date={ new Date(round.endTime) }
+                renderer={({hours, minutes, seconds}) => {
+                  return <>
+                    <strong>{hours < 10 && `0${hours}` || hours}</strong>
+                    <sub>H</sub>
+                    &nbsp;
+                    <strong>{minutes < 10 && `0${minutes}` || minutes}</strong>
+                    <sub>M</sub>
+                    &nbsp;
+                    <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
+                    <sub>S</sub>
+                  </>
+                }}
+              />
+              &nbsp;
           </Typography>
-          UNTIL ATTACK TIME
+          <Typography color="primary" variant="h5" display="inline">
+            UNTIL ATTACK TIME
+          </Typography>
         </Grid>
         <Grid item>
-          BUY TICKETS CTA
+          <GButton background="primary">
+            Buy Tickets
+          </GButton>
         </Grid>
       </Grid>
       <Collapse in={showDetail}>
-        NEED COLLAPSE WITH EXTRA DATA
+        <Typography variant="h5" sx={{pt:3, pb:3}} align="center">
+          Match Invaders and their colors in exact order to win!
+        </Typography>
+        <Grid container justifyContent="space-evenly" spacing={4}>
+            {matchDisplays}
+        </Grid>
+        <Typography variant="h6" sx={{pt:3, pb:3}} align="center" color="textSecondary">
+          {burnPercent/percentBase*100}% is burned when tickets bought are more than 10% of prize pool
+        </Typography>
       </Collapse>
     </CardContent>
-      <SmButton color="secondary" onClick={toggleDetail}>
-        Hide Button
+      <SmButton color="secondary" onClick={toggleDetail} sx={{ pl: 4, pr:2, borderTopLeftRadius: 0, borderTopRightRadius: 80, borderBottomRightRadius: 0, borderBottom: 'none'}}>
+        Details&nbsp;<ExpandMoreIcon sx={{ transform: showDetail ? 'rotate(180deg)' : 'none', position: 'relative', bottom: 2}}/>
       </SmButton>
   </Card>
 }
