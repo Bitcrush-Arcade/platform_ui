@@ -6,7 +6,9 @@ import Countdown from 'react-countdown'
 // MaterialUi
 import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 // Icons
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -75,10 +77,10 @@ const Summary = () => {
 
   return <Card background="dark">
     {/* CARD HEADER */}
-    <Grid container justifyContent="space-between" alignItems="center" 
+    <Stack justifyContent="space-between" alignItems="center" direction={{ xs: "column", md: "row"}}
       sx={ theme => ({ px: 3, py:1, background: theme.palette.mode == 'dark' ? 'rgba(25,10,41,0.7)' : 'rgba(25,10,41,0.4)' })}
     >
-      <Grid item>
+      <div>
         <Typography color="textSecondary" variant="body2" component="div">
           Tickets:&nbsp;
           <Typography variant="body2" display="inline" color="textPrimary">
@@ -89,8 +91,8 @@ const Summary = () => {
             &nbsp;&nbsp;tickets this round
           </Typography>
         </Typography>
-      </Grid>
-      <Grid item>
+      </div>
+      <div>
         <Typography variant="body2" fontWeight={500} color="secondary" display="inline">
           NEXT DRAW <ArrowForwardIcon sx={{fontSize: 18, bottom: -4, position: 'relative' }} /> &nbsp;&nbsp;
         </Typography>
@@ -100,58 +102,59 @@ const Summary = () => {
         <Typography variant="body2" display="inline">
           {format(round.endTime, 'MMMM dd - HH aa')}
         </Typography>
-      </Grid>
-    </Grid>
+      </div>
+    </Stack>
     <CardContent>
-      <Grid container justifyContent="space-between" alignItems="center">
-        <Grid item>
+      <Stack direction={{ xs: "column", md: "row"}} justifyContent="space-between" alignItems="center">
+        <div>
           <Typography variant="body2" color="textSecondary">
             PRIZE POT:
           </Typography>
           <Typography variant="h5" color="primary" fontWeight="bold">
             <Currency value={round.pool} isWei/>&nbsp;CRUSH
           </Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="h4" color="secondary" display="inline">
-            <sup>$</sup>
+        </div>
+        <Stack 
+          direction={{ xs: 'column', md: 'row'}}
+          divider={<Divider orientation="vertical" flexItem />}
+          alignItems="center"
+          spacing={2}
+        >
+          <Typography variant="h4" color="secondary" display="inline" component="div">
+            <Typography variant="h5" color="secondary" display="inline">
+              <sup>$</sup>
+            </Typography>
             <strong>
               <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
             </strong>
-              &nbsp;
-            <Typography display="inline" color="primary">
-              |
-            </Typography>
-              &nbsp;
-            </Typography>
-            <Typography color="secondary" variant="h5" display="inline">
-              <Countdown
-                date={ new Date(round.endTime) }
-                renderer={({hours, minutes, seconds}) => {
-                  return <>
-                    <strong>{hours < 10 && `0${hours}` || hours}</strong>
-                    <sub>H</sub>
-                    &nbsp;
-                    <strong>{minutes < 10 && `0${minutes}` || minutes}</strong>
-                    <sub>M</sub>
-                    &nbsp;
-                    <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
-                    <sub>S</sub>
-                  </>
-                }}
-              />
-              &nbsp;
+            &nbsp;
           </Typography>
-          <Typography color="primary" variant="h5" display="inline">
-            UNTIL ATTACK TIME
+          <Typography color="secondary" variant="h5" display="inline" component="div">
+            <Countdown
+              date={ new Date(round.endTime) }
+              renderer={({hours, minutes, seconds}) => {
+                return <>
+                  <strong>{hours < 10 && `0${hours}` || hours}</strong>
+                  <sub>H</sub>
+                  &nbsp;
+                  <strong>{minutes < 10 && `0${minutes}` || minutes}</strong>
+                  <sub>M</sub>
+                  &nbsp;
+                  <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
+                  <sub>S</sub>
+                </>
+              }}
+            />
+            &nbsp;
+            <Typography color="primary" variant="h5" display="inline">
+              UNTIL ATTACK TIME
+            </Typography>
           </Typography>
-        </Grid>
-        <Grid item>
-          <GButton background="primary">
-            Buy Tickets
-          </GButton>
-        </Grid>
-      </Grid>
+        </Stack>
+        <GButton background="primary">
+          Buy Tickets
+        </GButton>
+      </Stack>
       <Collapse in={showDetail}>
         <Typography variant="h5" sx={{pt:3, pb:3}} align="center">
           Match Invaders and their colors in exact order to win!
