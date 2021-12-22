@@ -34,8 +34,8 @@ export default function BasicTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow>
+          {rows.map((row, rowIndex) => (
+            <TableRow key={`current-view-${rowIndex}`}>
               <TableCell>{row.roundInfo}</TableCell>
               <TableCell>{row.teamInfo}</TableCell>
             </TableRow>
