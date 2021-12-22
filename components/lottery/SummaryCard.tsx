@@ -22,8 +22,12 @@ import SmButton from 'components/basics/SmallButton'
 import { useTransactionContext } from 'hooks/contextHooks'
 // utils
 
+type LotterySummaryProps = {
+  onBuy: () => void
+}
 
-const Summary = () => {
+const Summary = (props: LotterySummaryProps) => {
+  const { onBuy } = props
   // These will come from props
   const [round, setRound] = useState({ id: 123, tickets: 3, endTime: new Date().getTime()+(3600*24*1000), pool: new BigNumber(10).pow(23), match6: 40000, match5: 20000, match4: 10000, match3: 5000, match2: 3000, match1:2000, noMatch: 2000, burn: new BigNumber(1800).times(10**18) })
   const burnPercent = 18000
@@ -151,7 +155,11 @@ const Summary = () => {
             </Typography>
           </Typography>
         </Stack>
-        <GButton background="primary" sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}>
+        <GButton
+          onClick={onBuy}
+          background="primary"
+          sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
+        >
           Buy Tickets
         </GButton>
       </Stack>
