@@ -27,7 +27,7 @@ const LotteryHistory = () => {
     return <>
     
     <Grid container justifyContent="space-between" alignItems="flex-end">
-        <Grid item sx={{pl:2.5}}>
+        <Grid item sx={{pl:3.5}}>
             
                 {/*Tab changer*/}
                 <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
