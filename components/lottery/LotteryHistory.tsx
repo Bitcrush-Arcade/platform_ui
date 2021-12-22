@@ -52,6 +52,7 @@ const LotteryHistory = () => {
                 currentPageView={selectedPage} 
                 onPagination={(p) => setSelectedPage(p)}
                 rowsPerPage={roundsPerPage}
+                onRoundView={(round) => console.log('selected Round ', round)}
             />
         }
     </Card>
