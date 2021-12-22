@@ -22,7 +22,7 @@ type HistoryViewProps = {
   currentPageView: number,
   onPagination: (newPage: number) => void,
   rowsPerPage:number,
-  onRoundView:(roundId: number) => void,
+  onRoundView: (roundId: number) => void,
 }
 
 {/* History table props and formatting */}
@@ -61,7 +61,7 @@ const History = (props: HistoryViewProps) => {
         <TableCell>DATE</TableCell>
         <TableCell>TOTAL TICKETS</TableCell>
         <TableCell>USER TICKETS</TableCell>
-        </TableRow>
+      </TableRow>
     </TableHead>
     <TableBody>
       {tableRows}
