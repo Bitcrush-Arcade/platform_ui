@@ -159,7 +159,7 @@ const Summary = () => {
         <Grid container justifyContent="space-evenly" spacing={4}>
             {matchDisplays}
         </Grid>
-        <Typography variant="h6" sx={{pt:3, pb:3}} align="center" color="textSecondary">
+        <Typography variant="h6" sx={{pt:3}} align="center" color="textSecondary">
           {burnPercent/percentBase*100}% is burned when tickets bought are more than 10% of prize pool
         </Typography>
       </Collapse>
