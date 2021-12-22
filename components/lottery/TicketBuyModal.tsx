@@ -13,6 +13,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import { useWeb3React } from '@web3-react/core'
 // Icons
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CloseIcon from '@mui/icons-material/Close'
 // Bitcrush UI
 import Button from 'components/basics/GeneralUseButton'
@@ -26,6 +27,7 @@ import { getContracts } from 'data/contracts'
 // Libs
 import { currencyFormat } from 'utils/text/text'
 import { standardizeNumber, getTicketDigits } from 'utils/lottery'
+import NumberInvader from 'components/lottery/NumberInvader'
 
 type TicketBuyModalProps ={
   open: boolean;
@@ -104,7 +106,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         const valueNumber = parseInt( e.target.value )
         if(isNaN(valueNumber))
           return
-        setTickets( new Array(Math.abs(valueNumber)).fill(0).map( v => standardizeNumber(random(0,2000000, false)).toString() ) )
+        setTickets( new Array(Math.abs(valueNumber)).fill(0).map( v => standardizeNumber(random(0,999999, false)).toString() ) )
       }}
       inputProps={{
         inputMode: 'numeric',
@@ -164,7 +166,16 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     PaperComponent={FormComponent}
     PaperProps={{sx: {pt: 2}}}
   >
-    <Stack direction="row" justifyContent="flex-end">
+    <Stack direction="row" justifyContent="space-between">
+      <div>
+        { step > 0 && 
+          <Tooltip arrow title={<Typography variant="subtitle1">Back</Typography>}>
+            <IconButton size="small" onClick={()=>setStep( p => p - 1 )}>
+              <ArrowBackIcon fontSize="inherit"/>
+            </IconButton>
+          </Tooltip>
+        }
+      </div>
       <Tooltip arrow title={<Typography variant="subtitle1">Close Modal</Typography>}>
         <IconButton onClick={closeModal} size="small">
           <CloseIcon fontSize="inherit" color="error"/>
@@ -182,20 +193,25 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         Your Tickets
       </Typography>
       {tickets.map( (ticketNumber, ticketIndex) => {
-        const ticketDigits = getTicketDigits(parseInt(ticketNumber))
-
+        const ticketDigits = ticketNumber.split('')
+        console.log(ticketDigits)
         return <Stack key={`tickets-to-buy-${ticketIndex}`}>
           <Typography variant="subtitle2" color="textSecondary">
             #{ticketIndex+1}
           </Typography>
-          <Paper elevation={0}
+          <Paper
             sx={ theme => ({
               backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : theme.palette.primary.dark,
+              borderRadius: 3,
               px: 2,
               py: 2,
             })}
           >
-
+            <Stack direction="row">
+              <NumberInvader twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+              <NumberInvader twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+              <NumberInvader twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
+            </Stack>
           </Paper>
         </Stack>
       })}
