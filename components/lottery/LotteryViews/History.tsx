@@ -65,7 +65,9 @@ const History = (props: HistoryViewProps) => {
     </TableHead>
     <TableBody>
       {tableRows}
-      <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
+      <TableRow>
+        <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={totalRounds} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
+      </TableRow>
     </TableBody>
   </Table>
 }
