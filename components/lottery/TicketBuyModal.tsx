@@ -154,8 +154,8 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         Lucky Draw
       </Button>
       <Typography variant="subtitle2" px={2} whiteSpace="pre-line">
-        "Choose Tickets" Shows you our draw selections and allows you to edit your invader team to customize your perfect team.{'\n'}
-        "Lucky Draw" chooses your ticket numbers randomly with no duplicates on this draw.{'\n'}
+        &quot;Choose Tickets&quot; Shows you our draw selections and allows you to edit your invader team to customize your perfect team.{'\n'}
+        &quot;Lucky Draw&quot; chooses your ticket numbers randomly with no duplicates on this draw.{'\n'}
         Purchases are final.
       </Typography>
     </Stack>
