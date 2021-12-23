@@ -8,8 +8,10 @@ import Typography from '@mui/material/Typography';
 //Bitcrush UI
 import BasicButton from 'components/basics/GeneralUseButton';
 import Card from 'components/basics/Card';
-import History from 'components/lottery/LotteryViews/History';
 import Current from 'components/lottery/LotteryViews/Current';
+import History from 'components/lottery/LotteryViews/History';
+import LastRound from 'components/lottery/LotteryViews/LastRound';
+
 
 
 
@@ -47,7 +49,8 @@ const LotteryHistory = () => {
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current/>}
-        {tabSelected == 1 && 
+        {tabSelected == 1 && <LastRound/>}
+        {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
                 totalRounds={testHistoryArray.length} 
                 currentPageView={selectedPage} 
