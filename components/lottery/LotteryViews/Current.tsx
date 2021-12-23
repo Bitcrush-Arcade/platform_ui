@@ -5,43 +5,21 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 
-function createData(
-  roundInfo: string,
-  teamInfo: any,
-  
-) {
-  return { roundInfo, teamInfo };
+{/* History table props */}
+type CurrentViewProps = {
+  ticketNumber: string,
+  currentPageView: number,
+  onPagination: (newPage: number) => void,
+  onRoundView: (roundId: number) => void,
 }
 
-const rows = [
-  createData('WINNING TEAM', 'PLACEHOLDER'),
-  createData('TICKET INFO', 'PLACEHOLDER'),
-  
-];
-{/*const teamArray = Array()
-const ticketArray = Array()*/}
+{/* History table props and formatting */}
+const Current = (props: CurrentViewProps) => {
+  const { ticketNumber, currentPageView, onPagination, onRoundView } = props
 
-export default function BasicTable() {
-  return (
-    
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>ROUND 3 </TableCell>
-            <TableCell>DATE AND TIME OF ROUND</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row, rowIndex) => (
-            <TableRow key={`current-view-${rowIndex}`}>
-              <TableCell>{row.roundInfo}</TableCell>
-              <TableCell>{row.teamInfo}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    
-  );
+  
+
+return null
+
 }
