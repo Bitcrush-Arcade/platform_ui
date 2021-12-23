@@ -44,7 +44,7 @@ const History = (props: HistoryViewProps) => {
         {roundInfo.userTickets}
         { roundInfo.userTickets && roundInfo.userTickets > 0 &&
             
-            <IconButton color="primary" onClick={() => onRoundView(roundInfo.id)}>
+            <IconButton sx ={{pl: 1}} color="primary" onClick={() => onRoundView(roundInfo.id)}>
             <RemoveRedEyeIcon />
           </IconButton>
         }
