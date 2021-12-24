@@ -1,11 +1,13 @@
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import { FabProps } from '@material-ui/core/Fab'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import type { FabProps } from '@mui/material/Fab'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Typography from '@mui/material/Typography'
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Currency from 'components/basics/Currency'
@@ -63,8 +65,8 @@ type PoolCardProps ={
   icon?: JSX.Element,
   action1Title: string,
   action2Title?: string,
-  btn1Props?: {href ?: string } & Omit<FabProps, "children">,
-  btn2Props?: {href ?: string } & Omit<FabProps, "children">,
+  btn1Props?: {href ?: string } & Omit<FabProps, "children"|"sx">,
+  btn2Props?: {href ?: string } & Omit<FabProps, "children"|"sx">,
   firstAction?: () => void,
   secondAction?: () => void,
   color?: 'primary' | 'secondary',
@@ -119,13 +121,13 @@ const useStyles = makeStyles( (theme: Theme) => createStyles({
   title:{
     fontWeight: 600,
     textTransform: 'uppercase',
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       fontSize: theme.typography.h5.fontSize
     }
   },
   titleGrid:{
     marginBottom: theme.spacing(2),
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       marginBottom: theme.spacing(2),
     }
   }

@@ -6,14 +6,16 @@ import Link from 'next/link'
 import shuffle from 'lodash/shuffle'
 import compact from 'lodash/compact'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import IconButton from '@material-ui/core/IconButton'
-import Slide from '@material-ui/core/Slide'
-import Grid from "@material-ui/core/Grid"
-import Typography from '@material-ui/core/Typography'
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import IconButton from '@mui/material/IconButton'
+import Slide from '@mui/material/Slide'
+import Grid from "@mui/material/Grid"
+import Typography from '@mui/material/Typography'
 // Icons
-import ChevronLeft from "@material-ui/icons/ChevronLeft"
-import ChevronRight from "@material-ui/icons/ChevronRight"
+import ChevronLeft from "@mui/icons-material/ChevronLeft"
+import ChevronRight from "@mui/icons-material/ChevronRight"
 // Bitcrush
 import Card from 'components/basics/Card'
 import Carousel, { CarouselHandles } from 'components/basics/Carousel'
@@ -187,7 +189,7 @@ const Games = ( props: InferGetServerSidePropsType<typeof getServerSideProps> ) 
       <Carousel
         LeftScroll={LeftScroll}
         RightScroll={RightScroll}
-        items={gamesByType[1].map( (game, gameIdx) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
+        items={gamesByType[1].map( (game:any, gameIdx: number) => <GameCard key={`${game.game_title}-${gameIdx}`} imgSrc={game.logos[0].url} gameKey={game.game_name}/>)}
         xs={1}
         sm={2}
         md={3}
@@ -240,9 +242,9 @@ export const getServerSideProps = async() =>{
   
   const gameTypes = Object.keys(availableGames?.result || {})
 
-  const allGames = []
+  const allGames: any[] = []
   const gamesByType = compact( gameTypes.map( (gameType, typeIndex) => {
-    return  availableGames?.result[ gameType ].map( game => {
+    return  availableGames?.result[ gameType ].map( (game:any) => {
       const flatGame = flattenObject( game, 1 )
       allGames.push(flatGame)
       return flatGame
@@ -269,14 +271,14 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
     maxWidth: 980,
     position: 'relative',
     zIndex: 1,
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       maxWidth: 480
     }
   },
   textContainer:{
     paddingRight: theme.spacing(6),
     position: 'relative',
-    [theme.breakpoints.down('sm')]:{
+    [theme.breakpoints.down('md')]:{
       paddingTop: theme.spacing(2),
       paddingRight: theme.spacing(2),
       paddingLeft: theme.spacing(2),

@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const ArcadeIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 24.85 29" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <path d="M19.64,15a.69.69,0,0,0,.05-.24.85.85,0,0,0-.84-.84H8.42a.84.84,0,0,0-.83.84.67.67,0,0,0,0,.24Z"/>

@@ -19,7 +19,7 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const body = JSON.parse(req.body || "{}" )
 
   const host = req.headers.host
-  const isLocal = host.indexOf('localhost:') > -1
+  const isLocal = (host||'').indexOf('localhost:') > -1
   if( !isLocal && ( req.method !== 'POST' || !body.chainId ) )
     return res.status(400).json({ error: "Request Invalid"})
   
@@ -33,6 +33,8 @@ export default async function getApy(req : NextApiRequest, res: NextApiResponse)
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const contractSetup = getContracts( usedContract, usedChain )
+  if(!contractSetup.abi)
+    return res.status(400).json({message: 'No contract ABI'})
   const contract = await new web3.eth.Contract( contractSetup.abi, contractSetup.address )
 
   const emission = await contract.methods.crushPerBlock().call()

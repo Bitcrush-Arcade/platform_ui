@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Checkbox from '@material-ui/core/Checkbox'
-import Dialog from '@material-ui/core/Dialog'
-import DialogContent from '@material-ui/core/DialogContent'
-import FormControlLabel from "@material-ui/core/FormControlLabel"
-import Grid from "@material-ui/core/Grid"
-import Typography from "@material-ui/core/Typography"
-import CardContent from "@material-ui/core/CardContent"
-import Tooltip from "@material-ui/core/Tooltip"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Checkbox from '@mui/material/Checkbox'
+import Dialog from '@mui/material/Dialog'
+import DialogContent from '@mui/material/DialogContent'
+import FormControlLabel from "@mui/material/FormControlLabel"
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import CardContent from "@mui/material/CardContent"
+import Tooltip from "@mui/material/Tooltip"
 // Icons
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
@@ -23,6 +25,7 @@ import { useTransactionContext } from "hooks/contextHooks"
 // data
 import { getContracts } from "data/contracts"
 import BigNumber from 'bignumber.js'
+import { Receipt } from "types/PromiEvent";
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
@@ -71,12 +74,12 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
     }
     setShowWarning(false)
     methods.compoundAll().send({ from: account })
-      .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
-      .on('receipt', rct =>{
+      .on('transactionHash', (tx: string) => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
+      .on('receipt', (rct:Receipt) =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
       })
-      .on('error', (error, rct) => {
+      .on('error', (error: any, rct: Receipt) => {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
       } )
@@ -130,11 +133,11 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
       </Grid>
     </CardContent>
   </Card>
-  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => <Card {...paperProps} style={{paddingBottom: 16}}/>}>
+  <Dialog open={showWarning} onClose={exitClaim} PaperComponent={ paperProps => { const {sx, ...others} = paperProps; return <Card {...others} style={{paddingBottom: 16}}/>}}>
     <DialogContent>
       <Typography paragraph style={{whiteSpace: 'pre-line' }} align="justify">
         Due to excessive gas fees charged by the claim function, please only use when claim amount is Higher than gas fee. Otherwise you will be losing funds.
-        {'\n'}If you don’t understand, please have the mods explain this to you.
+        {'\n'}If you don&apos;t understand, please have the mods explain this to you.
       </Typography>
       <Typography align="center" paragraph>
         Are you sure?

@@ -6,8 +6,8 @@ import Web3 from 'web3'
 import getNodeUrl from './getRpcUrl'
 
 const POLLING_INTERVAL = 12000
-const rpcUrl = getNodeUrl()
-const chainId = parseInt(process.env.REACT_APP_CHAIN_ID, 10)
+const rpcUrl = getNodeUrl() || ''
+const chainId = parseInt(process.env.REACT_APP_CHAIN_ID || '97', 10)
 
 const injected = new InjectedConnector({ supportedChainIds: [chainId] })
 
@@ -26,6 +26,6 @@ const bscConnector = new BscConnector({ supportedChainIds: [chainId] })
 //   [ConnectorNames.BSC]: bscConnector,
 // }
 
-export const getLibrary = (provider): Web3 => {
+export const getLibrary = (provider: any): Web3 => {
   return provider
 }

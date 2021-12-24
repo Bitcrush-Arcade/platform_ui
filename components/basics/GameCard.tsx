@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import { useState } from 'react'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import ButtonBase from "@material-ui/core/ButtonBase"
-import CircularProgress from '@material-ui/core/CircularProgress'
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import ButtonBase from "@mui/material/ButtonBase"
+import CircularProgress from '@mui/material/CircularProgress'
 // Icons
-import PlayIcon from '@material-ui/icons/PlayCircleFilled';
+import PlayIcon from '@mui/icons-material/PlayCircleFilled';
 // Bitcrush
 import Card from 'components/basics/Card'
 

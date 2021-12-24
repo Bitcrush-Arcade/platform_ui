@@ -1,5 +1,5 @@
-import Link from '@material-ui/core/Link'
-import Typography from '@material-ui/core/Typography'
+import Link from '@mui/material/Link'
+import Typography from '@mui/material/Typography'
 
 export const blacklistExplanation = <>{`
   Bitcrush.com is committed to support responsible gaming, so we added a Self Blacklist function to our contract that allows you to blacklist yourself from making deposits to the Live Wallet for gameplay. 

@@ -19,6 +19,8 @@ const compounderCalculator = async(req: NextApiRequest, res: NextApiResponse)=>{
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-1-s1.binance.org:8545/'
   const web3 = new Web3( new Web3.providers.HttpProvider( provider ) )
   const { address, abi } = getContracts('bankStaking', usedChain)
+  if(!abi)
+    return res.status(400).json({message: 'No contract ABI'})
   
   const { methods } = await new web3.eth.Contract( abi, address )
   // profit[0] => { total, remaining }

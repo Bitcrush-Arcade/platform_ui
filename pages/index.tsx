@@ -6,14 +6,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import Carousel from 'react-material-ui-carousel'
 // Material
-import { makeStyles, createStyles, Theme, useTheme } from "@material-ui/core/styles"
-import useMediaQuery from "@material-ui/core/useMediaQuery"
-import CardContent from '@material-ui/core/CardContent'
-import Container from '@material-ui/core/Container'
-import Divider from '@material-ui/core/Divider'
-import Grid from '@material-ui/core/Grid'
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from '@material-ui/core/Typography'
+import { Theme, useTheme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import useMediaQuery from "@mui/material/useMediaQuery"
+import CardContent from '@mui/material/CardContent'
+import Container from '@mui/material/Container'
+import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
+import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 // Bitcrush Components
 import PageContainer from 'components/PageContainer'
 import Card from 'components/basics/Card'
@@ -26,7 +28,7 @@ import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Icons
 import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 // utils
 import { currencyFormat } from 'utils/text/text'
 import { useContract } from 'hooks/web3Hooks'
@@ -36,11 +38,12 @@ import { getContracts } from 'data/contracts'
 import { blacklistExplanation } from 'data/texts'
 import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
+import { Receipt } from 'types/PromiEvent'
 
 export default function Home() {
 
   const theme = useTheme()
-  const isSm = useMediaQuery( theme.breakpoints.down('sm') )
+  const isSm = useMediaQuery( theme.breakpoints.down('md') )
   const router = useRouter()
   const { chainId, account } = useWeb3React()
   const { tokenInfo, editTransactions, liveWallet: lwContext, toggleLwModal } = useTransactionContext()
@@ -79,15 +82,15 @@ export default function Home() {
     if( account && !staked)
       return router.push("/mining","/mining",{ shallow: false})
     methods.claim().send({ from: account })
-    .on('transactionHash', (tx) => {
+    .on('transactionHash', (tx:string) => {
       console.log('hash', tx )
       editTransactions(tx,'pending', { description: 'Harvest All Pools' })
     })
-    .on('receipt', ( rc) => {
+    .on('receipt', ( rc:Receipt) => {
       console.log('receipt',rc)
       editTransactions(rc.transactionHash,'complete')
     })
-    .on('error', (error, receipt) => {
+    .on('error', (error:any, receipt:Receipt) => {
       console.log('error', error, receipt)
       receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
     })
@@ -102,11 +105,11 @@ export default function Home() {
   /**
    * @description This helps for announcemnts that have special effects internally.
    */
-  const clickAnnouncement = (name: string) => {
+  const clickAnnouncement = useCallback((name: string) => {
     console.log('annoucement', name)
-  }
+  },[])
 
-  const announcements = highlightedAnnouncements.map( (annoucement, aIndex) => {
+  const announcements = useMemo( () => highlightedAnnouncements.map( (annoucement, aIndex) => {
     const { name, img, imgMobile, link, target, rel } = annoucement
     const externalLink = link.indexOf('/') !== 0
 
@@ -131,7 +134,7 @@ export default function Home() {
           {mainImg}
         </Link>
       : mainImg
-  })
+  }), [ clickAnnouncement, isSm ])
 
   return (<>
   <Head>
@@ -161,7 +164,7 @@ export default function Home() {
               </Grid>
           </Grid>
           {/* BITCRUSH TVL INFO */}
-          <Container maxWidth="lg">
+          <Container maxWidth={false}>
             {/* TVL Card */}
             <Card style={{ width: '100%'}} background="transparent" shadow="primary" opacity={0.7} >
               <CardContent style={{paddingBottom: 16}}>
@@ -226,7 +229,7 @@ export default function Home() {
             </Card>
             {/* Announcement Card */}
             <section style={{ marginTop: 24, width: '100%' }}>
-              <Carousel animation="slide" interval={5000} stopAutoPlayOnHover navButtonsAlwaysVisible>
+              <Carousel>
                 {announcements}
               </Carousel>
             </section>
@@ -242,8 +245,8 @@ export default function Home() {
                   }}
                   stakedInfo={{
                     title: "CRUSH Staked",
-                    amount: <Currency value={staked} decimals={4}/>,
-                    subtitle: `$ ${currencyFormat( staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2 })}`,
+                    amount: <Currency value={userInfo.staked} isWei decimals={4}/>,
+                    subtitle: `$ ${currencyFormat( userInfo.staked * tokenInfo.crushUsdPrice, { decimalsToShow: 2, isWei: true })}`,
                   }}
                   action1Title={ !account && 'Connect First' || staked > 0 && "Harvest All" || "Go to Pool"}
                   icon={<Coin scale={0.5}/>}
@@ -299,7 +302,7 @@ export default function Home() {
                 <Grid container alignItems="center" justifyContent="space-evenly">
                   {partners.map( partner => {
                     const graphics = <>
-                      <Image src={theme.palette.type == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
+                      <Image src={theme.palette.mode == "dark" && partner.logoDark || partner.logo} height={partner.height/partner.factor} width={partner.width/partner.factor} alt={partner.name} title={partner.name}/>
                         <Tooltip arrow placement="bottom"
                           title={<Typography variant="body1">{partner.name}</Typography>}
                         >
@@ -327,7 +330,7 @@ export default function Home() {
             
             <Button width={'100%'} style={{marginTop: 24, marginBottom:32}} color="secondary" onClick={lwContext.selfBlacklist}>
               Self BlackList&nbsp;
-              <Tooltip arrow interactive leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
+              <Tooltip arrow leaveDelay={1000} classes={{ tooltip: css.tooltip}} placement="top" enterTouchDelay={100} leaveTouchDelay={120000}
                 title={<Typography style={{maxWidth: '100%', maxHeight: '70vh', overflowY: 'scroll', padding: 16, whiteSpace: 'pre-line'}} align="left">
                 {blacklistExplanation}
                 </Typography>}
@@ -345,13 +348,13 @@ const useStyles = makeStyles<Theme, { gradientId: string }>( theme => createStyl
     fill: props => `url(#${ props.gradientId })`,
   },
   gradientContainer:{
-    background: theme.palette.type == "dark" 
+    background: theme.palette.mode == "dark" 
       ? `radial-gradient( closest-side, ${theme.palette.common.black} 0%, rgba(0,0,0,0) 100%)`
       : `radial-gradient( closest-side,${theme.palette.common.white} 0%, rgba(255,255,255,0) 100%)`
   },
   announcementTitle:{
     marginTop: 16,
-    [theme.breakpoints.down('xs')]:{
+    [theme.breakpoints.down('sm')]:{
       fontSize: theme.typography.h6.fontSize
     }
   },
@@ -408,14 +411,14 @@ const partners: PartnerData[] = [
     logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
   },
-  // {
-  //   name: 'PearZap',
-  //   href: 'https://bsc.pearzap.com/the-garden',
-  //   width: 272,
-  //   height: 272,
-  //   logo: '/assets/thirdPartyLogos/partners/pearzap-logo.png',
-  //   factor: 4
-  // },
+  {
+    name: 'Beefy Finance',
+    href: 'https://app.beefy.finance/#/bsc',
+    width: 272,
+    height: 272,
+    logo: '/assets/thirdPartyLogos/partners/beefy.png',
+    factor: 4
+  },
   {
     name: 'Dragon Gaming',
     href: '/games',

@@ -71,25 +71,20 @@ const getBankData = useCallback( async() => {
       const profitsClaimed = await stakingMethods.totalProfitsClaimed().call()
       const distributedProfit = await stakingMethods.totalProfitDistributed().call()
       const totalClaimed = await stakingMethods.totalClaimed().call()
-      let poolStart 
+      let poolStart:number
       try{
-        poolStart = await stakingMethods.deploymentTimeStamp().call()
+        poolStart = parseInt(await stakingMethods.deploymentTimeStamp().call())
       }
       catch{
         poolStart = new Date().getTime()/1000 - (20*24*3600)
       }
-      console.log( {
-        distr: new BigNumber(distributedProfit).toString(),
-        claimed: new BigNumber(profitsClaimed).toString(),
-        diff: new BigNumber( distributedProfit ).minus( profitsClaimed ).toString(),
-      })
       
       setBankInfo(draft => {
         draft.profitsPending = new BigNumber( distributedProfit ).minus( profitsClaimed ).isGreaterThan( toWei('0.5') )
         draft.totalFrozen = new BigNumber( totalFrozen ).toNumber()
         draft.totalStaked = new BigNumber(totalStaked).minus( totalFrozen ).toNumber()
         draft.stakingDistributed = new BigNumber( distributedProfit ).plus( totalClaimed ).toNumber()
-        draft.poolStart = new Date( parseInt(poolStart) * 1000 )
+        draft.poolStart = new Date( poolStart * 1000 )
       })
       
       if(!account) return

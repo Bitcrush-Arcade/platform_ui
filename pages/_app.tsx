@@ -1,19 +1,20 @@
-// import App from 'next/app'
-import { useEffect } from 'react'
-import CssBaseline from '@material-ui/core/CssBaseline'
+import { AppProps } from 'next/app';
+
+import CssBaseline from '@mui/material/CssBaseline'
+import { EmotionCache } from '@emotion/react';
+import createEmotionCache from 'utils/styles/styling'
 // Context
 import ContextProviders from 'components/context/ContextProviders'
 
-function MyApp({ Component, pageProps }) {
+const clientSideEmotionCache = createEmotionCache();
 
-  useEffect(() => {
-    const jssStyles = document.querySelector('#jss-server-side')
-    if( jssStyles ){
-      jssStyles.parentElement.removeChild(jssStyles)
-    }
-  }, [])
+interface MyAppProps extends AppProps {
+  emotionCache?: EmotionCache;
+}
 
-  return (<ContextProviders>
+function MyApp(props:MyAppProps) {
+  const { Component, pageProps, emotionCache = clientSideEmotionCache } = props
+  return (<ContextProviders emotionCache={emotionCache}>
       <CssBaseline/>
       <Component {...pageProps} />
     </ContextProviders>

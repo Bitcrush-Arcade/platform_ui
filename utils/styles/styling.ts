@@ -1,8 +1,7 @@
+import createCache from '@emotion/cache';
 
-interface AnyMapping {
-  [key: string]: string
-}
+const createEmotionCache = () => {
+  return createCache({ key: 'css' });
+};
 
-export function styledBy<U, T>(property: string, mapping: T & AnyMapping) { 
-  return (props: U ) => mapping[props[property]] || mapping['default']
-}
+export default createEmotionCache;

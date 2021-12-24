@@ -1,19 +1,11 @@
 const highlightedAnnouncements : Array<Announcement> = [
   {
-    name: 'Live Now',
-    img: '/assets/announcements/1-live-now-banner.png',
-    imgMobile: '/assets/announcements/1-live-now-mobile.png',
-    link: '/games',
-    target: null,
-    rel: null,
-  },
-  {
-    name: 'Staking 2.0',
-    img: '/assets/announcements/2-stake-v2-banner.png',
-    imgMobile: '/assets/announcements/2-stake-v2-mobile.png',
-    link: '/mining',
-    target: null,
-    rel: null,
+    name: 'Beefy Partnership',
+    img: '/assets/announcements/6-beefy-banner.png',
+    imgMobile: '/assets/announcements/6-beefy-mobile.png',
+    link: 'https://app.beefy.finance/',
+    target: "_blank",
+    rel: "noopener nonreferrer",
   },
   {
     name: 'Knightswap Partnership',
@@ -31,6 +23,18 @@ const highlightedAnnouncements : Array<Announcement> = [
     target: "_blank",
     rel: "noopener nonreferrer",
   },
+  {
+    name: 'Live Now',
+    img: '/assets/announcements/1-live-now-banner.png',
+    imgMobile: '/assets/announcements/1-live-now-mobile.png',
+    link: '/games',
+  },
+  {
+    name: 'Staking 2.0',
+    img: '/assets/announcements/2-stake-v2-banner.png',
+    imgMobile: '/assets/announcements/2-stake-v2-mobile.png',
+    link: '/mining',
+  },
 ]
 
 export const height= 310
@@ -45,6 +49,6 @@ type Announcement = {
   img: string,
   imgMobile: string,
   link: string,
-  target: HTMLAnchorElement['target'] | null,
-  rel: HTMLAnchorElement['rel'] | null
+  target?: HTMLAnchorElement['target'],
+  rel?: HTMLAnchorElement['rel']
 }

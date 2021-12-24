@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const RechargeIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 26 26" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <path d="M25.92,3.18a4.24,4.24,0,0,0-1.16-1.94A4.24,4.24,0,0,0,22.82.08a2.06,2.06,0,0,0-2,.44,2.06,2.06,0,0,0-.44,2,4.29,4.29,0,0,0,1.16,1.94,4.29,4.29,0,0,0,1.94,1.16,2.06,2.06,0,0,0,2-.44A2.06,2.06,0,0,0,25.92,3.18Z"/>

@@ -5,7 +5,8 @@ import { useRouter } from 'next/router'
 import { useImmer } from 'use-immer'
 import { useWeb3React } from '@web3-react/core'
 // Material Theming
-import { ThemeProvider } from '@material-ui/core/styles'
+import { CacheProvider, EmotionCache } from '@emotion/react';
+import { ThemeProvider, Theme, StyledEngineProvider } from '@mui/material/styles';
 import getTheme from 'styles/BaseTheme'
 // data
 import { getContracts } from 'data/contracts'
@@ -13,6 +14,7 @@ import { getContracts } from 'data/contracts'
 import { useContract } from 'hooks/web3Hooks'
 // types
 import { TransactionHash } from 'types/TransactionTypes'
+import { Receipt } from 'types/PromiEvent';
 import BigNumber from 'bignumber.js'
 
 type TransactionSubmitData = { 
@@ -30,7 +32,7 @@ type ContextType = {
   liveWallet: { balance: BigNumber, timelock: number, selfBlacklist: () => void },
   toggleDarkMode?: () => void,
   isDark: boolean,
-  hydrateToken: () => Promise<void>,
+  hydrateToken: (reset?:boolean) => Promise<void>,
   toggleLwModal: () => void,
   lwModalStatus: boolean,
 }
@@ -42,14 +44,14 @@ export const TransactionContext = createContext<ContextType>({
   tokenInfo: { weiBalance: new BigNumber(0), crushUsdPrice: 0, burned: 0},
   toggleDarkMode: () => {},
   isDark: true,
-  hydrateToken: () => Promise.resolve(),
+  hydrateToken: (reset?:boolean) => Promise.resolve(),
   liveWallet: { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
 })
 
-export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
-  const { children } = props
+export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCache: EmotionCache })=>{
+  const { children, emotionCache } = props
   // Blockchain Coin
   const { account, chainId } = useWeb3React()
   const router = useRouter()
@@ -70,7 +72,10 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const toggleLwModal = useCallback( () => setLwModal( p => !p), [setLwModal])
 
-  const tokenHydration = useCallback( async () => {
+  const tokenHydration = useCallback( async (reset?:boolean) => {
+    if(reset){
+      setLiveWalletBalance( prev => ({...prev, balance: new BigNumber(0)}))
+    }
     let serverBalance = 0
     
     const tokenBalance = account && methods ? await methods.balanceOf(account).call() : '0'
@@ -140,8 +145,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   const edits = useMemo( () => ({
     pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
-        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data.errorData }
-        if(data.needsReview)
+        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data?.errorData }
+        if(data?.needsReview)
         setReviewHash( draft => { draft.hashArray.push(id) })
       })
     },
@@ -180,7 +185,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
   },[edits])
 
   const checkTransactions = useCallback( (hashArray: Array<string>) => {
-    const recheckArr =  []
+    const recheckArr: string[] =  []
     hashArray.map( async (hash, index) => {
 
       if(pendingTransactions[hash]?.status !== 'pending') return
@@ -188,7 +193,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
       
       await web3.eth.getTransactionReceipt( hash, ( e, rc) => {
         console.log( 'check response', {e, rc})
-        if( !rc || !pendingTransactions[hash]) return recheckArr.push(pendingTransactions[hash])
+        if( !rc || !pendingTransactions[hash]) return recheckArr.push(hash)
         pendingTransactions[hash] && editTransactions( hash, rc.status ? 'complete' : 'error')
         setReviewHash( draft => {
           draft.hashArray.splice(index, 1)
@@ -219,34 +224,39 @@ export const TransactionLoadingContext = (props:{ children: ReactNode })=>{
 
   const selfBlacklist = useCallback(() => {
     lwMethods.blacklistSelf().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx: string) => {
         editTransactions(tx, 'pending', { description: "Self Blacklist"})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc: Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })
   }, [ lwMethods, account, editTransactions])
 
-  return <TransactionContext.Provider value={{
-    pending: pendingTransactions,
-    completed: completeTransactions,
-    editTransactions: editTransactions,
-    tokenInfo: coinInfo,
-    toggleDarkMode: toggle,
-    isDark: dark,
-    hydrateToken: tokenHydration,
-    liveWallet: { ...liveWalletBalance, selfBlacklist },
-    toggleLwModal,
-    lwModalStatus: lwModal
-  }}>
-    <ThemeProvider theme={basicTheme}>
-      {children}
-    </ThemeProvider>
-  </TransactionContext.Provider>
+  return (<CacheProvider value={emotionCache}>
+    <TransactionContext.Provider value={{
+      pending: pendingTransactions,
+      completed: completeTransactions,
+      editTransactions: editTransactions,
+      tokenInfo: coinInfo,
+      toggleDarkMode: toggle,
+      isDark: dark,
+      hydrateToken: tokenHydration,
+      liveWallet: { ...liveWalletBalance, selfBlacklist },
+      toggleLwModal,
+      lwModalStatus: lwModal
+    }}>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={basicTheme}>
+          {children}
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </TransactionContext.Provider>
+  </CacheProvider>
+  );
 }
 

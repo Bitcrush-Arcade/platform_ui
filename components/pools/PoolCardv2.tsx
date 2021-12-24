@@ -1,20 +1,22 @@
 import { useState, useEffect, useCallback } from  'react'
 // Material
-import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
-import Avatar from '@material-ui/core/Avatar'
-import ButtonBase from "@material-ui/core/ButtonBase"
-import MButton from "@material-ui/core/Button"
-import CardHeader from '@material-ui/core/CardHeader'
-import CardContent from '@material-ui/core/CardContent'
-import CardActions from '@material-ui/core/CardActions'
-import CircularProgress from "@material-ui/core/CircularProgress"
-import Divider from "@material-ui/core/Divider"
-import Grid from '@material-ui/core/Grid'
-import IconButton from "@material-ui/core/IconButton"
-import Skeleton from "@material-ui/lab/Skeleton"
-import Typography from '@material-ui/core/Typography'
+import { Theme } from '@mui/material/styles';
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Avatar from '@mui/material/Avatar'
+import ButtonBase from "@mui/material/ButtonBase"
+import MButton from "@mui/material/Button"
+import CardHeader from '@mui/material/CardHeader'
+import CardContent from '@mui/material/CardContent'
+import CardActions from '@mui/material/CardActions'
+import CircularProgress from "@mui/material/CircularProgress"
+import Divider from "@mui/material/Divider"
+import Grid from '@mui/material/Grid'
+import IconButton from "@mui/material/IconButton"
+import Skeleton from '@mui/material/Skeleton'
+import Typography from '@mui/material/Typography'
 // Icons
-import RefreshIcon from '@material-ui/icons/Refresh'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import CalculationIcon from 'components/svg/CalculationIcon'
 import InvaderIcon from 'components/svg/InvaderIcon'
 // BitcrushUI
@@ -31,6 +33,7 @@ import { useWeb3React } from '@web3-react/core'
 import useCoin from 'hooks/useCoin'
 import { getContracts } from 'data/contracts'
 import { toWei } from 'web3-utils'
+import { Receipt } from 'types/PromiEvent';
 
 BigNumber.config({ DECIMAL_PLACES: 18 })
 
@@ -130,34 +133,34 @@ const Poolv2 = ( props: PoolCardProps ) => {
     if(!poolMethods) return setSubmitting(false)
     if(!values.actionType)
       return poolMethods.enterStaking(weiValue).send({ from: account })
-        .on('transactionHash', (tx) => {
+        .on('transactionHash', (tx:string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Stake in Bankroll`})
         })
-        .on('receipt', ( rc) => {
+        .on('receipt', ( rc:Receipt) => {
           console.log('receipt',rc)
           editTransactions(rc.transactionHash,'complete')
           getPoolData()
           getAPY()
           toggleStakeModal()
         })
-        .on('error', (error, receipt) => {
+        .on('error', (error: any, receipt:Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         })
     return poolMethods.emergencyWithdraw().send({ from: account })
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: `Withdraw All from Staking`})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc:Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         getPoolData()
         getAPY()
         toggleStakeModal()
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error: any, receipt:Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })

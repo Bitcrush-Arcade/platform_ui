@@ -1,4 +1,4 @@
-import SvgIcon, { SvgIconProps } from "@material-ui/core/SvgIcon";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
 
 const UfoIcon = ( props: SvgIconProps ) => <SvgIcon {...props} viewBox="0 0 25 25" id="Warstwa_1" data-name="Warstwa 1" xmlns="http://www.w3.org/2000/svg">
   <circle cx="12.5" cy="22.5" r="0.42"/>

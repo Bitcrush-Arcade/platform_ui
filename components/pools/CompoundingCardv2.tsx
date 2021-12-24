@@ -1,12 +1,14 @@
 import { useEffect } from "react"
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import Grid from "@material-ui/core/Grid"
-import Typography from "@material-ui/core/Typography"
-import CardContent from "@material-ui/core/CardContent"
-import Tooltip from "@material-ui/core/Tooltip"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import Grid from "@mui/material/Grid"
+import Typography from "@mui/material/Typography"
+import CardContent from "@mui/material/CardContent"
+import Tooltip from "@mui/material/Tooltip"
 // Icons
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
@@ -17,6 +19,7 @@ import { useWeb3React } from "@web3-react/core"
 import useCalculator from 'hooks/compounder/useCalculator'
 // Context
 import { useTransactionContext } from "hooks/contextHooks"
+import { Receipt } from "types/PromiEvent";
 
 const CompoundingCard = (props: CompoundingCardProps ) => {
 
@@ -31,13 +34,13 @@ const CompoundingCard = (props: CompoundingCardProps ) => {
 
   const claim = () => {
     contractMethods.compoundAll().send({ from: account })
-      .on('transactionHash', tx => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
-      .on('receipt', rct =>{
+      .on('transactionHash', (tx:string) => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
+      .on('receipt', (rct: Receipt) =>{
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
         calculate()
       })
-      .on('error', (error, rct) => {
+      .on('error', (error:any, rct:Receipt) => {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
         calculate()

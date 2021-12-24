@@ -5,6 +5,7 @@ import { useTransactionContext } from "./contextHooks"
 import { useContract } from "./web3Hooks"
 
 import BigNumber from 'bignumber.js'
+import { Receipt } from 'types/PromiEvent'
 
 const useCoin = (coinAddress?: string) => {
   
@@ -31,16 +32,16 @@ const useCoin = (coinAddress?: string) => {
     if(!coinMethods) return
     coinMethods.approve( contractToApprove, approveAmount ?? new BigNumber(30000000000000000000000000).toFixed() )
       .send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`)})
-      .on('transactionHash', (tx) => {
+      .on('transactionHash', (tx:string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: `Approve TOKEN spend`})
       })
-      .on('receipt', ( rc) => {
+      .on('receipt', ( rc:Receipt) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
         getApproved(contractToApprove)
       })
-      .on('error', (error, receipt) => {
+      .on('error', (error:any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         getApproved(contractToApprove)

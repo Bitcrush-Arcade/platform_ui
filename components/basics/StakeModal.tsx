@@ -1,19 +1,21 @@
 import { Fragment, ReactNode } from 'react'
 import { Formik, Form, Field } from 'formik'
-import { TextField } from 'formik-material-ui'
+import { TextField } from 'formik-mui'
 import BigNumber from 'bignumber.js'
 // Material
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles"
-import MButton from "@material-ui/core/Button"
-import Dialog from "@material-ui/core/Dialog"
-import Divider from "@material-ui/core/Divider"
-import Grid from "@material-ui/core/Grid"
-import Skeleton from "@material-ui/lab/Skeleton"
-import Slider from "@material-ui/core/Slider"
-import Tooltip from '@material-ui/core/Tooltip'
-import Typography from "@material-ui/core/Typography"
+import { Theme } from "@mui/material/styles";
+import makeStyles from '@mui/styles/makeStyles';
+import createStyles from '@mui/styles/createStyles';
+import MButton from "@mui/material/Button"
+import Dialog from "@mui/material/Dialog"
+import Divider from "@mui/material/Divider"
+import Grid from "@mui/material/Grid"
+import Skeleton from '@mui/material/Skeleton'
+import Slider, { SliderThumb } from "@mui/material/Slider"
+import Tooltip from '@mui/material/Tooltip'
+import Typography from "@mui/material/Typography"
 // Icons
-import InfoIcon from '@material-ui/icons/InfoOutlined';
+import InfoIcon from '@mui/icons-material/InfoOutlined';
 
 // Bitcrush
 import Button from 'components/basics/GeneralUseButton'
@@ -22,7 +24,6 @@ import SmallButton from 'components/basics/SmallButton'
 // Icons
 import InvaderIcon from 'components/svg/InvaderIcon'
 // libs
-import { fromWei } from 'web3-utils'
 import { currencyFormat } from 'utils/text/text'
 
 /**
@@ -78,7 +79,10 @@ function StakeModal( props: StakeModalProps ) {
           stakeAmount: new BigNumber(0),
           actionType: initAction || 0
         }}
-        onSubmit={ (vals, ops) => needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)}
+        onSubmit={ (vals, ops) => {
+          console.log('submits', needsApprove)
+          needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)
+        }}
         validate ={ ( values ) => {
           let errors: any = {}
           const bigValue = new BigNumber(values.stakeAmount)
@@ -91,23 +95,28 @@ function StakeModal( props: StakeModalProps ) {
         }}
         validateOnChange
       >
-      { ({values, setFieldValue, isSubmitting, errors}) =>{
+      { ({values, setFieldValue, isSubmitting, errors, handleSubmit}) =>{
         const { actionType, stakeAmount } = values
         const {maxValue: maxUsed, disableAction} = options[actionType]
         const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
         const hasErrors = Object.keys( errors ).length > 0
-        const sliderChange = (e: any, value: number) => {
+        const sliderChange = (e: any, value: number | number[]) => {
+          if(Array.isArray(value)) return
           const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
           setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) )
         }
         const switchAction = (stakeActionValue: number) => {
           setFieldValue('actionType', stakeActionValue )
           setFieldValue('stakeAmount', 0 )
-          options[stakeActionValue]?.onSelectOption && options[stakeActionValue]?.onSelectOption()
+
+          const selectedAction = options[stakeActionValue]?.onSelectOption
+          selectedAction && selectedAction()
           onActionSelected && onActionSelected( stakeActionValue )
         }
         const maxUsedAvailable = maxUsed ?? false
         const isMaxAvailable = typeof(maxUsedAvailable) !== 'boolean'
+
+        const doMore = options[actionType]?.more
 
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer } alignItems="center">
@@ -120,7 +129,7 @@ function StakeModal( props: StakeModalProps ) {
                   </Grid>
                 }
                 <Grid item>
-                  <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "default"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
+                  <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "info"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
                     {name}
                   </MButton>
                 </Grid>
@@ -151,7 +160,7 @@ function StakeModal( props: StakeModalProps ) {
                 MAX
               </MButton>,
               className: css.textField,
-              onFocus: e => e.target.select()
+              onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
             }}
           />
           <div className={ css.sliderContainer }>
@@ -159,8 +168,9 @@ function StakeModal( props: StakeModalProps ) {
               value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
               onChange={sliderChange}
               step={ 10 }
-              ThumbComponent={p => <InvaderThumb thumbProps={p} percent={percent}/>}
-              valueLabelDisplay="on"
+              components={{
+                Thumb: function IThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/> },
+              }}
             />
           </div>
           <Grid container justifyContent="space-evenly">
@@ -179,13 +189,14 @@ function StakeModal( props: StakeModalProps ) {
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
             onClick={ e => { 
-              if(!needsApprove) return
+              console.log('click the damn thing', needsApprove)
+              if(!needsApprove) return handleSubmit();
               e.preventDefault()
               onApprove && onApprove()
           }}>
             {`${ needsApprove ? "Approve" : options[actionType].name } ${coinInfo?.symbol}`}
           </Button>
-          {options[actionType]?.more && options[actionType]?.more(values)}
+          {doMore && doMore(values)}
         </Form>)
         }}
       </Formik>
@@ -222,13 +233,12 @@ const useStyles = makeStyles<Theme>( theme => createStyles({
 const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
   const isMax = allProps.percent.toNumber() === 100
   return(
-    <span {...allProps.thumbProps}>
-      <div style={{position: 'relative'}}>
-        <InvaderIcon color="secondary" style={{position: 'absolute',left: -12, bottom: -10}}/>
-        <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
-          { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
-        </Typography>
-      </div>
-    </span>
+    <SliderThumb {...allProps.thumbProps} sx={{color: 'transparent'}}>
+      {allProps.thumbProps.children}
+      <InvaderIcon color="secondary"/>
+      <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -2 : -8, bottom: -25 }} color="textPrimary" variant="caption">
+        { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
+      </Typography>
+    </SliderThumb>
 )}
-const FormComponent = p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>
+const FormComponent = (p:any) => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>
