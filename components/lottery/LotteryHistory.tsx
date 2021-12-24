@@ -39,16 +39,11 @@ const LotteryHistory = () => {
                     
                 </Tabs>
         </Grid>
-
-        <Grid item sx={{pb:1, pr:1}}>
-            <BasicButton background="primary">BUY MORE</BasicButton>
-        </Grid>
-         
     </Grid>
         
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
-        {tabSelected == 0 && <Current/>}
+        {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
         {tabSelected == 1 && <LastRound/>}
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
@@ -72,4 +67,17 @@ const testHistoryArray=[
     {id: 5, date: new Date(), totalTickets: 1000, userTickets: 3},
     {id: 6, date: new Date(), totalTickets: 1000, userTickets: 3},
     {id: 7, date: new Date(), totalTickets: 1000, userTickets: 3},
+]
+const testCurrentArray=[
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
+    '1123456',
 ]
