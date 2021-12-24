@@ -43,7 +43,7 @@ export default function TxCard( props: TxCardProps ){
       <Grid item>
         <Tooltip arrow
           title={ <Typography variant="caption">
-              { first.description || first.errorMsg}<br/>{keys[0]}<br/>{first.comment || ''}
+              { first.description || first.errorMsg}<br/>{keys[0]}
             </Typography>}
         >
           <Typography noWrap className={ css.description }>
