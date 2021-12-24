@@ -28,19 +28,38 @@ const invaderColor : { [key: string] : string } = {
   "9": "#A92682",
 }
 
-const NumberInvader = ( props : {twoDigits: [string, string]}) => {
-  const { twoDigits } = props
+type NumberInvaderProps = {
+  twoDigits: [string,string],
+  size?: 'small' | 'medium'
+}
+
+const NumberInvader = ( props : NumberInvaderProps) => {
+  const { twoDigits, size } = props
   const SelectedInvader = isNaN(parseInt(twoDigits[0])) ? null :  invaderList[parseInt(twoDigits[0])]
-  return <Grid container justifyContent="center" sx={{ width: '80px'}}>
+
+  const isSmall = size === "small"
+  const iconSize = isSmall ? 25 : 40
+  const textVariant = isSmall ? "h6" : "h5"
+  return <Grid container justifyContent="center" sx={{ width: isSmall ? '60px' : '80px'}}>
     <Grid item>
-      {SelectedInvader && <SelectedInvader sx={{width: 40, height: 40, color: invaderColor[twoDigits[1]] || "white"}} />}
+      {
+        SelectedInvader && 
+          <SelectedInvader 
+            sx={{
+              width: iconSize,
+              height: iconSize,
+              color: invaderColor[twoDigits[1]] || "white"
+            }}
+          />
+      }
     </Grid>
+
     <Grid item xs={12}>
       <Stack direction="row" justifyContent="space-evenly">
-        <Typography variant="h5" fontWeight={500} color="primary">
+        <Typography variant={textVariant} fontWeight={500} color="primary">
           {twoDigits[0]}
         </Typography>
-        <Typography variant="h5" fontWeight={500} color="primary">
+        <Typography variant={textVariant} fontWeight={500} color="primary">
           {twoDigits[1]}
         </Typography>
       </Stack>
