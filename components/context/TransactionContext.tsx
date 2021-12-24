@@ -145,7 +145,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
   const edits = useMemo( () => ({
     pending: (id: string, data?: TransactionSubmitData) => {
       setPendingTransactions( draft => {
-        draft[id] = { status: 'pending', description: data?.comment || '', errorMsg: data?.errorData }
+        draft[id] = { status: 'pending', description: data?.description || data?.comment || '', errorMsg: data?.errorData }
         if(data?.needsReview)
         setReviewHash( draft => { draft.hashArray.push(id) })
       })
