@@ -66,6 +66,8 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   const lotteryContract = getContracts('lottery', chainId)
   const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
 
+  const selectedNumber = step == 2 && tickets[selectedTicket].split('') || null
+
   // Get Lottery Info
   useEffect( () => {
     if(!lotteryMethods) return
@@ -297,6 +299,23 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     {
       step == 2 && 
       <>
+        <Typography>
+          Each invader is represented by two numbers, one being the invader type and the other the color. To edit, select the invader you want to edit and pick your favorites.
+        </Typography>
+        <Paper
+          sx={ theme => ({
+            backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : alpha(theme.palette.primary.dark,0.2),
+            borderRadius: 3,
+            px: 2,
+            py: 2,
+          })}
+        >
+          {selectedNumber && <Stack direction="row">
+            <NumberInvader twoDigits={[selectedNumber[1], selectedNumber[2]]}/>
+            <NumberInvader twoDigits={[selectedNumber[3], selectedNumber[4]]}/>
+            <NumberInvader twoDigits={[selectedNumber[5], selectedNumber[6]]}/>
+          </Stack>}
+        </Paper>
       </>
     }
     {
