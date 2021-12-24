@@ -14,8 +14,8 @@ import Invader7 from 'components/svg/invaders/Invader7'
 import Invader8 from 'components/svg/invaders/Invader8'
 import Invader9 from 'components/svg/invaders/Invader9'
 
-const invaderList = [Invader0, Invader1, Invader2, Invader3, Invader4, Invader4, Invader5, Invader6, Invader7, Invader8, Invader9]
-const invaderColor : { [key: string] : string } = {
+export const invaderList = [Invader0, Invader1, Invader2, Invader3, Invader4, Invader5, Invader6, Invader7, Invader8, Invader9]
+export const invaderColor : { [key: string] : string } = {
   "0": "#E5087E",
   "1": "#01A0E3",
   "2": "#7AEA34",

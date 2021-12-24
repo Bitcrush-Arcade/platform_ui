@@ -8,6 +8,7 @@ import { TextField } from 'formik-mui'
 import type { Theme } from '@mui/material/styles'
 import { alpha } from '@mui/material/styles'
 import MButton from '@mui/material/Button'
+import ButtonBase from '@mui/material/ButtonBase'
 import Dialog from '@mui/material/Dialog'
 import IconButton from '@mui/material/IconButton'
 import Paper from '@mui/material/Paper'
@@ -17,13 +18,18 @@ import Typography from '@mui/material/Typography'
 import { useWeb3React } from '@web3-react/core'
 // Icons
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import CircleIcon from '@mui/icons-material/Circle'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
+import EjectIcon from '@mui/icons-material/Eject'
+import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // Bitcrush UI
 import Button from 'components/basics/GeneralUseButton'
 import Currency from 'components/basics/Currency'
+import NumberInvader, { invaderList, invaderColor } from 'components/lottery/NumberInvader'
 import { FormComponent } from 'components/basics/StakeModal'
 // Hooks
+import useCoin from 'hooks/useCoin'
 import { useContract } from 'hooks/web3Hooks'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Data
@@ -31,8 +37,7 @@ import { getContracts } from 'data/contracts'
 // Libs
 import { currencyFormat } from 'utils/text/text'
 import { standardizeNumber, getTicketDigits } from 'utils/lottery'
-import NumberInvader from 'components/lottery/NumberInvader'
-import useCoin from 'hooks/useCoin'
+import { Receipt } from 'types/PromiEvent'
 
 type TicketBuyModalProps ={
   open: boolean;
@@ -43,11 +48,15 @@ type LotteryInfo={
   currentRound: number,
   ticketPrice: BigNumber,
   userBalance: BigNumber,
+  txHash: string,
 }
+
 
 const TicketBuyModal = (props: TicketBuyModalProps) => {
 
   const { open, onClose } = props;
+  const { editTransactions } = useTransactionContext()
+  const [ gradient, gradientId ] = invaderGradient()
   // Steps are:
   // 0 -> buy tickets
   // 1 -> select Tickets
@@ -55,11 +64,12 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   // 3 -> Thanks page
   const [ step, setStep ] = useState<number>(0)
   // Lottery Info
-  const [ lotteryInfo, setLotteryInfo ] = useImmer<LotteryInfo>({ currentRound: 0, ticketPrice: new BigNumber(0), userBalance: new BigNumber(0) })
+  const [ lotteryInfo, setLotteryInfo ] = useImmer<LotteryInfo>({ currentRound: 0, ticketPrice: new BigNumber(0), userBalance: new BigNumber(0) , txHash: ''})
   // Ticket Info
   const [ tickets, setTickets ] = useImmer<Array<string>>([])
   // Ticket Editor
   const [ selectedTicket, setSelectedTicket ] = useState<number>(0)
+  const [ ticketPair, setTicketPair ] = useState<number>(0)
   // BlockChain
   const { account, chainId } = useWeb3React()
   const { approve, isApproved, coinMethods, getApproved} = useCoin()
@@ -67,7 +77,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
 
   const selectedNumber = step == 2 && tickets[selectedTicket].split('') || null
-
+  const selectedPair = selectedNumber && selectedNumber.slice(ticketPair * 2 + 1, ticketPair * 2 + 3)
   // Get Lottery Info
   useEffect( () => {
     if(!lotteryMethods) return
@@ -103,6 +113,27 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     setTickets([])
     setStep(0)
   }
+
+  const buyTickets = () => {
+    if(!lotteryMethods) return
+    lotteryMethods.buyTickets(tickets,0)
+      .send({ from: account })
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        setLotteryInfo( draft => { draft.txHash = tx })
+        editTransactions(tx,'pending', { description: `Recruit ${tickets.length} invader teams`})
+        setStep(3)
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  }
+
   return <Dialog 
     open={open}
     PaperComponent={FormComponent}
@@ -113,12 +144,10 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         { step > 0 && 
           <Tooltip arrow title={<Typography variant="subtitle1">Back</Typography>}>
             <IconButton size="small" 
-              onClick={()=>setStep( p => {
-                if(step < 3) 
-                  return p - 1
-                else
-                  return 1
-              } )}
+              onClick={()=>{
+                setStep( p => step < 3 ? p - 1 : 1 )
+                setTicketPair(0)
+              }}
             >
               <ArrowBackIcon fontSize="inherit"/>
             </IconButton>
@@ -131,11 +160,11 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         </IconButton>
       </Tooltip>
     </Stack>
-    <Typography variant="h5" align="center" fontWeight={600} sx={{ textTransform: 'uppercase', pb:3}}>
-      { step === 0 && "Buy Tickets"}
+    <Typography variant="h5" align="center" color={ step === 3  ? "secondary" : "textPrimary"} fontWeight={600} sx={{ textTransform: 'uppercase', pb:3}}>
+      { step === 0 && "Recruit Team"}
       { step === 1 && `ROUND ${lotteryInfo.currentRound}`}
-      { step === 2 && `Edit Ticket ${selectedTicket + 1}`}
-      { step === 3 && `Thanks for participating`}
+      { step === 2 && `Edit Team ${selectedTicket + 1}`}
+      { step === 3 && `Recruiting...`}
     </Typography>
     { 
       step === 0 &&
@@ -224,7 +253,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
                       <Button color="primary" background="primary" onClick={submitForm}
                         disabled={hasError || isNaN(parseInt(values.ticketAmount)) || parseInt(values.ticketAmount) == 0}
                       >
-                        Choose Tickets
+                        Pick Team
                       </Button>
                       <Button color="secondary"
                         disabled={hasError || isNaN(parseInt(values.ticketAmount)) || parseInt(values.ticketAmount) == 0}
@@ -241,8 +270,8 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
                       </Button>
                   }
                   <Typography variant="subtitle2" px={2} whiteSpace="pre-line">
-                    &quot;Choose Tickets&quot; Shows you our draw selections and allows you to edit your invader team to customize your perfect team.{'\n'}
-                    &quot;Lucky Draw&quot; chooses your ticket numbers randomly with no duplicates on this draw.{'\n'}
+                    &quot;Pick Team&quot; Sets teams as default 000000, customize your teams to your taste.{'\n'}
+                    &quot;Lucky Draw&quot; chooses your team members randomly with no duplicates on this draw.{'\n'}
                     Purchases are final.
                   </Typography>
                 </Stack>
@@ -255,7 +284,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
       step === 1 && 
       <>
         <Typography variant="subtitle1" align="center" fontWeight={600}>
-          Your Tickets
+          New Recruits
         </Typography>
         {tickets.map( (ticketNumber, ticketIndex) => {
           const ticketDigits = ticketNumber.split('')
@@ -291,7 +320,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
             </Paper>
           </Stack>
         })}
-        <Button color="secondary" onClick={() => setStep(3)} sx={{ mt: 2}}>
+        <Button color="secondary" onClick={buyTickets} sx={{ mt: 2}}>
           Get Tickets
         </Button>
       </>
@@ -299,30 +328,158 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     {
       step == 2 && 
       <>
-        <Typography>
-          Each invader is represented by two numbers, one being the invader type and the other the color. To edit, select the invader you want to edit and pick your favorites.
+        <Typography sx={{ mb: 2}}>
+          Each invader is represented by two numbers, one being the invader type and the other the color. To edit, select the invader you want to edit and pick your favorite type or color.
         </Typography>
         <Paper
           sx={ theme => ({
+            borderColor: theme.palette.primary.main,
+            borderWidth: 2,
+            borderStyle: 'solid',
             backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : alpha(theme.palette.primary.dark,0.2),
             borderRadius: 3,
             px: 2,
-            py: 2,
           })}
         >
-          {selectedNumber && <Stack direction="row">
-            <NumberInvader twoDigits={[selectedNumber[1], selectedNumber[2]]}/>
-            <NumberInvader twoDigits={[selectedNumber[3], selectedNumber[4]]}/>
-            <NumberInvader twoDigits={[selectedNumber[5], selectedNumber[6]]}/>
-          </Stack>}
+          { 
+            selectedNumber && 
+              <Stack direction="row" justifyContent="space-evenly">
+                <ButtonBase onClick={() => setTicketPair(0)} sx={{ position: 'relative' ,py: 2}}>
+                  <NumberInvader twoDigits={[selectedNumber[1], selectedNumber[2]]}/>
+                  {ticketPair == 0 && <EjectIcon sx={{position: 'absolute', left: 'calc(50% - 20px)', bottom: -10, fontSize: 40, color: 'secondary.main'}}/>}
+                </ButtonBase>
+                <ButtonBase onClick={() => setTicketPair(1)} sx={{ position: 'relative' ,py: 2}}>
+                  <NumberInvader twoDigits={[selectedNumber[3], selectedNumber[4]]}/>
+                  {ticketPair == 1 && <EjectIcon sx={{position: 'absolute', left: 'calc(50% - 20px)', bottom: -10, fontSize: 40, color: 'secondary.main'}}/>}
+                </ButtonBase>
+                <ButtonBase onClick={() => setTicketPair(2)} sx={{ position: 'relative' ,py: 2}}>
+                  <NumberInvader twoDigits={[selectedNumber[5], selectedNumber[6]]}/>
+                  {ticketPair == 2 && <EjectIcon sx={{position: 'absolute', left: 'calc(50% - 20px)', bottom: -10, fontSize: 40, color: 'secondary.main'}}/>}
+                </ButtonBase>
+              </Stack>
+          }
         </Paper>
+        <Stack direction="row" justifyContent="space-evenly" mt={3}>
+          {invaderList.map( (Invader, invaderIndex) => {
+            const selectedInvader = selectedPair && invaderIndex === parseInt(selectedPair[0])
+            const chooseInvader = () => {
+              if(selectedInvader)
+                return;
+              setTickets( draft => {
+                const ticketString = draft[selectedTicket].split('')
+                ticketString[ticketPair*2 + 1] = `${invaderIndex}`
+                draft[selectedTicket] = ticketString.join('')
+              })
+            }
+            return <ButtonBase
+              key={`invader-Type-selector-${invaderIndex}`}
+              onClick={chooseInvader}
+              sx={ theme => ({
+                py: 1,
+                px: 0.5,
+                border: 1,
+                borderColor: selectedInvader ? "primary.main" : 'transparent',
+                borderRadius: 2,
+                background: selectedInvader ? `linear-gradient( 180deg, transparent 0%, ${alpha(theme.palette.primary.dark, 0.8)} 100%)` : 'none'
+              })}
+            >
+              <Stack alignItems="center">
+                <Invader sx={{ width: 20, height: 20 }} color={selectedInvader ? "primary" : "inherit"}/>
+                <Typography color={selectedInvader ? "textPrimary" : "primary"}>
+                  {invaderIndex}
+                </Typography>
+              </Stack>
+            </ButtonBase>
+          })}
+        </Stack>
+        <Stack direction="row" justifyContent="space-evenly" my={2}>
+          {invaderList.map( (x, colorIndex) => {
+            const selectedColor = selectedPair && colorIndex === parseInt(selectedPair[1])
+            const chooseColor = () => {
+              if(selectedColor)
+                return;
+              setTickets( draft => {
+                const ticketString = draft[selectedTicket].split('')
+                ticketString[(ticketPair + 1)*2] = `${colorIndex}`
+                draft[selectedTicket] = ticketString.join('')
+              })
+            }
+            return <ButtonBase
+              key={`invader-Color-selector-${colorIndex}`}
+              onClick={chooseColor}
+              sx={ theme => ({
+                py: 1,
+                px: 0.5,
+                border: 1,
+                borderColor: selectedColor ? "primary.main" : 'transparent',
+                borderRadius: 2,
+                background: selectedColor ? `linear-gradient( 180deg, transparent 0%, ${alpha(theme.palette.primary.dark, 0.8)} 100%)` : 'none'
+              })}
+            >
+              <Stack alignItems="center">
+                <CircleIcon sx={{ width: 20, height: 20, color: invaderColor[`${colorIndex}`] }} />
+                <Typography color={selectedColor ? "textPrimary" : "primary"}>
+                  {colorIndex}
+                </Typography>
+              </Stack>
+            </ButtonBase>
+          })}
+        </Stack>
+        {
+          (selectedTicket + 1) < tickets.length &&
+            <Button color="secondary" size="small" sx={{ mb: 1}}
+              onClick={() => {
+                // setStep(1)
+                setSelectedTicket( p => p+1)
+                setTicketPair(0)
+              }}
+            >
+              Edit Next Team
+            </Button>
+        }
+        <Button color="primary" size="small"
+          onClick={() => {
+            setStep(1)
+            setTicketPair(0)
+          }}
+        >
+          Back to Teams
+        </Button>
       </>
     }
     {
       step == 3 && 
-      <>
-      Thanks
-      </>
+      <Stack alignItems="center">
+        <Typography align="center">
+          Your transaction has been Submitted
+        </Typography>
+        <Typography align="center" color="secondary" component="a" target="_blank" href={`https://${chainId == 97 ? 'testnet.' : ''}bscscan.com/tx/${lotteryInfo.txHash}`} rel="noreferrer noopener">
+            Check BSCscan
+        </Typography>
+        <div>
+          { gradient }
+          <InvaderIcon color="secondary"
+            sx={{
+              fill: `url(#${ gradientId })`,
+              fontSize: 100,
+            }}
+          />
+        </div>
+        <Typography align="center" fontFamily="Zebulon" variant="h5"
+          sx={theme => ({
+            backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.main} 10%, ${theme.palette.secondary.main} 70%)`,
+            WebkitBackgroundClip: 'text',
+            color: 'transparent',
+            WebkitTextFillColor: 'transparent',
+            textShadow: 'none',
+          })}
+        >
+          CRUSH IT!
+        </Typography>
+        <Button color="primary" onClick={closeModal} sx={{mt: 2, width:  200}}>
+          Close
+        </Button>
+      </Stack>
     }
   </Dialog>
 
