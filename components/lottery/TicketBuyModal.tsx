@@ -22,12 +22,14 @@ import CircleIcon from '@mui/icons-material/Circle'
 import CloseIcon from '@mui/icons-material/Close'
 import EditIcon from '@mui/icons-material/Edit'
 import EjectIcon from '@mui/icons-material/Eject'
+import InvaderIcon, { invaderGradient } from 'components/svg/InvaderIcon'
 // Bitcrush UI
 import Button from 'components/basics/GeneralUseButton'
 import Currency from 'components/basics/Currency'
 import NumberInvader, { invaderList, invaderColor } from 'components/lottery/NumberInvader'
 import { FormComponent } from 'components/basics/StakeModal'
 // Hooks
+import useCoin from 'hooks/useCoin'
 import { useContract } from 'hooks/web3Hooks'
 import { useTransactionContext } from 'hooks/contextHooks'
 // Data
@@ -35,7 +37,7 @@ import { getContracts } from 'data/contracts'
 // Libs
 import { currencyFormat } from 'utils/text/text'
 import { standardizeNumber, getTicketDigits } from 'utils/lottery'
-import useCoin from 'hooks/useCoin'
+import { Receipt } from 'types/PromiEvent'
 
 type TicketBuyModalProps ={
   open: boolean;
@@ -46,11 +48,15 @@ type LotteryInfo={
   currentRound: number,
   ticketPrice: BigNumber,
   userBalance: BigNumber,
+  txHash: string,
 }
+
 
 const TicketBuyModal = (props: TicketBuyModalProps) => {
 
   const { open, onClose } = props;
+  const { editTransactions } = useTransactionContext()
+  const [ gradient, gradientId ] = invaderGradient()
   // Steps are:
   // 0 -> buy tickets
   // 1 -> select Tickets
@@ -58,7 +64,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   // 3 -> Thanks page
   const [ step, setStep ] = useState<number>(0)
   // Lottery Info
-  const [ lotteryInfo, setLotteryInfo ] = useImmer<LotteryInfo>({ currentRound: 0, ticketPrice: new BigNumber(0), userBalance: new BigNumber(0) })
+  const [ lotteryInfo, setLotteryInfo ] = useImmer<LotteryInfo>({ currentRound: 0, ticketPrice: new BigNumber(0), userBalance: new BigNumber(0) , txHash: ''})
   // Ticket Info
   const [ tickets, setTickets ] = useImmer<Array<string>>([])
   // Ticket Editor
@@ -107,6 +113,27 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     setTickets([])
     setStep(0)
   }
+
+  const buyTickets = () => {
+    if(!lotteryMethods) return
+    lotteryMethods.buyTickets(tickets,0)
+      .send({ from: account })
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        setLotteryInfo( draft => { draft.txHash = tx })
+        editTransactions(tx,'pending', { description: `Recruit ${tickets.length} invader teams`})
+        setStep(3)
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  }
+
   return <Dialog 
     open={open}
     PaperComponent={FormComponent}
@@ -133,11 +160,11 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
         </IconButton>
       </Tooltip>
     </Stack>
-    <Typography variant="h5" align="center" fontWeight={600} sx={{ textTransform: 'uppercase', pb:3}}>
+    <Typography variant="h5" align="center" color={ step === 3  ? "secondary" : "textPrimary"} fontWeight={600} sx={{ textTransform: 'uppercase', pb:3}}>
       { step === 0 && "Recruit Team"}
       { step === 1 && `ROUND ${lotteryInfo.currentRound}`}
       { step === 2 && `Edit Team ${selectedTicket + 1}`}
-      { step === 3 && `Thanks for participating`}
+      { step === 3 && `Recruiting...`}
     </Typography>
     { 
       step === 0 &&
@@ -293,7 +320,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
             </Paper>
           </Stack>
         })}
-        <Button color="secondary" onClick={() => setStep(3)} sx={{ mt: 2}}>
+        <Button color="secondary" onClick={buyTickets} sx={{ mt: 2}}>
           Get Tickets
         </Button>
       </>
@@ -422,9 +449,37 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     }
     {
       step == 3 && 
-      <>
-      Thanks
-      </>
+      <Stack alignItems="center">
+        <Typography align="center">
+          Your transaction has been Submitted
+        </Typography>
+        <Typography align="center" color="secondary" component="a" target="_blank" href={`https://${chainId == 97 ? 'testnet.' : ''}bscscan.com/tx/${lotteryInfo.txHash}`} rel="noreferrer noopener">
+            Check BSCscan
+        </Typography>
+        <div>
+          { gradient }
+          <InvaderIcon color="secondary"
+            sx={{
+              fill: `url(#${ gradientId })`,
+              fontSize: 100,
+            }}
+          />
+        </div>
+        <Typography align="center" fontFamily="Zebulon" variant="h5"
+          sx={theme => ({
+            backgroundImage: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.main} 10%, ${theme.palette.secondary.main} 70%)`,
+            WebkitBackgroundClip: 'text',
+            color: 'transparent',
+            WebkitTextFillColor: 'transparent',
+            textShadow: 'none',
+          })}
+        >
+          CRUSH IT!
+        </Typography>
+        <Button color="primary" onClick={closeModal} sx={{mt: 2, width:  200}}>
+          Close
+        </Button>
+      </Stack>
     }
   </Dialog>
 
