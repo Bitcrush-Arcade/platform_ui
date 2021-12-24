@@ -84,6 +84,7 @@ const theme = (isDark?: boolean) => createTheme({
       'Zebulon-Hollow',
       'Zebulon-Condensed-Hollow',
       'Zebulon',
+      'MarsAttacks',
       '-apple-system',
       'BlinkMacSystemFont',
       '"Segoe UI"',
@@ -101,6 +102,126 @@ const theme = (isDark?: boolean) => createTheme({
     }
   },
   components: {
+    MuiCssBaseline:{
+      styleOverrides: `
+      @font-face{
+        font-family: 'MarsAttacks';
+        font-weigth: normal;
+        font-style: normal;
+        src: url('/fonts/MarsAttacks/MarsAttacks.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Condensed';
+        font-weight: normal;
+        font-style: normal;
+        src: url('/fonts/Zebulon/Zebulon-Condensed.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Condensed';
+        font-weight: bold;
+        font-style: normal;
+        src: url('/fonts/Zebulon/Zebulon-Condensed-Bold.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Condensed';
+        font-weight: bold;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon-Condensed-Bold-Italic.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Condensed';
+        font-weight: normal;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon-Condensed-Italic.ttf');
+      }
+      /* ZEBULON CONDENSED HOLLOW */
+      @font-face {
+        font-family: 'Zebulon-Condensed-Hollow';
+        font-weight: normal;
+        font-style: normal;
+        src: url('/fonts/Zebulon/Zebulon-Condensed-Hollow.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Condensed-Hollow';
+        font-weight: bold;
+        font-style: normal;
+        src: url('/fonts/Zebulon/Zebulon-Condensed-Hollow-Bold.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Hollow';
+        font-weight: bold;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon-Hollow-Bold-Italic.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon-Hollow';
+        font-weight: normal;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon-Hollow-Italic.ttf');
+      }
+
+      @font-face {
+        font-family: 'Zebulon';
+        font-weight: bold;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon\ Bold\ Italic.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon';
+        font-weight: normal;
+        font-style: normal;
+        src: url('/fonts/Zebulon/Zebulon.ttf');
+      }
+      @font-face {
+        font-family: 'Zebulon';
+        font-weight: normal;
+        font-style: italic;
+        src: url('/fonts/Zebulon/Zebulon-Italic.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 200;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-VariableFont_wght.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 300;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-Light.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 400;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-Regular.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 500;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-Medium.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 600;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-SemiBold.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 700;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-Bold.ttf');
+      }
+      @font-face {
+        font-family: 'Oxanium';
+        font-weight: 800;
+        font-style: normal;
+        src: url('/fonts/Oxanium/Oxanium-ExtraBold.ttf');
+      }
+      `
+    },
     MuiPaper: {
       styleOverrides: { root: { backgroundImage: 'unset' } },
     },

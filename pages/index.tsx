@@ -134,7 +134,7 @@ export default function Home() {
           {mainImg}
         </Link>
       : mainImg
-  }), [highlightedAnnouncements, clickAnnouncement])
+  }), [ clickAnnouncement, isSm ])
 
   return (<>
   <Head>

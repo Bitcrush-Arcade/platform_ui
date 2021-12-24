@@ -9,7 +9,6 @@ class MyDocument extends Document {
       <Html>
         <Head>
           {/* Add external scripts here */}
-          <link rel="stylesheet" href="/fonts/fonts.css"/>
           <script async src="https://www.googletagmanager.com/gtag/js?id=G-FHLPYG3GMV"></script>
           <script
             dangerouslySetInnerHTML={ { __html:`
