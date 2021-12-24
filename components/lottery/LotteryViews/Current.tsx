@@ -27,12 +27,13 @@ return <>
       <Typography variant="h6" sx={{pr: 1}}>
         #{ticketIndex+1}
       </Typography>
-      <Paper
+      <Paper  
         sx={ theme => ({
           backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : theme.palette.primary.dark,
           borderRadius: 3,
           px: 2,
           py: 2,
+          m: 1,
         })}
       >
         <Stack direction="row">
