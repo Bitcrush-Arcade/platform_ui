@@ -80,7 +80,6 @@ function StakeModal( props: StakeModalProps ) {
           actionType: initAction || 0
         }}
         onSubmit={ (vals, ops) => {
-          console.log('submits', needsApprove)
           needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)
         }}
         validate ={ ( values ) => {
