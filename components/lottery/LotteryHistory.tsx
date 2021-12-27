@@ -44,7 +44,7 @@ const LotteryHistory = () => {
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
-        {tabSelected == 1 && <LastRound/>}
+        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} />} 
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
                 totalRounds={testHistoryArray.length} 
@@ -81,3 +81,18 @@ const testCurrentArray=[
     '1123456',
     '1123456',
 ]
+const testLastArray=[
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+    {ticket: '1123456', claimed: false},
+]
+
+const winningTestTicket="1456789"
