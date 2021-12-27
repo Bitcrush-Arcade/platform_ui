@@ -37,7 +37,7 @@ const History = (props: HistoryViewProps) => {
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell>{roundInfo.id}</TableCell>
       <TableCell>
-        { typeof(roundInfo.date) == 'string' ? roundInfo.date : format(roundInfo.date, 'MMMM dd-yyyy')}
+        { typeof(roundInfo.date) == 'string' ? roundInfo.date : format(roundInfo.date, 'yyyy-MMM-dd HHaa')}
       </TableCell>
       <TableCell align ="right">{roundInfo.totalTickets}</TableCell>
       <TableCell align ="right">
