@@ -24,7 +24,7 @@ return <>
   </Typography>
   <Divider sx={{my: 2}}/>
   
-  <Stack sx={{ maxHeight: 400, overflowY: 'auto'}}>
+  <Stack sx={{ maxHeight: 329, overflowY: 'auto'}}>
     {tickets.map( (ticketNumber: string, ticketIndex: number) => {
       const ticketDigits = ticketNumber.split('')
       return <Stack  justifyContent="center" alignItems="center" direction ="row" key={`tickets-to-buy-${ticketIndex}`}>
