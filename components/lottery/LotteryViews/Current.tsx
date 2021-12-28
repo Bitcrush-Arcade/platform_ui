@@ -11,7 +11,6 @@ import NumberInvader from 'components/lottery/NumberInvader'
 {/* Current table props */}
 type CurrentViewProps = {
   tickets: Array<string>;
-  nextDrawDate: number;
 }
 
 {/* Current table props and formatting */}
@@ -20,10 +19,10 @@ const { tickets } = props
 
 return <>
 
-  <Typography sx={{p: 2}} variant="h6" align="center" fontWeight={600}>
+  <Typography sx={{p: 0.5}} variant="h6" align="center" fontWeight={600}>
     Your Tickets
   </Typography>
-  <Divider my={2}/>
+  <Divider sx={{my: 2}}/>
   
   <Stack sx={{ maxHeight: 400, overflowY: 'auto'}}>
     {tickets.map( (ticketNumber: string, ticketIndex: number) => {
