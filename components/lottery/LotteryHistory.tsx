@@ -44,7 +44,7 @@ const LotteryHistory = () => {
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
-        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} />} 
+        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} lastDate={ new Date().getTime() - (3600*24*1000)} />} 
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
                 totalRounds={testHistoryArray.length} 

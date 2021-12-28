@@ -30,11 +30,12 @@ export const invaderColor : { [key: string] : string } = {
 
 type NumberInvaderProps = {
   twoDigits: [string,string],
-  size?: 'small' | 'medium'
+  size?: 'small' | 'medium',
+  matched?: 0 | 1 | 2
 }
 
 const NumberInvader = ( props : NumberInvaderProps) => {
-  const { twoDigits, size } = props
+  const { twoDigits, size, matched } = props
   const SelectedInvader = isNaN(parseInt(twoDigits[0])) ? null :  invaderList[parseInt(twoDigits[0])]
 
   const isSmall = size === "small"
@@ -56,10 +57,10 @@ const NumberInvader = ( props : NumberInvaderProps) => {
 
     <Grid item xs={12}>
       <Stack direction="row" justifyContent="space-evenly">
-        <Typography variant={textVariant} fontWeight={500} color="primary">
+        <Typography variant={textVariant} fontWeight={500} color={ matched && matched > 0 ? "secondary" : "primary"}>
           {twoDigits[0]}
         </Typography>
-        <Typography variant={textVariant} fontWeight={500} color="primary">
+        <Typography variant={textVariant} fontWeight={500} color={ matched && matched > 1 ? "secondary" : "primary"}>
           {twoDigits[1]}
         </Typography>
       </Stack>
