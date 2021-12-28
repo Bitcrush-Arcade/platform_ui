@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import format from 'date-fns/format'
 // OtherLibs
 import BigNumber from 'bignumber.js'
 import Countdown from 'react-countdown'
 // MaterialUi
+import { keyframes, Theme } from '@mui/system'
 import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
@@ -20,26 +21,73 @@ import Currency from 'components/basics/Currency'
 import SmButton from 'components/basics/SmallButton'
 // hooks
 import { useTransactionContext } from 'hooks/contextHooks'
+import { useWeb3React } from '@web3-react/core'
+import { useContract } from 'hooks/web3Hooks'
 // utils
+import { getContracts } from 'data/contracts'
 
 type LotterySummaryProps = {
-  onBuy: () => void
+  onBuy: () => void,
 }
 
 const SummaryCard = (props: LotterySummaryProps) => {
   const { onBuy } = props
   // These will come from props
-  const [round, setRound] = useState({ id: 123, tickets: 3, endTime: new Date().getTime()+(3600*24*1000), pool: new BigNumber(10).pow(23), match6: 40000, match5: 20000, match4: 10000, match3: 5000, match2: 3000, match1:2000, noMatch: 2000, burn: new BigNumber(1800).times(10**18) })
-  const burnPercent = 18000
-  const percentBase = 100000
-  // Context
-  const { tokenInfo } = useTransactionContext()
-  
+  const [round, setRound] = useState({ id: 123, isActive: true, tickets: 3, endTime: new Date().getTime()+(10*1000), pool: new BigNumber(10).pow(23), match6: new BigNumber(40000), match5: new BigNumber(20000), match4: new BigNumber(10000), match3: new BigNumber(5000), match2: new BigNumber(3000), match1:new BigNumber(2000), noMatch: new BigNumber(2000), burn: new BigNumber(1800).times(10**18) })
   const [ showDetail, setShowDetail ] = useState<boolean>(false)
   const toggleDetail = () => setShowDetail( p => !p )
   
+  const { account, chainId } = useWeb3React()
+  const lotteryContract = getContracts('lottery', chainId)
+  const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
+  
+  const burnPercent = 18000
+  const percentBase = new BigNumber('100000000000')
+  // Context
+  const { tokenInfo } = useTransactionContext()
+
+  const getLotteryInfo = useCallback(async () => {
+    const currentRound = await lotteryMethods.currentRound().call()
+    const roundInfo = await lotteryMethods.roundInfo(currentRound).call()
+    const isActive = await lotteryMethods.currentIsActive().call()
+    const userTickets = await lotteryMethods.getRoundTickets(currentRound).call({ from: account })
+    console.log({currentRound, roundInfo, isActive,userTickets})
+    setRound( p => ({
+      ...p,
+      id: new BigNumber(currentRound).toNumber(),
+      endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
+      tickets: userTickets.length,
+      isActive: isActive,
+      pool: new BigNumber(roundInfo.pool).div(10**18),
+      match6: new BigNumber(roundInfo.match6),
+      match5: new BigNumber(roundInfo.match5),
+      match4: new BigNumber(roundInfo.match4),
+      match3: new BigNumber(roundInfo.match3),
+      match2: new BigNumber(roundInfo.match2),
+      match1: new BigNumber(roundInfo.match1),
+      noMatch: new BigNumber(roundInfo.noMatch),
+    }))
+
+  }, [lotteryMethods, account,setRound])
+
+  useEffect(()=>{
+    if(!lotteryMethods) return
+    const interval = setInterval(getLotteryInfo, 10000)
+    return () => {
+      clearInterval(interval)
+    }
+  },[lotteryMethods, getLotteryInfo])
+
+
+  const onAttack = useCallback( ()=>{
+    if(!lotteryMethods) return
+    lotteryMethods.endRound().send({ from: account })
+  },[ lotteryMethods, account ])
+  
+  
+  
   const matchDisplays = new Array(7).fill(null).map( (x,i) => {
-    let percent: number = 0
+    let percent: BigNumber = new BigNumber(0)
     switch(i){
       case 6:
         percent = round.noMatch
@@ -133,27 +181,38 @@ const SummaryCard = (props: LotterySummaryProps) => {
             </strong>
             &nbsp;
           </Typography>
-          <Typography color="secondary" variant="h5" display="inline" component="div">
-            <Countdown
-              date={ new Date(round.endTime) }
-              renderer={({hours, minutes, seconds}) => {
-                return <>
-                  <strong>{hours < 10 && `0${hours}` || hours}</strong>
-                  <sub>H</sub>
-                  &nbsp;
-                  <strong>{minutes < 10 && `0${minutes}` || minutes}</strong>
-                  <sub>M</sub>
-                  &nbsp;
-                  <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
-                  <sub>S</sub>
-                </>
-              }}
-            />
-            &nbsp;
-            <Typography color="primary" variant="h5" display="inline">
-              UNTIL ATTACK TIME
+          { round.isActive ?
+            <Typography color="secondary" variant="h5" display="inline" component="div">
+              <Countdown
+                date={ new Date(round.endTime) }
+                renderer={({hours, minutes, seconds, completed}) => {
+                  if(completed)
+                    return <GButton color="secondary" onClick={onAttack}>
+                      Attack Now
+                    </GButton>
+                  return <>
+                    <strong>{hours < 10 && `0${hours}` || hours}</strong>
+                    <sub>H</sub>
+                    &nbsp;
+                    <strong>{minutes < 10 && `0${minutes}` || minutes}</strong>
+                    <sub>M</sub>
+                    &nbsp;
+                    <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
+                    <sub>S</sub>
+                    &nbsp;
+                    <Typography color="primary" variant="h5" display="inline">
+                      UNTIL ATTACK TIME
+                    </Typography>
+                  </>
+                }}
+              />
+              &nbsp;
             </Typography>
-          </Typography>
+            :
+            <Typography color="secondary" variant="h4" fontWeight={600} sx={ theme => ({ animation: `${winnerFlash(theme)} 1s ease infinite`})}>
+              Picking Winner
+            </Typography>
+          }
         </Stack>
         <GButton
           onClick={onBuy}
@@ -171,7 +230,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
             {matchDisplays}
         </Grid>
         <Typography variant="h6" sx={{pt:3}} align="center" color="textSecondary">
-          {burnPercent/percentBase*100}% is burned when tickets bought are more than 10% of prize pool
+          {new BigNumber(burnPercent).div(percentBase).times(100).toFixed(2,1)}% is burned when tickets bought are more than 10% of prize pool
         </Typography>
       </Collapse>
     </CardContent>
@@ -182,3 +241,15 @@ const SummaryCard = (props: LotterySummaryProps) => {
 }
 
 export default SummaryCard
+
+const winnerFlash = (theme:Theme) =>  keyframes`
+  0% { 
+    color: ${theme.palette.primary.main};
+  }
+  75% { 
+    color: ${theme.palette.secondary.light};
+  }
+  100% { 
+    color: ${theme.palette.primary.main};
+  }
+`
