@@ -48,12 +48,9 @@ const LastRound = (props: LastRoundProps) => {
       <Divider sx={{my: 2}}/>
 
       {/*Player stats*/}
-      <Stack justifyContent ="space-evenly" direction="row" alignItems="center" >
+      <Stack justifyContent ="space-evenly" direction="row" alignItems="center" sx={{mb:1}}>
         <Stack>
-          <Typography align="left" variant="subtitle2" sx={{pr: 1}}>
-            YOUR TICKETS: {tickets.length} total
-          </Typography>
-          <Typography align="left" variant="subtitle2" sx={{pr: 1}}>
+          <Typography align="left" variant="subtitle2">
             TOKENS: {tokenAmount} {token} 
           </Typography>
         </Stack>
@@ -66,6 +63,10 @@ const LastRound = (props: LastRoundProps) => {
       </Stack>
       
       <Stack sx={{ maxHeight: 180.08, overflowY: 'auto'}}>
+        <Typography align="center" variant="h6" sx={{pl: 4.5, m: 1}}>
+          Your Squadron
+        </Typography>
+
         {tickets.map(( ticketObj, ticketIndex) => {
           const { ticket, claimed } = ticketObj
           const ticketDigits = ticket.split('')
@@ -81,7 +82,7 @@ const LastRound = (props: LastRoundProps) => {
           
             <Stack>
               <Typography align="right" variant="subtitle1" sx={{pr: 1}}>
-               TICKET #{ticketIndex+1}
+               TICKET #{ticketIndex+1}/{tickets.length}
               </Typography>
               <Typography variant="subtitle2" sx={{pr: 1}}>
                 Matched first: {totalDigitsMatched}
