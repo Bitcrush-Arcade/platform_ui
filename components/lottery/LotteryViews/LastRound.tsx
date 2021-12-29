@@ -83,9 +83,9 @@ const LastRound = (props: LastRoundProps) => {
                 })}
               >
                 <Stack justifyContent="center" direction="row">
-                  <NumberInvader size="small" matches={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
-                  <NumberInvader size="small" matches={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
-                  <NumberInvader size="small" matches={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
+                  <NumberInvader size="small" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+                  <NumberInvader size="small" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+                  <NumberInvader size="small" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
                 </Stack>
               </Paper>
               <Stack>
