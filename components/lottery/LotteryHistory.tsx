@@ -75,13 +75,13 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
 export default LotteryHistory
 
 const testHistoryArray=[
-    {id: 1, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 2, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 3, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 4, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 5, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 6, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
-    {id: 7, date: new Date(), totalTickets: 1000, userTickets: 3, token: 'KNIGHT'},
+    {id: 1, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 2, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 3, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 4, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 5, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 6, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
+    {id: 7, date: new Date(), totalTickets: 1000, userTickets: 3, tokenAmount: 5000, token: 'KNIGHT'},
 ]
 const testCurrentArray=[
     '1123456',
