@@ -20,11 +20,12 @@ type LotteryHistoryProps = {
     currentTickets?: Array<{ticketNumber: string, claimed: boolean}> | null,
     lastArray?: Array<{ticket: string, claimed: boolean}>,
     lastWinner?: string,
-    tabChange: (newTab: number) => void
+    tabChange: (newTab: number) => void,
+    selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
 }
 
 const LotteryHistory = (props: LotteryHistoryProps) => {
-    const { currentTickets, tabChange } = props
+    const { currentTickets, tabChange, selectTicket, currentRound } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
     const roundsPerPage = 4
@@ -58,7 +59,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current tickets={ currentTickets && parsedCurrentTickets}/>}
-        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} lastDate={ new Date().getTime() - (3600*24*1000)} />} 
+        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} lastDate={ new Date().getTime() - (3600*24*1000)} selectTicket={selectTicket} currentRound={currentRound}/>} 
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
                 totalRounds={testHistoryArray.length} 
