@@ -15,39 +15,55 @@ type LastRoundProps = {
   winningTeamTicket: string;
   lastDate: number;
   currentRound: number;
+  token: string;
+  tokenAmount: number; 
   tickets: Array<{ ticket: string, claimed: boolean }>;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
 }
 
 const LastRound = (props: LastRoundProps) => {
-  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound } = props
+  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, tokenAmount } = props
   const winningDigits = winningTeamTicket.split('')
-    
+  const numberOfWinners: number = 0    
+  
   return (<>
-  {/*Winning ticket stack*/}
+
+  {/*Winning team stack*/}
     <Stack>
       <Typography variant="subtitle2" color="textPrimary">
           Last round date: { format( lastDate ? new Date(lastDate * 1000) : new Date(), 'yyyy-MMM-dd HHaa')}    
       </Typography>
       <Divider sx={{my: 2}}/>
     
-      <Stack justifyContent="center" direction = "row" alignItems="center" >
+      <Stack justifyContent="space-between" direction = "row" alignItems="center" >
         <Typography sx={{pl: 2, pb: 2}} variant="h6" align="center" fontWeight={600}>
           Winning Team
         </Typography>
-        <Stack direction="row">
-          <NumberInvader size="medium" twoDigits={[winningDigits[1], winningDigits[2]]}/>
-          <NumberInvader size="medium" twoDigits={[winningDigits[3], winningDigits[4]]}/>
-          <NumberInvader size="medium" twoDigits={[winningDigits[5], winningDigits[6]]}/>
+        <Stack direction="row" sx={{pr: 4.5}}>
+          <NumberInvader size="large" twoDigits={[winningDigits[1], winningDigits[2]]}/>
+          <NumberInvader size="large" twoDigits={[winningDigits[3], winningDigits[4]]}/>
+          <NumberInvader size="large" twoDigits={[winningDigits[5], winningDigits[6]]}/>
         </Stack>
       </Stack>
       <Divider sx={{my: 2}}/>
-      <Stack justifyContent="center" direction ="row">
-        <Typography variant="subtitle2" sx={{pr: 1}}>
-          Total Tickets = {tickets.length}
+
+      {/*Player stats*/}
+      <Stack justifyContent ="space-evenly" direction="row" alignItems="center" >
+        <Stack>
+          <Typography align="left" variant="subtitle2" sx={{pr: 1}}>
+            YOUR TICKETS: {tickets.length} total
+          </Typography>
+          <Typography align="left" variant="subtitle2" sx={{pr: 1}}>
+            TOKENS: {tokenAmount} {token} 
+          </Typography>
+        </Stack>
+        <Typography variant="subtitle2" >
+          {numberOfWinners} Winners
         </Typography>
+     
+          <Chip label="CLAIM ALL" color="secondary" variant="outlined"/>
+        
       </Stack>
-      <Divider sx={{my: 2}}/>
       
       <Stack sx={{ maxHeight: 180.08, overflowY: 'auto'}}>
         {tickets.map(( ticketObj, ticketIndex) => {
@@ -59,15 +75,16 @@ const LastRound = (props: LastRoundProps) => {
             }
             return acc
           },0)
-                                    
+          const totalDigitsMatched: number = 0
+                                            
           return <Stack direction="row" justifyContent="center" alignItems="center" key={`ticket-display-${ticketIndex}`}>
           
             <Stack>
-              <Typography align="right" variant="h6" sx={{pr: 1}}>
-                #{ticketIndex+1}
+              <Typography align="right" variant="subtitle1" sx={{pr: 1}}>
+               TICKET #{ticketIndex+1}
               </Typography>
               <Typography variant="subtitle2" sx={{pr: 1}}>
-                Matched first:
+                Matched first: {totalDigitsMatched}
               </Typography>
             </Stack>
 
@@ -77,15 +94,15 @@ const LastRound = (props: LastRoundProps) => {
                 sx={ theme => ({
                   backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : theme.palette.primary.dark,
                   borderRadius: 3,
-                  px: 2,
+                  px: 1,
                   py: 2,
                   m: 1,
                 })}
               >
                 <Stack justifyContent="center" direction="row">
-                  <NumberInvader size="small" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
-                  <NumberInvader size="small" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
-                  <NumberInvader size="small" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
+                  <NumberInvader size="medium" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+                  <NumberInvader size="medium" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+                  <NumberInvader size="medium" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
                 </Stack>
               </Paper>
               <Stack>
