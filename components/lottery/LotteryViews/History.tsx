@@ -17,6 +17,7 @@ type HistoryViewProps = {
     date: Date,
     totalTickets: number,
     userTickets: number,
+    token: string,
   }>,
   totalRounds: number,
   currentPageView: number,
@@ -30,7 +31,7 @@ const History = (props: HistoryViewProps) => {
   const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage, onRoundView } = props
 
   {/*Creating filler array to fill missing rows*/}
-  const filler = new Array(rowsPerPage-rounds.length).fill({id: '', date: '-', totalTickets: '', userTickets: ''})
+  const filler = new Array(rowsPerPage-rounds.length).fill({id: '', date: '-', totalTickets: '', userTickets: '', token: ''})
 
   {/*History table rows data formatting*/}
   const tableRows = (rounds.concat(filler)).map( (roundInfo, index) => {
@@ -49,6 +50,7 @@ const History = (props: HistoryViewProps) => {
           </IconButton>
         }
       </TableCell>
+      <TableCell>{roundInfo.token}</TableCell>
     </TableRow>
   })
 
@@ -61,6 +63,8 @@ const History = (props: HistoryViewProps) => {
         <TableCell>DATE</TableCell>
         <TableCell>TOTAL TICKETS</TableCell>
         <TableCell>USER TICKETS</TableCell>
+        <TableCell>TOKEN</TableCell>
+        
       </TableRow>
     </TableHead>
     <TableBody>
