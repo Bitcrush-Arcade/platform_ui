@@ -30,7 +30,7 @@ export const invaderColor : { [key: string] : string } = {
 
 type NumberInvaderProps = {
   twoDigits: [string,string],
-  size?: 'small' | 'medium',
+  size?: 'small' | 'medium' | 'large' | 'xl',
   matched?: 0 | 1 | 2
 }
 
@@ -39,9 +39,15 @@ const NumberInvader = ( props : NumberInvaderProps) => {
   const SelectedInvader = isNaN(parseInt(twoDigits[0])) ? null :  invaderList[parseInt(twoDigits[0])]
 
   const isSmall = size === "small"
-  const iconSize = isSmall ? 25 : 40
-  const textVariant = isSmall ? "h6" : "h5"
-  return <Grid container justifyContent="center" sx={{ width: isSmall ? '60px' : '80px'}}>
+  const isMedium = size === "medium"
+  const isLarge = size === "large"
+
+  const textVariant = isSmall ? "h6" : isMedium ? "h5" : isLarge? "h4" : "h3"
+  const iconSize = isSmall ? 25 : isMedium ? 40 : isLarge? 55 : 70
+  
+  return <Grid container justifyContent="center" 
+            sx={{ width: isSmall ? '60px' : isMedium ? '80px' : isLarge ? '100px' : '120px'}}
+          > 
     <Grid item>
       {
         SelectedInvader && 
