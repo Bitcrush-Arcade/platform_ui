@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 // Material
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -14,9 +14,16 @@ import LastRound from 'components/lottery/LotteryViews/LastRound';
 
 
 
+type LotteryHistoryProps = {
+    currentRound: number,
+    visibleRounds?: Array<{id: number, date: Date, totalTickets: number, userTickets: number, token: string}>,
+    currentTickets?: Array<{ticketNumber: string, claimed: boolean}> | null,
+    lastArray?: Array<{ticket: string, claimed: boolean}>,
+    lastWinner?: string
+}
 
-
-const LotteryHistory = () => {
+const LotteryHistory = (props: LotteryHistoryProps) => {
+    const { currentTickets } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
     const roundsPerPage = 4
@@ -25,6 +32,11 @@ const LotteryHistory = () => {
     const selectTab = ( e:React.SyntheticEvent, v: number) =>{
         setTabSelected(v)
     }
+
+    const parsedCurrentTickets = useMemo( () => {
+        if(!currentTickets) return []
+        return currentTickets.map( (ticket) => ticket.ticketNumber )
+    },[currentTickets])
 
     return <>
     
@@ -43,7 +55,7 @@ const LotteryHistory = () => {
         
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
-        {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
+        {tabSelected == 0 && <Current tickets={parsedCurrentTickets}/>}
         {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} lastDate={ new Date().getTime() - (3600*24*1000)} />} 
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
