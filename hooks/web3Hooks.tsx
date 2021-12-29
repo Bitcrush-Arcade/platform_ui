@@ -78,7 +78,7 @@ export function useContract(abi: any, address: string): ContractHandles{
 
 type ContractHandles = {
   contract: any,
-  methods: any,
+  methods: any | null,
   web3: Web3,
 }
 
