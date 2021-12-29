@@ -47,6 +47,10 @@ type LotteryRoundInfo = {
   match1: BigNumber,
   noMatch: BigNumber,
   burn: BigNumber,
+  bonusToken?: {
+    address: string,
+    amount: BigNumber,
+  } | null
 }
 
 const SummaryCard = (props: LotterySummaryProps) => {
@@ -71,6 +75,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
     const roundInfo = await lotteryMethods.roundInfo(currentRound).call()
     const isActive = await lotteryMethods.currentIsActive().call()
     const userTickets = await lotteryMethods.getRoundTickets(currentRound).call({ from: account })
+    const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
     console.log({currentRound, roundInfo, isActive,userTickets})
     setRound( {
       id: new BigNumber(currentRound).toNumber(),
@@ -85,7 +90,10 @@ const SummaryCard = (props: LotterySummaryProps) => {
       match2: new BigNumber(roundInfo.match2),
       match1: new BigNumber(roundInfo.match1),
       noMatch: new BigNumber(roundInfo.noMatch),
-      burn: new BigNumber(0)
+      burn: new BigNumber(0),
+      bonusToken: new BigNumber(bonusToken.bonusAmount).isGreaterThan(0)
+        ? { address: bonusToken.bonusToken, amount: new BigNumber( bonusToken.bonusAmount ) }
+        : null
     })
 
   }, [lotteryMethods, account,setRound])
