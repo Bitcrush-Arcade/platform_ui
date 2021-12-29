@@ -5,10 +5,18 @@ import BigNumber from 'bignumber.js'
 import Head from 'next/head'
 // Material
 import Box from '@mui/material/Box'
+import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import IconButton from '@mui/material/IconButton'
+import Stack from '@mui/material/Stack'
+import Typography from '@mui/material/Typography'
+// Icons
+import CloseIcon from '@mui/icons-material/Close'
+import FireIcon from '@mui/icons-material/LocalFireDepartment';
 // Bitcrush UI
 import Card from 'components/basics/Card'
 import LotteryHistory from 'components/lottery/LotteryHistory'
+import NumberInvader from 'components/lottery/NumberInvader'
 import PageContainer from 'components/PageContainer'
 import SummaryCard from 'components/lottery/SummaryCard'
 import TicketBuyModal from 'components/lottery/TicketBuyModal'
@@ -34,6 +42,7 @@ const Lottery = () => {
   const [ currentTickets, setCurrentTickets ] = useState<Array<TicketInfo> | null>(null)
   const [ lastRoundInfo, setLastRoundInfo ] = useState<{ totalTickets: BigNumber, winnerNumber: string, userTickets: Array<TicketInfo>} | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
+  const [ selectedTicket, setSelectedTicket ] = useState<{ticketNumber: string, claimed: boolean, ticketRound: number, instant: boolean} | null>(null)
 
   useEffect(() => {
     if(!lotteryMethods || !account) return
@@ -66,6 +75,17 @@ const Lottery = () => {
     }
   },[lotteryMethods, account, currentRound])
 
+  const selectTicket = (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
+    setSelectedTicket({
+      ticketNumber,
+      claimed,
+      ticketRound: roundNumber,
+      instant: instaClaim || false
+    })
+  }
+
+  const selectedDigits = selectedTicket?.ticketNumber.split('')
+
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -75,10 +95,63 @@ const Lottery = () => {
     <SummaryCard onBuy={toggleOpenBuy}/>
     <Grid container sx={{mt: 4}} justifyContent="space-between">
       <Grid item xs={12} md={6}>
-        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets} tabChange={getTabData}/>
+        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets} tabChange={getTabData} selectTicket={selectTicket}/>
       </Grid>
       <Grid item xs={12} md={5}>
-        <Box
+        {selectedTicket && selectedDigits ? 
+          <Card
+            sx={{
+              background: 'url(/backgrounds/lotterybg.png) no-repeat',
+              backgroundSize: '135% 100%',
+              backgroundPosition: 'top 0 right 0',
+              position: 'relative',
+              width: '100%',
+              height: {
+                xs: 350,
+                md: 450
+              },
+              p:2.5,
+              mt:{
+                xs: 4,
+                md: 7,
+              }
+            }}
+          >
+            <IconButton onClick={()=>setSelectedTicket(null)}
+              sx={{ position: 'absolute', top: 12, right: 16 }}
+            >
+              <CloseIcon/>
+            </IconButton>
+            <Typography variant="h5" align="center">
+              Squadron Detail 
+            </Typography>
+            <Divider sx={{ my: 1}}/>
+            <Grid container alignItems="center" sx={{pt: 2}}>
+              <Grid item xs={12} md={6}>
+                <Stack direction="row" justifyContent="space-evenly">
+                  <NumberInvader twoDigits={[selectedDigits[1], selectedDigits[2]]}/>
+                  <NumberInvader twoDigits={[selectedDigits[3], selectedDigits[4]]}/>
+                  <NumberInvader twoDigits={[selectedDigits[5], selectedDigits[6]]}/>
+                </Stack>
+              </Grid>
+              <Grid item md={6}>
+                <Typography align="center">
+                  You matched x of x
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                stuff and data
+              </Grid>
+              <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
+                <FireIcon sx={{position:'absolute', top: 15, left: 70 }}/>
+                <FireIcon sx={{position:'absolute', top: '50%', left: 0 }}/>
+                <FireIcon sx={{position:'absolute', bottom: '25%', left: 85 }}/>
+                <FireIcon sx={{position:'absolute', bottom: '13%', left: '50%' }}/>
+                <FireIcon sx={{position:'absolute', top: '50%', right: 15 }}/>
+              </Grid>
+            </Grid>
+          </Card>
+        :<Box
           sx={theme => ({
             p: 2,
             m: 2,
@@ -106,7 +179,7 @@ const Lottery = () => {
             Bonus for this round:
             5000 KNIGHT pool
           </Box>
-        </Box>
+        </Box>}
       </Grid>
     </Grid>
     <TicketBuyModal
