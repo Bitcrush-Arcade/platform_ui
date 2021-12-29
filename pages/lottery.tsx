@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { useImmer } from 'use-immer'
+import BigNumber from 'bignumber.js'
 // Next
 import Head from 'next/head'
 // Material
@@ -18,8 +20,31 @@ import { useWeb3React } from '@web3-react/core'
 import { getContracts } from 'data/contracts'
 
 const Lottery = () => {
+
+  const { account, chainId } = useWeb3React()
+  const lotteryContract = getContracts('lottery', chainId)
+  const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
+
   const [ openBuy, setOpenBuy ] = useState<boolean>(false)
   const toggleOpenBuy = () => setOpenBuy( p => !p )
+
+  const [ currentRound, setCurrentRound ] = useState<number>(0)
+  const [ currentTickets, setCurrentTickets ] = useState<Array<{ ticketNumber: string, claimed: boolean}> | null>(null)
+
+  useEffect(() => {
+    if(!lotteryMethods || !account) return
+
+    const getCurrentTickets = async () => {
+      const contractRound = new BigNumber(await lotteryMethods.currentRound().call()).toNumber()
+      const userTickets = await lotteryMethods.getRoundTickets(contractRound).call({ from: account })
+      setCurrentRound(contractRound)
+      setCurrentTickets(userTickets)
+    }
+
+    getCurrentTickets()
+
+  },[lotteryMethods, account])
+
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -29,7 +54,7 @@ const Lottery = () => {
     <SummaryCard onBuy={toggleOpenBuy}/>
     <Grid container sx={{mt: 4}} justifyContent="space-between">
       <Grid item xs={12} md={6}>
-        <LotteryHistory/>
+        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets}/>
       </Grid>
       <Grid item xs={12} md={5}>
         <Box
