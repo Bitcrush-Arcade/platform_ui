@@ -59,7 +59,16 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 && <Current tickets={ currentTickets && parsedCurrentTickets}/>}
-        {tabSelected == 1 && <LastRound winningTeamTicket={winningTestTicket} tickets={testLastArray} lastDate={ new Date().getTime() - (3600*24*1000)} selectTicket={selectTicket} currentRound={currentRound}/>} 
+        {tabSelected == 1 && 
+            <LastRound winningTeamTicket={winningTestTicket} 
+                tickets={testLastArray} 
+                lastDate={ new Date().getTime() - (3600*24*1000)} 
+                selectTicket={selectTicket} 
+                currentRound={currentRound}
+                token={lastRoundToken}
+                tokenAmount={lastRoundTokenAmount}
+            />} 
+        
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
                 totalRounds={testHistoryArray.length} 
@@ -111,3 +120,6 @@ const testLastArray=[
 ]
 
 const winningTestTicket="1456789"
+
+const lastRoundToken = "KNIGHT"
+const lastRoundTokenAmount =5000
