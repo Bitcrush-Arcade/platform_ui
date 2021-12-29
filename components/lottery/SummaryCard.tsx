@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import Countdown from 'react-countdown'
 // MaterialUi
 import { keyframes, Theme } from '@mui/system'
+import Button from '@mui/material/Button'
 import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
@@ -19,6 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GButton from 'components/basics/GeneralUseButton'
 import Card from 'components/basics/Card'
 import Currency from 'components/basics/Currency'
+import InfoTooltip from 'components/basics/InfoTooltip'
 import SmButton from 'components/basics/SmallButton'
 // hooks
 import { useTransactionContext } from 'hooks/contextHooks'
@@ -51,6 +53,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
   const { onBuy } = props
   // These will come from props
   const [round, setRound] = useState<LotteryRoundInfo | null>(null)
+  const [roundTimeEnded, setRoundTimeEnded] = useState<boolean>(false)
   const [ showDetail, setShowDetail ] = useState<boolean>(false)
   const toggleDetail = () => setShowDetail( p => !p )
   
@@ -161,6 +164,38 @@ const SummaryCard = (props: LotterySummaryProps) => {
           </Typography>
         </Typography>
       </div>
+      { round && round.endTime < new Date().getTime() || roundTimeEnded &&
+        <div>
+          <Button
+            sx={theme => ({
+              fontWeight: 600,
+              borderRadius: 20,
+              px: 2,
+              color: 'black',
+              fontSize: theme.typography.body2.fontSize,
+              textShadow: `0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #49ff18, 0 0 30px #49FF18, 0 0 40px #49FF18, 0 0 55px #49FF18, 0 0 75px #49ff18,
+                2px 2px 0 ${theme.palette.primary.dark}, 2px -2px 0 ${theme.palette.primary.dark}, -2px 2px 0 ${theme.palette.primary.dark}, -2px -2px 0 ${theme.palette.primary.dark}, 2px 0px 0 ${theme.palette.primary.dark}, 0px 2px 0 ${theme.palette.primary.dark}, -2px 0px 0 ${theme.palette.primary.dark}, 0px -2px 0 ${theme.palette.primary.dark}
+              `,
+              backgroundImage: `repeating-linear-gradient(
+                45deg,
+                yellow,
+                yellow 20px,
+                black 20px,
+                black 40px
+              )`
+            })}
+          >
+            Initiate Attack for 0.75% of winning pot
+            <InfoTooltip color="inherit"
+              info={
+                <Typography variant="body2">
+                  Help start the attack and may the best team survive the invasion. Signaling the attack awards you 0.75% of the winning pot once the attack is over.
+                </Typography>
+              }
+            />
+          </Button>
+        </div>
+      }
       <div>
         {
           round && <>
@@ -189,12 +224,23 @@ const SummaryCard = (props: LotterySummaryProps) => {
           <Typography variant="body2" color="textSecondary">
             PRIZE POT:
           </Typography>
-          <Typography variant="h5" color="primary" fontWeight="bold">
-            {round && <>
-              <Currency value={round.pool} isWei decimals={0}/>&nbsp;CRUSH
-            </>
-            || <Skeleton width={200}/>}
-          </Typography>
+          <Stack>
+            <Typography variant="h4" color="primary" fontWeight="bold">
+              {round && <>
+                <Currency value={round.pool} isWei decimals={0}/>&nbsp;CRUSH
+              </>
+              || <Skeleton width={200}/>}
+            </Typography>
+            <Typography variant="caption" color="textSecondary" component="div">
+              { round ? <>
+                  $
+                  <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
+                  &nbsp;
+                </>
+                : <Skeleton width={400}/>
+              }
+            </Typography>
+          </Stack>
         </div>
         <Stack 
           direction={{ xs: 'column', lg: 'row'}}
@@ -202,30 +248,23 @@ const SummaryCard = (props: LotterySummaryProps) => {
           alignItems="center"
           spacing={2}
         >
-          <Typography variant="h4" color="secondary" display="inline" component="div">
-            { round ? <>
-                <Typography variant="h5" color="secondary" display="inline">
-                  <sup>$</sup>
-                </Typography>
-                <strong>
-                  <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
-                </strong>
-                &nbsp;
-              </>
-              : <Skeleton width={400}/>
-            }
-          </Typography>
           { round &&
             (round.isActive ?
               <Typography color="secondary" variant="h5" display="inline" component="div">
                 <Countdown
+                  onStart={()=> setRoundTimeEnded(false)}
+                  onComplete={ () => setRoundTimeEnded(true)}
                   date={ new Date(round.endTime) }
-                  renderer={({hours, minutes, seconds, completed}) => {
-                    if(completed)
-                      return <GButton color="secondary" onClick={onAttack}>
-                        Attack Now
-                      </GButton>
+                  renderer={({ days, hours, minutes, seconds }) => {
                     return <>
+                      {
+                        days ? <>
+                          <strong>{days < 10 && `0${days}` || days}</strong>
+                          <sub>D</sub>
+                          &nbsp;
+                          </>
+                        : null
+                      }
                       <strong>{hours < 10 && `0${hours}` || hours}</strong>
                       <sub>H</sub>
                       &nbsp;
