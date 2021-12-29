@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useImmer } from 'use-immer'
 import BigNumber from 'bignumber.js'
 // Next
@@ -19,6 +19,8 @@ import { useWeb3React } from '@web3-react/core'
 // Utils & Data
 import { getContracts } from 'data/contracts'
 
+type TicketInfo = { ticketNumber: string, claimed: boolean }
+
 const Lottery = () => {
 
   const { account, chainId } = useWeb3React()
@@ -29,7 +31,9 @@ const Lottery = () => {
   const toggleOpenBuy = () => setOpenBuy( p => !p )
 
   const [ currentRound, setCurrentRound ] = useState<number>(0)
-  const [ currentTickets, setCurrentTickets ] = useState<Array<{ ticketNumber: string, claimed: boolean}> | null>(null)
+  const [ currentTickets, setCurrentTickets ] = useState<Array<TicketInfo> | null>(null)
+  const [ lastRoundInfo, setLastRoundInfo ] = useState<{ totalTickets: BigNumber, winnerNumber: string, userTickets: Array<TicketInfo>} | null>(null)
+  const [ viewHistory, setViewHistory ] = useState<null>(null)
 
   useEffect(() => {
     if(!lotteryMethods || !account) return
@@ -45,6 +49,23 @@ const Lottery = () => {
 
   },[lotteryMethods, account])
 
+  const getTabData = useCallback( async (newTab: number) => {
+    if(newTab === 0 || !lotteryMethods || !account) return
+    if(newTab === 1){
+      // get last round info
+      const userTickets = currentRound > 1 && await lotteryMethods.getRoundTickets(currentRound -1).call({ from: account }) || []
+      const lastRoundInfo = currentRound > 1 && await lotteryMethods.roundInfo(currentRound - 1).call() || null
+      console.log({ userTickets, lastRoundInfo })
+      setLastRoundInfo({ 
+        ...lastRoundInfo,
+        userTickets,
+      })
+    }
+    if(newTab === 2){
+      // gethistory
+    }
+  },[lotteryMethods, account, currentRound])
+
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -54,7 +75,7 @@ const Lottery = () => {
     <SummaryCard onBuy={toggleOpenBuy}/>
     <Grid container sx={{mt: 4}} justifyContent="space-between">
       <Grid item xs={12} md={6}>
-        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets}/>
+        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets} tabChange={getTabData}/>
       </Grid>
       <Grid item xs={12} md={5}>
         <Box
