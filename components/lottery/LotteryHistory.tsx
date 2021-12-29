@@ -19,11 +19,12 @@ type LotteryHistoryProps = {
     visibleRounds?: Array<{id: number, date: Date, totalTickets: number, userTickets: number, token: string}>,
     currentTickets?: Array<{ticketNumber: string, claimed: boolean}> | null,
     lastArray?: Array<{ticket: string, claimed: boolean}>,
-    lastWinner?: string
+    lastWinner?: string,
+    tabChange: (newTab: number) => void
 }
 
 const LotteryHistory = (props: LotteryHistoryProps) => {
-    const { currentTickets } = props
+    const { currentTickets, tabChange } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
     const roundsPerPage = 4
@@ -31,6 +32,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     const shownHistoryRounds = testHistoryArray.slice(selectedPage * roundsPerPage, (selectedPage + 1)*roundsPerPage)
     const selectTab = ( e:React.SyntheticEvent, v: number) =>{
         setTabSelected(v)
+        tabChange(v)
     }
 
     const parsedCurrentTickets = useMemo( () => {
