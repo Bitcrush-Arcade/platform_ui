@@ -19,7 +19,7 @@ const Lottery = () => {
   const [ openBuy, setOpenBuy ] = useState<boolean>(false)
   const toggleOpenBuy = () => setOpenBuy( p => !p )
 
-  return <PageContainer>
+  return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
       <title>BITCRUSH - Lottery</title>
       <meta name="description" content="The lottery where everyone wins."/>

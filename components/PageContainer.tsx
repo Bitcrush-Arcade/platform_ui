@@ -36,7 +36,7 @@ import type { Receipt } from 'types/PromiEvent'
 
 const PageContainer = ( props: ContainerProps ) => {
   
-  const { children, menuSm, background } = props
+  const { children, menuSm, background, customBg } = props
   
   const { chainId, account } = useWeb3React()
   const theme = useTheme()
@@ -285,7 +285,7 @@ const PageContainer = ( props: ContainerProps ) => {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
         }),
-        backgroundImage: `url(${backgrounds[theme.palette.mode][background || 'default']})`,
+        backgroundImage: `url(${customBg || backgrounds[theme.palette.mode][background || 'default']})`,
         backgroundSize: 'cover',
         [theme.breakpoints.down('md')]:{
           backgroundSize: '200% auto',
@@ -343,6 +343,7 @@ type ContainerProps ={
   children?: ReactNode,
   fullPage?: boolean,
   background?: 'default' | 'galactic',
+  customBg?: string,
   menuSm?: boolean,
 }
 
