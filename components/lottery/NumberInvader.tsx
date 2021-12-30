@@ -1,7 +1,7 @@
 // Material
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
-import Typography from '@mui/material/Typography'
+import Typography, { TypographyProps } from '@mui/material/Typography'
 // Bitcrush UI
 import Invader0 from 'components/svg/invaders/Invader0'
 import Invader1 from 'components/svg/invaders/Invader1'
@@ -38,23 +38,41 @@ const NumberInvader = ( props : NumberInvaderProps) => {
   const { twoDigits, size, matched } = props
   const SelectedInvader = isNaN(parseInt(twoDigits[0])) ? null :  invaderList[parseInt(twoDigits[0])]
 
-  const isSmall = size === "small"
-  const isMedium = size === "medium"
-  const isLarge = size === "large"
+  const sizeStyle: { [size: string] :{ text: TypographyProps['variant'], iconSize: number, width: number}} = {
+    small:{
+      text: "h6",
+      iconSize: 25,
+      width: 60
+    },
+    medium:{
+      text: "h5",
+      iconSize: 40,
+      width: 80
+    },
+    large:{
+      text: "h4",
+      iconSize: 55,
+      width: 100
+    },
+    xl:{
+      text: "h3",
+      iconSize: 70,
+      width: 120
+    },
+  }
 
-  const textVariant = isSmall ? "h6" : isMedium ? "h5" : isLarge? "h4" : "h3"
-  const iconSize = isSmall ? 25 : isMedium ? 40 : isLarge? 55 : 70
+  const selectedStyle = sizeStyle[size || 'medium']
   
   return <Grid container justifyContent="center" 
-            sx={{ width: isSmall ? '60px' : isMedium ? '80px' : isLarge ? '100px' : '120px'}}
+            sx={{ width: selectedStyle.width }}
           > 
     <Grid item>
       {
         SelectedInvader && 
           <SelectedInvader 
             sx={{
-              width: iconSize,
-              height: iconSize,
+              width: selectedStyle.iconSize,
+              height: selectedStyle.iconSize,
               color: invaderColor[twoDigits[1]] || "white"
             }}
           />
@@ -63,10 +81,10 @@ const NumberInvader = ( props : NumberInvaderProps) => {
 
     <Grid item xs={12}>
       <Stack direction="row" justifyContent="space-evenly">
-        <Typography variant={textVariant} fontWeight={500} color={ matched && matched > 0 ? "secondary" : "primary"}>
+        <Typography variant={selectedStyle.text} fontWeight={500} color={ matched && matched > 0 ? "secondary" : "primary"}>
           {twoDigits[0]}
         </Typography>
-        <Typography variant={textVariant} fontWeight={500} color={ matched && matched > 1 ? "secondary" : "primary"}>
+        <Typography variant={selectedStyle.text} fontWeight={500} color={ matched && matched > 1 ? "secondary" : "primary"}>
           {twoDigits[1]}
         </Typography>
       </Stack>
