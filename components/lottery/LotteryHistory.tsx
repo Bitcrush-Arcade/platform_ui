@@ -58,7 +58,8 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
         
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
-        {tabSelected == 0 && <Current tickets={ currentTickets && parsedCurrentTickets}/>}
+        {/*{tabSelected == 0 && <Current tickets={ currentTickets && parsedCurrentTickets}/>}*/}
+        {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
         {tabSelected == 1 && 
             <LastRound winningTeamTicket={winningTestTicket} 
                 tickets={testLastArray} 
