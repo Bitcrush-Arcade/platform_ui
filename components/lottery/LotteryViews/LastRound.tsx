@@ -62,7 +62,7 @@ const LastRound = (props: LastRoundProps) => {
         
       </Stack>
       
-      <Stack sx={{ maxHeight: 180.08, overflowY: 'auto'}}>
+      <Stack sx={{ maxHeight: 196.08, overflowY: 'auto'}}>
         <Typography align="center" variant="h6" sx={{pl: 4.5, m: 1}}>
           Your Squadron
         </Typography>
