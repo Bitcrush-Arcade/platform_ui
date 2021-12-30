@@ -28,6 +28,8 @@ import { useWeb3React } from '@web3-react/core'
 import { useContract } from 'hooks/web3Hooks'
 // utils
 import { getContracts } from 'data/contracts'
+// Types
+import { Receipt } from 'types/PromiEvent'
 
 type LotterySummaryProps = {
   onBuy: () => void,
@@ -68,7 +70,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
   const burnPercent = 18000
   const percentBase = new BigNumber('100000000000')
   // Context
-  const { tokenInfo } = useTransactionContext()
+  const { tokenInfo, editTransactions } = useTransactionContext()
 
   const getLotteryInfo = useCallback(async () => {
     const currentRound = await lotteryMethods.currentRound().call()
@@ -76,7 +78,6 @@ const SummaryCard = (props: LotterySummaryProps) => {
     const isActive = await lotteryMethods.currentIsActive().call()
     const userTickets = await lotteryMethods.getRoundTickets(currentRound).call({ from: account })
     const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
-    console.log({currentRound, roundInfo, isActive,userTickets})
     setRound( {
       id: new BigNumber(currentRound).toNumber(),
       endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
@@ -110,6 +111,20 @@ const SummaryCard = (props: LotterySummaryProps) => {
   const onAttack = useCallback( ()=>{
     if(!lotteryMethods) return
     lotteryMethods.endRound().send({ from: account })
+      .on('transactionHash', (tx:string) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Launch Lottery Invasion`})
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        getLotteryInfo()
+      })
+      .on('error', (error: any, receipt: Receipt ) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        getLotteryInfo()
+      })
   },[ lotteryMethods, account ])
   
   
@@ -155,6 +170,8 @@ const SummaryCard = (props: LotterySummaryProps) => {
     </Grid>
   } )
 
+  const roundEnded = (round?.endTime || 0) < new Date().getTime()
+
   return <Card background="dark">
     {/* CARD HEADER */}
     <Stack justifyContent="space-between" alignItems="center" direction={{ xs: "column", md: "row"}}
@@ -172,17 +189,17 @@ const SummaryCard = (props: LotterySummaryProps) => {
           </Typography>
         </Typography>
       </div>
-      { round && round.endTime < new Date().getTime() || roundTimeEnded &&
+      { round && (roundEnded || roundTimeEnded) &&
         <div>
-          <Button
+          <Button onClick={onAttack}
             sx={theme => ({
               fontWeight: 600,
               borderRadius: 20,
               px: 2,
-              color: 'black',
+              color: 'white',
               fontSize: theme.typography.body2.fontSize,
               textShadow: `0 0 5px #FFF, 0 0 10px #FFF, 0 0 15px #FFF, 0 0 20px #49ff18, 0 0 30px #49FF18, 0 0 40px #49FF18, 0 0 55px #49FF18, 0 0 75px #49ff18,
-                2px 2px 0 ${theme.palette.primary.dark}, 2px -2px 0 ${theme.palette.primary.dark}, -2px 2px 0 ${theme.palette.primary.dark}, -2px -2px 0 ${theme.palette.primary.dark}, 2px 0px 0 ${theme.palette.primary.dark}, 0px 2px 0 ${theme.palette.primary.dark}, -2px 0px 0 ${theme.palette.primary.dark}, 0px -2px 0 ${theme.palette.primary.dark}
+                2px 2px 0 ${theme.palette.common.black}, 2px -2px 0 ${theme.palette.common.black}, -2px 2px 0 ${theme.palette.common.black}, -2px -2px 0 ${theme.palette.common.black}, 2px 0px 0 ${theme.palette.common.black}, 0px 2px 0 ${theme.palette.common.black}, -2px 0px 0 ${theme.palette.common.black}, 0px -2px 0 ${theme.palette.common.black}
               `,
               backgroundImage: `repeating-linear-gradient(
                 45deg,
