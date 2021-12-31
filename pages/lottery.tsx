@@ -27,14 +27,18 @@ import { useContract } from 'hooks/web3Hooks'
 import { useWeb3React } from '@web3-react/core'
 // Utils & Data
 import { getContracts } from 'data/contracts'
+import { currencyFormat } from 'utils/text/text'
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
+import { useTransactionContext } from 'hooks/contextHooks'
+import { Receipt } from 'types/PromiEvent'
 
 const Lottery = () => {
 
   const { account, chainId } = useWeb3React()
   const lotteryContract = getContracts('lottery', chainId)
   const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
+  const { tokenInfo, editTransactions } = useTransactionContext()
 
   const [ openBuy, setOpenBuy ] = useState<boolean>(false)
   const toggleOpenBuy = () => setOpenBuy( p => !p )
@@ -44,7 +48,7 @@ const Lottery = () => {
   const [ currentRoundInfo, setCurrentRoundInfo ] = useState< RoundInfo | null>(null)
   const [ lastRoundInfo, setLastRoundInfo ] = useState< RoundInfo | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
-  const [ selectedTicket, setSelectedTicket ] = useState<{ticketNumber: string, claimed: boolean, ticketRound: number, instant: boolean} | null>(null)
+  const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: number } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
 
   const getCurrentTickets = useCallback( async () => {
@@ -94,7 +98,7 @@ const Lottery = () => {
     }
   },[lotteryMethods, account, currentRound, getRoundInfo, setLastRoundInfo])
 
-  const selectTicket = async (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
+  const selectTicket = useCallback(async (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
     
     const ticketRound = await getRoundInfo(roundNumber)
     const winnerHolders = new BigNumber(ticketRound.winnerNumber).toString().split('')
@@ -113,9 +117,46 @@ const Lottery = () => {
       ticketNumber,
       claimed,
       ticketRound: roundNumber,
-      instant: instaClaim || false
     })
-  }
+    if(instaClaim){
+      lotteryMethods.claimNumber(roundNumber,ticketNumber).send({from: account})
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Claim Number ${ticketNumber.substring(1)}`})
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        setSelectedTicket({
+          ticketNumber,
+          claimed: true,
+          ticketRound: roundNumber,
+        })
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+    }
+  },[getRoundInfo,lotteryMethods,setSelectedRoundInfo,setSelectedTicket, account, editTransactions])
+
+  const claimTicket = useCallback(( roundNumber: number, ticketNumber: string ) => {
+    if(!lotteryMethods || !account) return
+    lotteryMethods.claimNumber(roundNumber,ticketNumber).send({from: account})
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Claim Number ${ticketNumber.substring(1)}`})
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        selectTicket(`${roundNumber}`, true, roundNumber)
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  },[lotteryMethods, editTransactions, account, selectTicket])
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {
@@ -126,6 +167,7 @@ const Lottery = () => {
   },{base: "", matches: 0})
   const matchPercents = [new BigNumber(selectedRoundInfo?.noMatch || 0), new BigNumber(selectedRoundInfo?.match1 || 0), new BigNumber(selectedRoundInfo?.match2 || 0), new BigNumber(selectedRoundInfo?.match3 || 0), new BigNumber(selectedRoundInfo?.match4 || 0), new BigNumber(selectedRoundInfo?.match5 || 0), new BigNumber(selectedRoundInfo?.match6 || 0),]
   const crushWin = new BigNumber(matchPercents[(matches?.matches || 1 ) -1 ]).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
+  const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -233,16 +275,35 @@ const Lottery = () => {
               </Grid>
               <Grid item xs={12} md={6}>
                 <Stack>
+                  {(matches?.matches || 1) > 1 ? 
+                    <>
+                      <Typography variant="h5" color="secondary" align="left" fontWeight={600}>
+                        Congratulations!
+                      </Typography>
+                      <Typography variant="h6" color="white" align="left" fontWeight={600}>
+                        You CRUSHED it!
+                      </Typography>
+                    </>
+                    :
+                    <>
+                      <Typography variant="h5" color="primary" align="left" fontWeight={600}>
+                        No matches
+                      </Typography>
+                      <Typography variant="h6" color="white" align="left" fontWeight={600}>
+                        Still crushed it!
+                      </Typography>
+                    </>
+                  }
                   <Typography variant="subtitle2" color="textSecondary" align="left">
                     Squadron Reward
                   </Typography>
                   <Typography variant="h5" color="primary" fontWeight={600}>
-                    {crushWin.toFixed(4,1)} CRUSH
+                    {currencyFormat(crushWin.toString(), { decimalsToShow: 4 })} CRUSH
                   </Typography>
                   <Typography variant="subtitle2" color="textSecondary" align="left">
-                    $&nbsp;
+                    $&nbsp;{currencyFormat(usdCrushWin.toString(), { decimalsToShow: 4})}
                   </Typography>
-                  <GButton disabled={selectedTicket.claimed} color="secondary" width={"80%"} sx={{mt: 1}}>
+                  <GButton disabled={selectedTicket.claimed} color="secondary" width={"80%"} sx={{mt: 1}} onClick={ () => claimTicket(selectedTicket.ticketRound, selectedTicket.ticketNumber)}>
                     {selectedTicket.claimed ? "Already Claimed" : "Claim"}
                   </GButton>
                 </Stack>
