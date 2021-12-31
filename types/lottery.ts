@@ -5,6 +5,13 @@ export type RoundInfo = {
   winnerNumber: string,
   userTickets?: Array<TicketInfo>,
   endTime: BigNumber,
+  noMatch: BigNumber,
+  match1: BigNumber,
+  match2: BigNumber,
+  match3: BigNumber,
+  match4: BigNumber,
+  match5: BigNumber,
+  match6: BigNumber,
   bonusInfo?: {
     bonusToken: string,
     bonusAmount: BigNumber,
