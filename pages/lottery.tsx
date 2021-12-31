@@ -4,6 +4,7 @@ import Image from 'next/image'
 import BigNumber from 'bignumber.js'
 // Next
 import Head from 'next/head'
+import { useWeb3React } from '@web3-react/core'
 // Material
 import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
@@ -24,13 +25,13 @@ import SummaryCard from 'components/lottery/SummaryCard'
 import TicketBuyModal from 'components/lottery/TicketBuyModal'
 // Hooks
 import { useContract } from 'hooks/web3Hooks'
-import { useWeb3React } from '@web3-react/core'
+import { useTransactionContext } from 'hooks/contextHooks'
 // Utils & Data
 import { getContracts } from 'data/contracts'
 import { currencyFormat } from 'utils/text/text'
+import { partnerTokens } from 'data/partnerTokens'
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
-import { useTransactionContext } from 'hooks/contextHooks'
 import { Receipt } from 'types/PromiEvent'
 
 const Lottery = () => {
@@ -169,6 +170,8 @@ const Lottery = () => {
   const crushWin = new BigNumber(matchPercents[(matches?.matches || 1 ) -1 ]).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
   const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
+  const partnerToken = partnerTokens[currentRoundInfo?.bonusInfo?.bonusToken || '0x0'] 
+
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
       <title>BITCRUSH - Lottery</title>
@@ -185,7 +188,7 @@ const Lottery = () => {
         />
       </Grid>
       <Grid item xs={12} lg={5}>
-        <Stack direction="row" justifyContent="flex-end">
+        {partnerToken && <Stack direction="row" justifyContent="flex-end">
           <Box
             sx={theme => ({
               p: 2,
@@ -217,14 +220,14 @@ const Lottery = () => {
                     Partner Bonus for this round:
                   </Typography>
                   <Typography color="secondary" variant="h5" component="div" display="inline" align="center">
-                    5000 KNIGHT
+                    {currencyFormat(new BigNumber(currentRoundInfo?.bonusInfo?.bonusAmount || 0).toString(), { decimalsToShow: 2, isWei: true})} {partnerToken.name}
                   </Typography>
                 </Stack>
-                <Image src="/assets/thirdPartyLogos/partners/knightswap-logo.png" height={272/2.2} width={272/2.2} alt="partner Logo"/>
+                {partnerToken.img && <Image src={partnerToken.img} height={272/2.2} width={272/2.2} alt="partner Logo"/>}
               </Stack>
             </Box>
           </Box>
-        </Stack>
+        </Stack>}
         {selectedTicket && selectedDigits &&
           <Card
             sx={{
@@ -337,7 +340,6 @@ const Lottery = () => {
               </Grid>
             </Grid>
           </Card>
-        
         }
       </Grid>
     </Grid>
