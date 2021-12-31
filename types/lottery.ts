@@ -12,6 +12,7 @@ export type RoundInfo = {
   match4: BigNumber,
   match5: BigNumber,
   match6: BigNumber,
+  pool: BigNumber,
   bonusInfo?: {
     bonusToken: string,
     bonusAmount: BigNumber,
