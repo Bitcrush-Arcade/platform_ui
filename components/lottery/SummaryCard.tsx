@@ -189,7 +189,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
           </Typography>
         </Typography>
       </div>
-      { round && (roundEnded || roundTimeEnded) &&
+      { round && (roundEnded || roundTimeEnded) && round.isActive &&
         <div>
           <Button onClick={onAttack}
             sx={theme => ({
@@ -316,6 +316,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
         <GButton
           onClick={onBuy}
           background="primary"
+          disabled={!round?.isActive}
           sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
         >
           Buy Tickets
