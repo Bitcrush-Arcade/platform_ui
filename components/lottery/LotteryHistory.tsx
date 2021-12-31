@@ -24,10 +24,11 @@ type LotteryHistoryProps = {
     lastRound?: RoundInfo | null;
     tabChange: (newTab: number) => void,
     selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
+    claimAll: (round: number) => void;
 }
 
 const LotteryHistory = (props: LotteryHistoryProps) => {
-    const { currentTickets, tabChange, selectTicket, currentRound, lastRound, currentInfo } = props
+    const { currentTickets, tabChange, selectTicket, currentRound, lastRound, currentInfo,claimAll } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
     const roundsPerPage = 4
@@ -75,6 +76,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 currentRound={currentRound -1}
                 token={lastRound.bonusInfo?.bonusToken}
                 tokenAmount={lastRound.bonusInfo?.bonusAmount}
+                claimAll={claimAll}
             />
         } 
         

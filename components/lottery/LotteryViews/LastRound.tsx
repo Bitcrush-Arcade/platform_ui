@@ -22,12 +22,15 @@ type LastRoundProps = {
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
+  claimAll: (round: number) => void
 }
 
 const LastRound = (props: LastRoundProps) => {
-  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, tokenAmount } = props
+  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, tokenAmount, claimAll } = props
   const winningDigits = winningTeamTicket.split('')
   const numberOfWinners: number = 0    
+
+  const unclaimedTickets = tickets.filter( ticket => !ticket.claimed).length > 0
   
   return (<>
 
@@ -76,7 +79,9 @@ const LastRound = (props: LastRoundProps) => {
           {numberOfWinners} Winners
         </Typography>
      
-        <SmallButton color="secondary" hasIcon={true}>CLAIM ALL</SmallButton>
+        <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(currentRound)} disabled={!unclaimedTickets}>
+          { unclaimedTickets ? "CLAIM ALL" : "ALL CLAIMED"}
+        </SmallButton>
         
       </Stack>
  

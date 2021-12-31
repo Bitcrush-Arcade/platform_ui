@@ -47,7 +47,7 @@ const Lottery = () => {
   const [ currentRound, setCurrentRound ] = useState<number>(0)
   const [ currentTickets, setCurrentTickets ] = useState<Array<TicketInfo> | null>(null)
   const [ currentRoundInfo, setCurrentRoundInfo ] = useState< RoundInfo | null>(null)
-  const [ lastRoundInfo, setLastRoundInfo ] = useState< RoundInfo | null>(null)
+  const [ lastRoundInfo, setLastRoundInfo ] = useImmer< RoundInfo | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: number } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
@@ -159,6 +159,30 @@ const Lottery = () => {
       })
   },[lotteryMethods, editTransactions, account, selectTicket])
 
+  const claimAllTickets = useCallback( (round: number) => {
+    if(!lotteryMethods || !account) return
+    lotteryMethods.claimAll(round).send({from: account})
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Claim All Round ${round}`})
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        setLastRoundInfo( draft => {
+          if(!draft?.userTickets?.length) return
+          for( let i = 0; i < draft.userTickets.length; i ++){
+            draft.userTickets[i].claimed = true
+          }
+        })
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+
+  },[lotteryMethods, account, editTransactions,setLastRoundInfo])
+
   const selectedDigits = selectedTicket?.ticketNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {
     acc.base += number
@@ -185,6 +209,7 @@ const Lottery = () => {
           currentInfo={currentRoundInfo}
           tabChange={getTabData} selectTicket={selectTicket}
           lastRound={lastRoundInfo}
+          claimAll={claimAllTickets}
         />
       </Grid>
       <Grid item xs={12} lg={5}>
