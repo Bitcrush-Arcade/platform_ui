@@ -213,7 +213,7 @@ const Lottery = () => {
         />
       </Grid>
       <Grid item xs={12} lg={5}>
-        {partnerToken && <Stack direction="row" justifyContent="flex-end">
+        {partnerToken?.name && <Stack direction="row" justifyContent="flex-end">
           <Box
             sx={theme => ({
               p: 2,
@@ -256,13 +256,16 @@ const Lottery = () => {
         {selectedTicket && selectedDigits &&
           <Card
             sx={{
-              background: 'url(/backgrounds/lotterybg.png) no-repeat',
+              background: {
+                xs: 'none',
+                md: 'url(/backgrounds/lotterybg.png) no-repeat'
+              },
               backgroundSize: '135% 100%',
               backgroundPosition: 'top 0 right 0',
               position: 'relative',
               width: '100%',
               height: {
-                xs: 350,
+                xs: 'auto',
                 md: 450
               },
               p:2.5,
@@ -281,7 +284,7 @@ const Lottery = () => {
               Squadron Details
             </Typography>
             <Divider sx={{ my: 1}}/>
-            <Grid container alignItems="center" sx={{pt: 2}}>
+            <Grid container alignItems="center" sx={{pt: 2}} rowSpacing={1}>
               <Grid item xs={12} md={6}>
                 <Stack direction="row" justifyContent="space-evenly">
                   <NumberInvader variant="fancy" twoDigits={[selectedDigits[1], selectedDigits[2]]} matched={matches ? matches.matches > 3 ? 2 : matches.matches - 1 : 0 }/>
@@ -289,7 +292,7 @@ const Lottery = () => {
                   <NumberInvader variant="fancy" twoDigits={[selectedDigits[5], selectedDigits[6]]} matched={matches ? matches.matches - 5 : 0 }/>
                 </Stack>
               </Grid>
-              <Grid item md={6}>
+              <Grid item xs={12} md={6}>
                 <Typography align="center" color="textSecondary" variant="subtitle2">
                   Round # {selectedTicket.ticketRound}
                 </Typography>
@@ -302,7 +305,7 @@ const Lottery = () => {
                 </Typography>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Stack>
+                <Stack alignItems={{xs: "center", md:'flex-start'}}>
                   {(matches?.matches || 1) > 1 ? 
                     <>
                       <Typography variant="h5" color="secondary" align="left" fontWeight={600}>
