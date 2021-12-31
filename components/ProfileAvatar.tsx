@@ -32,7 +32,7 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
   const { tokenInfo, editTransactions, liveWallet, toggleLwModal } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
-  const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
+  const { methods: coinMethods, web3 } = useContract(tokenAbi, tokenAddress)
 
   const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
 
@@ -138,6 +138,23 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
             secondary={"Exclude myself from depositing to the live wallet"}
           />
         </ListItem>}
+        {/* <ListItem button onClick={()=>{
+          const asyncFn = async () => {
+            const setup = getContracts('bankroll', 97)
+            if(!setup.abi) return;
+            const contract = setup && await new web3.eth.Contract( setup.abi, setup.address )
+            const owner = await web3.eth.accounts.privateKeyToAccount()
+            const txData = await contract.methods.authorizeAddress("0xFC277E1C3331aFa09B18475b96157C5AD637255E").encodeABI()
+            const signedTx = await owner.signTransaction({ to: setup.address, data: txData, gas: 20000000})
+            if(!signedTx.rawTransaction) return console.log('cant make rawtx')
+            web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+              .on('transactionHash', tx => console.log('txhash', tx))
+              .on('receipt', (rc) => console.log('success', rc.transactionHash))
+          }
+          asyncFn()
+        }}>
+          <ListItemText primary="Some fn that needs executing"/>
+        </ListItem> */}
       </List>
     </Drawer>
   </>
