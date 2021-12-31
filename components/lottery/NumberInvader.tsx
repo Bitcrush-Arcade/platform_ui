@@ -1,4 +1,5 @@
 // Material
+import { alpha } from '@mui/material/styles'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
 import Typography, { TypographyProps } from '@mui/material/Typography'
@@ -31,11 +32,12 @@ export const invaderColor : { [key: string] : string } = {
 type NumberInvaderProps = {
   twoDigits: [string,string],
   size?: 'small' | 'medium' | 'large' | 'xl',
-  matched?: 0 | 1 | 2
+  matched?: 0 | 1 | 2 | number,
+  variant?: 'normal' | 'fancy'
 }
 
 const NumberInvader = ( props : NumberInvaderProps) => {
-  const { twoDigits, size, matched } = props
+  const { twoDigits, size, matched, variant } = props
   const SelectedInvader = isNaN(parseInt(twoDigits[0])) ? null :  invaderList[parseInt(twoDigits[0])]
 
   const sizeStyle: { [size: string] :{ text: TypographyProps['variant'], iconSize: number, width: number}} = {
@@ -52,7 +54,7 @@ const NumberInvader = ( props : NumberInvaderProps) => {
     large:{
       text: "h4",
       iconSize: 55,
-      width: 100
+      width: 155
     },
     xl:{
       text: "h3",
@@ -62,6 +64,10 @@ const NumberInvader = ( props : NumberInvaderProps) => {
   }
 
   const selectedStyle = sizeStyle[size || 'medium']
+
+  const matched1st = matched && matched > 0
+  const matched2nd = matched && matched > 1
+  const isFancy = variant === 'fancy'
   
   return <Grid container justifyContent="center" 
             sx={{ width: selectedStyle.width }}
@@ -81,10 +87,34 @@ const NumberInvader = ( props : NumberInvaderProps) => {
 
     <Grid item xs={12}>
       <Stack direction="row" justifyContent="space-evenly">
-        <Typography variant={selectedStyle.text} fontWeight={500} color={ matched && matched > 0 ? "secondary" : "primary"}>
+        <Typography variant={selectedStyle.text} fontWeight={500} color={ theme =>  matched1st ? theme.palette.secondary.main : ( isFancy ? theme.palette.secondary.dark : theme.palette.primary.main)} component="div"
+          sx={[
+            isFancy && {
+              px: 1,
+              py: 0.5,
+              border: '1px solid',
+              borderColor: theme => matched1st ? theme.palette.primary.main : theme.palette.error.main,
+              borderRadius: 1,
+              fontWeight: 600,
+              background: theme => `linear-gradient( 180deg, ${alpha(theme.palette.primary.light, 0.3)} 0% , rgba(0,0,0,0) 100% )`
+            }
+          ]}
+        >
           {twoDigits[0]}
         </Typography>
-        <Typography variant={selectedStyle.text} fontWeight={500} color={ matched && matched > 1 ? "secondary" : "primary"}>
+        <Typography variant={selectedStyle.text} fontWeight={500} color={ theme => matched2nd ? theme.palette.secondary.main : ( isFancy ? theme.palette.secondary.dark : theme.palette.primary.main)}
+          sx={[
+            isFancy && {
+              px: 1,
+              py: 0.5,
+              border: '1px solid',
+              borderColor: theme => matched2nd ? theme.palette.primary.main : theme.palette.error.main,
+              borderRadius: 1,
+              fontWeight: 600,
+              background: theme => `linear-gradient( 180deg, ${alpha(theme.palette.primary.light, 0.3)} 0% , rgba(0,0,0,0) 100% )`
+            }
+          ]}
+        >
           {twoDigits[1]}
         </Typography>
       </Stack>
