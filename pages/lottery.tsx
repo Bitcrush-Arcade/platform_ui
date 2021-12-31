@@ -16,6 +16,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import FireIcon from '@mui/icons-material/LocalFireDepartment';
 // Bitcrush UI
 import Card from 'components/basics/Card'
+import GButton from 'components/basics/GeneralUseButton'
 import LotteryHistory from 'components/lottery/LotteryHistory'
 import NumberInvader from 'components/lottery/NumberInvader'
 import PageContainer from 'components/PageContainer'
@@ -26,9 +27,8 @@ import { useContract } from 'hooks/web3Hooks'
 import { useWeb3React } from '@web3-react/core'
 // Utils & Data
 import { getContracts } from 'data/contracts'
-
-type TicketInfo = { ticketNumber: string, claimed: boolean }
-type RoundInfo = { totalTickets: BigNumber, winnerNumber: string, userTickets?: Array<TicketInfo> }
+// Types
+import { RoundInfo, TicketInfo } from 'types/lottery'
 
 const Lottery = () => {
 
@@ -41,24 +41,33 @@ const Lottery = () => {
 
   const [ currentRound, setCurrentRound ] = useState<number>(0)
   const [ currentTickets, setCurrentTickets ] = useState<Array<TicketInfo> | null>(null)
+  const [ currentRoundInfo, setCurrentRoundInfo ] = useState< RoundInfo | null>(null)
   const [ lastRoundInfo, setLastRoundInfo ] = useState< RoundInfo | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ticketNumber: string, claimed: boolean, ticketRound: number, instant: boolean} | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo | null>(null)
 
+  const getCurrentTickets = useCallback( async () => {
+    if(!lotteryMethods || !account) return 
+    const contractRound = new BigNumber(await lotteryMethods.currentRound().call()).toNumber()
+    const roundInfo = await lotteryMethods.roundInfo(contractRound).call()
+    const userTickets = await lotteryMethods.getRoundTickets(contractRound).call({ from: account })
+    const bonus = await lotteryMethods.bonusCoins(contractRound).call()
+    setCurrentRound(contractRound)
+    setCurrentTickets(userTickets)
+    setCurrentRoundInfo({
+      ...roundInfo,
+      userTickets,
+      bonusInfo: bonus
+    })
+  },[setCurrentRound, setCurrentTickets, setCurrentRoundInfo, lotteryMethods, account])
+  
   useEffect(() => {
-    if(!lotteryMethods || !account) return
-
-    const getCurrentTickets = async () => {
-      const contractRound = new BigNumber(await lotteryMethods.currentRound().call()).toNumber()
-      const userTickets = await lotteryMethods.getRoundTickets(contractRound).call({ from: account })
-      setCurrentRound(contractRound)
-      setCurrentTickets(userTickets)
+    const interval = setInterval(getCurrentTickets,30000)
+    return () => {
+      clearInterval(interval)
     }
-
-    getCurrentTickets()
-
-  },[lotteryMethods, account])
+  },[getCurrentTickets])
 
   const getRoundInfo = useCallback( async (round: number) => {
     if(!lotteryMethods) return null
@@ -70,17 +79,20 @@ const Lottery = () => {
     if(newTab === 1){
       // get last round info
       const userTickets = currentRound > 1 && await lotteryMethods.getRoundTickets(currentRound -1).call({ from: account }) || []
-      const lastRoundInfo = currentRound > 1 && await getRoundInfo( currentRound - 1 ) || null
-      console.log({ userTickets, lastRoundInfo })
+      const prevRound = currentRound > 1 && await getRoundInfo( currentRound - 1 ) || null
+      const prevBonus = currentRound > 1 && await lotteryMethods.bonusCoins(currentRound -1).call()
+      console.log({ userTickets, prevRound })
       setLastRoundInfo({ 
-        ...lastRoundInfo,
+        ...prevRound,
+        winnerNumber: new BigNumber(prevRound.winnerNumber).toString(),
         userTickets,
+        bonusInfo: prevBonus
       })
     }
     if(newTab === 2){
       // gethistory
     }
-  },[lotteryMethods, account, currentRound, getRoundInfo])
+  },[lotteryMethods, account, currentRound, getRoundInfo, setLastRoundInfo])
 
   const selectTicket = async (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
     setSelectedTicket({
@@ -94,7 +106,13 @@ const Lottery = () => {
   }
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
-
+  const selectedWinner = selectedRoundInfo?.winnerNumber.split('')
+  const matches = selectedDigits?.reduce( (acc, number, index) => {
+    acc.base += number
+    if(acc.base === (selectedRoundInfo?.winnerNumber || "1123456").substring(0,index +1))
+      acc.matches ++
+    return acc
+  },{base: "", matches: 0})
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -104,7 +122,12 @@ const Lottery = () => {
     <SummaryCard onBuy={toggleOpenBuy}/>
     <Grid container sx={{mt: 4}} justifyContent="space-between">
       <Grid item xs={12} lg={6}>
-        <LotteryHistory currentRound={currentRound} currentTickets={currentTickets} tabChange={getTabData} selectTicket={selectTicket}/>
+        <LotteryHistory 
+          currentRound={currentRound} currentTickets={currentTickets}
+          currentInfo={currentRoundInfo}
+          tabChange={getTabData} selectTicket={selectTicket}
+          lastRound={lastRoundInfo}
+        />
       </Grid>
       <Grid item xs={12} lg={5}>
         <Stack direction="row" justifyContent="flex-end">
@@ -135,14 +158,14 @@ const Lottery = () => {
             >
               <Stack direction="row" alignItems="center" px={2}>
                 <Stack>
-                  <Typography variant="body2" component="div" display="inline">
+                  <Typography variant="body2" component="div" display="inline" color="white">
                     Partner Bonus for this round:
                   </Typography>
                   <Typography color="secondary" variant="h5" component="div" display="inline" align="center">
                     5000 KNIGHT
                   </Typography>
                 </Stack>
-                <Image src="/assets/thirdPartyLogos/partners/knightswap-logo.png" height={272/2.2} width={272/2.2}/>
+                <Image src="/assets/thirdPartyLogos/partners/knightswap-logo.png" height={272/2.2} width={272/2.2} alt="partner Logo"/>
               </Stack>
             </Box>
           </Box>
@@ -171,7 +194,7 @@ const Lottery = () => {
             >
               <CloseIcon/>
             </IconButton>
-            <Typography variant="h5" align="center">
+            <Typography variant="h5" align="center" color="white">
               Squadron Details
             </Typography>
             <Divider sx={{ my: 1}}/>
@@ -187,30 +210,45 @@ const Lottery = () => {
                 <Typography align="center" color="textSecondary" variant="subtitle2">
                   Round # {selectedTicket.ticketRound}
                 </Typography>
-                <Typography align="center">
-                  You matched <span>{}</span> of 6
+                <Typography align="center" color="white">
+                  You matched&nbsp;
+                  <Typography display="inline" color="primary" component="span">
+                    {(matches?.matches || 1) -1}
+                  </Typography> 
+                  &nbsp;of 6
                 </Typography>
               </Grid>
               <Grid item xs={12} md={6}>
-                stuff and data
+                <Stack>
+                  <Typography variant="subtitle2" color="textSecondary" align="left">
+                    Squadron Reward
+                  </Typography>
+                  <Typography variant="h5" color="primary" fontWeight={600}>
+                    Reward Amount in CRUSH
+                  </Typography>
+                  <Typography variant="subtitle2" color="textSecondary" align="left">
+                    Reward Amount in USD
+                  </Typography>
+                  <GButton disabled={selectedTicket.claimed} color="secondary" width={"80%"} sx={{mt: 1}}>
+                    {selectedTicket.claimed ? "Already Claimed" : "Claim"}
+                  </GButton>
+                </Stack>
               </Grid>
               <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
-                {/* Rocket Explosion */}
                 <Box sx={{position:'absolute', top: 20, left: 55 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5}/>
+                  <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
                 </Box>
-                {/* Satellite  */}
                 <Box sx={{position:'absolute', top: 'calc(50% - 25px)', left: -20 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4}/>
+                  <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4} alt="Satellite Explosion"/>
                 </Box>
-                <Box sx={{position:'absolute', bottom: '25%', left: 85 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/2} height={77/2}/>
+                <Box sx={{position:'absolute', bottom: '25%', left: 65 }}>
+                  <Image src="/assets/launcher/explosion.png" width={100/1.9} height={77/1.9} alt="Antennae Explosion"/>
                 </Box>
-                <Box sx={{position:'absolute', bottom: '13%', left: '50%' }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/2} height={77/2} />
+                <Box sx={{position:'absolute', bottom: '5%', left: '38%' }}>
+                  <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Truck Explosion"/>
                 </Box>
-                <Box sx={{position:'absolute', top: '50%', right: 15 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/2} height={77/2} />
+                <Box sx={{position:'absolute', top: '40%', right: 0 }}>
+                  <Image src="/assets/launcher/explosion.png" width={100/1.2} height={77/1.2}  alt="Big Antennae Explosion"/>
                 </Box>
               </Grid>
             </Grid>
@@ -222,6 +260,7 @@ const Lottery = () => {
     <TicketBuyModal
       open={openBuy}
       onClose={toggleOpenBuy}
+      onReceipt={getCurrentTickets}
     />
   </PageContainer>
 }
