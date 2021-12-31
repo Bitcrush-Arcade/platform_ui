@@ -45,7 +45,7 @@ const Lottery = () => {
   const [ lastRoundInfo, setLastRoundInfo ] = useState< RoundInfo | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ticketNumber: string, claimed: boolean, ticketRound: number, instant: boolean} | null>(null)
-  const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo | null>(null)
+  const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
 
   const getCurrentTickets = useCallback( async () => {
     if(!lotteryMethods || !account) return 
@@ -95,24 +95,37 @@ const Lottery = () => {
   },[lotteryMethods, account, currentRound, getRoundInfo, setLastRoundInfo])
 
   const selectTicket = async (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
+    
+    const ticketRound = await getRoundInfo(roundNumber)
+    const winnerHolders = new BigNumber(ticketRound.winnerNumber).toString().split('')
+      .reduce( (acc: string[], number, index) => {
+        acc.push( (acc[index - 1] || '') + number );
+        return acc
+      },[])
+    const holderTotal: number[] = []
+    for(let i = 0; i < winnerHolders.length; i ++){
+      holderTotal.push( new BigNumber(await lotteryMethods.holders(roundNumber,winnerHolders[i]).call()).toNumber() )
+    }
+    holderTotal[0] = new BigNumber(ticketRound.totalTickets).minus(holderTotal.reduce( (acc, val) => acc + val, 0)).toNumber()
+
+    setSelectedRoundInfo({...ticketRound, holders: holderTotal})
     setSelectedTicket({
       ticketNumber,
       claimed,
       ticketRound: roundNumber,
       instant: instaClaim || false
     })
-    const ticketRound = await getRoundInfo(roundNumber)
-    setSelectedRoundInfo(ticketRound)
   }
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
-  const selectedWinner = selectedRoundInfo?.winnerNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {
     acc.base += number
     if(acc.base === (selectedRoundInfo?.winnerNumber || "1123456").substring(0,index +1))
       acc.matches ++
     return acc
   },{base: "", matches: 0})
+  const matchPercents = [new BigNumber(selectedRoundInfo?.noMatch || 0), new BigNumber(selectedRoundInfo?.match1 || 0), new BigNumber(selectedRoundInfo?.match2 || 0), new BigNumber(selectedRoundInfo?.match3 || 0), new BigNumber(selectedRoundInfo?.match4 || 0), new BigNumber(selectedRoundInfo?.match5 || 0), new BigNumber(selectedRoundInfo?.match6 || 0),]
+  const crushWin = new BigNumber(matchPercents[(matches?.matches || 1 ) -1 ]).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -201,9 +214,9 @@ const Lottery = () => {
             <Grid container alignItems="center" sx={{pt: 2}}>
               <Grid item xs={12} md={6}>
                 <Stack direction="row" justifyContent="space-evenly">
-                  <NumberInvader twoDigits={[selectedDigits[1], selectedDigits[2]]}/>
-                  <NumberInvader twoDigits={[selectedDigits[3], selectedDigits[4]]}/>
-                  <NumberInvader twoDigits={[selectedDigits[5], selectedDigits[6]]}/>
+                  <NumberInvader variant="fancy" twoDigits={[selectedDigits[1], selectedDigits[2]]} matched={matches ? matches.matches > 3 ? 2 : matches.matches - 1 : 0 }/>
+                  <NumberInvader variant="fancy" twoDigits={[selectedDigits[3], selectedDigits[4]]} matched={matches ? matches.matches > 5 ? 2 : matches.matches -3 : 0 }/>
+                  <NumberInvader variant="fancy" twoDigits={[selectedDigits[5], selectedDigits[6]]} matched={matches ? matches.matches - 5 : 0 }/>
                 </Stack>
               </Grid>
               <Grid item md={6}>
@@ -224,10 +237,10 @@ const Lottery = () => {
                     Squadron Reward
                   </Typography>
                   <Typography variant="h5" color="primary" fontWeight={600}>
-                    Reward Amount in CRUSH
+                    {crushWin.toFixed(4,1)} CRUSH
                   </Typography>
                   <Typography variant="subtitle2" color="textSecondary" align="left">
-                    Reward Amount in USD
+                    $&nbsp;
                   </Typography>
                   <GButton disabled={selectedTicket.claimed} color="secondary" width={"80%"} sx={{mt: 1}}>
                     {selectedTicket.claimed ? "Already Claimed" : "Claim"}
@@ -235,21 +248,31 @@ const Lottery = () => {
                 </Stack>
               </Grid>
               <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
-                <Box sx={{position:'absolute', top: 20, left: 55 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
-                </Box>
-                <Box sx={{position:'absolute', top: 'calc(50% - 25px)', left: -20 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4} alt="Satellite Explosion"/>
-                </Box>
-                <Box sx={{position:'absolute', bottom: '25%', left: 65 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.9} height={77/1.9} alt="Antennae Explosion"/>
-                </Box>
-                <Box sx={{position:'absolute', bottom: '5%', left: '38%' }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Truck Explosion"/>
-                </Box>
-                <Box sx={{position:'absolute', top: '40%', right: 0 }}>
-                  <Image src="/assets/launcher/explosion.png" width={100/1.2} height={77/1.2}  alt="Big Antennae Explosion"/>
-                </Box>
+                {(matches?.matches || 0) >= 2 && 
+                  <Box sx={{position:'absolute', top: 20, left: 55 }}>
+                    <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
+                  </Box>
+                }
+                {(matches?.matches || 0) >= 4 && 
+                  <Box sx={{position:'absolute', top: 'calc(50% - 25px)', left: -20 }}>
+                    <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4} alt="Satellite Explosion"/>
+                  </Box>
+                }
+                {(matches?.matches || 0) >= 3 && 
+                  <Box sx={{position:'absolute', bottom: '25%', left: 65 }}>
+                    <Image src="/assets/launcher/explosion.png" width={100/1.9} height={77/1.9} alt="Antennae Explosion"/>
+                  </Box>
+                }
+                {(matches?.matches || 0) >= 5 && 
+                  <Box sx={{position:'absolute', bottom: '5%', left: '38%' }}>
+                    <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Truck Explosion"/>
+                  </Box>
+                }
+                {(matches?.matches || 0) >= 6 && 
+                  <Box sx={{position:'absolute', top: '40%', right: 0 }}>
+                    <Image src="/assets/launcher/explosion.png" width={100/1.2} height={77/1.2}  alt="Big Antennae Explosion"/>
+                  </Box>
+                }
               </Grid>
             </Grid>
           </Card>
