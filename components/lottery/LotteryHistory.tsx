@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import BigNumber from 'bignumber.js'
 // Material
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -11,21 +12,22 @@ import Card from 'components/basics/Card';
 import Current from 'components/lottery/LotteryViews/Current';
 import History from 'components/lottery/LotteryViews/History';
 import LastRound from 'components/lottery/LotteryViews/LastRound';
-
+// Types
+import { RoundInfo, TicketInfo } from 'types/lottery'
 
 
 type LotteryHistoryProps = {
     currentRound: number,
     visibleRounds?: Array<{id: number, date: Date, totalTickets: number, userTickets: number, token: string}>,
-    currentTickets?: Array<{ticketNumber: string, claimed: boolean}> | null,
-    lastArray?: Array<{ticket: string, claimed: boolean}>,
-    lastWinner?: string,
+    currentTickets?: Array<TicketInfo> | null,
+    currentInfo?: RoundInfo | null;
+    lastRound?: RoundInfo | null;
     tabChange: (newTab: number) => void,
     selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
 }
 
 const LotteryHistory = (props: LotteryHistoryProps) => {
-    const { currentTickets, tabChange, selectTicket, currentRound } = props
+    const { currentTickets, tabChange, selectTicket, currentRound, lastRound, currentInfo } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(1)
     const roundsPerPage = 4
@@ -37,9 +39,9 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     }
 
     const parsedCurrentTickets = useMemo( () => {
-        if(!currentTickets) return []
-        return currentTickets.map( (ticket) => ticket.ticketNumber )
-    },[currentTickets])
+        if(!currentInfo?.userTickets) return []
+        return currentInfo?.userTickets.map( (ticket) => ticket.ticketNumber )
+    },[currentInfo?.userTickets])
 
     return <>
     
@@ -49,7 +51,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 {/*Tab changer*/}
                 <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
                     <Tab label={<Typography color='white' variant="body1">CURRENT</Typography>}/>
-                    <Tab label={<Typography color='white' variant="body1">LAST ROUND</Typography>}/>
+                    <Tab label={<Typography color='white' variant="body1" >LAST ROUND</Typography>}/>
                     <Tab label={<Typography color='white' variant="body1">HISTORY</Typography>}/>
                     
                 </Tabs>
@@ -58,17 +60,23 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
         
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
-        {/*{tabSelected == 0 && <Current tickets={ currentTickets && parsedCurrentTickets}/>}*/}
-        {tabSelected == 0 && <Current tickets={testCurrentArray}/>}
-        {tabSelected == 1 && 
-            <LastRound winningTeamTicket={winningTestTicket} 
-                tickets={testLastArray} 
-                lastDate={ new Date().getTime() - (3600*24*1000)} 
+        {tabSelected == 0 &&
+            <Current
+                tickets={ currentInfo && parsedCurrentTickets}
+                currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
+                totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
+            />
+        }
+        {tabSelected == 1 && lastRound && 
+            <LastRound winningTeamTicket={lastRound.winnerNumber} 
+                tickets={lastRound.userTickets || []} 
+                lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
-                currentRound={currentRound}
-                token={lastRoundToken}
-                tokenAmount={lastRoundTokenAmount}
-            />} 
+                currentRound={currentRound -1}
+                token={lastRound.bonusInfo?.bonusToken}
+                tokenAmount={lastRound.bonusInfo?.bonusAmount}
+            />
+        } 
         
         {tabSelected == 2 &&   
             <History rounds={shownHistoryRounds}
