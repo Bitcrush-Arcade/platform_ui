@@ -132,7 +132,7 @@ const LastRound = (props: LastRoundProps) => {
                   </Stack>
                 <Stack>
                   <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, currentRound)}/>
-                  <Chip label="Claim" color="secondary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, currentRound, true)}/>
+                  <Chip label={claimed ? "Claimed!" : "Claim"} disabled={claimed} color="secondary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, currentRound, true)}/>
                 </Stack>
             </Stack>
           </Stack>
