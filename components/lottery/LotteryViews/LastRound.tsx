@@ -6,13 +6,14 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
-// Types
-import { TicketInfo } from 'types/lottery'
-// Libs 
+// Bitcrush UI 
 import NumberInvader from 'components/lottery/NumberInvader'
 import SmallButton from 'components/basics/SmallButton'
-// data
+// data & utils
+import { currencyFormat } from 'utils/text/text'
 import { partnerTokens } from 'data/partnerTokens'
+// Types
+import { TicketInfo } from 'types/lottery'
 
 type LastRoundProps = {
   winningTeamTicket: string;
@@ -27,10 +28,10 @@ type LastRoundProps = {
 
 const LastRound = (props: LastRoundProps) => {
   const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, tokenAmount, claimAll } = props
-  const winningDigits = winningTeamTicket.split('')
+  const winningDigits = (winningTeamTicket || 'XXXXXXX').split('')
   const numberOfWinners: number = 0    
 
-  const unclaimedTickets = tickets.filter( ticket => !ticket.claimed).length > 0
+  const unclaimedTickets = (tickets ||[]).filter( ticket => !ticket.claimed).length > 0
   
   return (<>
 
@@ -67,29 +68,37 @@ const LastRound = (props: LastRoundProps) => {
       <Divider sx={{mb: 2}}/>
 
       {/*Player stats*/}
-      <Stack justifyContent ="space-evenly" direction="row" alignItems="center" sx={{mb: 1}}>
-        
-        { new BigNumber(tokenAmount || 0).isGreaterThan(0) &&
-            <Typography align="left" variant="subtitle2">
-              PARTNER BONUS: {tokenAmount} {token && partnerTokens[token] || 'Pending'} 
-            </Typography>
+      <Stack justifyContent={{ xs: 'center' ,md:"space-evenly"}} direction={{ md: "row", xs:'column'}} alignItems="center" sx={{mb: 1}}>
+        <Typography align="left" variant="subtitle2" whiteSpace="pre-line">
+        { new BigNumber(tokenAmount || 0).isGreaterThan(0) 
+            ?
+              <>
+                PARTNER BONUS:{'\n'}
+                <Typography display="inline" color="secondary">
+                  {currencyFormat(new BigNumber(tokenAmount || 0).toString(),{ decimalsToShow: 2, isWei: true})}
+                </Typography>
+                &nbsp;
+                {token && partnerTokens[token]?.name || 'Pending'}
+              </>
+              : null
         }
-        
-        <Typography variant="subtitle2" >
-          {numberOfWinners} Winners
         </Typography>
-     
-        <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(currentRound)} disabled={!unclaimedTickets}>
-          { unclaimedTickets ? "CLAIM ALL" : "ALL CLAIMED"}
-        </SmallButton>
+        <Typography align="center" variant="h6" sx={{ my: 2}}>
+          Your Squadrons  
+        </Typography>
+        <Stack>
+          <Typography variant="subtitle2" >
+            {numberOfWinners} Successful Flights
+          </Typography>
+          <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(currentRound)} disabled={!unclaimedTickets}>
+            { unclaimedTickets ? "CLAIM ALL" : "ALL CLAIMED"}
+          </SmallButton>
+        </Stack>
         
       </Stack>
  
       <Stack sx={{ maxHeight: 196, overflowY: 'auto'}}>
         
-        <Typography align="center" variant="h6" sx={{pl: 2, my: 2}}>
-          Your Squadron
-        </Typography>
         <Divider sx={{my: 1}}/>
 
         {tickets.map(( ticketObj, ticketIndex) => {
