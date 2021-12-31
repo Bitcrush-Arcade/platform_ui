@@ -60,12 +60,12 @@ const History = (props: HistoryViewProps) => {
   {/*Building the table with header*/}
   return <Table>
     <TableHead>
-      <TableRow>
-        <TableCell>ID</TableCell>
-        <TableCell>DATE</TableCell>
-        <TableCell>TOTAL TICKETS</TableCell>
-        <TableCell>USER TICKETS</TableCell>
-        <TableCell>TOKENS</TableCell>
+      <TableRow> 
+        <TableCell align="center">ID</TableCell>
+        <TableCell align="center">DATE</TableCell>
+        <TableCell align="center">TOTAL TICKETS</TableCell>
+        <TableCell align="center">USER TICKETS</TableCell>
+        <TableCell align="center">PARTNER BONUS</TableCell>
       </TableRow>
     </TableHead>
     <TableBody>
