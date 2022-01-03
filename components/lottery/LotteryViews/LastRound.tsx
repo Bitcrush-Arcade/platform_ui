@@ -46,10 +46,11 @@ const LastRound = (props: LastRoundProps) => {
               LAST ROUND 
           </Typography>
 
-          <ArrowForwardIcon color="primary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
+          <ArrowForwardIcon color="primary" sx={{fontSize: 18, bottom: 0, position: 'relative', mx: 0.5}} />    
           
           <Typography color="textSecondary" variant="body2">
             #{lastRound}
+            &nbsp; 
             &nbsp; 
           </Typography>
           <Typography variant="body2" color="textPrimary">
@@ -63,7 +64,7 @@ const LastRound = (props: LastRoundProps) => {
             &nbsp;
           </Typography>
           <Typography color="primary" display="inline" variant="body2">
-            ATTACKED
+            SQUADS ATTACKED
           </Typography>
         </Stack>
 
@@ -71,7 +72,7 @@ const LastRound = (props: LastRoundProps) => {
       
       <Divider sx={{mt: 2}}/>
     
-      <Stack justifyContent="center" alignItems="center"
+      <Stack justifyContent="center" 
           sx={{
             py: 2,
             backgroundColor: theme => theme.palette.mode === "dark" ? 'transparent' : 'rgb(23,24,54)'
@@ -81,7 +82,7 @@ const LastRound = (props: LastRoundProps) => {
         <Typography sx={{mb: 2, color: 'white'}} variant="h6" align="center" fontWeight={600}>
           Winning Team
         </Typography>
-        <Stack direction="row" justifyContent="center" alignItems="center">
+        <Stack direction="row" justifyContent="center">
                 <NumberInvader size="large" matched={2} twoDigits={[winningDigits[1], winningDigits[2]]}/>
                 <NumberInvader size="large" matched={2} twoDigits={[winningDigits[3], winningDigits[4]]}/>
                 <NumberInvader size="large" matched={2} twoDigits={[winningDigits[5], winningDigits[6]]}/>
@@ -123,19 +124,16 @@ const LastRound = (props: LastRoundProps) => {
         }
         <Stack>
           <Typography variant="subtitle2" >
-            {numberOfWinners} Successful Flights
+            {numberOfWinners} Successful Attacks
           </Typography>
           <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(lastRound)} disabled={!unclaimedTickets}>
-            { unclaimedTickets ? "CLAIM ALL" : "ALL CLAIMED"}
+            { unclaimedTickets ? "CALCULATE" : "ALL CLAIMED"}
           </SmallButton>
         </Stack>
-        
+      
       </Stack>
- 
+      <Divider sx={{mt: 1}}/>
       <Stack sx={{ maxHeight: 196, overflowY: 'auto'}}>
-        
-        <Divider sx={{my: 1}}/>
-
         {tickets.map(( ticketObj, ticketIndex) => {
           const { ticketNumber: ticket, claimed } = ticketObj
           const ticketDigits = ticket.split('')
@@ -148,41 +146,30 @@ const LastRound = (props: LastRoundProps) => {
           const totalDigitsMatched: number = 0
 
           {/*Ticket stack*/}
-          return <Stack sx={{my: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
-
-            <Stack justifyContent="left" direction="row" sx={{mb: 3}}>
-              <Typography variant="subtitle2" sx={{pr: 1}}>
-                FLIGHT: 
+          return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
+            <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
+              <Typography color="textSecondary" variant="body2">
+                  SQUAD: &nbsp;
+                <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                    {ticketIndex+1} 
+                </Typography>
+                &nbsp;
+                <Typography  color="textPrimary" variant="body2" display="inline" component="span">
+                  of
+                </Typography>
+                &nbsp;
+                <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                  {tickets.length}
+                </Typography>
               </Typography>
-              <Typography color="primary" variant="subtitle2" sx={{pr: 1}}>
-                {ticketIndex+1} 
-              </Typography>
-              <Typography variant="subtitle2" sx={{pr: 1}}>
-                of
-              </Typography>
-              <Typography color="primary" variant="subtitle2" sx={{pr: 1}}>
-              {tickets.length}
-              </Typography>
+              <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
             </Stack>
 
-            <Stack direction="row" justifyContent="center" alignItems="center" key={`ticket-display-${ticketIndex}`}>
-            
-              <Stack>
-                <Typography variant="subtitle2" sx={{pr: 1}}>
-                  Matched first: {totalDigitsMatched}
-                </Typography>
-              </Stack>
-
-              {/*Paper with numberInvaders*/}
-                  <Stack justifyContent="center" direction="row">
-                    <NumberInvader size="large" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
-                    <NumberInvader size="large" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
-                    <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
-                  </Stack>
-                <Stack>
-                  <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
-                  <Chip label={claimed ? "Claimed!" : "Claim"} disabled={claimed} color="secondary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound, true)}/>
-                </Stack>
+            {/*Paper with numberInvaders*/}
+            <Stack justifyContent="center" direction="row">
+              <NumberInvader size="large" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+              <NumberInvader size="large" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+              <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
             </Stack>
           </Stack>
           })}
