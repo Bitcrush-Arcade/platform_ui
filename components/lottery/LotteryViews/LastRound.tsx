@@ -7,6 +7,7 @@ import Divider from '@mui/material/Divider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 // Bitcrush UI 
+import Currency from 'components/basics/Currency'
 import NumberInvader from 'components/lottery/NumberInvader'
 import SmallButton from 'components/basics/SmallButton'
 // data & utils
@@ -22,12 +23,14 @@ type LastRoundProps = {
   token?: string;
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
+  globalTickets: number;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
   claimAll: (round: number) => void
 }
 
 const LastRound = (props: LastRoundProps) => {
-  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, tokenAmount, claimAll } = props
+  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, 
+    tokenAmount, globalTickets, claimAll } = props
   const winningDigits = (winningTeamTicket || 'XXXXXXX').split('')
   const numberOfWinners: number = 0    
 
@@ -51,12 +54,22 @@ const LastRound = (props: LastRoundProps) => {
       <Divider sx={{mt: 2}}/>
     
       <Stack justifyContent="space-between" alignItems="center"
-        sx={{
-          py: 2,
-          backgroundColor: theme => theme.palette.mode === "dark" ? 'transparent' : 'rgb(23,24,54)'
-        }}
-      >
-        <Typography sx={{pb: 2, color: 'white'}} variant="h6" align="center" fontWeight={600}>
+          sx={{
+            py: 2,
+            backgroundColor: theme => theme.palette.mode === "dark" ? 'transparent' : 'rgb(23,24,54)'
+          }}
+        >
+        <Stack direction="row" justifyContent="center">
+          <Typography  align ="center" color="secondary">
+              <strong><Currency value={globalTickets} decimals ={0}/></strong> 
+          </Typography>
+          &nbsp;
+          <Typography color="primary">
+            FLIGHTS LAST ROUND WORLDWIDE
+          </Typography>
+        </Stack>
+
+        <Typography sx={{mt: 1, mb: 2, color: 'white'}} variant="h6" align="center" fontWeight={600}>
           Winning Team
         </Typography>
         <Stack direction="row">
@@ -73,8 +86,10 @@ const LastRound = (props: LastRoundProps) => {
         { new BigNumber(tokenAmount || 0).isGreaterThan(0) 
             ?
               <>
-                PARTNER BONUS:{'\n'}
-                <Typography display="inline" color="secondary">
+                <Typography color="textSecondary" variant="body2">
+                  PARTNER BONUS:{'\n'}
+                </Typography>
+                <Typography  display="inline" color="secondary">
                   {currencyFormat(new BigNumber(tokenAmount || 0).toString(),{ decimalsToShow: 2, isWei: true})}
                 </Typography>
                 &nbsp;
