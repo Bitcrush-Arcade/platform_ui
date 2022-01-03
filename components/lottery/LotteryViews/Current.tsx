@@ -33,35 +33,50 @@ const { tickets, currentDate, currentRound, totalTickets, globalTickets } = prop
 
 return <>
 
-  <Stack direction="row" alignItems="center">
+  <Stack direction="row" alignItems="center" justifyContent="space-between">
+    <Stack direction="row">
     <Typography variant="body2" fontWeight={500} color="secondary">
       NEXT DRAW
     </Typography>
 
     <ArrowForwardIcon color="secondary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
     
-    <Typography color="textSecondary" variant="body2" sx={{pr: 1}}>
-      #{currentRound} 
-    </Typography>
+    <Typography color="textSecondary" variant="body2">
+      #{currentRound}
+      &nbsp; 
+    </Typography> 
 
     <Typography variant="body2" color="textPrimary">
-      { format( currentDate ? new Date(currentDate * 1000) : new Date(), 'yyyy-MMMM-dd HHaa')}    
+      { format( currentDate ? new Date(currentDate * 1000) : new Date(), 'yyyy-MMM-dd HHaa')}    
     </Typography>
+    </Stack>
+    <Stack direction ="row">    
+      <Typography color="secondary" component="div" variant="body2">
+        <strong><Currency value={globalTickets} decimals ={0}/></strong> 
+        &nbsp;
+      </Typography>
+      <Typography color="primary" display="inline" variant="body2">
+        ATTACKING NOW
+      </Typography>
+    </Stack>
+      
   </Stack>
   <Divider sx={{my: 2}}/>
 
-  <Stack>
-    <Typography  align ="center" color="secondary" component="div">
-        <strong><Currency value={globalTickets} decimals ={0}/></strong> 
-        &nbsp;
-        <Typography color="primary" display="inline">
-          FLIGHTS THIS ROUND WORLDWIDE
-        </Typography>
-    </Typography>
-    <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
-      Your Squadron
-    </Typography>
-  </Stack>
+    {
+      tickets ? 
+        <>
+          <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
+            Your Squadrons
+          </Typography>
+        </>
+        :
+        <>
+          <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
+            No Squadrons Recruited Yet
+          </Typography>
+        </>
+    }
 
   <Divider sx={{my: 2}}/>
   
@@ -79,7 +94,7 @@ return <>
 
             <Stack justifyContent="left" direction="row" sx={{mb: 3}}>
               <Typography color="textSecondary" variant="body2">
-                FLIGHT: &nbsp;
+                SQUADRON: &nbsp;
                 <Typography color="primary" variant="subtitle2" display="inline" component="span">
                   {ticketIndex+1} 
                 </Typography>
@@ -93,7 +108,7 @@ return <>
                 </Typography>
               </Typography>
             </Stack>
-                <Stack direction="row" justifyContent="center" alignItems="center">
+              <Stack direction="row" justifyContent="center" alignItems="center">
                 <NumberInvader size="large" twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
