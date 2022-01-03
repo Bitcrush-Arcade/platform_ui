@@ -66,7 +66,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
                 roundId={1}
-                globalTickets={12195}
+                globalTickets={globalTicketsTest}
             />
         }
         {tabSelected == 1 && lastRound && 
@@ -78,6 +78,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 token={lastRound.bonusInfo?.bonusToken}
                 tokenAmount={lastRound.bonusInfo?.bonusAmount}
                 claimAll={claimAll}
+                globalTickets={globalTicketsTest}
             />
         } 
         
@@ -135,3 +136,4 @@ const winningTestTicket="1456789"
 
 const lastRoundToken = "KNIGHT"
 const lastRoundTokenAmount =5000
+const globalTicketsTest = 12408
