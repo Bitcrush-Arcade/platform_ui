@@ -65,7 +65,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 tickets={ currentInfo && parsedCurrentTickets}
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
-                roundId={1}
+                currentRound={currentRound}
                 globalTickets={globalTicketsTest}
             />
         }
@@ -74,7 +74,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 tickets={lastRound.userTickets || []} 
                 lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
-                currentRound={currentRound -1}
+                lastRound={currentRound -1}
                 token={lastRound.bonusInfo?.bonusToken}
                 tokenAmount={lastRound.bonusInfo?.bonusAmount}
                 claimAll={claimAll}
