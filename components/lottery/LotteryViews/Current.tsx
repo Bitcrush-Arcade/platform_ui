@@ -24,7 +24,7 @@ type CurrentViewProps = {
   currentDate: number;
   roundId?: number | 0;
   totalTickets?: number;
-  globalTickets?: number | 0;
+  globalTickets: number;
 }
 
 {/* Current table props and formatting */}
