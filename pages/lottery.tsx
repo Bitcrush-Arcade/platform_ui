@@ -260,8 +260,13 @@ const Lottery = () => {
                 xs: 'none',
                 md: 'url(/backgrounds/lotterybg.png) no-repeat'
               },
-              backgroundSize: '135% 100%',
-              backgroundPosition: 'top 0 right 0',
+              backgroundSize: {
+                xs: '100% 100%',
+                md: '135% 100%'
+              },
+              backgroundPosition: {
+                md: 'top 0 right 0'
+              },
               position: 'relative',
               width: '100%',
               height: {
