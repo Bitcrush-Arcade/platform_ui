@@ -81,7 +81,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     <Card background="light" shadow="primary" sx={{p: 3}}>
         {tabSelected == 0 &&
             <Current
-                tickets={ currentInfo && parsedCurrentTickets}
+                tickets={currentInfo && parsedCurrentTickets}
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
                 currentRound={currentRound}
