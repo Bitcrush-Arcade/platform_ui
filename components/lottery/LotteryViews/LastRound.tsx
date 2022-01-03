@@ -40,45 +40,51 @@ const LastRound = (props: LastRoundProps) => {
 
   {/*Winning team stack*/}
     <Stack>
-      <Stack direction="row" alignItems="center">
-        <Typography variant="body2" fontWeight={500} color="primary">
-            LAST ROUND 
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="space-between">
+          <Stack direction="row">
+          <Typography variant="body2" fontWeight={500} color="primary">
+              LAST ROUND 
+          </Typography>
 
-        <ArrowForwardIcon color="primary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
-        
-        <Typography color="textSecondary" variant="body2" sx={{pr: 1}}>
-          #{lastRound} 
-        </Typography>
-        <Typography variant="body2" color="textPrimary">
-          { format( lastDate ? new Date(lastDate * 1000) : new Date(), 'yyyy-MMMM-dd HHaa')}    
-        </Typography>
+          <ArrowForwardIcon color="primary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
+          
+          <Typography color="textSecondary" variant="body2">
+            #{lastRound}
+            &nbsp; 
+          </Typography>
+          <Typography variant="body2" color="textPrimary">
+            { format( lastDate ? new Date(lastDate * 1000) : new Date(), 'yyyy-MMM-dd HHaa')}    
+          </Typography>
+        </Stack>
+
+        <Stack direction ="row">    
+          <Typography color="secondary" component="div" variant="body2">
+            <strong><Currency value={globalTickets} decimals ={0}/></strong> 
+            &nbsp;
+          </Typography>
+          <Typography color="primary" display="inline" variant="body2">
+            ATTACKED
+          </Typography>
+        </Stack>
+
       </Stack>
+      
       <Divider sx={{mt: 2}}/>
     
-      <Stack justifyContent="space-between" alignItems="center"
+      <Stack justifyContent="center" alignItems="center"
           sx={{
             py: 2,
             backgroundColor: theme => theme.palette.mode === "dark" ? 'transparent' : 'rgb(23,24,54)'
           }}
         >
-        <Stack direction="row" justifyContent="center">
-          <Typography  align ="center" color="secondary">
-              <strong><Currency value={globalTickets} decimals ={0}/></strong> 
-          </Typography>
-          &nbsp;
-          <Typography color="primary">
-            FLIGHTS LAST ROUND WORLDWIDE
-          </Typography>
-        </Stack>
 
-        <Typography sx={{mt: 1, mb: 2, color: 'white'}} variant="h6" align="center" fontWeight={600}>
+        <Typography sx={{mb: 2, color: 'white'}} variant="h6" align="center" fontWeight={600}>
           Winning Team
         </Typography>
-        <Stack direction="row">
-          <NumberInvader size="large" twoDigits={[winningDigits[1], winningDigits[2]]}/>
-          <NumberInvader size="large" twoDigits={[winningDigits[3], winningDigits[4]]}/>
-          <NumberInvader size="large" twoDigits={[winningDigits[5], winningDigits[6]]}/>
+        <Stack direction="row" justifyContent="center" alignItems="center">
+                <NumberInvader size="large" matched={2} twoDigits={[winningDigits[1], winningDigits[2]]}/>
+                <NumberInvader size="large" matched={2} twoDigits={[winningDigits[3], winningDigits[4]]}/>
+                <NumberInvader size="large" matched={2} twoDigits={[winningDigits[5], winningDigits[6]]}/>
         </Stack>
       </Stack>
       <Divider sx={{mb: 2}}/>
@@ -101,9 +107,20 @@ const LastRound = (props: LastRoundProps) => {
               : null
         }
         </Typography>
-        <Typography align="center" variant="h6" sx={{ my: 2}}>
-          Your Squadrons  
-        </Typography>
+        {
+          tickets ? 
+            <>
+              <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
+                Your Squadrons
+              </Typography>
+            </>
+            :
+            <>
+              <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
+                No Squadrons Recruited 
+              </Typography>
+            </>
+        }
         <Stack>
           <Typography variant="subtitle2" >
             {numberOfWinners} Successful Flights
