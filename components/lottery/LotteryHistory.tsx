@@ -50,9 +50,28 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
             
                 {/*Tab changer*/}
                 <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
-                    <Tab label={<Typography color='white' variant="body1">CURRENT</Typography>}/>
-                    <Tab label={<Typography color={!currentRound ? 'textSecondary' : 'white'} variant="body1" >LAST ROUND</Typography>} disabled={!currentRound} />
-                    <Tab label={<Typography color='white' variant="body1">HISTORY</Typography>}/>
+                    <Tab
+                        label={
+                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                                CURRENT
+                            </Typography>
+                        }
+                    />
+                    <Tab
+                        label={
+                            <Typography color={!currentRound ? 'textSecondary' : 'white'} variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }} >
+                                LAST ROUND
+                            </Typography>
+                        }
+                        disabled={!currentRound}
+                    />
+                    <Tab
+                        label={
+                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                                HISTORY
+                            </Typography>
+                        }
+                    />
                     
                 </Tabs>
         </Grid>
