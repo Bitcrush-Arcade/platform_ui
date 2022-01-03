@@ -19,7 +19,7 @@ import { TicketInfo } from 'types/lottery'
 type LastRoundProps = {
   winningTeamTicket: string;
   lastDate: number;
-  currentRound: number;
+  lastRound: number;
   token?: string;
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
@@ -29,7 +29,7 @@ type LastRoundProps = {
 }
 
 const LastRound = (props: LastRoundProps) => {
-  const { winningTeamTicket, lastDate, tickets, selectTicket, currentRound, token, 
+  const { winningTeamTicket, lastDate, tickets, selectTicket, lastRound, token, 
     tokenAmount, globalTickets, claimAll } = props
   const winningDigits = (winningTeamTicket || 'XXXXXXX').split('')
   const numberOfWinners: number = 0    
@@ -47,6 +47,9 @@ const LastRound = (props: LastRoundProps) => {
 
         <ArrowForwardIcon color="primary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
         
+        <Typography color="textSecondary" variant="body2" sx={{pr: 1}}>
+          #{lastRound} 
+        </Typography>
         <Typography variant="body2" color="textPrimary">
           { format( lastDate ? new Date(lastDate * 1000) : new Date(), 'yyyy-MMMM-dd HHaa')}    
         </Typography>
@@ -105,7 +108,7 @@ const LastRound = (props: LastRoundProps) => {
           <Typography variant="subtitle2" >
             {numberOfWinners} Successful Flights
           </Typography>
-          <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(currentRound)} disabled={!unclaimedTickets}>
+          <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(lastRound)} disabled={!unclaimedTickets}>
             { unclaimedTickets ? "CLAIM ALL" : "ALL CLAIMED"}
           </SmallButton>
         </Stack>
@@ -160,8 +163,8 @@ const LastRound = (props: LastRoundProps) => {
                     <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
                   </Stack>
                 <Stack>
-                  <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, currentRound)}/>
-                  <Chip label={claimed ? "Claimed!" : "Claim"} disabled={claimed} color="secondary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, currentRound, true)}/>
+                  <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
+                  <Chip label={claimed ? "Claimed!" : "Claim"} disabled={claimed} color="secondary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound, true)}/>
                 </Stack>
             </Stack>
           </Stack>
