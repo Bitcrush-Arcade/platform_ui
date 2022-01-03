@@ -96,25 +96,11 @@ return <>
                 </Typography>
               </Typography>
             </Stack>
-            
-            {/* <Paper 
-                sx={ theme => ({
-                backgroundColor: theme.palette.mode == "dark" ? "#0C0E22" : theme.palette.primary.dark,
-                borderRadius: 3,
-                px: 1,
-                py: 2,
-                m: 1,
-                alignSelf: "center",
-                
-                })}
-                
-            > */}
-              <Stack direction="row" justifyContent="center" alignItems="center">
+                <Stack direction="row" justifyContent="center" alignItems="center">
                 <NumberInvader size="large" twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
-              </Stack>
-            {/* </Paper> */}
+              </Stack>           
           </Stack>
         })}
       </>
