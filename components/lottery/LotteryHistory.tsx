@@ -89,8 +89,19 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
             />
         }
         {tabSelected == 1 && lastRound && 
+            // <LastRound winningTeamTicket={lastRound.winnerNumber} 
+            //     tickets={lastRound.userTickets || []} 
+            //     lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
+            //     selectTicket={selectTicket} 
+            //     lastRound={currentRound -1}
+            //     token={lastRound.bonusInfo?.bonusToken}
+            //     tokenAmount={lastRound.bonusInfo?.bonusAmount}
+            //     claimAll={claimAll}
+            //     globalTickets={globalTicketsTest}
+            // />
+
             <LastRound winningTeamTicket={lastRound.winnerNumber} 
-                tickets={lastRound.userTickets || []} 
+                tickets={testLastArray} 
                 lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
                 lastRound={currentRound -1}
@@ -138,17 +149,17 @@ const testCurrentArray=[
     '1123456',
 ]
 const testLastArray=[
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
-    {ticket: '1123456', claimed: false},
+    {ticketNumber: '1123456', claimed: false},
+    {ticketNumber: '1361535', claimed: false},
+    {ticketNumber: '1371535', claimed: false},
+    {ticketNumber: '1372535', claimed: false},
+    {ticketNumber: '1372635', claimed: false},
+    {ticketNumber: '1372645', claimed: false},
+    {ticketNumber: '1372646', claimed: false},
+    {ticketNumber: '1123456', claimed: false},
+    {ticketNumber: '1123456', claimed: false},
+    {ticketNumber: '1123456', claimed: false},
+    {ticketNumber: '1123456', claimed: false},
 ]
 
 const winningTestTicket="1456789"
