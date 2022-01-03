@@ -248,7 +248,9 @@ const Lottery = () => {
                     {currencyFormat(new BigNumber(currentRoundInfo?.bonusInfo?.bonusAmount || 0).toString(), { decimalsToShow: 2, isWei: true})} {partnerToken.name}
                   </Typography>
                 </Stack>
-                {partnerToken.img && <Image src={partnerToken.img} height={272/2.2} width={272/2.2} alt="partner Logo"/>}
+                <Box sx={{pl: 2}}>
+                  {partnerToken.img && <Image src={partnerToken.img} height={272/4} width={272/4} alt="partner Logo"/>}
+                </Box>
               </Stack>
             </Box>
           </Box>
