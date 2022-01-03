@@ -1,4 +1,5 @@
 import format from 'date-fns/format'
+import BigNumber from 'bignumber.js'
 // Material
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Paper from '@mui/material/Paper'
@@ -9,6 +10,13 @@ import Divider from '@mui/material/Divider'
 // Libs
 import NumberInvader from 'components/lottery/NumberInvader'
 
+// Bitcrush UI
+import Currency from 'components/basics/Currency'
+
+// Data & Utils
+import { currencyFormat } from 'utils/text/text'
+import { partnerTokens } from 'data/partnerTokens'
+
 
 {/* Current table props */}
 type CurrentViewProps = {
@@ -16,11 +24,12 @@ type CurrentViewProps = {
   currentDate: number;
   roundId?: number | 0;
   totalTickets?: number;
+  globalTickets?: number | 0;
 }
 
 {/* Current table props and formatting */}
 const Current = (props: CurrentViewProps) => {
-const { tickets, currentDate, roundId, totalTickets } = props
+const { tickets, currentDate, roundId, totalTickets, globalTickets } = props
 
 return <>
 
@@ -41,9 +50,22 @@ return <>
   </Stack>
   <Divider sx={{mt: 2}}/>
 
-  <Typography variant="h6" align="center" sx={{my: 2}} fontWeight={600}>
-    Your Squadron
-  </Typography>
+  <Stack>
+   
+    <Stack direction="row" justifyContent="center" sx={{my: 1}}>
+      <Typography  align ="center" color="secondary">
+          <strong><Currency value={globalTickets} decimals ={0}/></strong> &nbsp;
+      </Typography>
+
+      <Typography color="primary">
+        FLIGHTS THIS ROUND WORLDWIDE
+      </Typography>
+    </Stack>
+    <Typography variant="h6" align="center" sx={{mt: 1, mb: 2}} fontWeight={600}>
+      Your Squadron
+    </Typography>
+  </Stack>
+
   <Divider sx={{my: 1}}/>
   
   <Stack sx={{ maxHeight: 353, overflowY: 'auto'}}>
