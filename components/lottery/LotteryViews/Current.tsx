@@ -22,14 +22,14 @@ import { partnerTokens } from 'data/partnerTokens'
 type CurrentViewProps = {
   tickets?: Array<string> | null;
   currentDate: number;
-  roundId?: number | 0;
+  currentRound?: number | 0;
   totalTickets?: number;
   globalTickets: number;
 }
 
 {/* Current table props and formatting */}
 const Current = (props: CurrentViewProps) => {
-const { tickets, currentDate, roundId, totalTickets, globalTickets } = props
+const { tickets, currentDate, currentRound, totalTickets, globalTickets } = props
 
 return <>
 
@@ -41,7 +41,7 @@ return <>
     <ArrowForwardIcon color="secondary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
     
     <Typography color="textSecondary" variant="body2" sx={{pr: 1}}>
-      #{roundId} 
+      #{currentRound} 
     </Typography>
 
     <Typography variant="body2" color="textPrimary">
