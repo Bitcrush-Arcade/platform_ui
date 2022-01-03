@@ -66,7 +66,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
                 roundId={1}
-                globalTickets={10000}
+                globalTickets={12195}
             />
         }
         {tabSelected == 1 && lastRound && 
