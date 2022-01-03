@@ -39,10 +39,11 @@ return <>
       NEXT DRAW
     </Typography>
 
-    <ArrowForwardIcon color="secondary" sx={{fontSize: 18, bottom: 1, position: 'relative', ml: 0.5, mr: 1.5}} />    
+    <ArrowForwardIcon color="secondary" sx={{fontSize: 18, bottom: 0, position: 'relative', mx: 0.5}} />    
     
     <Typography color="textSecondary" variant="body2">
       #{currentRound}
+      &nbsp;
       &nbsp; 
     </Typography> 
 
@@ -56,7 +57,7 @@ return <>
         &nbsp;
       </Typography>
       <Typography color="primary" display="inline" variant="body2">
-        ATTACKING NOW
+        SQUADS ATTACKING NOW
       </Typography>
     </Stack>
       
@@ -94,7 +95,7 @@ return <>
 
             <Stack justifyContent="left" direction="row" sx={{mb: 3}}>
               <Typography color="textSecondary" variant="body2">
-                SQUADRON: &nbsp;
+                SQUAD: &nbsp;
                 <Typography color="primary" variant="subtitle2" display="inline" component="span">
                   {ticketIndex+1} 
                 </Typography>
