@@ -48,25 +48,25 @@ return <>
       { format( currentDate ? new Date(currentDate * 1000) : new Date(), 'yyyy-MMMM-dd HHaa')}    
     </Typography>
   </Stack>
-  <Divider sx={{mt: 2}}/>
+  <Divider sx={{my: 2}}/>
 
   <Stack>
    
-    <Stack direction="row" justifyContent="center" sx={{my: 1}}>
+    <Stack direction="row" justifyContent="center">
       <Typography  align ="center" color="secondary">
-          <strong><Currency value={globalTickets} decimals ={0}/></strong> &nbsp;
+          <strong><Currency value={globalTickets} decimals ={0}/></strong> 
       </Typography>
-
+      &nbsp;
       <Typography color="primary">
         FLIGHTS THIS ROUND WORLDWIDE
       </Typography>
     </Stack>
-    <Typography variant="h6" align="center" sx={{mt: 1, mb: 2}} fontWeight={600}>
+    <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
       Your Squadron
     </Typography>
   </Stack>
 
-  <Divider sx={{my: 1}}/>
+  <Divider sx={{my: 2}}/>
   
   <Stack sx={{ maxHeight: 353, overflowY: 'auto'}}>
   {
