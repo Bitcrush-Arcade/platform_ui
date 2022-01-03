@@ -51,16 +51,13 @@ return <>
   <Divider sx={{my: 2}}/>
 
   <Stack>
-   
-    <Stack direction="row" justifyContent="center">
-      <Typography  align ="center" color="secondary">
-          <strong><Currency value={globalTickets} decimals ={0}/></strong> 
-      </Typography>
-      &nbsp;
-      <Typography color="primary">
-        FLIGHTS THIS ROUND WORLDWIDE
-      </Typography>
-    </Stack>
+    <Typography  align ="center" color="secondary" component="div">
+        <strong><Currency value={globalTickets} decimals ={0}/></strong> 
+        &nbsp;
+        <Typography color="primary" display="inline">
+          FLIGHTS THIS ROUND WORLDWIDE
+        </Typography>
+    </Typography>
     <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
       Your Squadron
     </Typography>
