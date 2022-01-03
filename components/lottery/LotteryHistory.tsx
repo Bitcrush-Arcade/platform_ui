@@ -15,7 +15,6 @@ import LastRound from 'components/lottery/LotteryViews/LastRound';
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
 
-
 type LotteryHistoryProps = {
     currentRound: number,
     visibleRounds?: Array<{id: number, date: Date, totalTickets: number, userTickets: number, token: string}>,
@@ -66,6 +65,8 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 tickets={ currentInfo && parsedCurrentTickets}
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
+                roundId={1}
+                globalTickets={10000}
             />
         }
         {tabSelected == 1 && lastRound && 
