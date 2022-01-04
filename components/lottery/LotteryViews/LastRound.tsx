@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider'
+import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 // Bitcrush UI 
@@ -117,8 +118,8 @@ const LastRound = (props: LastRoundProps) => {
             </>
             :
             <>
-              <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
-                No Squadrons Recruited 
+              <Typography variant="h6" align="center" whiteSpace="pre-line" sx={{mt: 1}} fontWeight={600}>
+                No Squadrons {'\n'} Recruited
               </Typography>
             </>
         }
@@ -134,45 +135,65 @@ const LastRound = (props: LastRoundProps) => {
       </Stack>
       <Divider sx={{mt: 1}}/>
       <Stack sx={{ maxHeight: 196, overflowY: 'auto'}}>
-        {tickets.map(( ticketObj, ticketIndex) => {
-          const { ticketNumber: ticket, claimed } = ticketObj
-          const ticketDigits = ticket.split('')
-          const digitsMatched = ticketDigits.reduce( (acc, value, index) => {
-            if(value === winningDigits[index] && acc === index){
-              return acc + 1
-            }
-            return acc
-          },0)
-          const totalDigitsMatched: number = 0
+        {
+        tickets ? <>
+          {tickets.map(( ticketObj, ticketIndex) => {
+            const { ticketNumber: ticket, claimed } = ticketObj
+            const ticketDigits = ticket.split('')
+            const digitsMatched = ticketDigits.reduce( (acc, value, index) => {
+              if(value === winningDigits[index] && acc === index){
+                return acc + 1
+              }
+              return acc
+            },0)
+            const totalDigitsMatched: number = 0
 
-          {/*Ticket stack*/}
-          return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
-            <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
-              <Typography color="textSecondary" variant="body2">
-                  SQUAD: &nbsp;
-                <Typography color="primary" variant="subtitle2" display="inline" component="span">
-                    {ticketIndex+1} 
+            {/*Ticket stack*/}
+            return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
+              <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
+                <Typography color="textSecondary" variant="body2">
+                    SQUAD: &nbsp;
+                  <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                      {ticketIndex+1} 
+                  </Typography>
+                  &nbsp;
+                  <Typography  color="textPrimary" variant="body2" display="inline" component="span">
+                    of
+                  </Typography>
+                  &nbsp;
+                  <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                    {tickets.length}
+                  </Typography>
                 </Typography>
-                &nbsp;
-                <Typography  color="textPrimary" variant="body2" display="inline" component="span">
-                  of
-                </Typography>
-                &nbsp;
-                <Typography color="primary" variant="subtitle2" display="inline" component="span">
-                  {tickets.length}
-                </Typography>
+                <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
+              </Stack>
+
+              {/*Paper with numberInvaders*/}
+              <Stack justifyContent="center" direction="row">
+                <NumberInvader size="large" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+                <NumberInvader size="large" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+                <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
+              </Stack>
+            </Stack>
+            })}
+            </>
+            :
+            <>
+             <Typography variant="caption" component="div" sx={{ px: 2, width: 150 }}>
+                <Skeleton />
               </Typography>
-              <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
-            </Stack>
+              <Typography variant="h6" component="div" sx={{ px: 2, }}>
+                <Skeleton height={150} />
+              </Typography>
+              <Typography variant="caption" component="div" sx={{ px: 2, width: 150 }}>
+                <Skeleton />
+              </Typography>
+              <Typography variant="h6" component="div" sx={{ px: 2, }}>
+                <Skeleton height={150} />
+              </Typography>
+            </>
+        }
 
-            {/*Paper with numberInvaders*/}
-            <Stack justifyContent="center" direction="row">
-              <NumberInvader size="large" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
-              <NumberInvader size="large" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
-              <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
-            </Stack>
-          </Stack>
-          })}
       </Stack>     
     </Stack>
   </>)
