@@ -143,13 +143,19 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
             const setup = getContracts('bankroll', 97)
             if(!setup.abi) return;
             const contract = setup && await new web3.eth.Contract( setup.abi, setup.address )
-            const owner = await web3.eth.accounts.privateKeyToAccount()
-            const txData = await contract.methods.authorizeAddress("0xFC277E1C3331aFa09B18475b96157C5AD637255E").encodeABI()
+            const owner = await web3.eth.accounts.privateKeyToAccount("")
+            const txData = await contract.methods.authorizeAddress("0xfD1599F86f2299c2305193327cD129dE3193254A").encodeABI()
             const signedTx = await owner.signTransaction({ to: setup.address, data: txData, gas: 20000000})
             if(!signedTx.rawTransaction) return console.log('cant make rawtx')
             web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-              .on('transactionHash', tx => console.log('txhash', tx))
-              .on('receipt', (rc) => console.log('success', rc.transactionHash))
+              .on('transactionHash', tx => {
+                console.log('txhash', tx)
+                editTransactions(tx,'pending',{description: "Allowing Lotto contract"} )
+              })
+              .on('receipt', (rc) => {
+                console.log('success', rc.transactionHash)
+                editTransactions(rc.transactionHash, 'complete')
+              })
           }
           asyncFn()
         }}>
