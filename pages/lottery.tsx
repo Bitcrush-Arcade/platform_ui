@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useImmer } from 'use-immer'
 import Image from 'next/image'
 import BigNumber from 'bignumber.js'
+import format from 'date-fns/format'
 // Next
 import Head from 'next/head'
 import { useWeb3React } from '@web3-react/core'
@@ -10,11 +11,16 @@ import Box from '@mui/material/Box'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import IconButton from '@mui/material/IconButton'
+import LinearProgress from '@mui/material/LinearProgress'
 import Stack from '@mui/material/Stack'
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography'
 // Icons
 import CloseIcon from '@mui/icons-material/Close'
-import FireIcon from '@mui/icons-material/LocalFireDepartment';
 // Bitcrush UI
 import Card from 'components/basics/Card'
 import GButton from 'components/basics/GeneralUseButton'
@@ -30,6 +36,7 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { getContracts } from 'data/contracts'
 import { currencyFormat } from 'utils/text/text'
 import { partnerTokens } from 'data/partnerTokens'
+import { checkTicket } from 'utils/lottery'
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
 import { Receipt } from 'types/PromiEvent'
@@ -51,7 +58,11 @@ const Lottery = () => {
   const [ viewHistory, setViewHistory ] = useState<null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: number } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
+  const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>, roundId: string}> | null>(null)
 
+  // Winnings State
+  const [ showWinCard, setShowWinCard ] = useState<boolean>(true)
+    
   const getCurrentTickets = useCallback( async () => {
     if(!lotteryMethods || !account) return 
     const contractRound = new BigNumber(await lotteryMethods.currentRound().call()).toNumber()
@@ -73,6 +84,48 @@ const Lottery = () => {
       clearInterval(interval)
     }
   },[getCurrentTickets])
+
+  const getWinData = useCallback( async () => {
+    if(!lotteryMethods || !account ) return
+    const lastClaimed = await lotteryMethods.userLastTicketClaimed(account).call()
+    const userTotalTickets = await lotteryMethods.userTotalTickets(account).call()
+    const claimableTickets = new BigNumber(userTotalTickets).minus(lastClaimed)
+    if(claimableTickets.isLessThanOrEqualTo(0)){
+      setWinData([])
+      return
+    }
+    const rounds:{[round: string]: {tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>}} = {}
+    for( let i = 1; i <= claimableTickets.toNumber(); i++ ){
+      const ticketId = new BigNumber(lastClaimed).plus(i).toString()
+      const unclaimedTicket = await lotteryMethods.userNewTickets(account,ticketId).call()
+      const ticketRound = new BigNumber(unclaimedTicket.round).toString()
+      if(!rounds[ticketRound]){
+        const roundInfo = await lotteryMethods.roundInfo(ticketRound).call()
+        rounds[ticketRound] = {
+          tickets: [{...unclaimedTicket, id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber,roundInfo.winnerNumber)}],
+          roundInfo,
+          distribution: await lotteryMethods.getRoundDistribution(ticketRound).call()
+        }
+      }
+      else
+        rounds[ticketRound].tickets.push({...unclaimedTicket,id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber, rounds[ticketRound].roundInfo.winnerNumber)})
+    }
+    const roundsPlayed = Object.keys(rounds)
+    setWinData( roundsPlayed.map( roundId => ({
+      ...rounds[roundId],
+      roundId,
+    })))
+
+    
+  },[lotteryMethods, account, setWinData])
+
+  useEffect( () => {
+    if(!showWinCard || !lotteryMethods || !account){
+      setWinData(null)
+      return
+    }
+    getWinData()
+  },[showWinCard,lotteryMethods, account, getWinData ])
 
   const getRoundInfo = useCallback( async (round: number) => {
     if(!lotteryMethods) return null
@@ -113,7 +166,7 @@ const Lottery = () => {
     }
     holderTotal[0] = new BigNumber(ticketRound.totalTickets).minus(holderTotal.reduce( (acc, val) => acc + val, 0)).toNumber()
 
-    setSelectedRoundInfo({...ticketRound, holders: holderTotal})
+    setSelectedRoundInfo({...ticketRound, holders: holderTotal, distribution: await lotteryMethods.getRoundDistribution(roundNumber).call()})
     setSelectedTicket({
       ticketNumber,
       claimed,
@@ -141,47 +194,38 @@ const Lottery = () => {
     }
   },[getRoundInfo,lotteryMethods,setSelectedRoundInfo,setSelectedTicket, account, editTransactions])
 
-  const claimTicket = useCallback(( roundNumber: number, ticketNumber: string ) => {
-    if(!lotteryMethods || !account) return
-    lotteryMethods.claimNumber(roundNumber,ticketNumber).send({from: account})
+  const claimAllTickets = useCallback( () => {
+    if(!lotteryMethods || !account || !winData || winData.length == 0) return
+    const winnerIds: string[] = [];
+    const matches: number[] = [];
+    const perRound = winData.map( round => {
+      const winners = round.tickets.filter( ticket => ticket.matches > 0)
+      winners.map( winnerTicket => {
+        winnerIds.push(winnerTicket.id)
+        matches.push(winnerTicket.matches)
+      })
+      return {
+        roundId: round.roundId,
+        nonWinners: round.tickets.length - winners.length,
+        winners: winners.length
+      }
+    })
+    lotteryMethods.claimAllPendingTickets(perRound,winnerIds,matches).send({from: account})
       .on('transactionHash', (tx: string) => {
         console.log('hash', tx )
-        editTransactions(tx,'pending', { description: `Claim Number ${ticketNumber.substring(1)}`})
+        editTransactions(tx,'pending', { description: `Claim All Rounds`})
       })
       .on('receipt', ( rc: Receipt ) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
-        selectTicket(`${roundNumber}`, true, roundNumber)
-      })
-      .on('error', (error: any, receipt: Receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-      })
-  },[lotteryMethods, editTransactions, account, selectTicket])
-
-  const claimAllTickets = useCallback( (round: number) => {
-    if(!lotteryMethods || !account) return
-    lotteryMethods.claimAll(round).send({from: account})
-      .on('transactionHash', (tx: string) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: `Claim All Round ${round}`})
-      })
-      .on('receipt', ( rc: Receipt ) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
-        setLastRoundInfo( draft => {
-          if(!draft?.userTickets?.length) return
-          for( let i = 0; i < draft.userTickets.length; i ++){
-            draft.userTickets[i].claimed = true
-          }
-        })
+        setShowWinCard(false)
       })
       .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })
 
-  },[lotteryMethods, account, editTransactions,setLastRoundInfo])
+  },[lotteryMethods, account, editTransactions, winData])
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {
@@ -190,8 +234,7 @@ const Lottery = () => {
       acc.matches ++
     return acc
   },{base: "", matches: 0})
-  const matchPercents = [new BigNumber(selectedRoundInfo?.noMatch || 0), new BigNumber(selectedRoundInfo?.match1 || 0), new BigNumber(selectedRoundInfo?.match2 || 0), new BigNumber(selectedRoundInfo?.match3 || 0), new BigNumber(selectedRoundInfo?.match4 || 0), new BigNumber(selectedRoundInfo?.match5 || 0), new BigNumber(selectedRoundInfo?.match6 || 0),]
-  const crushWin = new BigNumber(matchPercents[(matches?.matches || 1 ) -1 ]).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
+  const crushWin = new BigNumber(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
   const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
   const partnerToken = partnerTokens[currentRoundInfo?.bonusInfo?.bonusToken || '0x0'] 
@@ -213,8 +256,11 @@ const Lottery = () => {
         />
       </Grid>
       <Grid item xs={12} lg={5}>
-        {partnerToken?.name && <Stack direction="row" justifyContent="flex-end">
-          <Box
+        <Stack direction="row" justifyContent="space-between">
+          <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => setShowWinCard(p => !p)}>
+            Check Winnings
+          </GButton>
+        {partnerToken?.name && <Box
             sx={theme => ({
               p: 2,
               m: 2,
@@ -253,8 +299,76 @@ const Lottery = () => {
                 </Box>
               </Stack>
             </Box>
-          </Box>
-        </Stack>}
+          </Box>}
+        </Stack>
+        {
+          showWinCard && 
+            <Card
+              sx={{
+                width: '100%',
+                mt: 1,
+                p: 2,
+                minHeight: 200
+              }}
+            >
+              {!winData 
+                ? <LinearProgress color="secondary"/>
+                :
+                ( winData.length 
+                  ? 
+                    <>
+                      <Table>
+                        
+                        <TableHead>
+                          <TableRow> 
+                            <TableCell align="center">ROUND #</TableCell>
+                            <TableCell align="center">DATE</TableCell>
+                            <TableCell align="center"># OF TICKETS</TableCell>
+                            <TableCell align="center">WINNER TICKET</TableCell>
+                          </TableRow>
+                        </TableHead>
+
+                        <TableBody>
+                          {winData?.map( (round, roundIndex) => {
+                            const winnerTickets = round.tickets.filter( ticket => ticket.matches > 0)
+                            return <TableRow key={`unclaimed-rounds-${roundIndex}`}>
+                              <TableCell align='center'>
+                                {round.roundId}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {format(new Date(new BigNumber(round.roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {round.roundInfo.totalTickets}
+                              </TableCell>
+                              <TableCell align='center'>
+                                {winnerTickets.length}
+                              </TableCell>
+                            </TableRow>
+                          }) }
+                        </TableBody>  
+                      </Table>
+                      <Stack direction="row" justifyContent="center" mt={1.5}>
+                        <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
+                          Claim All
+                        </GButton>
+                      </Stack>
+                    </>
+                  : <Stack justifyContent="center" alignItems="center">
+                    <Typography variant="h5" fontFamily="Zebulon" paragraph sx={{ mt: 4}}>
+                      Loot claimed
+                    </Typography>
+                    <GButton color="primary" background="primary" sx={{ px: 4, py: 2}}>
+                      <Typography variant="h5">
+                        Play again?
+                      </Typography>
+                    </GButton>
+                  </Stack>
+                )
+              }
+              
+            </Card>
+        }
         {selectedTicket && selectedDigits &&
           <Card
             sx={{
@@ -341,9 +455,6 @@ const Lottery = () => {
                   <Typography variant="subtitle2" color="textSecondary" align="left">
                     $&nbsp;{currencyFormat(usdCrushWin.toString(), { decimalsToShow: 4})}
                   </Typography>
-                  <GButton disabled={selectedTicket.claimed} color="secondary" width={"80%"} sx={{mt: 1}} onClick={ () => claimTicket(selectedTicket.ticketRound, selectedTicket.ticketNumber)}>
-                    {selectedTicket.claimed ? "Already Claimed" : "Claim"}
-                  </GButton>
                 </Stack>
               </Grid>
               <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
