@@ -46,7 +46,7 @@ const LastRound = (props: LastRoundProps) => {
         }
         return acc
       },0)
-      return { matchedAmount: digitsMatched, ticketNumber: ticket.ticketNumber}
+      return { matchedAmount: digitsMatched*(-1), ticketNumber: ticket.ticketNumber}
     })
     ,[ o => o.matchedAmount ])
 
@@ -151,9 +151,10 @@ const LastRound = (props: LastRoundProps) => {
         {
         tickets ? <>
           {sortedTickets.map(( ticketObj, ticketIndex) => {
-            const { ticketNumber: ticket, matchedAmount } = ticketObj
+            const { ticketNumber: ticket, matchedAmount: baseMatched } = ticketObj
             const ticketDigits = ticket.split('')
-            
+            const matchedAmount = Math.abs(baseMatched)
+
             {/*Ticket stack*/}
             return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
               <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
