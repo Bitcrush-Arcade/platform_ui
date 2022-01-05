@@ -5,6 +5,7 @@ import sortBy from 'lodash/sortBy'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider'
+import Grid from '@mui/material/Grid'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -26,17 +27,16 @@ type LastRoundProps = {
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
   globalTickets: number;
+  totalWinners: number;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
   claimAll: (round: number) => void
 }
 
 const LastRound = (props: LastRoundProps) => {
   const { winningTeamTicket, lastDate, tickets, selectTicket, lastRound, token, 
-    tokenAmount, globalTickets, claimAll } = props
+    tokenAmount, globalTickets } = props
   const winningDigits = (winningTeamTicket || 'XXXXXXX').split('')
-  const numberOfWinners: number = 0    
 
-  const unclaimedTickets = (tickets ||[]).filter( ticket => !ticket.claimed).length > 0
   const sortedTickets = sortBy(
     (tickets ||[]).map( ticket => {
       const ticketDigits = ticket.ticketNumber.split('')
@@ -49,6 +49,7 @@ const LastRound = (props: LastRoundProps) => {
       return { matchedAmount: digitsMatched*(-1), ticketNumber: ticket.ticketNumber}
     })
     ,[ o => o.matchedAmount ])
+  const totalUserRoundWinners = sortedTickets.filter( ticket => ticket.matchedAmount < -1).length
 
   return (<>
 
@@ -104,48 +105,47 @@ const LastRound = (props: LastRoundProps) => {
       </Stack>
       <Divider sx={{mb: 2}}/>
 
-      {/*Player stats*/}
-      <Stack justifyContent={{ xs: 'center' ,md:"space-evenly"}} direction={{ md: "row", xs:'column'}} alignItems="center" sx={{mb: 1}}>
-        <Typography align="left" variant="subtitle2" whiteSpace="pre-line">
-        { new BigNumber(tokenAmount || 0).isGreaterThan(0) 
-            ?
-              <>
-                <Typography color="textSecondary" variant="body2">
-                  PARTNER BONUS:{'\n'}
-                </Typography>
-                <Typography  display="inline" color="secondary">
-                  {currencyFormat(new BigNumber(tokenAmount || 0).toString(),{ decimalsToShow: 2, isWei: true})}
-                </Typography>
-                &nbsp;
-                {token && partnerTokens[token]?.name || 'Pending'}
-              </>
-              : null
-        }
-        </Typography>
-        {
-          tickets ? 
-            <>
-              <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
-                Your Squadrons
-              </Typography>
-            </>
-            :
-            <>
-              <Typography variant="h6" align="center" whiteSpace="pre-line" sx={{mt: 1}} fontWeight={600}>
-                No Squadrons {'\n'} Recruited
-              </Typography>
-            </>
-        }
-        <Stack>
-          <Typography variant="subtitle2" >
-            {numberOfWinners} Successful Attacks
+      <Grid container alignItems="center" sx={{mb: 1}}>
+        <Grid item xs={12} sm={4}>
+          <Typography align="center" variant="subtitle2" whiteSpace="pre-line">
+          { new BigNumber(tokenAmount || 0).isGreaterThan(0) 
+              ?
+                <>
+                  <Typography color="textSecondary" variant="body2">
+                    PARTNER BONUS:{'\n'}
+                  </Typography>
+                  <Typography  display="inline" color="secondary">
+                    {currencyFormat(new BigNumber(tokenAmount || 0).toString(),{ decimalsToShow: 2, isWei: true})}
+                  </Typography>
+                  &nbsp;
+                  {token && partnerTokens[token]?.name || 'Pending'}
+                </>
+                : null
+          }
           </Typography>
-          <SmallButton color="secondary" hasIcon={true} onClick={() => claimAll(lastRound)} disabled={!unclaimedTickets}>
-            { unclaimedTickets ? "CALCULATE" : "ALL CLAIMED"}
-          </SmallButton>
-        </Stack>
-      
-      </Stack>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          {
+            tickets && tickets.length > 0 ? 
+              <>
+                <Typography variant="h6" align="center" fontWeight={600}>
+                  Your Squadrons
+                </Typography>
+              </>
+              :
+              <>
+                <Typography variant="h6" align="center" whiteSpace="pre-line" fontWeight={600}>
+                  No Squadrons {'\n'} Recruited
+                </Typography>
+              </>
+          }
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Typography align="center" variant="subtitle2" >
+            {totalUserRoundWinners} Successful Attacks
+          </Typography>
+        </Grid>
+      </Grid>
       <Divider sx={{mt: 1}}/>
       <Stack sx={{ maxHeight: 196, overflowY: 'auto'}}>
         {
@@ -157,7 +157,7 @@ const LastRound = (props: LastRoundProps) => {
 
             {/*Ticket stack*/}
             return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
-              <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
+              <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2} px={4}> 
                 <Typography color="textSecondary" variant="body2">
                     SQUAD: &nbsp;
                   <Typography color="primary" variant="subtitle2" display="inline" component="span">
