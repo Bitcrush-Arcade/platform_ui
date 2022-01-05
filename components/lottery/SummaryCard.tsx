@@ -41,13 +41,7 @@ type LotteryRoundInfo = {
   tickets: number,
   endTime: number,
   pool: BigNumber,
-  match6: BigNumber,
-  match5: BigNumber,
-  match4: BigNumber,
-  match3: BigNumber,
-  match2: BigNumber,
-  match1: BigNumber,
-  noMatch: BigNumber,
+  distribution: Array<BigNumber>,
   burn: BigNumber,
   bonusToken?: {
     address: string,
@@ -76,21 +70,17 @@ const SummaryCard = (props: LotterySummaryProps) => {
     const currentRound = await lotteryMethods.currentRound().call()
     const roundInfo = await lotteryMethods.roundInfo(currentRound).call()
     const isActive = await lotteryMethods.currentIsActive().call()
-    const userTickets = await lotteryMethods.getRoundTickets(currentRound).call({ from: account })
+    const userTickets = await lotteryMethods.userRoundTickets(account,currentRound).call()
     const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
+    const distribution = await lotteryMethods.getRoundDistribution(currentRound).call()
+    console.log( roundInfo )
     setRound( {
       id: new BigNumber(currentRound).toNumber(),
       endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
       tickets: userTickets.length,
       isActive: isActive,
       pool: new BigNumber(roundInfo.pool),
-      match6: new BigNumber(roundInfo.match6),
-      match5: new BigNumber(roundInfo.match5),
-      match4: new BigNumber(roundInfo.match4),
-      match3: new BigNumber(roundInfo.match3),
-      match2: new BigNumber(roundInfo.match2),
-      match1: new BigNumber(roundInfo.match1),
-      noMatch: new BigNumber(roundInfo.noMatch),
+      distribution: distribution?.map( (d: string) => new BigNumber(d)),
       burn: new BigNumber(0),
       bonusToken: new BigNumber(bonusToken.bonusAmount).isGreaterThan(0)
         ? { address: bonusToken.bonusToken, amount: new BigNumber( bonusToken.bonusAmount ) }
@@ -130,30 +120,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
   
   
   const matchDisplays = new Array(7).fill(null).map( (x,i) => {
-    let percent: BigNumber = new BigNumber(0)
-    switch(i){
-      case 6:
-        percent = round?.noMatch || new BigNumber(0)
-        break
-      case 5:
-        percent = round?.match1 || new BigNumber(0)
-        break
-      case 4:
-        percent = round?.match2 || new BigNumber(0)
-        break
-      case 3:
-        percent = round?.match3 || new BigNumber(0)
-        break
-      case 2:
-        percent = round?.match4 || new BigNumber(0)
-        break
-      case 1:
-        percent = round?.match5 || new BigNumber(0)
-        break
-      case 0:
-        percent = round?.match6 || new BigNumber(0)
-        break
-    }
+    let percent: BigNumber = round?.distribution?.[6-i] || new BigNumber(0)
     const text = i== 0 ? 'JACKPOT!' : `Match ${6-i}`
     const crushReward = round?.pool.times(percent || 0).div(percentBase) || new BigNumber(0)
     return <Grid item xs={5} md={3} lg={'auto'} key={`match-amounts-${i}`}>
