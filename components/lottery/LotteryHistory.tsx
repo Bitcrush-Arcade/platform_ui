@@ -59,11 +59,11 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                     />
                     <Tab
                         label={
-                            <Typography color={!currentRound ? 'textSecondary' : 'white'} variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }} >
+                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }} >
                                 LAST ROUND
                             </Typography>
                         }
-                        disabled={!currentRound}
+                        disabled={!currentRound || currentRound == 1}
                     />
                     <Tab
                         label={
@@ -71,6 +71,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                                 HISTORY
                             </Typography>
                         }
+                        disabled={!currentRound || currentRound == 1}
                     />
                     <Tab
                         label={
@@ -92,20 +93,18 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 currentDate={currentInfo ? new BigNumber(currentInfo.endTime).toNumber() : 0 }
                 totalTickets={currentInfo ? new BigNumber(currentInfo.totalTickets).toNumber() : 0}
                 currentRound={currentRound}
-                globalTickets={globalTicketsTest}
             />
         }
         {tabSelected == 1 && lastRound && 
             <LastRound winningTeamTicket={lastRound.winnerNumber} 
-                //tickets={lastRound.userTickets || []}
-                tickets={testLastArray} 
+                tickets={lastRound.userTickets || []}
                 lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
                 lastRound={currentRound -1}
                 token={lastRound.bonusInfo?.bonusToken}
                 tokenAmount={lastRound.bonusInfo?.bonusAmount}
                 claimAll={claimAll}
-                globalTickets={globalTicketsTest}
+                globalTickets={new BigNumber(lastRound.totalTickets).toNumber()}
             />
         } 
         
