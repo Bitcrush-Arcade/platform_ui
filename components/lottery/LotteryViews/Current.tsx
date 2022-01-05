@@ -16,13 +16,12 @@ type CurrentViewProps = {
   tickets?: Array<string> | null;
   currentDate: number;
   currentRound?: number | 0;
-  totalTickets?: number;
-  globalTickets: number;
+  totalTickets: number;
 }
 
 {/* Current table props and formatting */}
 const Current = (props: CurrentViewProps) => {
-const { tickets, currentDate, currentRound, totalTickets, globalTickets } = props
+const { tickets, currentDate, currentRound, totalTickets} = props
 
 return <>
 
@@ -46,7 +45,7 @@ return <>
     </Stack>
     <Stack direction ="row">    
       <Typography color="secondary" component="div" variant="body2">
-        <strong><Currency value={globalTickets} decimals ={0}/></strong> 
+        <strong><Currency value={totalTickets} decimals={0}/></strong> 
         &nbsp;
       </Typography>
       <Typography color="primary" display="inline" variant="body2">
