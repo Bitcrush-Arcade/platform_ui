@@ -1,5 +1,5 @@
 import type BigNumber from 'bignumber.js'
-export type TicketInfo = string
+export type TicketInfo = {ticketNumber: string, round: string}
 export type RoundInfo = { 
   totalTickets: BigNumber,
   winnerNumber: string,
