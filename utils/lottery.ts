@@ -19,3 +19,15 @@ export const getTicketDigits = (number: number) => {
   allDigits.shift()
   return allDigits
 }
+
+export const checkTicket = (ticketToCheck: string, winnerNumber: string) => {
+  const winningDigits = winnerNumber.split('')
+  const ticketDigits = ticketToCheck.split('')
+  const digitsMatched = ticketDigits.reduce( (acc, value, index) => {
+    if(value === winningDigits[index] && acc === index){
+      return acc + 1
+    }
+    return acc
+  },0)
+  return digitsMatched -1
+}
