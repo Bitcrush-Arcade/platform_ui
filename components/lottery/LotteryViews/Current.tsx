@@ -57,7 +57,7 @@ return <>
   <Divider sx={{my: 2}}/>
 
     {
-      tickets ? 
+      tickets && tickets.length > 0 ? 
         <>
           <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
             Your Squadrons
@@ -66,7 +66,7 @@ return <>
         :
         <>
           <Typography variant="h6" align="center" sx={{mt: 1}} fontWeight={600}>
-            No Squadrons Recruited Yet
+            {!tickets ? <Skeleton/> : "No Squadrons Recruited Yet"}
           </Typography>
         </>
     }
@@ -79,34 +79,31 @@ return <>
       {tickets.map( (ticketNumber: string, ticketIndex: number) => {
           const ticketDigits = ticketNumber.split('')
           return <Stack
-                   key={`tickets-to-buy-${ticketIndex}`} 
-                   sx={{mt: 0.5, mb: 5,
-                   
-                    }}
-                  >
-
-            <Stack justifyContent="left" direction="row" sx={{mb: 3}}>
-              <Typography color="textSecondary" variant="body2">
-                SQUAD: &nbsp;
-                <Typography color="primary" variant="subtitle2" display="inline" component="span">
-                  {ticketIndex+1} 
+              key={`tickets-to-buy-${ticketIndex}`} 
+              sx={{ mt: 0.5, mb: 5 }}
+            >
+              <Stack justifyContent="left" direction="row" sx={{mb: 3, pl: 4}}>
+                <Typography color="textSecondary" variant="body2">
+                  SQUAD: &nbsp;
+                  <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                    {ticketIndex+1} 
+                  </Typography>
+                  &nbsp;
+                  <Typography  color="textPrimary" variant="body2" display="inline" component="span">
+                    of
+                  </Typography>
+                  &nbsp;
+                  <Typography color="primary" variant="subtitle2" display="inline" component="span">
+                  {tickets.length}
+                  </Typography>
                 </Typography>
-                &nbsp;
-                <Typography  color="textPrimary" variant="body2" display="inline" component="span">
-                  of
-                </Typography>
-                &nbsp;
-                <Typography color="primary" variant="subtitle2" display="inline" component="span">
-                {tickets.length}
-                </Typography>
-              </Typography>
-            </Stack>
+              </Stack>
               <Stack direction="row" justifyContent="center" alignItems="center">
                 <NumberInvader size="large" twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
                 <NumberInvader size="large" twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
               </Stack>           
-          </Stack>
+            </Stack>
         })}
       </>
       :
