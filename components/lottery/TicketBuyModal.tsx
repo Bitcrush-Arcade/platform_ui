@@ -94,7 +94,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   },[lotteryMethods, setLotteryInfo])
   // Get Lottery Approval
   useEffect(() => {
-    if(!account || isApproved) return
+    if(!account || isApproved || !lotteryContract.address) return
     getApproved(lotteryContract.address)
   },[coinMethods, getApproved, lotteryContract.address, account, isApproved])
 
