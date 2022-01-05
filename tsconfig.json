@@ -18,12 +18,21 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "baseUrl": ".",
-    "paths":{
-      "components" : ["/components"],
-      "utils": ["/utils"],
-      "abi": ["/abi"],
-      "styles": ["/styles"]
-    }
+    "paths": {
+      "components": [
+        "/components"
+      ],
+      "utils": [
+        "/utils"
+      ],
+      "abi": [
+        "/abi"
+      ],
+      "styles": [
+        "/styles"
+      ]
+    },
+    "incremental": true
   },
   "include": [
     "next-env.d.ts",

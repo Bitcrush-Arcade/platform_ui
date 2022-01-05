@@ -1,8 +1,6 @@
 import format from 'date-fns/format'
-import BigNumber from 'bignumber.js'
 // Material
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import Paper from '@mui/material/Paper'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -12,11 +10,6 @@ import NumberInvader from 'components/lottery/NumberInvader'
 
 // Bitcrush UI
 import Currency from 'components/basics/Currency'
-
-// Data & Utils
-import { currencyFormat } from 'utils/text/text'
-import { partnerTokens } from 'data/partnerTokens'
-
 
 {/* Current table props */}
 type CurrentViewProps = {

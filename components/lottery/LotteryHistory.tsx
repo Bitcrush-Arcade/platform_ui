@@ -1,17 +1,17 @@
 import { useState, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 // Material
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 //Bitcrush UI
-import BasicButton from 'components/basics/GeneralUseButton';
 import Card from 'components/basics/Card';
 import Current from 'components/lottery/LotteryViews/Current';
 import History from 'components/lottery/LotteryViews/History';
+import HowToPlay from 'components/lottery/LotteryViews/HowToPlay'
 import LastRound from 'components/lottery/LotteryViews/LastRound';
+
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
 
@@ -72,6 +72,13 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                             </Typography>
                         }
                     />
+                    <Tab
+                        label={
+                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                                HOW TO PLAY
+                            </Typography>
+                        }
+                    />
                     
                 </Tabs>
         </Grid>
@@ -89,18 +96,8 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
             />
         }
         {tabSelected == 1 && lastRound && 
-            // <LastRound winningTeamTicket={lastRound.winnerNumber} 
-            //     tickets={lastRound.userTickets || []} 
-            //     lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
-            //     selectTicket={selectTicket} 
-            //     lastRound={currentRound -1}
-            //     token={lastRound.bonusInfo?.bonusToken}
-            //     tokenAmount={lastRound.bonusInfo?.bonusAmount}
-            //     claimAll={claimAll}
-            //     globalTickets={globalTicketsTest}
-            // />
-
             <LastRound winningTeamTicket={lastRound.winnerNumber} 
+                //tickets={lastRound.userTickets || []}
                 tickets={testLastArray} 
                 lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
@@ -121,6 +118,10 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 onRoundView={(round) => console.log('selected Round ', round)}
             />
         }
+        {tabSelected == 3 &&
+            <HowToPlay/>
+        }
+        
     </Card>
     </>
 }
