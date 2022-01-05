@@ -1,5 +1,6 @@
 import format from 'date-fns/format'
 import BigNumber from 'bignumber.js'
+import sortBy from 'lodash/sortBy'
 // Material
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Chip from '@mui/material/Chip';
@@ -36,7 +37,19 @@ const LastRound = (props: LastRoundProps) => {
   const numberOfWinners: number = 0    
 
   const unclaimedTickets = (tickets ||[]).filter( ticket => !ticket.claimed).length > 0
-  
+  const sortedTickets = sortBy(
+    (tickets ||[]).map( ticket => {
+      const ticketDigits = ticket.ticketNumber.split('')
+      const digitsMatched = ticketDigits.reduce( (acc, value, index) => {
+        if(value === winningDigits[index] && acc === index){
+          return acc + 1
+        }
+        return acc
+      },0)
+      return { matchedAmount: digitsMatched, ticketNumber: ticket.ticketNumber}
+    })
+    ,[ o => o.matchedAmount ])
+
   return (<>
 
   {/*Winning team stack*/}
@@ -137,17 +150,10 @@ const LastRound = (props: LastRoundProps) => {
       <Stack sx={{ maxHeight: 196, overflowY: 'auto'}}>
         {
         tickets ? <>
-          {tickets.map(( ticketObj, ticketIndex) => {
-            const { ticketNumber: ticket, claimed } = ticketObj
+          {sortedTickets.map(( ticketObj, ticketIndex) => {
+            const { ticketNumber: ticket, matchedAmount } = ticketObj
             const ticketDigits = ticket.split('')
-            const digitsMatched = ticketDigits.reduce( (acc, value, index) => {
-              if(value === winningDigits[index] && acc === index){
-                return acc + 1
-              }
-              return acc
-            },0)
-            const totalDigitsMatched: number = 0
-
+            
             {/*Ticket stack*/}
             return <Stack sx={{mt: 1, mb: 1.5}} key={`last-round-ticket-${ticketIndex}`}>
               <Stack direction ="row" justifyContent="space-between" alignItems="center" mb={2}> 
@@ -165,14 +171,14 @@ const LastRound = (props: LastRoundProps) => {
                     {tickets.length}
                   </Typography>
                 </Typography>
-                <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, claimed, lastRound)}/>
+                <Chip label="Details" color="primary" variant="outlined" sx={{my: 1}} onClick={() => selectTicket(ticket, true, lastRound)}/>
               </Stack>
 
               {/*Paper with numberInvaders*/}
               <Stack justifyContent="center" direction="row">
-                <NumberInvader size="large" matched={ digitsMatched > 3 ? 2 : digitsMatched - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
-                <NumberInvader size="large" matched={ digitsMatched > 5 ? 2 : digitsMatched - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
-                <NumberInvader size="large" matched={ digitsMatched - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
+                <NumberInvader size="large" matched={ matchedAmount > 3 ? 2 : matchedAmount - 1 } twoDigits={[ticketDigits[1], ticketDigits[2]]}/>
+                <NumberInvader size="large" matched={ matchedAmount > 5 ? 2 : matchedAmount - 3 } twoDigits={[ticketDigits[3], ticketDigits[4]]}/>
+                <NumberInvader size="large" matched={ matchedAmount - 5 } twoDigits={[ticketDigits[5], ticketDigits[6]]}/>
               </Stack>
             </Stack>
             })}
