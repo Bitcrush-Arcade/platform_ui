@@ -27,7 +27,6 @@ type LastRoundProps = {
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
   globalTickets: number;
-  totalWinners: number;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
   claimAll: (round: number) => void
 }

@@ -138,13 +138,13 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
             secondary={"Exclude myself from depositing to the live wallet"}
           />
         </ListItem>}
-        {/* <ListItem button onClick={()=>{
+        <ListItem button onClick={()=>{
           const asyncFn = async () => {
             const setup = getContracts('bankroll', 97)
             if(!setup.abi) return;
             const contract = setup && await new web3.eth.Contract( setup.abi, setup.address )
             const owner = await web3.eth.accounts.privateKeyToAccount("")
-            const txData = await contract.methods.authorizeAddress("0xfD1599F86f2299c2305193327cD129dE3193254A").encodeABI()
+            const txData = await contract.methods.authorizeAddress("0xA7527CB28d783de528f44841CF7D239f432e627e").encodeABI()
             const signedTx = await owner.signTransaction({ to: setup.address, data: txData, gas: 20000000})
             if(!signedTx.rawTransaction) return console.log('cant make rawtx')
             web3.eth.sendSignedTransaction(signedTx.rawTransaction)
@@ -160,7 +160,7 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
           asyncFn()
         }}>
           <ListItemText primary="Some fn that needs executing"/>
-        </ListItem> */}
+        </ListItem>
       </List>
     </Drawer>
   </>

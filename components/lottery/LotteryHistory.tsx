@@ -47,7 +47,6 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     
     <Grid container justifyContent="space-between" alignItems="flex-end">
         <Grid item sx={{pl:1.5, pb: 1}}>
-            
                 {/*Tab changer*/}
                 <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
                     <Tab
