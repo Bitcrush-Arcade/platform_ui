@@ -115,7 +115,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
         getLotteryInfo()
       })
-  },[ lotteryMethods, account ])
+  },[ lotteryMethods, account, editTransactions, getLotteryInfo ])
   
   
   

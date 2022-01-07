@@ -74,7 +74,7 @@ const History = (props: HistoryViewProps) => {
         id: roundId
       }
     })
-  },[lotteryMethods, account, setHistory])
+  },[lotteryMethods, account, setHistory, rowsPerPage])
 
   const getCurrentRound = useCallback(async () => {
     if(!lotteryMethods) return
@@ -94,13 +94,13 @@ const History = (props: HistoryViewProps) => {
       onLastRoundView()
     else
       setSelectedRound(selectedRound)
-  },[setSelectedRound, currentRound, onLastRoundView])
+  },[setSelectedRound, currentRound, onLastRoundView, history])
 
   // EFFECTS
   useEffect( () => {
     if(!lotteryMethods)  return
     getCurrentRound()
-  },[lotteryMethods])
+  },[lotteryMethods, getCurrentRound])
 
   {/*History table rows data formatting*/}
   const tableRows = history.map( (roundInfo, index) => {

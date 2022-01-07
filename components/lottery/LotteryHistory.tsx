@@ -33,7 +33,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     const roundsPerPage = 4
 
     const shownHistoryRounds = testHistoryArray.slice(selectedPage * roundsPerPage, (selectedPage + 1)*roundsPerPage)
-    const selectTab = ( e:React.SyntheticEvent, v: number) =>{
+    const selectTab = ( e:any, v: number) =>{
         setTabSelected(v)
         tabChange(v)
     }
