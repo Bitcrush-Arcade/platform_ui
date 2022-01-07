@@ -1,6 +1,7 @@
 // React
 import { useState, ReactNode, useEffect, useMemo } from 'react'
 import { useImmer } from 'use-immer'
+import Script from 'next/script'
 // 3p
 import compact from 'lodash/compact'
 // Material
@@ -279,6 +280,17 @@ const PageContainer = ( props: ContainerProps ) => {
     }
 
   return <div>
+    <Script async src="https://www.googletagmanager.com/gtag/js?id=G-FHLPYG3GMV" strategy="afterInteractive"/>
+    <Script id="google-analytics" strategy='afterInteractive'
+    >
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-FHLPYG3GMV');
+      `}
+    </Script>
     <Box 
       sx={{
         transition: theme.transitions.create('background', {
@@ -342,6 +354,7 @@ type ContainerProps ={
   children?: ReactNode,
   fullPage?: boolean,
   background?: 'default' | 'galactic',
+  customBg?: string,
   menuSm?: boolean,
   customBg?: string | null,
 }

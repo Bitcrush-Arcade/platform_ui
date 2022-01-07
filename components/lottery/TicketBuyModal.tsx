@@ -42,6 +42,7 @@ import { Receipt } from 'types/PromiEvent'
 type TicketBuyModalProps ={
   open: boolean;
   onClose: () => void;
+  onReceipt: () => void;
 }
 
 type LotteryInfo={
@@ -54,7 +55,7 @@ type LotteryInfo={
 
 const TicketBuyModal = (props: TicketBuyModalProps) => {
 
-  const { open, onClose } = props;
+  const { open, onClose, onReceipt } = props;
   const { editTransactions } = useTransactionContext()
   const [ gradient, gradientId ] = invaderGradient()
   // Steps are:
@@ -93,7 +94,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
   },[lotteryMethods, setLotteryInfo])
   // Get Lottery Approval
   useEffect(() => {
-    if(!account || isApproved) return
+    if(!account || isApproved || !lotteryContract.address) return
     getApproved(lotteryContract.address)
   },[coinMethods, getApproved, lotteryContract.address, account, isApproved])
 
@@ -127,6 +128,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
       .on('receipt', ( rc: Receipt ) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
+        onReceipt()
       })
       .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)

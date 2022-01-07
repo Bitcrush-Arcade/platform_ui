@@ -5,6 +5,6 @@ import { NextResponse } from 'next/server'
 export default function getCountry( req:NextRequest ){
   const { geo, nextUrl: url } = req
   console.log('middleware',geo)
-  url.searchParams.set('country', geo.country || "CR")
+  url.searchParams.set('country', geo?.country || "CR")
   return NextResponse.rewrite( url )
 }
