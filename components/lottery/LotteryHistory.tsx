@@ -29,7 +29,7 @@ type LotteryHistoryProps = {
 const LotteryHistory = (props: LotteryHistoryProps) => {
     const { currentTickets, tabChange, selectTicket, currentRound, lastRound, currentInfo,claimAll } = props
     const [tabSelected, setTabSelected] = useState<number>(0)
-    const [selectedPage, setSelectedPage] = useState<number>(1)
+    const [selectedPage, setSelectedPage] = useState<number>(0)
     const roundsPerPage = 4
 
     const shownHistoryRounds = testHistoryArray.slice(selectedPage * roundsPerPage, (selectedPage + 1)*roundsPerPage)
@@ -99,23 +99,21 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
                 tickets={lastRound.userTickets || []}
                 lastDate={ new BigNumber(lastRound.endTime).toNumber()} 
                 selectTicket={selectTicket} 
-                lastRound={currentRound -1}
+                lastRound={`${currentRound -1}`}
                 token={lastRound.bonusInfo?.bonusToken}
                 tokenAmount={lastRound.bonusInfo?.bonusAmount}
-                claimAll={claimAll}
                 globalTickets={new BigNumber(lastRound.totalTickets).toNumber()}
             />
         } 
         
-        {tabSelected == 2 &&   
-            <History rounds={shownHistoryRounds}
-                totalRounds={testHistoryArray.length} 
-                currentPageView={selectedPage} 
-                onPagination={(p) => setSelectedPage(p)}
-                rowsPerPage={roundsPerPage}
-                onRoundView={(round) => console.log('selected Round ', round)}
-            />
-        }
+        <History rounds={shownHistoryRounds}
+            totalRounds={testHistoryArray.length} 
+            currentPageView={selectedPage} 
+            onPagination={(p) => setSelectedPage(p)}
+            rowsPerPage={roundsPerPage}
+            onLastRoundView={ (isCurrent) => selectTab(null, isCurrent ? 0 :  1)}
+            isInView={tabSelected == 2}
+        />
         {tabSelected == 3 &&
             <HowToPlay/>
         }
