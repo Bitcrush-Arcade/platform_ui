@@ -138,7 +138,7 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
             secondary={"Exclude myself from depositing to the live wallet"}
           />
         </ListItem>}
-        <ListItem button onClick={()=>{
+        {/* <ListItem button onClick={()=>{ */}
         //   const asyncFn = async () => {
         //     const setup = getContracts('bankroll', 97)
         //     if(!setup.abi) return;
