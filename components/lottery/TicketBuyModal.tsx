@@ -92,6 +92,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
     }
     getLotteryData()
   },[lotteryMethods, setLotteryInfo])
+
   // Get Lottery Approval
   useEffect(() => {
     if(!account || isApproved || !lotteryContract.address) return
@@ -405,6 +406,7 @@ const TicketBuyModal = (props: TicketBuyModalProps) => {
                 ticketString[(ticketPair + 1)*2] = `${colorIndex}`
                 draft[selectedTicket] = ticketString.join('')
               })
+              setTicketPair( p => p < 2 ? p + 1 : 0)
             }
             return <ButtonBase
               key={`invader-Color-selector-${colorIndex}`}
