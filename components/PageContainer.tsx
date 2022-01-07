@@ -354,7 +354,6 @@ type ContainerProps ={
   children?: ReactNode,
   fullPage?: boolean,
   background?: 'default' | 'galactic',
-  customBg?: string,
   menuSm?: boolean,
   customBg?: string | null,
 }
