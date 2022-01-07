@@ -22,13 +22,12 @@ import { TicketInfo } from 'types/lottery'
 type LastRoundProps = {
   winningTeamTicket: string;
   lastDate: number;
-  lastRound: number;
+  lastRound: string;
   token?: string;
   tokenAmount?: BigNumber; 
   tickets: Array<TicketInfo>;
   globalTickets: number;
   selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
-  claimAll: (round: number) => void
 }
 
 const LastRound = (props: LastRoundProps) => {
