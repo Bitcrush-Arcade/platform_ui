@@ -44,7 +44,7 @@ import { ConditionalLinkWrapper } from 'utils/wrappers'
 import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
 import UfoIcon from 'components/svg/UfoIcon'
-// import Ufo2Icon from 'components/svg/Ufo2Icon'
+import Ufo2Icon from 'components/svg/Ufo2Icon'
 // import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
@@ -77,8 +77,8 @@ const Menu = ( props: MenuProps) => {
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
-        { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: false },
-        // { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: true },
+        { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
+        { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: false },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
             { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},

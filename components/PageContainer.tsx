@@ -36,7 +36,7 @@ import type { Receipt } from 'types/PromiEvent'
 
 const PageContainer = ( props: ContainerProps ) => {
   
-  const { children, menuSm, background } = props
+  const { children, menuSm, background, customBg } = props
   
   const { chainId, account } = useWeb3React()
   const theme = useTheme()
@@ -285,23 +285,22 @@ const PageContainer = ( props: ContainerProps ) => {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.leavingScreen,
         }),
-        backgroundImage: `url(${backgrounds[theme.palette.mode][background || 'default']})`,
-        backgroundSize: 'cover',
-        [theme.breakpoints.down('md')]:{
-          backgroundSize: '200% auto',
-          backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
+        backgroundImage: `url(${customBg || backgrounds[theme.palette.mode][background || 'default']})`,
+        backgroundSize: {
+          xs: '400% auto',
+          sm: '200% auto',
+          md: '120% auto',
+          xl: !customBg ? '120% auto' : 'cover',
         },
-        [theme.breakpoints.down(750)]:{
-          backgroundSize: '400% auto',
-          backgroundPosition: 'left calc(100% - 50% + 32px) top 0',
-        },
-        [theme.breakpoints.up('md')]:{
-          backgroundPosition: (background || 'default') == 'default' ? 
-            menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 74 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? 12 : 32}px ) top 0`
-            : 'top',
-        },
-        [theme.breakpoints.up('xl')]:{
-          backgroundSize: '120% auto',
+        backgroundPosition:{
+          xs: theme.palette.mode =='dark' ? 'left calc(100% - 47.5%) top 0' : 'left calc(100% - 50%) top 0',
+          sm: theme.palette.mode =='dark' ? 'left calc(100% - 46%) top 0' : 'left calc(100% - 50%) top 0',
+          md: !customBg && (background || 'default') == 'default' ? 
+          menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 88 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? -12 : -32}px ) top 0`
+          : 'top',
+          xl: !customBg && (background || 'default') == 'default' ? 
+          menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 60 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? 12 : -32}px ) top 0`
+          : 'top',
         },
         backgroundRepeat: 'no-repeat',
         minHeight: '100vh',
@@ -344,6 +343,7 @@ type ContainerProps ={
   fullPage?: boolean,
   background?: 'default' | 'galactic',
   menuSm?: boolean,
+  customBg?: string | null,
 }
 
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
