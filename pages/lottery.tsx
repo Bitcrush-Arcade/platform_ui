@@ -61,7 +61,7 @@ const Lottery = () => {
   const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>, roundId: string}> | null>(null)
 
   // Winnings State
-  const [ showWinCard, setShowWinCard ] = useState<boolean>(true)
+  const [ showWinCard, setShowWinCard ] = useState<boolean>(false)
     
   const getCurrentTickets = useCallback( async () => {
     if(!lotteryMethods || !account) return 
@@ -257,7 +257,7 @@ const Lottery = () => {
       </Grid>
       <Grid item xs={12} lg={5}>
         <Stack direction="row" justifyContent="space-between">
-          <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => setShowWinCard(p => !p)}>
+          <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => setShowWinCard(p => !p)} disabled={currentRound <= 1}>
             Check Winnings
           </GButton>
         {partnerToken?.name && <Box
