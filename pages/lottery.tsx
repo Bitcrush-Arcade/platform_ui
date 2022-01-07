@@ -56,7 +56,7 @@ const Lottery = () => {
   const [ currentRoundInfo, setCurrentRoundInfo ] = useState< RoundInfo | null>(null)
   const [ lastRoundInfo, setLastRoundInfo ] = useImmer< RoundInfo | null>(null)
   const [ viewHistory, setViewHistory ] = useState<null>(null)
-  const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: number } | null>(null)
+  const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: string } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
   const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>, roundId: string}> | null>(null)
 
@@ -127,7 +127,7 @@ const Lottery = () => {
     getWinData()
   },[showWinCard,lotteryMethods, account, getWinData ])
 
-  const getRoundInfo = useCallback( async (round: number) => {
+  const getRoundInfo = useCallback( async (round: string) => {
     if(!lotteryMethods) return null
     return (await lotteryMethods.roundInfo(round).call())
   },[lotteryMethods])
@@ -137,7 +137,7 @@ const Lottery = () => {
     if(newTab === 1){
       // get last round info
       const userTickets = currentRound > 1 && await lotteryMethods.getRoundTickets(currentRound -1).call({ from: account }) || []
-      const prevRound = currentRound > 1 && await getRoundInfo( currentRound - 1 ) || null
+      const prevRound = currentRound > 1 && await getRoundInfo( new BigNumber(currentRound).minus(1).toString() ) || null
       const prevBonus = currentRound > 1 && await lotteryMethods.bonusCoins(currentRound -1).call()
       console.log({ userTickets, prevRound })
       setLastRoundInfo({ 
@@ -152,7 +152,7 @@ const Lottery = () => {
     }
   },[lotteryMethods, account, currentRound, getRoundInfo, setLastRoundInfo])
 
-  const selectTicket = useCallback(async (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean) => {
+  const selectTicket = useCallback(async (ticketNumber: string, claimed: boolean, roundNumber: string, instaClaim?:boolean) => {
     
     const ticketRound = await getRoundInfo(roundNumber)
     const winnerHolders = new BigNumber(ticketRound.winnerNumber).toString().split('')

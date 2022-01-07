@@ -22,7 +22,7 @@ type LotteryHistoryProps = {
     currentInfo?: RoundInfo | null;
     lastRound?: RoundInfo | null;
     tabChange: (newTab: number) => void,
-    selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: number, instaClaim?:boolean ) => void;
+    selectTicket: (ticketNumber: string, claimed: boolean, roundNumber: string, instaClaim?:boolean ) => void;
     claimAll: (round: number) => void;
 }
 

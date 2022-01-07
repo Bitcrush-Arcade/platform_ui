@@ -90,7 +90,6 @@ export const CONNECTORS: {[connector in ConnectorNames]: any } = {
       97: getRpcUrl(97) || ''
     },
     qrcode: true,
-    pollingInterval: POLLING_INTERVAL
   }),
   "clover":  new CloverConnector({ supportedChainIds: [56] })
 }

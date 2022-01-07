@@ -88,9 +88,9 @@ const History = (props: HistoryViewProps) => {
   },[lotteryMethods, setCurrentRound, getRoundData])
 
   const onRoundView = useCallback( (selectedRound: number) => {
-    if(history[selectedRound] && new BigNumber(history[selectedRound].id).isEqualTo( currentRound ))
+    if(history?.[selectedRound]?.id && new BigNumber(history[selectedRound]?.id || 0).isEqualTo( currentRound ))
       onLastRoundView(true)
-    else if(history[selectedRound] && new BigNumber(history[selectedRound].id).isEqualTo( new BigNumber(currentRound).minus(1) ))
+    else if(history?.[selectedRound]?.id && new BigNumber(history[selectedRound]?.id || 0).isEqualTo( new BigNumber(currentRound).minus(1) ))
       onLastRoundView()
     else
       setSelectedRound(selectedRound)
