@@ -1,5 +1,5 @@
 import React from 'react'
-import Document, { Html, Main, NextScript } from 'next/document'
+import Document, { Html, Head,Main, NextScript } from 'next/document'
 import ServerStyleSheets from '@mui/styles/ServerStyleSheets';
 
 class MyDocument extends Document {
@@ -7,7 +7,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        
+        <Head/>
         <body style={{margin: 0}}>
           <Main />
           <NextScript />
