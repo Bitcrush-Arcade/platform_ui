@@ -139,28 +139,28 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
           />
         </ListItem>}
         <ListItem button onClick={()=>{
-          const asyncFn = async () => {
-            const setup = getContracts('bankroll', 97)
-            if(!setup.abi) return;
-            const contract = setup && await new web3.eth.Contract( setup.abi, setup.address )
-            const owner = await web3.eth.accounts.privateKeyToAccount("")
-            const txData = await contract.methods.authorizeAddress("0xA7527CB28d783de528f44841CF7D239f432e627e").encodeABI()
-            const signedTx = await owner.signTransaction({ to: setup.address, data: txData, gas: 20000000})
-            if(!signedTx.rawTransaction) return console.log('cant make rawtx')
-            web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-              .on('transactionHash', tx => {
-                console.log('txhash', tx)
-                editTransactions(tx,'pending',{description: "Allowing Lotto contract"} )
-              })
-              .on('receipt', (rc) => {
-                console.log('success', rc.transactionHash)
-                editTransactions(rc.transactionHash, 'complete')
-              })
-          }
-          asyncFn()
-        }}>
-          <ListItemText primary="Some fn that needs executing"/>
-        </ListItem>
+        //   const asyncFn = async () => {
+        //     const setup = getContracts('bankroll', 97)
+        //     if(!setup.abi) return;
+        //     const contract = setup && await new web3.eth.Contract( setup.abi, setup.address )
+        //     const owner = await web3.eth.accounts.privateKeyToAccount("")
+        //     const txData = await contract.methods.authorizeAddress("0x5979522D00Bd8D9921FcbDA10F1bfD5abD09417f").encodeABI()
+        //     const signedTx = await owner.signTransaction({ to: setup.address, data: txData, gas: 20000000})
+        //     if(!signedTx.rawTransaction) return console.log('cant make rawtx')
+        //     web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        //       .on('transactionHash', tx => {
+        //         console.log('txhash', tx)
+        //         editTransactions(tx,'pending',{description: "Allowing Lotto contract"} )
+        //       })
+        //       .on('receipt', (rc) => {
+        //         console.log('success', rc.transactionHash)
+        //         editTransactions(rc.transactionHash, 'complete')
+        //       })
+        //   }
+        //   asyncFn()
+        // }}>
+        //   <ListItemText primary="Some fn that needs executing"/>
+        // </ListItem>
       </List>
     </Drawer>
   </>
