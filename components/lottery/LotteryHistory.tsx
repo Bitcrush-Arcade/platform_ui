@@ -44,45 +44,39 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     },[currentInfo?.userTickets])
 
     return <>
-    
-    <Grid container justifyContent="space-between" alignItems="flex-end">
-        <Grid item sx={{pl:1.5, pb: 1}}>
-                {/*Tab changer*/}
-                <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit">
-                    <Tab
-                        label={
-                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
-                                CURRENT
-                            </Typography>
-                        }
-                    />
-                    <Tab
-                        label={
-                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }} >
-                                LAST ROUND
-                            </Typography>
-                        }
-                        disabled={!currentRound || currentRound == 1}
-                    />
-                    <Tab
-                        label={
-                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
-                                HISTORY
-                            </Typography>
-                        }
-                        disabled={!currentRound || currentRound == 1}
-                    />
-                    <Tab
-                        label={
-                            <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
-                                HOW TO PLAY
-                            </Typography>
-                        }
-                    />
-                    
-                </Tabs>
-        </Grid>
-    </Grid>
+    {/*Tab changer*/}
+    <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit" centered sx={{pb: 1}}>
+        <Tab
+            label={
+                <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                    CURRENT
+                </Typography>
+            }
+        />
+        <Tab
+            label={
+                <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }} >
+                    LAST ROUND
+                </Typography>
+            }
+            disabled={!currentRound || currentRound == 1}
+        />
+        <Tab
+            label={
+                <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                    HISTORY
+                </Typography>
+            }
+            disabled={!currentRound || currentRound == 1}
+        />
+        <Tab
+            label={
+                <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
+                    HOW TO PLAY
+                </Typography>
+            }
+        />
+    </Tabs>
         
     {/* History Content */}
     <Card background="light" shadow="primary" sx={{p: 3}}>
