@@ -45,7 +45,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
 
     return <>
     {/*Tab changer*/}
-    <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit" centered sx={{pb: 1}} variant="scrollable">
+    <Tabs value={tabSelected} onChange={selectTab} indicatorColor="secondary" textColor="inherit" sx={{pb: 1, pl: 1.5}} variant="scrollable">
         <Tab
             label={
                 <Typography color='white' variant="body1" sx={{ typography: { xs: 'body2', sm: 'body1'} }}>
