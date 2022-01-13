@@ -99,16 +99,18 @@ const Lottery = () => {
       const ticketId = new BigNumber(lastClaimed).plus(i).toString()
       const unclaimedTicket = await lotteryMethods.userNewTickets(account,ticketId).call()
       const ticketRound = new BigNumber(unclaimedTicket.round).toString()
-      if(!rounds[ticketRound]){
-        const roundInfo = await lotteryMethods.roundInfo(ticketRound).call()
-        rounds[ticketRound] = {
-          tickets: [{...unclaimedTicket, id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber,roundInfo.winnerNumber)}],
-          roundInfo,
-          distribution: await lotteryMethods.getRoundDistribution(ticketRound).call()
+      if( !(new BigNumber(ticketRound).isEqualTo(currentRound)) ){
+        if(!rounds[ticketRound]){
+          const roundInfo = await lotteryMethods.roundInfo(ticketRound).call()
+          rounds[ticketRound] = {
+            tickets: [{...unclaimedTicket, id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber,roundInfo.winnerNumber)}],
+            roundInfo,
+            distribution: await lotteryMethods.getRoundDistribution(ticketRound).call()
+          }
         }
+        else
+          rounds[ticketRound].tickets.push({...unclaimedTicket,id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber, rounds[ticketRound].roundInfo.winnerNumber)})
       }
-      else
-        rounds[ticketRound].tickets.push({...unclaimedTicket,id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber, rounds[ticketRound].roundInfo.winnerNumber)})
     }
     const roundsPlayed = Object.keys(rounds)
     setWinData( roundsPlayed.map( roundId => ({
@@ -117,7 +119,7 @@ const Lottery = () => {
     })))
 
     
-  },[lotteryMethods, account, setWinData])
+  },[lotteryMethods, account, setWinData, currentRound])
 
   useEffect( () => {
     if(!showWinCard || !lotteryMethods || !account){
