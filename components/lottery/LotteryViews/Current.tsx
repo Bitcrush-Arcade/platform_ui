@@ -1,3 +1,4 @@
+import {useMemo} from 'react'
 import format from 'date-fns/format'
 // Material
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -5,6 +6,9 @@ import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
+// oTHERS
+import Countdown from 'react-countdown'
+// BitcrushUI
 // Libs
 import NumberInvader from 'components/lottery/NumberInvader'
 
@@ -23,6 +27,7 @@ type CurrentViewProps = {
 const Current = (props: CurrentViewProps) => {
 const { tickets, currentDate, currentRound, totalTickets} = props
 
+const startTimer = useMemo( () => new Date(new Date().getTime() + 40000),[])
 return <>
 
   <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -108,17 +113,22 @@ return <>
       </>
       :
       <>
-        <Typography variant="caption" component="div" sx={{ px: 2, width: 150 }}>
-          <Skeleton />
+        <Typography variant="caption" component="div" sx={{ px: 2, width: 150, height: 24 }}>
         </Typography>
-        <Typography variant="h6" component="div" sx={{ px: 2, }}>
-          <Skeleton height={150} />
+        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="primary" component="div">
+        <>
+          Searching the blockchain galaxy for recruits
+        </>
         </Typography>
-        <Typography variant="caption" component="div" sx={{ px: 2, width: 150 }}>
-          <Skeleton />
+        <Typography variant="caption" component="div" sx={{ px: 2, width: 150, height: 24 }}>
         </Typography>
-        <Typography variant="h6" component="div" sx={{ px: 2, }}>
-          <Skeleton height={150} />
+        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="secondary" component="div">
+          <Countdown
+            date={ startTimer }
+            renderer={({seconds}) =>{
+              return `T - ${Math.ceil(seconds/4)}`
+            }}
+          />
         </Typography>
       </>
     }

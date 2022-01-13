@@ -10,6 +10,7 @@ import CardContent from '@mui/material/CardContent'
 import Collapse from '@mui/material/Collapse'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import LinearProgress from '@mui/material/LinearProgress'
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
@@ -289,6 +290,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
           Buy Tickets
         </GButton>
       </Stack>
+      {!round && <LinearProgress color="secondary"/>}
       <Collapse in={showDetail}>
         <Typography variant="h5" sx={{pt:3, pb:3}} align="center">
           Match Invaders and their colors in exact order to win!
