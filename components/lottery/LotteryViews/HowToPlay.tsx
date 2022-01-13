@@ -25,7 +25,9 @@ const HowToPlay = () => {
     
     See this medium article for more details and breakdown:
     `}
-    
+    <a href="/" rel="noopener nonreferrer" target="_blank">
+      Flight of the Navigator v17
+    </a>
   </Typography>
 }
 export default HowToPlay
