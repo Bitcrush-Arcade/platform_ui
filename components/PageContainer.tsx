@@ -310,6 +310,9 @@ const PageContainer = ( props: ContainerProps ) => {
           md: !customBg && (background || 'default') == 'default' ? 
           menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 88 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? -12 : -32}px ) top 0`
           : 'top',
+          xl: !customBg && (background || 'default') == 'default' ? 
+          menuToggle ? `left calc( 50% + ${ theme.palette.mode =='dark' ? 60 : 120}px) top 0` : `left calc( 50% - ${ theme.palette.mode =='dark' ? 12 : -32}px ) top 0`
+          : 'top',
         },
         backgroundRepeat: 'no-repeat',
         minHeight: '100vh',
@@ -353,6 +356,7 @@ type ContainerProps ={
   background?: 'default' | 'galactic',
   customBg?: string,
   menuSm?: boolean,
+  customBg?: string | null,
 }
 
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
