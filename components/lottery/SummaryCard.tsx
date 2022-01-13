@@ -61,7 +61,6 @@ const SummaryCard = (props: LotterySummaryProps) => {
   const lotteryContract = getContracts('lottery', chainId)
   const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
   
-  const burnPercent = 18000
   const percentBase = new BigNumber('100000000000')
   // Context
   const { tokenInfo, editTransactions } = useTransactionContext()
@@ -73,15 +72,16 @@ const SummaryCard = (props: LotterySummaryProps) => {
     const userTickets = await lotteryMethods.userRoundTickets(account,currentRound).call()
     const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
     const distribution = await lotteryMethods.getRoundDistribution(currentRound).call()
-    console.log( roundInfo )
+    const burn = await lotteryMethods.burn().call()
+    console.log( new BigNumber(burn).toString() )
     setRound( {
       id: new BigNumber(currentRound).toNumber(),
       endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
-      tickets: userTickets.length,
+      tickets: userTickets.totalTickets,
       isActive: isActive,
       pool: new BigNumber(roundInfo.pool),
       distribution: distribution?.map( (d: string) => new BigNumber(d)),
-      burn: new BigNumber(0),
+      burn: new BigNumber(burn),
       bonusToken: new BigNumber(bonusToken.bonusAmount).isGreaterThan(0)
         ? { address: bonusToken.bonusToken, amount: new BigNumber( bonusToken.bonusAmount ) }
         : null
@@ -297,7 +297,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
             {matchDisplays}
         </Grid>
         <Typography variant="h6" sx={{pt:3}} align="center" color="textSecondary">
-          {new BigNumber(burnPercent).div(percentBase).times(100).toFixed(2,1)}% is burned when tickets bought are more than 10% of prize pool
+          {round?.burn.div(percentBase).times(100).toFixed(2,1)}% is burned when tickets bought are more than 10% of prize pool
         </Typography>
       </Collapse>
     </CardContent>
