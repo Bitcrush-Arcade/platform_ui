@@ -73,11 +73,11 @@ const SummaryCard = (props: LotterySummaryProps) => {
     const userTickets = await lotteryMethods.userRoundTickets(account,currentRound).call()
     const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
     const distribution = await lotteryMethods.getRoundDistribution(currentRound).call()
-    console.log( roundInfo )
+    console.log( userTickets )
     setRound( {
       id: new BigNumber(currentRound).toNumber(),
       endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
-      tickets: userTickets.length,
+      tickets: userTickets.totalTickets,
       isActive: isActive,
       pool: new BigNumber(roundInfo.pool),
       distribution: distribution?.map( (d: string) => new BigNumber(d)),
