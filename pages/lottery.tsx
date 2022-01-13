@@ -55,7 +55,6 @@ const Lottery = () => {
   const [ currentTickets, setCurrentTickets ] = useState<Array<TicketInfo> | null>(null)
   const [ currentRoundInfo, setCurrentRoundInfo ] = useState< RoundInfo | null>(null)
   const [ lastRoundInfo, setLastRoundInfo ] = useImmer< RoundInfo | null>(null)
-  const [ viewHistory, setViewHistory ] = useState<null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: string } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
   const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>, roundId: string}> | null>(null)
@@ -169,7 +168,12 @@ const Lottery = () => {
     }
     holderTotal[0] = new BigNumber(ticketRound.totalTickets).minus(holderTotal.reduce( (acc, val) => acc + val, 0)).toNumber()
 
-    setSelectedRoundInfo({...ticketRound, holders: holderTotal, distribution: await lotteryMethods.getRoundDistribution(roundNumber).call()})
+    setSelectedRoundInfo({
+      ...ticketRound,
+      holders: holderTotal,
+      distribution: await lotteryMethods.getRoundDistribution(roundNumber).call(),
+      bonusInfo: await lotteryMethods.bonusCoins(roundNumber).call()
+    })
     setSelectedTicket({
       ticketNumber,
       claimed,
@@ -237,6 +241,8 @@ const Lottery = () => {
       acc.matches ++
     return acc
   },{base: "", matches: 0})
+  const selectedPartner = partnerTokens[(selectedRoundInfo?.bonusInfo?.bonusToken || '0x0').toLowerCase()]
+  const selectedPartnerWin = new BigNumber(selectedRoundInfo?.bonusInfo?.bonusAmount || 0).times(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div(selectedRoundInfo?.bonusInfo?.bonusMaxPercent || 1).div(10**18)
   const crushWin = new BigNumber(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
   const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
@@ -382,7 +388,7 @@ const Lottery = () => {
             sx={{
               background: {
                 xs: 'none',
-                md: 'url(/backgrounds/lotterybg.png) no-repeat'
+                md: matches.matches > 6 ? 'none' : 'url(/backgrounds/lotterybg.png) no-repeat'
               },
               backgroundSize: {
                 xs: '100% 100%',
@@ -413,7 +419,7 @@ const Lottery = () => {
               Squadron Details
             </Typography>
             <Divider sx={{ my: 1}}/>
-            <Grid container alignItems="center" sx={{pt: 2}} rowSpacing={1}>
+            <Grid container alignItems="center" sx={{pt: 2, zIndex: 10}} rowSpacing={1}>
               <Grid item xs={12} md={6}>
                 <Stack direction="row" justifyContent="space-evenly">
                   <NumberInvader variant="fancy" twoDigits={[selectedDigits[1], selectedDigits[2]]} matched={matches ? matches.matches > 3 ? 2 : matches.matches - 1 : 0 }/>
@@ -463,34 +469,66 @@ const Lottery = () => {
                   <Typography variant="subtitle2" color="textSecondary" align="left">
                     $&nbsp;{currencyFormat(usdCrushWin.toString(), { decimalsToShow: 4})}
                   </Typography>
+                  {selectedPartner && <>
+                    <Typography variant="h6" color="primary" fontWeight={600}>
+                      {currencyFormat(selectedPartnerWin.toString(), { decimalsToShow: 4 })} {selectedPartner.name}
+                    </Typography>
+                  </>}
                 </Stack>
               </Grid>
               <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
-                {(matches?.matches || 0) >= 2 && 
-                  <Box sx={{position:'absolute', top: 20, left: 55 }}>
-                    <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
-                  </Box>
-                }
-                {(matches?.matches || 0) >= 4 && 
-                  <Box sx={{position:'absolute', top: 'calc(50% - 25px)', left: -20 }}>
-                    <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4} alt="Satellite Explosion"/>
-                  </Box>
-                }
-                {(matches?.matches || 0) >= 3 && 
-                  <Box sx={{position:'absolute', bottom: '25%', left: 65 }}>
-                    <Image src="/assets/launcher/explosion.png" width={100/1.9} height={77/1.9} alt="Antennae Explosion"/>
-                  </Box>
-                }
-                {(matches?.matches || 0) >= 5 && 
-                  <Box sx={{position:'absolute', bottom: '5%', left: '38%' }}>
-                    <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Truck Explosion"/>
-                  </Box>
-                }
-                {(matches?.matches || 0) >= 6 && 
-                  <Box sx={{position:'absolute', top: '40%', right: 0 }}>
-                    <Image src="/assets/launcher/explosion.png" width={100/1.2} height={77/1.2}  alt="Big Antennae Explosion"/>
-                  </Box>
-                }
+                {matches.matches < 6 ? <>
+                  {(matches?.matches || 0) >= 2 && 
+                    <Box sx={{position:'absolute', top: 20, left: 55 }}>
+                      <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
+                    </Box>
+                  }
+                  {(matches?.matches || 0) >= 4 && 
+                    <Box sx={{position:'absolute', top: 'calc(50% - 25px)', left: -20 }}>
+                      <Image src="/assets/launcher/explosion.png" width={100/1.4} height={77/1.4} alt="Satellite Explosion"/>
+                    </Box>
+                  }
+                  {(matches?.matches || 0) >= 3 && 
+                    <Box sx={{position:'absolute', bottom: '25%', left: 65 }}>
+                      <Image src="/assets/launcher/explosion.png" width={100/1.9} height={77/1.9} alt="Antennae Explosion"/>
+                    </Box>
+                  }
+                  {(matches?.matches || 0) >= 5 && 
+                    <Box sx={{position:'absolute', bottom: '5%', left: '38%' }}>
+                      <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Truck Explosion"/>
+                    </Box>
+                  }
+                  {(matches?.matches || 0) >= 6 && 
+                    <Box sx={{position:'absolute', top: '40%', right: 0 }}>
+                      <Image src="/assets/launcher/explosion.png" width={100/1.2} height={77/1.2}  alt="Big Antennae Explosion"/>
+                    </Box>
+                  }
+                </>
+                : <>
+                  <Typography fontFamily="Zebulon" color="secondary" variant="h3" align ="center" sx={{ zIndex: 10 }}>
+                    Jackpot!!!
+                  </Typography>
+                  <Stack direction="row">
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                    <Box sx={{zIndex: 9}}>
+                      <Image src="/assets/launcher/explosion.png" width={100} height={77}  alt="Big Antennae Explosion"/>
+                    </Box>
+                  </Stack>
+                </>}
               </Grid>
             </Grid>
           </Card>
