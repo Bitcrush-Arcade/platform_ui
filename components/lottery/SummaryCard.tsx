@@ -288,7 +288,6 @@ const SummaryCard = (props: LotterySummaryProps) => {
           background="primary"
           disabled={!round?.isActive}
           sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
-          component={buyHref ? 'a' : 'button'}
         >
           Buy Tickets
         </GButton>
