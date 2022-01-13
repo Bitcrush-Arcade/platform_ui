@@ -356,7 +356,6 @@ type ContainerProps ={
   background?: 'default' | 'galactic',
   customBg?: string,
   menuSm?: boolean,
-  customBg?: string | null,
 }
 
 const useStyles = makeStyles<Theme, { menuToggle: boolean } & ContainerProps >( (theme: Theme) => createStyles({
