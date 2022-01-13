@@ -102,9 +102,10 @@ const Lottery = () => {
       if( !(new BigNumber(ticketRound).isEqualTo(currentRound)) ){
         if(!rounds[ticketRound]){
           const roundInfo = await lotteryMethods.roundInfo(ticketRound).call()
+          const roundDistribution = await lotteryMethods.getRoundDistribution(ticketRound).call()
           rounds[ticketRound] = {
             tickets: [{...unclaimedTicket, id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber,roundInfo.winnerNumber)}],
-            roundInfo,
+            roundInfo: {...roundInfo, distribution: roundDistribution},
             distribution: await lotteryMethods.getRoundDistribution(ticketRound).call()
           }
         }
