@@ -64,7 +64,7 @@ export const contracts : { [key: string] : ContractSelect} = {
   },
   lottery:{
     56:{
-      address: '',
+      address: '0x9B55987e92958d3d6Af48Dd2DB1C577593401f78',
       abi: BitcrushLottery.abi,
     },
     97:{
