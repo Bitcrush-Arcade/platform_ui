@@ -256,18 +256,23 @@ const Lottery = () => {
         />
       </Grid>
       <Grid item xs={12} lg={5}>
-        <Stack direction="row" justifyContent="space-between">
+        <Stack direction={{xs: 'column', md:"row"}} justifyContent="space-between" alignItems="center">
           <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => setShowWinCard(p => !p)} disabled={currentRound <= 1}>
             Check Winnings
           </GButton>
         {partnerToken?.name && <Box
             sx={theme => ({
+              my:{
+                xs: 4,
+                md: 0
+              },
               px: 2,
               mx: 2,
               position:'relative',
               backgroundColor: theme.palette.primary.main,
               width: 350,
               height: 120,
+              maxWidth: '100%',
               clipPath: 'polygon(92% 0, 100% 25%, 100% 100%, 8% 100%, 0% 75%, 0 0)'
             })}
           >
