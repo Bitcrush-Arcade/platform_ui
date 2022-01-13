@@ -237,7 +237,7 @@ const Lottery = () => {
   const crushWin = new BigNumber(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
   const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
-  const partnerToken = partnerTokens[currentRoundInfo?.bonusInfo?.bonusToken || '0x0'] 
+  const partnerToken = partnerTokens[(currentRoundInfo?.bonusInfo?.bonusToken || '0x0').toLowerCase()] 
 
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
@@ -262,8 +262,8 @@ const Lottery = () => {
           </GButton>
         {partnerToken?.name && <Box
             sx={theme => ({
-              p: 2,
-              m: 2,
+              px: 2,
+              mx: 2,
               position:'relative',
               backgroundColor: theme.palette.primary.main,
               width: 350,
