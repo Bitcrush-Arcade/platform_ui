@@ -23,6 +23,7 @@ import Typography from '@mui/material/Typography'
 import CloseIcon from '@mui/icons-material/Close'
 // Bitcrush UI
 import Card from 'components/basics/Card'
+import Currency from 'components/basics/Currency'
 import GButton from 'components/basics/GeneralUseButton'
 import LotteryHistory from 'components/lottery/LotteryHistory'
 import NumberInvader from 'components/lottery/NumberInvader'
@@ -36,7 +37,7 @@ import { useTransactionContext } from 'hooks/contextHooks'
 import { getContracts } from 'data/contracts'
 import { currencyFormat } from 'utils/text/text'
 import { partnerTokens } from 'data/partnerTokens'
-import { checkTicket } from 'utils/lottery'
+import { checkTicket, getTicketDigits } from 'utils/lottery'
 // Types
 import { RoundInfo, TicketInfo } from 'types/lottery'
 import { Receipt } from 'types/PromiEvent'
@@ -57,7 +58,7 @@ const Lottery = () => {
   const [ lastRoundInfo, setLastRoundInfo ] = useImmer< RoundInfo | null>(null)
   const [ selectedTicket, setSelectedTicket ] = useState<{ ticketNumber: string, claimed: boolean, ticketRound: string } | null>(null)
   const [ selectedRoundInfo, setSelectedRoundInfo ] = useState<RoundInfo & {holders: number[]} | null>(null)
-  const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>, roundId: string}> | null>(null)
+  const [ winData, setWinData ] = useState<Array<{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo & {winnerHolders: Array<BigNumber>}, distribution: Array<BigNumber>, roundId: string}> | null>(null)
 
   // Winnings State
   const [ showWinCard, setShowWinCard ] = useState<boolean>(false)
@@ -93,7 +94,7 @@ const Lottery = () => {
       setWinData([])
       return
     }
-    const rounds:{[round: string]: {tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo, distribution: Array<BigNumber>}} = {}
+    const rounds:{[round: string]: {tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo & {winnerHolders: Array<BigNumber>}, distribution: Array<BigNumber>}} = {}
     for( let i = 1; i <= claimableTickets.toNumber(); i++ ){
       const ticketId = new BigNumber(lastClaimed).plus(i).toString()
       const unclaimedTicket = await lotteryMethods.userNewTickets(account,ticketId).call()
@@ -101,11 +102,16 @@ const Lottery = () => {
       if( !(new BigNumber(ticketRound).isEqualTo(currentRound)) ){
         if(!rounds[ticketRound]){
           const roundInfo = await lotteryMethods.roundInfo(ticketRound).call()
+          const winnerDigits = getTicketDigits(new BigNumber(roundInfo.winnerNumber).toNumber())
+          const winnerHolders = []
+          for( let digit = 0; digit < winnerDigits.length; digit ++){
+            winnerHolders.push( new BigNumber(await lotteryMethods.holders(ticketRound, winnerDigits[digit]).call()) )
+          }
           const roundDistribution = await lotteryMethods.getRoundDistribution(ticketRound).call()
           rounds[ticketRound] = {
             tickets: [{...unclaimedTicket, id: ticketId, matches: checkTicket(unclaimedTicket.ticketNumber,roundInfo.winnerNumber)}],
-            roundInfo: {...roundInfo, distribution: roundDistribution},
-            distribution: await lotteryMethods.getRoundDistribution(ticketRound).call()
+            roundInfo: {...roundInfo, distribution: roundDistribution, winnerHolders},
+            distribution: roundDistribution
           }
         }
         else
@@ -248,6 +254,29 @@ const Lottery = () => {
 
   const partnerToken = partnerTokens[(currentRoundInfo?.bonusInfo?.bonusToken || '0x0').toLowerCase()] 
 
+  const winAmounts = winData?.reduce((acc, round, index) => {
+    const winnerTickets = round.tickets.filter( ticket => ticket.matches > 0)
+    const nonWinners = round.tickets.length - winnerTickets.length
+    const nonWinReduction = round.roundInfo.winnerHolders.reduce( (percentage, holders, index)=>{
+      if(holders.isLessThan(1))
+        return percentage
+      return percentage.plus( round.roundInfo.distribution[index +1])
+    }, new BigNumber(0)).times("750000000").div("100000000000")
+    const nonWinnerAmount = new BigNumber(
+      round.roundInfo.pool)
+      .times(nonWinners)
+      .times( 
+        new BigNumber(round.roundInfo.distribution[0]).minus(nonWinReduction)
+      ).div( new BigNumber(round.roundInfo.totalTickets).minus(round.roundInfo.totalWinners).times("100000000000") )
+    const winnerAmount = winnerTickets.reduce( (winAmount, ticket, index) => {
+      return winAmount.plus( new BigNumber(round.roundInfo.distribution[ticket.matches]).times(round.roundInfo.pool).div( new BigNumber("100000000000").times(round.roundInfo.winnerHolders[ticket.matches-1]) ) )
+    },new BigNumber(0))
+    acc.nonWinner = acc.nonWinner.plus(nonWinnerAmount)
+    acc.winner = acc.winner.plus(winnerAmount)
+    return acc
+
+  },{nonWinner: new BigNumber(0), winner: new BigNumber(0), partners: []})
+
   return <PageContainer customBg="/backgrounds/lotterybg.png">
      <Head>
       <title>BITCRUSH - Lottery</title>
@@ -324,6 +353,7 @@ const Lottery = () => {
                 p: 2,
                 minHeight: 200
               }}
+              background="light"
             >
               {!winData 
                 ? <LinearProgress color="secondary"/>
@@ -331,17 +361,15 @@ const Lottery = () => {
                 ( winData.length 
                   ? 
                     <>
-                      <Table>
-                        
+                      <Table size="small">
                         <TableHead>
                           <TableRow> 
                             <TableCell align="center">ROUND #</TableCell>
-                            <TableCell align="center">DATE</TableCell>
+                            <TableCell align="center" sx={{ display: { xs:'none', md: 'table-cell'}}}>DATE</TableCell>
                             <TableCell align="center"># OF TICKETS</TableCell>
                             <TableCell align="center">WINNER TICKET</TableCell>
                           </TableRow>
                         </TableHead>
-
                         <TableBody>
                           {winData?.map( (round, roundIndex) => {
                             const winnerTickets = round.tickets.filter( ticket => ticket.matches > 0)
@@ -349,7 +377,7 @@ const Lottery = () => {
                               <TableCell align='center'>
                                 {round.roundId}
                               </TableCell>
-                              <TableCell align='center'>
+                              <TableCell align='center' sx={{ display: { xs:'none', md: 'table-cell'}}}>
                                 {format(new Date(new BigNumber(round.roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
                               </TableCell>
                               <TableCell align='center'>
@@ -362,7 +390,33 @@ const Lottery = () => {
                           }) }
                         </TableBody>  
                       </Table>
-                      <Stack direction="row" justifyContent="center" mt={1.5}>
+                      <Stack justifyContent="center" alignItems="center" mt={1.5} spacing={1}>
+                        {winAmounts && <>
+                          <Typography align="center" variant="h6" fontFamily="Zebulon" color="secondary">
+                            Claimable
+                          </Typography>
+                          <Typography align="center">
+                            Non Match
+                          </Typography>
+                          <Typography align="center" variant="h5" color="primary">
+                            <Currency value={winAmounts?.nonWinner.toString()} isWei decimals={4}/>&nbsp;CRUSH
+                          </Typography>
+                          {winAmounts.winner.isGreaterThan(0) && <>
+                            <Typography align="center" variant ="h6" fontFamily="Zebulon">
+                              Match Wins
+                            </Typography>
+                            <Typography align="center" variant="h4" color="primary">
+                              <Currency value={winAmounts?.winner.toString()} isWei decimals={4}/>&nbsp;CRUSH
+                            </Typography>
+                          </>}
+                            <Typography align="center" variant ="h6" fontFamily="Zebulon" color="secondary">
+                              Total Won
+                            </Typography>
+                            <Typography align="center" variant="h4" color="primary">
+                              <Currency value={winAmounts?.winner.plus(winAmounts.nonWinner).toString()} isWei decimals={4}/>&nbsp;CRUSH
+                            </Typography>
+                        </>
+                        }
                         <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
                           Claim All
                         </GButton>
