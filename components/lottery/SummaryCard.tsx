@@ -33,7 +33,8 @@ import { getContracts } from 'data/contracts'
 import { Receipt } from 'types/PromiEvent'
 
 type LotterySummaryProps = {
-  onBuy: () => void,
+  onBuy?: () => void,
+  buyHref?: string,
 }
 
 type LotteryRoundInfo = {
@@ -51,7 +52,7 @@ type LotteryRoundInfo = {
 }
 
 const SummaryCard = (props: LotterySummaryProps) => {
-  const { onBuy } = props
+  const { onBuy, buyHref } = props
   // These will come from props
   const [round, setRound] = useState<LotteryRoundInfo | null>(null)
   const [roundTimeEnded, setRoundTimeEnded] = useState<boolean>(false)
@@ -283,9 +284,11 @@ const SummaryCard = (props: LotterySummaryProps) => {
         </Stack>
         <GButton
           onClick={onBuy}
+          href={buyHref}
           background="primary"
           disabled={!round?.isActive}
           sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
+          component={buyHref ? 'a' : 'button'}
         >
           Buy Tickets
         </GButton>
