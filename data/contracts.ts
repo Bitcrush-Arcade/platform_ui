@@ -4,6 +4,7 @@ import BitcrushStaking_main from 'abi/BitcrushStaking_main.json'
 import BitcrushLiveWallet from 'abi/BitcrushLiveWallet.json'
 import BitcrushStaking from 'abi/BitcrushStakingv2.json'
 import BitcrushBankroll from 'abi/BitcrushBankroll.json'
+import BitcrushLottery from 'abi/BitcrushLottery.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -37,7 +38,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushLiveWallet.abi,
     },
     97:{
-      address: '0x974B38eAa7fc4FAE6A2802fC8C9984D86041A143',
+      address: '0x581DfD0B05AA9196FcD7553cAcb238161930d954',
       abi: BitcrushLiveWallet.abi,
     }
   },
@@ -47,7 +48,7 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushBankroll.abi,
     },
     97:{
-      address: '0x2997866Ef622bbAAa782fd0827d5EC630B3bc4e8',
+      address: '0xb40287dA5A314F6AB864498355b1FCDe6703956D',
       abi: BitcrushBankroll.abi,
     }
   },
@@ -57,10 +58,24 @@ export const contracts : { [key: string] : ContractSelect} = {
       abi: BitcrushStaking.abi,
     },
     97:{
-      address: '0x534828eDC1994d937d8d8113b3f0da751Cbc5e10',
+      address: '0x8139cA222D38296daB88d65960Ca400dcd95b246',
       abi: BitcrushStaking.abi,
     }
   },
+  lottery:{
+    56:{
+      address: '0x9B55987e92958d3d6Af48Dd2DB1C577593401f78',
+      abi: BitcrushLottery.abi,
+    },
+    97:{
+      address: '0x5979522D00Bd8D9921FcbDA10F1bfD5abD09417f',
+      abi: BitcrushLottery.abi,
+    }
+  },
+
+  // -------------------------------------------------------------
+  // FUCKED UP CONTRACTS
+  // -------------------------------------------------------------
   prevLw:{
     56:{
       address: '0xCd8AFEfFfd6E5b8cFC6C0c3348d984751496be51',

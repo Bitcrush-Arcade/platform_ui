@@ -77,7 +77,7 @@ const Menu = ( props: MenuProps) => {
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
-        { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: true },
+        { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: false },
         { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: false },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
@@ -165,7 +165,6 @@ const Menu = ( props: MenuProps) => {
         <ClickAwayListener onClickAway={() => { 
             if(!isSm || !open) return
             toggleOpen()
-            
             } }>
             <Paper className={ `${css.drawerContainer} ${css.paper}` } square onClick={() => !open && toggleOpen() }>
                 <List className={ css.list }>

@@ -15,7 +15,7 @@ const SmallFab = styled(Fab,{
   borderWidth: 1,
   borderStyle: 'solid',
   borderRadius: theme.spacing(10),
-  borderTopRightRadius: '0 !important',
+  borderTopRightRadius: '0',
   height: '24px !important',
   backgroundColor: 'transparent',
   boxShadow: `inset 0 0 15px rgba(${color == 'secondary' ? '29,233,182' : '174,82,227'},0.65)`,

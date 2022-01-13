@@ -195,7 +195,7 @@ const Carousel = forwardRef<CarouselHandles, CarouselPropsType>(( props, ref ) =
     </div>
   );
 })
-
+Carousel.displayName = "CustomCarousel-UI"
 export default Carousel
 
 function CarouselItem( props: PartialBy<CarouselPropsType, 'items'> & { item: any, containerWidth: number}) {

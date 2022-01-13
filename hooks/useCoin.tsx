@@ -24,6 +24,7 @@ const useCoin = (coinAddress?: string) => {
       return
     }
     const allowance = await coinMethods.allowance(account,contractToCheck).call()
+    console.log(allowance, allowance >= (amountToCheck ?? 1))
     setIsApproved( allowance >= (amountToCheck ?? 1) )
     return allowance >= (amountToCheck ?? 1)
   },[coinMethods, account, setIsApproved])

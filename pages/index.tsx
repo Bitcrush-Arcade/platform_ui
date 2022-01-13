@@ -23,6 +23,7 @@ import Coin from 'components/tokens/Token2'
 import Currency from 'components/basics/Currency'
 import Button from 'components/basics/GeneralUseButton'
 import HarvestCard from 'components/pools/HarvestCard'
+import SummaryCard from 'components/lottery/SummaryCard'
 // Hooks & Context
 import useBank from 'hooks/bank'
 import { useTransactionContext } from 'hooks/contextHooks'
@@ -134,7 +135,7 @@ export default function Home() {
           {mainImg}
         </Link>
       : mainImg
-  }), [ clickAnnouncement, isSm ])
+  }), [clickAnnouncement, isSm])
 
   return (<>
   <Head>
@@ -232,6 +233,10 @@ export default function Home() {
               <Carousel>
                 {announcements}
               </Carousel>
+            </section>
+            {/* Announcement Card */}
+            <section style={{ marginTop: 24, width: '100%' }}>
+              <SummaryCard buyHref="/lottery"/>
             </section>
             <Grid container justifyContent="space-around" style={{marginTop: 16}}>
               <Grid item md={5} style={{ paddingTop: 16, paddingBottom: 16}}>
