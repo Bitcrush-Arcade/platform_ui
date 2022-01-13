@@ -115,14 +115,14 @@ return <>
       <>
         <Typography variant="caption" component="div" sx={{ px: 2, width: 150, height: 24 }}>
         </Typography>
-        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="primary" component="div">
+        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="primary">
         <>
           Searching the blockchain galaxy for recruits
         </>
         </Typography>
         <Typography variant="caption" component="div" sx={{ px: 2, width: 150, height: 24 }}>
         </Typography>
-        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="secondary" component="div">
+        <Typography variant="h4" component="div" sx={{ px: 2, height: 150 }} align="center" color="secondary">
           <Countdown
             date={ startTimer }
             renderer={({seconds}) =>{
