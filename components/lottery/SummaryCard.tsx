@@ -215,7 +215,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
     <CardContent>
       <Stack direction={{ xs: "column", lg: "row"}} justifyContent="space-between" alignItems="center">
         <div>
-          <Typography variant="body2" color="textSecondary">
+          <Typography variant="body2" color="textSecondary" sx={{ textAlign: { xs: 'center', md:'left'}}}>
             PRIZE POT:
           </Typography>
           <Stack>
@@ -225,7 +225,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
               </>
               || <Skeleton width={200}/>}
             </Typography>
-            <Typography variant="caption" color="textSecondary" component="div">
+            <Typography variant="caption" color="textSecondary" component="div" sx={{ textAlign: { xs: 'center', md:'left'}}}>
               { round ? <>
                   $
                   <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
@@ -244,7 +244,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
         >
           { round &&
             (round.isActive ?
-              <Typography color="secondary" variant="h5" display="inline" component="div">
+              <Typography color="secondary" variant="h5" display="inline" component="div" sx={{ whiteSpace: { xs: 'pre-line', md: 'normal'}, textAlign: { xs: 'center', md:'left'}}}>
                 <Countdown
                   onStart={()=> setRoundTimeEnded(false)}
                   onComplete={ () => setRoundTimeEnded(true)}
@@ -267,7 +267,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
                       &nbsp;
                       <strong>{seconds < 10 && `0${seconds}` || seconds}</strong>
                       <sub>S</sub>
-                      &nbsp;
+                      &nbsp;{'\n'}
                       <Typography color="primary" variant="h5" display="inline">
                         UNTIL ATTACK TIME
                       </Typography>
@@ -282,7 +282,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
               </Typography>)
           }
         </Stack>
-        <GButton
+        {round && <GButton
           onClick={onBuy}
           href={buyHref}
           background="primary"
@@ -290,7 +290,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
           sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
         >
           Buy Tickets
-        </GButton>
+        </GButton>}
       </Stack>
       {!round && <LinearProgress color="secondary"/>}
       <Collapse in={showDetail}>
