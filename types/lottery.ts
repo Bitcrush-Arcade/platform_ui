@@ -7,6 +7,7 @@ export type RoundInfo = {
   endTime: BigNumber,
   distribution: Array<BigNumber>,
   pool: BigNumber,
+  totalWinners: BigNumber,
   bonusInfo?: {
     bonusToken: string,
     bonusAmount: BigNumber,
