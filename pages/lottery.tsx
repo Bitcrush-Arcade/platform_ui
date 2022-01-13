@@ -388,7 +388,7 @@ const Lottery = () => {
             sx={{
               background: {
                 xs: 'none',
-                md: matches.matches > 6 ? 'none' : 'url(/backgrounds/lotterybg.png) no-repeat'
+                md: (matches?.matches || 0) > 6 ? 'none' : 'url(/backgrounds/lotterybg.png) no-repeat'
               },
               backgroundSize: {
                 xs: '100% 100%',
@@ -477,7 +477,7 @@ const Lottery = () => {
                 </Stack>
               </Grid>
               <Grid item xs={false} md={6} sx={{ display:{ xs: 'none', md: 'block', height: 267, position:'relative'}}}>
-                {matches.matches < 6 ? <>
+                {matches && matches?.matches < 6 ? <>
                   {(matches?.matches || 0) >= 2 && 
                     <Box sx={{position:'absolute', top: 20, left: 55 }}>
                       <Image src="/assets/launcher/explosion.png" width={100/1.5} height={77/1.5} alt="Rocket Explosion"/>
