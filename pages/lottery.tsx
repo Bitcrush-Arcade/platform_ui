@@ -246,7 +246,7 @@ const Lottery = () => {
     </Head>
     <SummaryCard onBuy={toggleOpenBuy}/>
     <Grid container sx={{mt: 4}} justifyContent="space-between">
-      <Grid item xs={12} lg={6}>
+      <Grid item xs={12} lg={6} sx={{pb:4}}>
         <LotteryHistory 
           currentRound={currentRound} currentTickets={currentTickets}
           currentInfo={currentRoundInfo}
