@@ -22,6 +22,14 @@ const HowToPlay = () => {
     After each round you may check your tickets to view winners, and see your cumulative rewards. You can wait to claim until you have won enough to cover gas fees. 
     
     Additionally, the lottery features partner tokens, that act as an airdrop. Each round you will be allocated your share of partner tokens based on your winnings. Please note not every round might feature a partner. This is just a delicious little bonus for playing!
+
+    To win, numbers must be matched in the exact order. 
+
+    For example, if the winning number is 236536;
+
+    If your ticket is is 239636, You matched the first two numbers consecutively so you win for match 2. 
+
+    If you your tickets 336536, you did not match the first number correctly so unfortunately you did not win. Try again and Crush It next time!
     
     See this medium article for more details and breakdown:
     `}
