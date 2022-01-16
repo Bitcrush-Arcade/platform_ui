@@ -248,8 +248,16 @@ const Lottery = () => {
     return acc
   },{base: "", matches: 0})
   const selectedPartner = partnerTokens[(selectedRoundInfo?.bonusInfo?.bonusToken || '0x0').toLowerCase()]
-  const selectedPartnerWin = new BigNumber(selectedRoundInfo?.bonusInfo?.bonusAmount || 0).times(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div(selectedRoundInfo?.bonusInfo?.bonusMaxPercent || 1).div(10**18)
-  const crushWin = new BigNumber(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0).div("100000000000").times(selectedRoundInfo?.pool || 1).div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1).div(10**18)
+  const selectedPartnerWin = new BigNumber(selectedRoundInfo?.bonusInfo?.bonusAmount || 0)
+    .times(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0)
+    .div(selectedRoundInfo?.bonusInfo?.bonusMaxPercent || 1)
+    .div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1)
+    .div(10**18)
+  const crushWin = new BigNumber(selectedRoundInfo?.distribution[(matches?.matches || 1 ) -1 ] || 0)
+    .div("100000000000")
+    .times(selectedRoundInfo?.pool || 1)
+    .div((selectedRoundInfo?.holders[(matches?.matches || 1) -1]) || 1)
+    .div(10**18)
   const usdCrushWin = crushWin.times(tokenInfo?.crushUsdPrice || 0)
 
   const partnerToken = partnerTokens[(currentRoundInfo?.bonusInfo?.bonusToken || '0x0').toLowerCase()] 
