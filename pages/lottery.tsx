@@ -418,7 +418,7 @@ const Lottery = () => {
                               </TableCell>
                               <Tooltip title="Claim previous rounds first" open={roundIndex == 0 ? false : undefined}>
                                 <TableCell align='center'>
-                                    <GButton color="secondary" onClick={() => console.log('do something')} size="small" disabled={roundIndex !== 0} background='secondary'>
+                                    <GButton color="secondary" onClick={() =>claimSingleRound(round)} size="small" disabled={roundIndex !== 0} background='secondary'>
                                       Claim
                                     </GButton>
                                 </TableCell>
@@ -454,9 +454,9 @@ const Lottery = () => {
                             </Typography>
                         </>
                         }
-                        <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
+                        {/* <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
                           Claim All
-                        </GButton>
+                        </GButton> */}
                       </Stack>
                     </>
                   : <Stack justifyContent="center" alignItems="center">
