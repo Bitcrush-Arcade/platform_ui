@@ -396,7 +396,7 @@ const PoolCard = (props: PoolProps) => {
       <Formik
         initialValues = {{
           stakeAmount: 0,
-          actionType: items.totalPool !== 0
+          actionType: disabled || items.totalPool !== 0
         }}
         onSubmit={ ( values, { setSubmitting } ) => {
           const { stakeAmount, actionType } = values
@@ -467,7 +467,7 @@ const PoolCard = (props: PoolProps) => {
         return(<Form>
           <Grid container className={ css.stakeActionBtnContainer }>
             <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0}>
+              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0 || disabled}>
                 STAKE
               </MButton>
             </Grid>
