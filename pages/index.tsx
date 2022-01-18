@@ -413,7 +413,8 @@ const partners: PartnerData[] = [
     href: 'https://app.knightswap.financial/farms',
     width: 272,
     height: 272,
-    logo: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
+    logo: '/assets/thirdPartyLogos/partners/knightswap-dark.png',
+    logoDark: '/assets/thirdPartyLogos/partners/knightswap-logo.png',
     factor: 4
   },
   {
