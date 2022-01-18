@@ -18,6 +18,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 // Icons
 import CloseIcon from '@mui/icons-material/Close'
@@ -185,6 +186,7 @@ const Lottery = () => {
       claimed,
       ticketRound: roundNumber,
     })
+    setShowWinCard(false)
     if(instaClaim){
       lotteryMethods.claimNumber(roundNumber,ticketNumber).send({from: account})
       .on('transactionHash', (tx: string) => {
@@ -239,6 +241,25 @@ const Lottery = () => {
       })
 
   },[lotteryMethods, account, editTransactions, winData])
+
+  const claimSingleRound = useCallback( (roundData:{tickets: Array<{ticketNumber: BigNumber, round: BigNumber, id: string, matches: number}>, roundInfo: RoundInfo & {winnerHolders: Array<BigNumber>}, distribution: Array<BigNumber>, roundId: string}) => {
+    const winnerTickets = roundData.tickets.filter( ticket => ticket.matches > 0 )
+    const thisRound = { roundId: roundData.roundId, nonWinners: roundData.tickets.length - winnerTickets.length, winners: winnerTickets.length}
+    lotteryMethods.claimAllPendingTickets([thisRound], winnerTickets.map( ticket => ticket.id), winnerTickets.map( ticket => ticket.matches)).send({from: account})
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx )
+        editTransactions(tx,'pending', { description: `Claim Round ${roundData.roundId}`})
+      })
+      .on('receipt', ( rc: Receipt ) => {
+        console.log('receipt',rc)
+        editTransactions(rc.transactionHash,'complete')
+        getWinData()
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+      })
+  },[getRoundInfo,lotteryMethods,setSelectedRoundInfo,setSelectedTicket, account, editTransactions])
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {
@@ -303,7 +324,7 @@ const Lottery = () => {
       </Grid>
       <Grid item xs={12} lg={5}>
         <Stack direction={{xs: 'column', md:"row"}} justifyContent="space-between" alignItems="center">
-          <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => setShowWinCard(p => !p)} disabled={currentRound <= 1}>
+          <GButton color="secondary" width={"300px"} background='secondary' onClick={ () => {setShowWinCard(p => !p); setSelectedTicket(null)}} disabled={currentRound <= 1}>
             Check Winnings
           </GButton>
         {partnerToken?.name && <Box
@@ -372,10 +393,11 @@ const Lottery = () => {
                       <Table size="small">
                         <TableHead>
                           <TableRow> 
-                            <TableCell align="center">ROUND #</TableCell>
-                            <TableCell align="center" sx={{ display: { xs:'none', md: 'table-cell'}}}>DATE</TableCell>
-                            <TableCell align="center"># OF TICKETS</TableCell>
-                            <TableCell align="center">WINNER TICKET</TableCell>
+                            <TableCell align="center">ROUND</TableCell>
+                            {/* <TableCell align="center" sx={{ display: { xs:'none', md: 'table-cell'}}}>DATE</TableCell> */}
+                            <TableCell align="center">Total Tickets</TableCell>
+                            <TableCell align="center">WINNER TICKETS</TableCell>
+                            <TableCell align="center">Claim</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -385,15 +407,22 @@ const Lottery = () => {
                               <TableCell align='center'>
                                 {round.roundId}
                               </TableCell>
-                              <TableCell align='center' sx={{ display: { xs:'none', md: 'table-cell'}}}>
+                              {/* <TableCell align='center' sx={{ display: { xs:'none', md: 'table-cell'}}}>
                                 {format(new Date(new BigNumber(round.roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
-                              </TableCell>
+                              </TableCell> */}
                               <TableCell align='center'>
                                 {round.roundInfo.totalTickets}
                               </TableCell>
                               <TableCell align='center'>
                                 {winnerTickets.length}
                               </TableCell>
+                              <Tooltip title="Claim previous rounds first" open={roundIndex == 0 ? false : undefined}>
+                                <TableCell align='center'>
+                                    <GButton color="secondary" onClick={() =>claimSingleRound(round)} size="small" disabled={roundIndex !== 0} background='secondary'>
+                                      Claim
+                                    </GButton>
+                                </TableCell>
+                              </Tooltip>
                             </TableRow>
                           }) }
                         </TableBody>  
@@ -425,9 +454,9 @@ const Lottery = () => {
                             </Typography>
                         </>
                         }
-                        <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
+                        {/* <GButton color='secondary' width={'150px'} onClick={claimAllTickets}>
                           Claim All
-                        </GButton>
+                        </GButton> */}
                       </Stack>
                     </>
                   : <Stack justifyContent="center" alignItems="center">
