@@ -10,6 +10,7 @@ import makeStyles from '@mui/styles/makeStyles';
 import createStyles from '@mui/styles/createStyles';
 import Avatar from "@mui/material/Avatar"
 import MButton from "@mui/material/Button"
+import Box from '@mui/material/Box'
 import ButtonBase from "@mui/material/ButtonBase"
 import CardHeader from "@mui/material/CardHeader"
 import CardContent from "@mui/material/CardContent"
@@ -45,7 +46,7 @@ import { toWei } from 'web3-utils'
 import { Receipt } from 'types/PromiEvent'
 
 const PoolCard = (props: PoolProps) => {
-  const { abi, tokenAddress, contractAddress, tokenAbi, infoText } = props
+  const { abi, tokenAddress, contractAddress, tokenAbi, infoText,disabled } = props
   // Web3
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
@@ -80,7 +81,7 @@ const PoolCard = (props: PoolProps) => {
   const isApproved = useMemo( () => items.approved > 0 , [items])
 
   useEffect(() => {
-    if(!hydrateAPY) return
+    if(!hydrateAPY || disabled) return
     fetch('/api/getAPY',{
       method: 'POST',
       body: JSON.stringify({
@@ -208,7 +209,7 @@ const PoolCard = (props: PoolProps) => {
 
   const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
   const maxStaked = new BigNumber(userStaked).div( new BigNumber(10).pow(18) )
-  const css = useStyles({})
+  const css = useStyles(props)
 
   const shownInfo = useCallback( ( amount: number, decimals?: number ) => {
     if(!account)
@@ -257,11 +258,11 @@ const PoolCard = (props: PoolProps) => {
               {currencyFormat(maxStaked.toFixed(18) || 0)}
             </Typography>
           </Grid>
-          <Grid item>
+          {!disabled && <Grid item>
             <Typography color="textSecondary" variant="body2" >
               Your stake&nbsp;{currencyFormat(stakedPercent || 0, { decimalsToShow: 6 }) }%
             </Typography>
-          </Grid>
+          </Grid>}
           <Grid item xs={12}/>
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
@@ -269,25 +270,36 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
           </Grid>
           <Grid item>
-            <ButtonBase onClick={toggleRoi}>
-              <Grid container alignItems="center">
-                <Grid item style={{paddingRight: 8}}>
-                  { apyData?.d365?.percent 
-                    ? <Typography color="primary" variant="body2" className={ css.percent }>
-                        {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
-                      </Typography>
-                    : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
-                  }
+          {
+             disabled ? 
+             <>
+              <Typography color="primary" variant="body2" className={ css.percent }>
+                {currencyFormat(0, { decimalsToShow: 2 })}%
+              </Typography>
+             </>
+             :
+             <>
+              <ButtonBase onClick={toggleRoi}>
+                <Grid container alignItems="center">
+                  <Grid item style={{paddingRight: 8}}>
+                    { apyData?.d365?.percent 
+                      ? <Typography color="primary" variant="body2" className={ css.percent }>
+                          {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
+                        </Typography>
+                      : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
+                    }
+                  </Grid>
+                  <Grid item style={{paddingRight: 4}}>
+                    <CalculationIcon className={ css.aprAction }/>
+                  </Grid>
                 </Grid>
-                <Grid item style={{paddingRight: 4}}>
-                  <CalculationIcon className={ css.aprAction }/>
-                </Grid>
-              </Grid>
-            </ButtonBase>
-            <IconButton size="small" color="primary" onClick={triggerAPYHydrate} disabled={!contractAddress}>
-              { hydrateAPY ? <CircularProgress size="inherit"/>
-                : <RefreshIcon fontSize="inherit"/>}
-            </IconButton>
+              </ButtonBase>
+              <IconButton size="small" color="primary" onClick={triggerAPYHydrate} disabled={!contractAddress}>
+                { hydrateAPY ? <CircularProgress size="inherit"/>
+                  : <RefreshIcon fontSize="inherit"/>}
+              </IconButton>
+            </> 
+          }
           </Grid>
         </Grid>
         <Grid container justifyContent="space-between" alignItems="flex-end" className={ css.earnings }>
@@ -302,17 +314,19 @@ const PoolCard = (props: PoolProps) => {
               $&nbsp;{shownInfo(pendingRewards * tokenInfo.crushUsdPrice, 2)} USD
             </Typography>
           </Grid>
-          <Grid item>
+          {!disabled && <Grid item>
             {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest} disabled={ pendingRewards == 0 } solidDisabledText>
               Harvest
             </Button>}
-          </Grid>
+          </Grid>}
         </Grid>
         <Button width="100%" color="primary" onClick={cardPreStake} solidDisabledText
           disabled={ !contractAddress }
         >
           { account 
-              ? isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"
+              ? (disabled 
+                ? "Withdraw"
+                : (isApproved ? `STAKE ${coinInfo.symbol}` : "Enable") )
               : "Unlock Wallet"}
         </Button>
       </CardContent>
@@ -322,7 +336,7 @@ const PoolCard = (props: PoolProps) => {
             <Divider style={{marginBottom: 24}}/>
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 4}} onClick={manualCompound} hasIcon disabled={!contractAddress}>
+            <SmallButton size="small" color="primary" style={{marginRight: 4}} onClick={manualCompound} hasIcon disabled={!contractAddress || disabled}>
               <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 4}}/>Manual
             </SmallButton>
             <Tooltip arrow
@@ -357,6 +371,19 @@ const PoolCard = (props: PoolProps) => {
           </Grid> */}
         </Grid>
       </CardActions>
+      { disabled && <Box sx={theme => ({
+        backgroundColor: theme.palette.grey[800],
+        position: 'absolute',
+        top: 20,
+        left: -60,
+        py: 1,
+        transform: 'rotate(-45deg)',
+        width: '200px'
+      })}>
+        <Typography color="primary" fontWeight="bolder" align="center">
+          Expired
+        </Typography>
+      </Box>}
     </Card>
     {/* 
         STAKING FORM
@@ -524,20 +551,22 @@ type PoolProps = {
   contractAddress: string, // address
   tokenAddress : string //address
   tokenAbi?: any,
-  infoText?: string
+  infoText?: string,
+  disabled?: boolean,
 }
 
-const useStyles = makeStyles<Theme>( theme => createStyles({
+const useStyles = makeStyles<Theme, PoolProps>( theme => createStyles({
   card:{
     maxWidth: 385,
     width: '100%',
     padding: theme.spacing(2),
     paddingTop: theme.spacing(1),
+    position:'relative'
   },
   avatar:{
     width: theme.spacing(6),
     height: theme.spacing(6),
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: props => props.disabled ? theme.palette.grey[600] : theme.palette.primary.main
   },
   avatarIcon:{
     fontSize: 30,
