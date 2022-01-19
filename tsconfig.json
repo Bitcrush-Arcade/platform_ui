@@ -28,6 +28,9 @@
       "abi": [
         "/abi"
       ],
+      "queries": [
+        "/queries"
+      ],
       "styles": [
         "/styles"
       ]
