@@ -12,6 +12,7 @@ import AppBar from '@mui/material/AppBar'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
+import Skeleton from '@mui/material/Skeleton'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 // BitCrush
@@ -29,6 +30,9 @@ import usePrevLiveWallet from 'hooks/usePrevLw'
 import { getContracts } from 'data/contracts'
 import { liveWallets } from 'data/liveWallets'
 import { pink } from '@mui/material/colors';
+import { usePreviewSubscription } from 'utils/sanityConfig'
+// Queries
+import { liveWalletsQuery as walletsQuery } from 'queries/livewallets'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -56,6 +60,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     // {name:'View on BSC', onClick: ()=>console.log('action 3')},
     // {name:'History', onClick: ()=>console.log('action 4')},
   ]
+
+  const { data: availableWallets, loading: loadingWallets } = usePreviewSubscription( walletsQuery )
+  console.log({availableWallets})
 
   const crushActions = [
     { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
@@ -102,7 +109,10 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 color="secondary"
                 actions={lwActions}
                 token={ walletSelected }
-                label={ isPlaying 
+                label={ loadingWallets && <>
+                <Skeleton/>
+                </> 
+                  || isPlaying 
                   ? 
                     <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
                       Game Mode{'\n'}
