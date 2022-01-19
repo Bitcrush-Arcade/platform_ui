@@ -11,16 +11,24 @@ export default async function getPrice(req : NextApiRequest, res: NextApiRespons
   const web3 = new Web3( new Web3.providers.HttpProvider('https://bsc-dataseed1.defibit.io/') )
 
   // POOL ADDRESS
-  const crushBnb = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x8A10489f1255fb63217Be4cc96B8F4CD4D42a469')
-  const bnbBusd = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16')
+  let crushBnb;
+  let bnbBusd;
+  try{
+    crushBnb = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x8A10489f1255fb63217Be4cc96B8F4CD4D42a469')
+    bnbBusd = await new web3.eth.Contract(APE_ABI as AbiItem[], '0x58F876857a02D6762E0101bb5C46A8c1ED44Dc16')
+  }
+  catch{
+    console.log( "error creating contracts")
+    return res.status(400).json({ message: "something went wrong"})
+  }
 
-  const totalCrush = await crushBnb.methods.getReserves().call()
-  const totalBusd = await bnbBusd.methods.getReserves().call()
+  const totalCrush = await crushBnb?.methods.getReserves().call().catch( e => {console.log( 'crushBnb Error', e); return undefined})
+  const totalBusd = await bnbBusd?.methods.getReserves().call().catch( e => {console.log( 'bnbBusd Error', e); return undefined})
   
-  const crush1 = new BigNumber( totalCrush._reserve0 ).div( new BigNumber(10).pow(18) ) //CRUSH RESERVE AMOUNT
-  const bnb1 = new BigNumber( totalCrush._reserve1 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
-  const bnb2 = new BigNumber( totalBusd._reserve0 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
-  const busd2 = new BigNumber( totalBusd._reserve1 ).div( new BigNumber(10).pow(18) ) //BUSD RESERVE AMOUNT
+  const crush1 = new BigNumber( totalCrush?._reserve0 || 0 ).div( new BigNumber(10).pow(18) ) //CRUSH RESERVE AMOUNT
+  const bnb1 = new BigNumber( totalCrush?._reserve1 || 0 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
+  const bnb2 = new BigNumber( totalBusd?._reserve0 || 0 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
+  const busd2 = new BigNumber( totalBusd?._reserve1 || 0 ).div( new BigNumber(10).pow(18) ) //BUSD RESERVE AMOUNT
 
   // GET BNB USD price
   const crushUsdPrice = bnb1.times(busd2).div( bnb2.times(crush1) )
