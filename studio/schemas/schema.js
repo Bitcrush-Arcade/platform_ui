@@ -5,8 +5,10 @@ import createSchema from 'part:@sanity/base/schema-creator'
 import schemaTypes from 'all:part:@sanity/base/schema-type'
 // DOCUMENTS
 import liveWallet from './liveWallet'
+import bep20 from './BEP20'
 // OBJECTS
 import seoImage from './objects/seoImage'
+import contract from './objects/contract'
 // Then we give our schema to the builder and provide the result to Sanity
 export default createSchema({
   // We name our schema
@@ -15,8 +17,10 @@ export default createSchema({
   // to the ones provided by any plugins that are installed
   types: schemaTypes.concat([
     // DOCUMENTS
+    bep20,
     liveWallet,
     // OBJECTS
     seoImage,
+    contract
   ]),
 })

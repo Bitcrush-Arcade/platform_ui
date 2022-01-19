@@ -11,13 +11,14 @@ const liveWallet = {
     {
       title: "Token",
       name: "tokenName",
-      type: "string",
+      type: "reference",
+      to: [{type: "token"}],
       validation: Rule => Rule.required(),
     },
     {
-      title: "Contract Address",
-      name: "contract",
-      type: "string",
+      title: "Contract Info",
+      name: "walletContract",
+      type: "contract"
     },
     {
       title: "Status",
