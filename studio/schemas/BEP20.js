@@ -37,8 +37,14 @@ const token = {
       name: "tokenContract",
       type: "contract"
     },
-
-  ]
+  ],
+  preview: {
+    select:{
+      title: 'symbol',
+      subtitle: 'name',
+      media: 'tokenIcon'
+    },
+  }
 }
 
 export default token

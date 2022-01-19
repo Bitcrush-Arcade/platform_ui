@@ -25,7 +25,21 @@ const liveWallet = {
       name: "status",
       type: "boolean"
     }
-  ]
+  ],
+  preview:{
+    select:{
+      title: 'tokenName.symbol',
+      subtitle: 'status',
+      media: 'tokenName.tokenIcon'
+    },
+    prepare({ title, subtitle, media }){
+      return{
+        title,
+        subtitle: subtitle ? 'On' : "Off",
+        media,
+      }
+    }
+  }
 }
 
 export default liveWallet
