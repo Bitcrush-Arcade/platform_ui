@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Bitcrush UI. Stay tuned for more information coming soon",
   "main": "package.json",
-  "author": "José Miguel Fernández Ramírez <josmfernandez@gmail.com>",
+  "author": "Bitcrush Dev Team",
   "license": "UNLICENSED",
   "scripts": {
     "start": "sanity start",

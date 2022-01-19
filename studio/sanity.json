@@ -1,11 +1,12 @@
 {
   "root": true,
-  "project": {
-    "name": "invaderCMS"
-  },
   "api": {
     "projectId": "yirb57h5",
     "dataset": "production"
+  },
+  "project": {
+    "name": "invaderCMS",
+    "basePath": "/studio"
   },
   "plugins": [
     "@sanity/base",
