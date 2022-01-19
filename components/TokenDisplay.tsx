@@ -52,7 +52,7 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
           token?.icon &&
           <Grid item style={{ paddingRight: 8 }}>
             <Avatar className={ css.avatarIcon }>
-              {token.icon}                                                      
+              {token.icon}
             </Avatar>
           </Grid>
         }
