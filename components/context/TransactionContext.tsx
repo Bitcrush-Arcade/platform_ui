@@ -16,6 +16,7 @@ import { useContract } from 'hooks/web3Hooks'
 import { TransactionHash } from 'types/TransactionTypes'
 import { Receipt } from 'types/PromiEvent';
 import BigNumber from 'bignumber.js'
+import type Web3 from 'web3'
 
 type TransactionSubmitData = { 
   description?: string,
@@ -35,6 +36,7 @@ type ContextType = {
   hydrateToken: (reset?:boolean) => Promise<void>,
   toggleLwModal: () => void,
   lwModalStatus: boolean,
+  web3: Web3 | null
 }
 
 export const TransactionContext = createContext<ContextType>({
@@ -48,6 +50,7 @@ export const TransactionContext = createContext<ContextType>({
   liveWallet: { balance: new BigNumber(0), timelock: 0, selfBlacklist: () => {} },
   toggleLwModal: () => {},
   lwModalStatus: false,
+  web3: null
 })
 
 export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCache: EmotionCache })=>{
@@ -248,7 +251,8 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
       hydrateToken: tokenHydration,
       liveWallet: { ...liveWalletBalance, selfBlacklist },
       toggleLwModal,
-      lwModalStatus: lwModal
+      lwModalStatus: lwModal,
+      web3
     }}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={basicTheme}>

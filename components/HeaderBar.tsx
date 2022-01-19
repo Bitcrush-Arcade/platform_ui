@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
+import { useImmer } from 'use-immer'
+import { AbiItem } from 'web3-utils'
 // Material
 import { Theme, useTheme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -25,14 +27,18 @@ import Coin from 'components/tokens/Token2'
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
 import { useTransactionContext } from 'hooks/contextHooks'
-import usePrevLiveWallet from 'hooks/usePrevLw'
 // libs
 import { getContracts } from 'data/contracts'
 import { liveWallets } from 'data/liveWallets'
 import { pink } from '@mui/material/colors';
-import { usePreviewSubscription } from 'utils/sanityConfig'
+import { usePreviewSubscription, client } from 'utils/sanityConfig'
 // Queries
 import { liveWalletsQuery as walletsQuery } from 'queries/livewallets'
+import LiveWalletSelectModal from './displays/LiveWalletSelectModal'
+import BigNumber from 'bignumber.js'
+// ABI
+import LiveWallet from 'abi/BitcrushLiveWallet.json'
+import Token from 'abi/CrushToken.json'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -44,25 +50,69 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { pathname } = useRouter()
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
-
+  const [ allWallets, setAllWallets ] = useImmer<Array<{status: boolean, walletIcon: any, walletContract: any, tokenName: any, symbolToken:string, balance?: string, walletBalance?: string}>>([])
   const [ walletSelected, setWalletSelected ] = useState(liveWallets.crush)
+  const [ lwSelectModal, setLwSelectModal ] = useState<boolean>(false)
+
+  const { tokenInfo, liveWallet, toggleLwModal, web3 } = useTransactionContext()
+
+
+  const getWalletBalances = useCallback( async () => {
+    if(!web3 || !account) return
+    const balances: Array<{lwBalance: string, currentWallet: string}> = []
+    for( let i = 0; i < allWallets.length; i++){
+      const usedAddress = allWallets[i].walletContract && (chainId === allWallets[i].walletContract.mainChain &&  allWallets[i].walletContract.mainAddress || chainId === allWallets[i].walletContract.testChain && allWallets[i].walletContract.testAddress) || null
+      const usedTokenAddress = chainId === allWallets[i].tokenName.tokenContract.mainChain &&  allWallets[i].tokenName.tokenContract.mainAddress || chainId === allWallets[i].tokenName.tokenContract.testChain && allWallets[i].tokenName.tokenContract.testAddress || null
+      const item = { lwBalance:'0', currentWallet:'0' }
+      if(usedAddress){
+        const walletContract = await new web3.eth.Contract(LiveWallet.abi as AbiItem[], usedAddress)
+        item.lwBalance = new BigNumber(await walletContract.methods.balanceOf(account).call()).div(10**18).toString()
+      }
+      else{
+        item.lwBalance = 'N/A'
+      }
+      if(usedTokenAddress){
+        const tokenContract = await new web3.eth.Contract(Token.abi as AbiItem[], usedTokenAddress)
+        item.currentWallet = new BigNumber(await tokenContract.methods.balanceOf(account).call()).div(10**18).toString()
+      }
+      else
+        item.currentWallet = '0'
+      balances.push(item)
+    }
+    setAllWallets( draft => {
+      for(let j = 0; j < draft.length; j++){
+        draft[j].balance = balances[j].lwBalance
+        draft[j].walletBalance = balances[j].currentWallet
+      }
+    })
+  },[allWallets, setAllWallets, web3, chainId, account])
+
+  useEffect( () => {
+    if(!allWallets.length) return
+
+    getWalletBalances()
+  },[getWalletBalances, allWallets])
+
+  const toggleSelectModal = useCallback( () => setLwSelectModal(p => !p),[setLwSelectModal])
 
   const isGame = pathname.indexOf('/games') > -1
   const isPlaying = pathname === '/games/[gameKey]'
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
-  const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
-
   const lwActions = [
     {name:'Add/Remove', onClick: toggleLwModal },
-    {name:'Withdraw v1', onClick: withdrawAll, highlight: hasFunds},
-    // {name:'View on BSC', onClick: ()=>console.log('action 3')},
-    // {name:'History', onClick: ()=>console.log('action 4')},
+    {name:'Change Wallet', onClick: toggleSelectModal },
   ]
 
-  const { data: availableWallets, loading: loadingWallets } = usePreviewSubscription( walletsQuery )
-  console.log({availableWallets})
+  const getAllWallets = useCallback( async() => {
+    const data = await client.fetch(walletsQuery)
+    setAllWallets(data)
+  },[client, walletsQuery, setAllWallets])
+
+  useEffect( () => {
+    getAllWallets()
+  },[getAllWallets])
+
 
   const crushActions = [
     { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
@@ -72,78 +122,78 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     { name: 'BABY Farm', onClick: ()=> window.open(`https://home.babyswap.finance/farms`, '_blank')},
   ]
 
-  return <AppBar className={css.appBar} variant="outlined" elevation={0} position={ isSm ? "sticky" : "absolute"}>
-    <Toolbar>
-      <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
-        {/* LEFT SIDE OF HEADER */}
-        <Grid item>
-          <Grid container alignItems="center">
-            <Grid item>
-              <Button onClick={toggleOpen} className={css.menuOpen}>
-                {svgGradient}{svgGradient2}
-                <MenuIcon fontSize={isSm ? "medium" : "large"} className={ css.gradient } />
-              </Button>
-            </Grid>
-            <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
-            <Grid item>
-              <Link href="/" passHref>
-                <a>
-                  { isGame 
-                    ? <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" alt="Bitcrush Arcade Logo" />
-                    : <Image src={'/bitcrush_logo.png'} width={3895/imgReducer} height={656/imgReducer} title="Bitcrush logo" alt="Bitcrush Logo" />
-                  }
-                </a>
-              </Link>
+  return <>
+    <AppBar className={css.appBar} variant="outlined" elevation={0} position={ isSm ? "sticky" : "absolute"}>
+      <Toolbar>
+        <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
+          {/* LEFT SIDE OF HEADER */}
+          <Grid item>
+            <Grid container alignItems="center">
+              <Grid item>
+                <Button onClick={toggleOpen} className={css.menuOpen}>
+                  {svgGradient}{svgGradient2}
+                  <MenuIcon fontSize={isSm ? "medium" : "large"} className={ css.gradient } />
+                </Button>
+              </Grid>
+              <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
+              <Grid item>
+                <Link href="/" passHref>
+                  <a>
+                    { isGame 
+                      ? <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" alt="Bitcrush Arcade Logo" />
+                      : <Image src={'/bitcrush_logo.png'} width={3895/imgReducer} height={656/imgReducer} title="Bitcrush logo" alt="Bitcrush Logo" />
+                    }
+                  </a>
+                </Link>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-        {/* RIGHT SIDE OF HEADER */}
-        <Grid item>
-          <Grid container alignItems="center">
-            {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            <Grid item className={ css.dropOnSm }> 
-              {/* LIVE WALLET */}
-              <TokenDisplay 
-                amount={liveWallet.balance}
-                icon={<Coin scale={0.25} token="LIVE" />}
-                color="secondary"
-                actions={lwActions}
-                token={ walletSelected }
-                label={ loadingWallets && <>
-                <Skeleton/>
-                </> 
-                  || isPlaying 
-                  ? 
-                    <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
-                      Game Mode{'\n'}
-                      <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
-                        CRUSH IT!
+          {/* RIGHT SIDE OF HEADER */}
+          <Grid item>
+            <Grid container alignItems="center">
+              {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
+              <Grid item className={ css.dropOnSm }> 
+                {/* LIVE WALLET */}
+                <TokenDisplay 
+                  amount={liveWallet.balance}
+                  icon={<Coin scale={0.25} token="LIVE" />}
+                  color="secondary"
+                  actions={lwActions}
+                  token={ walletSelected }
+                  label={ isPlaying 
+                    ? 
+                      <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
+                        Game Mode{'\n'}
+                        <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
+                          CRUSH IT!
+                        </Typography>
                       </Typography>
-                    </Typography>
-                  : undefined
-                }
-              />
-            </Grid>
-            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              {/* CRUSH on Wallet */}
-              <TokenDisplay
-                amount={tokenInfo.weiBalance}
-                icon={<Coin scale={0.25}/>}
-                color="primary"
-                actions={crushActions}
-              />
-            </Grid>
-            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              <ConnectButton/>
-            </Grid>
-            <Grid item>
-              <ProfileAvatar playing={isPlaying}/>
+                    : undefined
+                  }
+                />
+              </Grid>
+              <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
+                {/* CRUSH on Wallet */}
+                <TokenDisplay
+                  amount={tokenInfo.weiBalance}
+                  icon={<Coin scale={0.25}/>}
+                  color="primary"
+                  actions={crushActions}
+                />
+              </Grid>
+              <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
+                <ConnectButton/>
+              </Grid>
+              <Grid item>
+                <ProfileAvatar playing={isPlaying}/>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Toolbar>
-  </AppBar>
+      </Toolbar>
+    </AppBar>
+    <LiveWalletSelectModal open={lwSelectModal} onClose={toggleSelectModal} wallets={allWallets}/>
+  </>
 }
 
 export default HeaderBar
