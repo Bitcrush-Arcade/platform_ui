@@ -22,8 +22,8 @@ export default async function getPrice(req : NextApiRequest, res: NextApiRespons
     return res.status(400).json({ message: "something went wrong"})
   }
 
-  const totalCrush = await crushBnb?.methods.getReserves().call().catch( e => {console.log( 'crushBnb Error', e); return undefined})
-  const totalBusd = await bnbBusd?.methods.getReserves().call().catch( e => {console.log( 'bnbBusd Error', e); return undefined})
+  const totalCrush = await crushBnb?.methods.getReserves().call().catch( (e:any) => {console.log( 'crushBnb Error', e); return undefined})
+  const totalBusd = await bnbBusd?.methods.getReserves().call().catch( (e:any) => {console.log( 'bnbBusd Error', e); return undefined})
   
   const crush1 = new BigNumber( totalCrush?._reserve0 || 0 ).div( new BigNumber(10).pow(18) ) //CRUSH RESERVE AMOUNT
   const bnb1 = new BigNumber( totalCrush?._reserve1 || 0 ).div( new BigNumber(10).pow(18) ) //WBNB RESERVE AMOUNT
