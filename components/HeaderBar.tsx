@@ -5,6 +5,7 @@ import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { useImmer } from 'use-immer'
 import { AbiItem } from 'web3-utils'
+import find from 'lodash/find'
 // Material
 import { Theme, useTheme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -39,6 +40,8 @@ import BigNumber from 'bignumber.js'
 // ABI
 import LiveWallet from 'abi/BitcrushLiveWallet.json'
 import Token from 'abi/CrushToken.json'
+// Types
+import { Wallet } from 'types/liveWallets'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -50,12 +53,16 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { pathname } = useRouter()
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
-  const [ allWallets, setAllWallets ] = useImmer<Array<{status: boolean, walletIcon: any, walletContract: any, tokenName: any, symbolToken:string, balance?: string, walletBalance?: string}>>([])
-  const [ walletSelected, setWalletSelected ] = useState(liveWallets.crush)
+  const [ allWallets, setAllWallets ] = useImmer<Array<Wallet>>([])
+  const [ walletTokenSelected, setWalletTokenSelected ] = useState<string>('CRUSH')
   const [ lwSelectModal, setLwSelectModal ] = useState<boolean>(false)
 
   const { tokenInfo, liveWallet, toggleLwModal, web3 } = useTransactionContext()
 
+  const walletSelected = useMemo( () => {
+    if(!allWallets.length) return null
+    return find(allWallets, o => o.symbolToken == walletTokenSelected )
+  },[allWallets,walletTokenSelected])
 
   const getWalletBalances = useCallback( async () => {
     if(!web3 || !account) return
@@ -85,6 +92,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         draft[j].walletBalance = balances[j].currentWallet
       }
     })
+
   },[allWallets, setAllWallets, web3, chainId, account])
 
   useEffect( () => {
@@ -159,7 +167,6 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                   icon={<Coin scale={0.25} token="LIVE" />}
                   color="secondary"
                   actions={lwActions}
-                  token={ walletSelected }
                   label={ isPlaying 
                     ? 
                       <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
@@ -185,7 +192,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 <ConnectButton/>
               </Grid>
               <Grid item>
-                <ProfileAvatar playing={isPlaying}/>
+                <ProfileAvatar playing={isPlaying} currentLiveWallet={walletSelected} changeLiveWallet={toggleSelectModal}/>
               </Grid>
             </Grid>
           </Grid>
