@@ -5,6 +5,7 @@ import { useWeb3React } from '@web3-react/core'
 import BigNumber from 'bignumber.js'
 //Material
 import Button from '@mui/material/Button'
+import CircularProgress from '@mui/material/CircularProgress'
 import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton'
 import Stack from '@mui/material/Stack'
@@ -24,20 +25,12 @@ import { useContract } from 'hooks/web3Hooks';
 import { useTransactionContext } from 'hooks/contextHooks'
 // data
 import { getContracts } from 'data/contracts'
+import { partnerTokens } from 'data/partnerTokens'
 // types
 import { RoundInfo } from 'types/lottery'
 
 {/* History table props */}
 type HistoryViewProps = {
-  rounds: Array<{
-    id: number,
-    date: Date,
-    totalTickets: number,
-    userTickets: number,
-    tokenAmount: number,
-    token: string,
-  }>,
-  totalRounds: number,
   currentPageView: number,
   onPagination: (newPage: number) => void,
   onLastRoundView: (isCurrent?: boolean) => void,
@@ -47,7 +40,7 @@ type HistoryViewProps = {
 
 {/* History table props and formatting */}
 const History = (props: HistoryViewProps) => {
-  const { rounds, totalRounds, currentPageView, onPagination, rowsPerPage, isInView, onLastRoundView } = props
+  const { currentPageView, onPagination, rowsPerPage, isInView, onLastRoundView } = props
 
   // BLOCKCHAIN
   const { account, chainId } = useWeb3React()
@@ -58,6 +51,7 @@ const History = (props: HistoryViewProps) => {
   // STATE
   const [ currentRound, setCurrentRound ] = useState<string>('0')
   const [ history, setHistory ] = useImmer<Array< RoundInfo&{id: string} | null >>(new Array(4).fill(null))
+  const [ loadingHistory, setLoadingHistory ] = useState<boolean>(false)
   const [ selectedRound, setSelectedRound ] = useState<number | null>(null)
 
   const getRoundData = useCallback( async (roundId: string) => {
@@ -66,8 +60,9 @@ const History = (props: HistoryViewProps) => {
     const roundBonus = await lotteryMethods.bonusCoins(roundId).call()
     const userTickets = !account ? [] : await lotteryMethods.getRoundTickets(roundId).call({from: account})
     setHistory( draft => {
-      const roundToChange = new BigNumber(roundId).mod(rowsPerPage).toNumber()
-      draft[roundToChange -1] = {
+      const modRound = new BigNumber(roundId).mod(rowsPerPage).toNumber()
+      const roundToChange = modRound > 0 ? modRound - 1 : 3
+      draft[roundToChange] = {
         ...roundInfo,
         bonusInfo: roundBonus,
         userTickets,
@@ -78,19 +73,25 @@ const History = (props: HistoryViewProps) => {
 
   const getCurrentRound = useCallback(async () => {
     if(!lotteryMethods) return
-    console.log('this gets called')
     const currentRound = new BigNumber(await lotteryMethods.currentRound().call())
     setCurrentRound(currentRound.toString())
-    const roundFetchStart = currentRound.minus(3).isGreaterThan(0) ? currentRound.minus(3) : new BigNumber(0)
+    const roundFetchStart = currentRound.minus(3).isGreaterThan(0) 
+      ? ( 
+          currentRound.mod(rowsPerPage).isEqualTo(0)
+            ? currentRound.minus( rowsPerPage )
+            : currentRound.minus( currentRound.mod(rowsPerPage) )
+        )
+      : new BigNumber(0)
+
     for(let initRound = roundFetchStart; currentRound.isGreaterThanOrEqualTo(initRound) ; initRound = initRound.plus(1)){
       getRoundData(initRound.toString())
     }
   },[lotteryMethods, setCurrentRound, getRoundData])
 
   const onRoundView = useCallback( (selectedRound: number) => {
-    if(history?.[selectedRound]?.id && new BigNumber(history[selectedRound]?.id || 0).isEqualTo( currentRound ))
+    if(new BigNumber(selectedRound).isEqualTo( currentRound ))
       onLastRoundView(true)
-    else if(history?.[selectedRound]?.id && new BigNumber(history[selectedRound]?.id || 0).isEqualTo( new BigNumber(currentRound).minus(1) ))
+    else if(new BigNumber(selectedRound).isEqualTo( new BigNumber(currentRound).minus(1) ))
       onLastRoundView()
     else
       setSelectedRound(selectedRound)
@@ -102,6 +103,20 @@ const History = (props: HistoryViewProps) => {
     getCurrentRound()
   },[lotteryMethods, getCurrentRound])
 
+
+  const pagination = useCallback( ( newPage: number ) => {
+    setLoadingHistory(true)
+    const promises: Array<Promise<void>> = []
+    for(let i = newPage*4 + 1; i<= (newPage+1)*4; i++)
+      promises.push( getRoundData(`${i}`))
+    Promise.all(promises)
+      .finally( () => {
+        setLoadingHistory(false)
+        onPagination(newPage)
+      })
+  },[onPagination])
+
+
   {/*History table rows data formatting*/}
   const tableRows = history.map( (roundInfo, index) => {
     if(!roundInfo)
@@ -111,31 +126,33 @@ const History = (props: HistoryViewProps) => {
         </TableCell>
       </TableRow> 
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
-      <TableCell>{roundInfo.id}</TableCell>
-      <TableCell>
+      <TableCell align='center'>{roundInfo.id}</TableCell>
+      <TableCell align='center'>
         { format(new Date( new BigNumber(roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
       </TableCell>
       <TableCell 
         align ="center">{roundInfo.totalTickets}
       </TableCell>
       <TableCell align ="center">
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" justifyContent="center" alignItems="center">
           <div>
             {(roundInfo.userTickets || []).length}
           </div>
           <div>
-            { roundInfo.userTickets && roundInfo.userTickets.length > 0 &&
-                <IconButton color="primary" onClick={() => onRoundView(index)} sx ={{ml: 0.5}}>
-                <RemoveRedEyeIcon/>
-              </IconButton>
-            }
+            <IconButton color="primary" onClick={() => onRoundView(+roundInfo.id)} sx={{ml: 0.5}}>
+              <RemoveRedEyeIcon/>
+            </IconButton>
           </div>
 
         </Stack>
       </TableCell>
       <TableCell align="center">
-        { parseInt(roundInfo.bonusInfo?.bonusToken || '0',16) || '-'}
-        {/* {roundInfo.tokenAmount}&nbsp;{roundInfo.token} */}
+        {/* { parseInt(roundInfo.bonusInfo?.bonusAmount || '0',16) || '-'} */}
+        {
+         new BigNumber(roundInfo.bonusInfo?.bonusAmount || 0).isGreaterThan(0) ? new BigNumber(roundInfo.bonusInfo?.bonusAmount || '0').div(10**18).toFixed(2) : '-'
+        }
+        &nbsp;
+        {partnerTokens[roundInfo.bonusInfo?.bonusToken.toLowerCase() || '']?.name ?? ''}
       </TableCell>
    
     </TableRow>
@@ -145,7 +162,8 @@ const History = (props: HistoryViewProps) => {
     return null
   {/*Building the table with header*/}
   if(typeof(selectedRound) == 'number'){
-    const roundToView = history[selectedRound]
+    const roundSel = selectedRound%rowsPerPage > 0 ? selectedRound%rowsPerPage : 3
+    const roundToView = history[roundSel]
     if(!roundToView)
       return null
     return <Stack>
@@ -167,19 +185,23 @@ const History = (props: HistoryViewProps) => {
   return <Table>
     <TableHead>
       <TableRow> 
-        <TableCell align="center">ID</TableCell>
-        <TableCell align="center">DATE</TableCell>
-        <TableCell align="center">TOTAL TICKETS</TableCell>
-        <TableCell align="center">USER TICKETS</TableCell>
-        <TableCell align="center">PARTNER BONUS</TableCell>
+        <TableCell align="center">Round</TableCell>
+        <TableCell align="center">Played</TableCell>
+        <TableCell align="center">Total Squads</TableCell>
+        <TableCell align="center">Your Squads</TableCell>
+        <TableCell align="center">Partner</TableCell>
       </TableRow>
     </TableHead>
     <TableBody>
       { currentRound 
         ? <>
           {tableRows}
-          <TableRow>
-            <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={parseInt(currentRound) || 1} page={currentPageView} onPageChange={(e,p) => onPagination(p)}/>
+          <TableRow sx={{ position:"relative"}}>
+            {loadingHistory && <TableCell>
+              <CircularProgress thickness={5} size={30} sx={{position:'absolute', top: 10, right: 200}}/>
+            </TableCell>
+            }
+            <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={parseInt(currentRound) || 1} page={currentPageView} onPageChange={(e,p) => pagination(p)}/>
           </TableRow>
         </>
         : <>
