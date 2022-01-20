@@ -5,6 +5,7 @@ import Dialog from '@mui/material/Dialog'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
 import Stack from '@mui/material/Stack'
+import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 // BitcrushUI
 import Card from 'components/basics/Card'
@@ -45,29 +46,32 @@ const LiveWalletSelectModal = (props: LWSelectModalProps) => {
       </Grid>
       {wallets.map( (wallet, walletIndex) => {
         return <Fragment key={`live-wallet-selector-${walletIndex}`}>
-        <Grid item xs={4}>
-          <Stack direction="row" alignItems="center" justifyContent="space-between">
-            <Avatar src={wallet.walletIcon?.asset?._ref ? imageBuilder(wallet.walletIcon?.asset?._ref).height(50).width(50).url() || undefined: undefined}>
-              NA
-            </Avatar>
-            <Typography variant="body2">
-              {wallet.symbolToken}
-            </Typography>
-          </Stack>
-        </Grid>
-        <Grid item xs={4}>
-            <Typography variant="body2" align="right">
-          {wallet.balance}
-            </Typography>
-        </Grid>
-        <Grid item xs={4}>
-            <Typography variant="body2" align="right">
-          {wallet.walletBalance}
-            </Typography>
-        </Grid>
-        <Grid item xs={12} sx={{ py: 2 }}>
-          <Divider/>
-        </Grid>
+        <Tooltip title={<Typography variant="h5">
+            {wallet.symbolToken}
+          </Typography>
+          }
+        >
+          <Grid item xs={4}>
+            <Stack direction="row" alignItems="center" justifyContent="center">
+              <Avatar src={wallet.walletIcon?.asset?._ref ? imageBuilder(wallet.walletIcon?.asset?._ref).height(50).width(50).url() || undefined: undefined}>
+                N/A
+              </Avatar>
+            </Stack>
+          </Grid>
+        </Tooltip>
+          <Grid item xs={4}>
+              <Typography variant="body2" align="right" sx={{ pr: 2 }}>
+            {wallet.balance}
+              </Typography>
+          </Grid>
+          <Grid item xs={4}>
+              <Typography variant="body2" align="right" sx={{ pr: 2}}>
+            {wallet.walletBalance}
+              </Typography>
+          </Grid>
+          <Grid item xs={12} sx={{ py: 2 }}>
+            <Divider/>
+          </Grid>
         </Fragment>
       })}
     </Grid>
