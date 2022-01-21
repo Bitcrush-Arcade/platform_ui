@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 // Material
 import Grid from '@mui/material/Grid';
@@ -31,6 +31,10 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
     const [tabSelected, setTabSelected] = useState<number>(0)
     const [selectedPage, setSelectedPage] = useState<number>(0)
     const roundsPerPage = 4
+    console.log(currentRound)
+    useEffect(()=>{
+        setSelectedPage( Math.floor(currentRound/4) - (currentRound%roundsPerPage > 0 ? 0 : 1) )
+    },[currentRound, setSelectedPage])
 
     const shownHistoryRounds = testHistoryArray.slice(selectedPage * roundsPerPage, (selectedPage + 1)*roundsPerPage)
     const selectTab = ( e:any, v: number) =>{
@@ -100,8 +104,7 @@ const LotteryHistory = (props: LotteryHistoryProps) => {
             />
         } 
         
-        <History rounds={shownHistoryRounds}
-            totalRounds={testHistoryArray.length} 
+        <History
             currentPageView={selectedPage} 
             onPagination={(p) => setSelectedPage(p)}
             rowsPerPage={roundsPerPage}
