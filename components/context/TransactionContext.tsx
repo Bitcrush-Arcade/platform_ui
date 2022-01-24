@@ -60,6 +60,7 @@ export const TransactionLoadingContext = (props:{ children: ReactNode, emotionCa
   const router = useRouter()
   const token = getContracts('crushToken', chainId)
   const liveWallet = getContracts('liveWallet', chainId)
+
   const { methods, web3 } = useContract(token.abi, token.address )
   const { methods: lwMethods } = useContract(liveWallet.abi, liveWallet.address )
 
