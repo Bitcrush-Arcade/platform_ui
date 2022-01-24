@@ -23,15 +23,12 @@ type TokenDisplayProps ={
   label?: string | React.ReactNode,
   icon: JSX.Element,
   actions?: Array< { name: string, onClick?: () => void, url?: string, highlight?: boolean } >,
-  token?: {
-    icon?:  React.ReactNode,
-    symbol?: string,
-  }
+  tokenIcon?: string
 }
 
 const TokenDisplay = ( props: TokenDisplayProps ) => {
 
-  const { amount, icon, actions, color, token, label } = props
+  const { amount, icon, actions, color, tokenIcon, label } = props
   const [ showActions, setShowActions ] = useState<boolean>(false)
 
   const css = useStyles({ showActions, ...props })
@@ -49,10 +46,10 @@ const TokenDisplay = ( props: TokenDisplayProps ) => {
     >
       <Grid container alignItems="center" aria-controls="token-menu">
         {
-          token?.icon &&
+          tokenIcon &&
           <Grid item style={{ paddingRight: 8 }}>
-            <Avatar className={ css.avatarIcon }>
-              {token.icon}
+            <Avatar src={tokenIcon} sx={{ height: 32, width: 32}}>
+              N/A
             </Avatar>
           </Grid>
         }
