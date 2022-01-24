@@ -1,10 +1,9 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo, useEffect, useState, useCallback } from 'react'
+import { useMemo, useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import { useImmer } from 'use-immer'
-import { AbiItem } from 'web3-utils'
 import find from 'lodash/find'
 // Material
 import { Theme, useTheme } from '@mui/material/styles';
@@ -15,7 +14,6 @@ import AppBar from '@mui/material/AppBar'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
 import Grid from '@mui/material/Grid'
-import Skeleton from '@mui/material/Skeleton'
 import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 // BitCrush
@@ -27,19 +25,13 @@ import Coin from 'components/tokens/Token2'
 // Hooks
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
-import { useTransactionContext } from 'hooks/contextHooks'
+import { useTransactionContext, useLiveWalletContext } from 'hooks/contextHooks'
 // libs
+import { imageBuilder } from 'utils/sanityConfig'
 import { getContracts } from 'data/contracts'
-import { liveWallets } from 'data/liveWallets'
 import { pink } from '@mui/material/colors';
-import { usePreviewSubscription, client } from 'utils/sanityConfig'
 // Queries
-import { liveWalletsQuery as walletsQuery } from 'queries/livewallets'
-import LiveWalletSelectModal from './displays/LiveWalletSelectModal'
 import BigNumber from 'bignumber.js'
-// ABI
-import LiveWallet from 'abi/BitcrushLiveWallet.json'
-import Token from 'abi/CrushToken.json'
 // Types
 import { Wallet } from 'types/liveWallets'
 
@@ -55,53 +47,14 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { address: CrushAddress } = getContracts('crushToken', chainId)
   const [ allWallets, setAllWallets ] = useImmer<Array<Wallet>>([])
   const [ walletTokenSelected, setWalletTokenSelected ] = useState<string>('CRUSH')
-  const [ lwSelectModal, setLwSelectModal ] = useState<boolean>(false)
 
   const { tokenInfo, liveWallet, toggleLwModal, web3 } = useTransactionContext()
+  const { toggleSelectModal, selectedWallet } = useLiveWalletContext()
 
   const walletSelected = useMemo( () => {
     if(!allWallets.length) return null
     return find(allWallets, o => o.symbolToken == walletTokenSelected )
   },[allWallets,walletTokenSelected])
-
-  const getWalletBalances = useCallback( async () => {
-    if(!web3 || !account) return
-    const balances: Array<{lwBalance: string, currentWallet: string}> = []
-    for( let i = 0; i < allWallets.length; i++){
-      const usedAddress = allWallets[i].walletContract && (chainId === allWallets[i].walletContract.mainChain &&  allWallets[i].walletContract.mainAddress || chainId === allWallets[i].walletContract.testChain && allWallets[i].walletContract.testAddress) || null
-      const usedTokenAddress = chainId === allWallets[i].tokenName.tokenContract.mainChain &&  allWallets[i].tokenName.tokenContract.mainAddress || chainId === allWallets[i].tokenName.tokenContract.testChain && allWallets[i].tokenName.tokenContract.testAddress || null
-      const item = { lwBalance:'0', currentWallet:'0' }
-      if(usedAddress){
-        const walletContract = await new web3.eth.Contract(LiveWallet.abi as AbiItem[], usedAddress)
-        item.lwBalance = new BigNumber(await walletContract.methods.balanceOf(account).call()).div(10**18).toString()
-      }
-      else{
-        item.lwBalance = 'N/A'
-      }
-      if(usedTokenAddress){
-        const tokenContract = await new web3.eth.Contract(Token.abi as AbiItem[], usedTokenAddress)
-        item.currentWallet = new BigNumber(await tokenContract.methods.balanceOf(account).call()).div(10**18).toString()
-      }
-      else
-        item.currentWallet = '0'
-      balances.push(item)
-    }
-    setAllWallets( draft => {
-      for(let j = 0; j < draft.length; j++){
-        draft[j].balance = balances[j].lwBalance
-        draft[j].walletBalance = balances[j].currentWallet
-      }
-    })
-
-  },[allWallets, setAllWallets, web3, chainId, account])
-
-  useEffect( () => {
-    if(!allWallets.length) return
-
-    getWalletBalances()
-  },[getWalletBalances, allWallets])
-
-  const toggleSelectModal = useCallback( () => setLwSelectModal(p => !p),[setLwSelectModal])
 
   const isGame = pathname.indexOf('/games') > -1
   const isPlaying = pathname === '/games/[gameKey]'
@@ -111,16 +64,6 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     {name:'Add/Remove', onClick: toggleLwModal },
     {name:'Change Wallet', onClick: toggleSelectModal },
   ]
-
-  const getAllWallets = useCallback( async() => {
-    const data = await client.fetch(walletsQuery)
-    setAllWallets(data)
-  },[client, walletsQuery, setAllWallets])
-
-  useEffect( () => {
-    getAllWallets()
-  },[getAllWallets])
-
 
   const crushActions = [
     { name: 'Buy CRUSH', onClick: ()=> window.open(`https://app.apeswap.finance/swap?inputCurrency=ETH&outputCurrency=${CrushAddress}`, '_blank') },
@@ -162,8 +105,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
               {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
               <Grid item className={ css.dropOnSm }> 
                 {/* LIVE WALLET */}
-                <TokenDisplay 
-                  amount={liveWallet.balance}
+                <TokenDisplay
+                  tokenIcon={ selectedWallet?.walletIcon?.asset?._ref && imageBuilder(selectedWallet?.walletIcon?.asset?._ref).height(50).width(50).url() || undefined}
+                  amount={new BigNumber(selectedWallet?.balance || '0')}
                   icon={<Coin scale={0.25} token="LIVE" />}
                   color="secondary"
                   actions={lwActions}
@@ -199,7 +143,6 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
         </Grid>
       </Toolbar>
     </AppBar>
-    <LiveWalletSelectModal open={lwSelectModal} onClose={toggleSelectModal} wallets={allWallets}/>
   </>
 }
 
