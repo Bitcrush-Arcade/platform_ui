@@ -259,7 +259,7 @@ const Lottery = () => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
       })
-  },[getRoundInfo,lotteryMethods,setSelectedRoundInfo,setSelectedTicket, account, editTransactions])
+  },[getRoundInfo,lotteryMethods,setSelectedRoundInfo,setSelectedTicket, account, editTransactions, getWinData])
 
   const selectedDigits = selectedTicket?.ticketNumber.split('')
   const matches = selectedDigits?.reduce( (acc, number, index) => {

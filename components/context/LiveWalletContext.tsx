@@ -142,7 +142,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
       getApproved(walletContract)
       return !p
     })
-  },[setOpenStake, selectedWallet, walletContract])
+  },[setOpenStake, selectedWallet, walletContract, getApproved])
 
   const timelockInPlace = new BigNumber(selectedWallet?.timelock || '0').isGreaterThan( new Date().getTime()/1000 )
 
@@ -177,7 +177,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
       disableAction: timelockInPlace && selectedWallet?.isTimelockActive || false,
       more: withdrawDetails
     },
-  ], [selectedWallet])
+  ], [selectedWallet, getWalletBalances])
 
   const stakeModalActionSelected = useCallback(async ( action: number)=> {
     if(!usedWallet) return false

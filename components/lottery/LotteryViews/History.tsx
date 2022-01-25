@@ -86,7 +86,7 @@ const History = (props: HistoryViewProps) => {
     for(let initRound = roundFetchStart; currentRound.isGreaterThanOrEqualTo(initRound) ; initRound = initRound.plus(1)){
       getRoundData(initRound.toString())
     }
-  },[lotteryMethods, setCurrentRound, getRoundData])
+  },[lotteryMethods, setCurrentRound, getRoundData, rowsPerPage])
 
   const onRoundView = useCallback( (selectedRound: number) => {
     if(new BigNumber(selectedRound).isEqualTo( currentRound ))
@@ -95,7 +95,7 @@ const History = (props: HistoryViewProps) => {
       onLastRoundView()
     else
       setSelectedRound(selectedRound)
-  },[setSelectedRound, currentRound, onLastRoundView, history])
+  },[setSelectedRound, currentRound, onLastRoundView])
 
   // EFFECTS
   useEffect( () => {
@@ -114,7 +114,7 @@ const History = (props: HistoryViewProps) => {
         setLoadingHistory(false)
         onPagination(newPage)
       })
-  },[onPagination])
+  },[onPagination, getRoundData])
 
 
   {/*History table rows data formatting*/}
