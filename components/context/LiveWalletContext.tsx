@@ -146,7 +146,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
 
   const timelockInPlace = new BigNumber(selectedWallet?.timelock || '0').isGreaterThan( new Date().getTime()/1000 )
 
-  const withdrawDetails = () => {
+  const withdrawDetails = useCallback(() => {
     return timelockInPlace ? <>
           <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
             0.5% early withdraw fee if withdrawn before { differenceFromNow( new BigNumber(selectedWallet?.timelock || '0').toNumber() ) }.
@@ -158,7 +158,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
           </Typography>
         </>
         : <></>
-  }
+  }, [timelockInPlace, selectedWallet])
 
   // LiveWallet Options
   const lwOptions: Array<StakeOptionsType> = useMemo( ()=> [
