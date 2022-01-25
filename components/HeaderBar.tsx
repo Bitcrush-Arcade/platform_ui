@@ -48,8 +48,8 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const [ allWallets, setAllWallets ] = useImmer<Array<Wallet>>([])
   const [ walletTokenSelected, setWalletTokenSelected ] = useState<string>('CRUSH')
 
-  const { tokenInfo, liveWallet, toggleLwModal, web3 } = useTransactionContext()
-  const { toggleSelectModal, selectedWallet } = useLiveWalletContext()
+  const { tokenInfo } = useTransactionContext()
+  const { toggleSelectModal, selectedWallet, toggleStakeModal } = useLiveWalletContext()
 
   const walletSelected = useMemo( () => {
     if(!allWallets.length) return null
@@ -61,7 +61,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const imgReducer = isSm ? 26 : 18
   
   const lwActions = [
-    {name:'Add/Remove', onClick: toggleLwModal },
+    {name:'Add/Remove', onClick: toggleStakeModal },
     {name:'Change Wallet', onClick: toggleSelectModal },
   ]
 
@@ -107,7 +107,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 {/* LIVE WALLET */}
                 <TokenDisplay
                   tokenIcon={ selectedWallet?.walletIcon?.asset?._ref && imageBuilder(selectedWallet?.walletIcon?.asset?._ref).height(50).width(50).url() || undefined}
-                  amount={new BigNumber(selectedWallet?.balance || '0')}
+                  amount={new BigNumber(selectedWallet?.balance || '0').times(10**18)}
                   icon={<Coin scale={0.25} token="LIVE" />}
                   color="secondary"
                   actions={lwActions}
