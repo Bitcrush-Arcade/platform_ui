@@ -2,23 +2,27 @@
 import { createContext, ReactNode, useState, useMemo, useCallback, useEffect } from 'react'
 import { useImmer } from 'use-immer'
 import BigNumber from 'bignumber.js'
-import { AbiItem } from 'web3-utils'
+import { AbiItem, toWei } from 'web3-utils'
 import find from 'lodash/find'
 import findIndex from 'lodash/findIndex'
+import { useWeb3React } from '@web3-react/core'
 // Material
 import Typography from '@mui/material/Typography'
 // BitcrushUI
-import { useTransactionContext } from 'hooks/contextHooks'
 import LiveWalletSelectModal from 'components/displays/LiveWalletSelectModal'
 import StakeModal, { StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
+// Hooks
+import useCoin from 'hooks/useCoin'
+import { useTransactionContext } from 'hooks/contextHooks'
+import { useContract } from 'hooks/web3Hooks'
 // Data
 import { liveWalletsQuery as walletsQuery } from 'queries/livewallets'
 import { client } from 'utils/sanityConfig'
 // Utils
 import { differenceFromNow } from 'utils/dateFormat'
 // Types
+import type { Receipt } from 'types/PromiEvent'
 import { Wallet } from 'types/liveWallets'
-import { useWeb3React } from '@web3-react/core'
 // ABI
 import LiveWallet from 'abi/BitcrushLiveWallet.json'
 import Token from 'abi/CrushToken.json'
@@ -41,7 +45,7 @@ export const LiveWalletContext = createContext<ContextType>({
 
 export const LiveWalletsContext = (props: { children: ReactNode }) => {
   const { account, chainId } = useWeb3React()
-  const { tokenInfo, liveWallet, toggleLwModal, web3, editTransactions } = useTransactionContext()
+  const { web3, editTransactions } = useTransactionContext()
   const [ usedWallet, setUsedWallet ] = useState<string>('CRUSH')
   const [ allWallets, setAllWallets ] = useImmer<Array<Wallet>>([])
   const [ openSelect, setOpenSelect ] = useState<boolean>(false)
@@ -66,8 +70,8 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
       if(usedAddress){
         const walletContract = await new web3.eth.Contract(LiveWallet.abi as AbiItem[], usedAddress)
         item.lwBalance = new BigNumber(await walletContract.methods.balanceOf(account).call()).div(10**18).toString()
-        const lwTimelock = await walletContract.methods.betAmounts(account).call()
-        const timelock = new BigNumber(await walletContract.methods.lockPeriod().call()).plus(lwTimelock)
+        const betAmounts = await walletContract.methods.betAmounts(account).call()
+        const timelock = new BigNumber(await walletContract.methods.lockPeriod().call()).plus(betAmounts.lockTimeStamp)
         item.timelock = timelock.toString()
         item.timelockActive = timelock.minus(new Date().getTime()/1000).isGreaterThan(0)
       }
@@ -114,6 +118,15 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
     return find(allWallets, wallet => wallet.symbolToken === usedWallet) || null
   },[allWallets, usedWallet])
 
+  const [walletContract, tokenContract] = useMemo( () => {
+    if(!selectedWallet) return [null, null]
+    const chainType = selectedWallet.walletContract.mainChain === chainId && "mainAddress" || selectedWallet.walletContract.testChain === chainId && "testAddress" || ""
+    return [ selectedWallet.walletContract[chainType], selectedWallet?.tokenName.tokenContract[chainType]]
+  },[selectedWallet, chainId])
+
+  const { isApproved, getApproved, approve} = useCoin(tokenContract)
+  const { methods: liveWalletMethods } = useContract( LiveWallet.abi as AbiItem[], walletContract)
+
   const selectWallet = useCallback( (symbol: string) => {
     localStorage.setItem('lwUsed', symbol)
     setUsedWallet(symbol)
@@ -124,15 +137,19 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
   },[setOpenSelect])
 
   const toggleStakeModal = useCallback( ()=>{
-    setOpenStake( p => !p)
-  },[setOpenStake])
+    if( !selectedWallet ) return;
+    setOpenStake( p => {
+      getApproved(walletContract)
+      return !p
+    })
+  },[setOpenStake, selectedWallet, walletContract])
 
   const timelockInPlace = new BigNumber(selectedWallet?.timelock || '0').isGreaterThan( new Date().getTime()/1000 )
 
   const withdrawDetails = () => {
     return timelockInPlace ? <>
           <Typography variant="caption" component="div" style={{ marginTop: 16, letterSpacing: 1.5}} align="justify" >
-            0.5% early withdraw fee if withdrawn before { differenceFromNow( new BigNumber(selectedWallet?.timelock || '0').times(1000).toNumber() ) }.
+            0.5% early withdraw fee if withdrawn before { differenceFromNow( new BigNumber(selectedWallet?.timelock || '0').toNumber() ) }.
             <br/>
             {selectedWallet?.isTimelockActive && <>
               {"Withdraws are disabled for 90 seconds after gameplay, please try again shortly."}
@@ -144,23 +161,23 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
   }
 
   // LiveWallet Options
-  const lwOptions: Array<StakeOptionsType> = [
+  const lwOptions: Array<StakeOptionsType> = useMemo( ()=> [
     { 
       name: 'Add Funds',
-      description: 'Add Funds to Live Wallet from CRUSH',
-      btnText: 'Wallet CRUSH',
-      maxValue: tokenInfo.weiBalance
+      description: 'Add Funds to Live Wallet',
+      btnText: 'Wallet',
+      maxValue: new BigNumber( selectedWallet?.walletBalance || 0 ).times(10**18) // maxValue receives Wei
     },
     { 
       name: 'Withdraw Funds',
-      description: 'Withdraw funds from Live Wallet to CRUSH',
-      btnText: 'Live Wallet CRUSH',
-      maxValue: selectedWallet && selectedWallet.balance && new BigNumber(selectedWallet.balance) || 0,
+      description: 'Withdraw funds from Live Wallet',
+      btnText: 'Live Wallet',
+      maxValue: selectedWallet && selectedWallet.balance && new BigNumber(selectedWallet.balance).times(10**18) || 0,
       onSelectOption: () => getWalletBalances(),
       disableAction: timelockInPlace && selectedWallet?.isTimelockActive || false,
       more: withdrawDetails
     },
-  ]
+  ], [selectedWallet])
 
   const stakeModalActionSelected = useCallback(async ( action: number)=> {
     if(!usedWallet) return false
@@ -189,8 +206,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
   },[setAllWallets, usedWallet, account])
 
   const lwSubmit: SubmitFunction = ( values, form ) => {
-    console.log('does submit')
-    if(!liveWalletMethods || !account) return form.setSubmitting(false)
+    if(!liveWalletMethods || !selectedWallet?.walletContract || !account || !web3) return form.setSubmitting(false)
     const weiValue = toWei(`${new BigNumber(values.stakeAmount).toFixed(18,1)}`)
     if(!values.actionType){
       return liveWalletMethods.addbet( weiValue )
@@ -198,7 +214,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
         .on('transactionHash', (tx: string) => {
           console.log('hash', tx )
           editTransactions(tx,'pending', { description: `Add Funds to Live Wallet`})
-          toggleLwModal()
+          toggleStakeModal()
         })
         .on('receipt', ( rc: Receipt ) => {
           console.log('receipt',rc)
@@ -209,24 +225,23 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
               account: account,
               amount: values.stakeAmount.toString(),
               negative: false,
+              currency: selectedWallet.symbolToken.toLowerCase()
             })
           })
             .then( r => r.json())
             .then( c => console.log('response',c))
             .catch(e => console.log(e))
-          hydrateToken()
           form.setSubmitting(false)
         })
         .on('error', (error: any, receipt: Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
-          hydrateToken()
           form.setSubmitting(false)
         })
         
     }
     else if(timelockInPlace){
-      toggleLwModal()
+      toggleStakeModal()
       const signMessage = web3.utils.toHex("I agree to withdraw early from Livewallet "+values.stakeAmount+" and pay the early withdraw fee")
       return web3.eth.personal.sign( signMessage, account, "",
         (e,signature) => {
@@ -237,6 +252,8 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
               chain: chainId,
               account: account,
               amount: weiValue,
+              currency: selectedWallet.symbolToken.toLowerCase()
+
             })
           })
           .then( response => response.json())
@@ -251,7 +268,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
             }
             if(data.txHash) {
               editTransactions( data.txHash, 'pending', {  description: 'Withdraw for User from LiveWallet', needsReview: true});
-              setWfuCalled({ hash: data.txHash, amount: values.stakeAmount.toString()})
+              // setWfuCalled({ hash: data.txHash, amount: values.stakeAmount.toString()})
             }
             else{
               editTransactions( 'Err........or..', 'pending', {errorData: data.error})
@@ -271,18 +288,18 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
       .on('transactionHash', (tx: string) => {
         console.log('hash', tx )
         editTransactions(tx,'pending', { description: `Withdraw Funds from LiveWallet`})
-        toggleLwModal()
+        toggleStakeModal()
       })
       .on('receipt', ( rc: Receipt ) => {
         console.log('receipt',rc)
         editTransactions(rc.transactionHash,'complete')
-        hydrateToken()
         fetch('/api/db/deposit',{ 
           method: 'POST',
           body: JSON.stringify({ 
             account: account,
             amount: values.stakeAmount.toString(),
             negative: true,
+            currency: selectedWallet.symbolToken.toLowerCase()
           })
         })
           .then( r => r.json())
@@ -306,19 +323,19 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
   }}>
     {props.children}
     <LiveWalletSelectModal open={openSelect} onClose={toggleSelectModal} wallets={allWallets} onWalletSelected={selectWallet} />
-    <StakeModal
+    {selectedWallet && <StakeModal
       open={openStake}
       onClose={toggleStakeModal}
       options={lwOptions}
       onSubmit={lwSubmit}
       needsApprove={ !isApproved }
-      onApprove={ () => approve(liveWallet.address) }
+      onApprove={ () => approve(walletContract) }
       coinInfo={{
-        symbol: 'CRUSH',
-        name: 'Crush Coin',
-        decimals: 18
+        symbol: selectedWallet.symbolToken,
+        name: selectedWallet.tokenName.name,
+        decimals: selectedWallet.tokenName.decimals
       }}
       onActionSelected={stakeModalActionSelected}
-    />
+    />}
   </LiveWalletContext.Provider>
 }
