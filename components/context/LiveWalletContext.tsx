@@ -177,7 +177,7 @@ export const LiveWalletsContext = (props: { children: ReactNode }) => {
       disableAction: timelockInPlace && selectedWallet?.isTimelockActive || false,
       more: withdrawDetails
     },
-  ], [selectedWallet, getWalletBalances])
+  ], [selectedWallet, getWalletBalances, timelockInPlace, withdrawDetails])
 
   const stakeModalActionSelected = useCallback(async ( action: number)=> {
     if(!usedWallet) return false
