@@ -7,6 +7,9 @@ import schemaTypes from 'all:part:@sanity/base/schema-type'
 import liveWallet from './liveWallet'
 import bep20 from './BEP20'
 import team from './team'
+import partner from './partners'
+import page from './page'
+import faq from './faq'
 // OBJECTS
 import seoImage from './objects/seoImage'
 import contract from './objects/contract'
@@ -18,9 +21,12 @@ export default createSchema({
   // to the ones provided by any plugins that are installed
   types: schemaTypes.concat([
     // DOCUMENTS
+    page,
+    faq,
     bep20,
     liveWallet,
     team,
+    partner,
     // OBJECTS
     seoImage,
     contract
