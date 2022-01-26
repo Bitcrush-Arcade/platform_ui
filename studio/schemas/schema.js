@@ -6,6 +6,7 @@ import schemaTypes from 'all:part:@sanity/base/schema-type'
 // DOCUMENTS
 import liveWallet from './liveWallet'
 import bep20 from './BEP20'
+import team from './team'
 // OBJECTS
 import seoImage from './objects/seoImage'
 import contract from './objects/contract'
@@ -19,6 +20,7 @@ export default createSchema({
     // DOCUMENTS
     bep20,
     liveWallet,
+    team,
     // OBJECTS
     seoImage,
     contract
