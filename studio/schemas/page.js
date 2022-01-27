@@ -13,6 +13,11 @@ const page = {
       name: 'url',
       type: 'string'
     },
+    {
+      title: "Whitepaper",
+      name: 'whitepaper',
+      type: 'file'
+    },
   ]
 }
 
