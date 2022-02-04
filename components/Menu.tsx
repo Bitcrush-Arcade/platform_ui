@@ -78,7 +78,7 @@ const Menu = ( props: MenuProps) => {
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         // { name: `Recharging`, icon: <RechargeIcon/>, url_link: '/recharge', disabled: true },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: false },
-        { name: `NFTs`, icon: <Ufo2Icon/>, url_link: '/nft', disabled: false },
+        { name: `NFTs`, icon: <Ufo2Icon/>, url_link: 'https://invaderverse.com', isA: true, disabled: false },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
         { name: 'MORE', icon: null, subMenu: [ 
             { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small"/>, url_link: 'https://github.com/Bitcrush-Arcade'},
@@ -100,7 +100,7 @@ const Menu = ( props: MenuProps) => {
     const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>( new Array(linkArray.length).fill(false) )
 
     const linkItems = linkArray.map( (link, linkIndex) => {
-        const { name, icon, url_link, subMenu, disabled, loadOnClick } = link
+        const { name, icon, url_link, subMenu, disabled, loadOnClick, isA } = link
         const click = (e : React.MouseEvent<HTMLAnchorElement>) => {
             e.stopPropagation()
             !subMenu && setShowLoad( draft => { draft[linkIndex] = !draft[linkIndex] })
@@ -116,7 +116,7 @@ const Menu = ( props: MenuProps) => {
             url_link ? 'a' : 'button'
 
         return <Fragment key={`nav-menu-item-${name}`} >
-            <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }}>
+            <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }} isA={isA}>
                 <ListItemButton 
                     onClick={ click } component={component}
                     className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
@@ -279,7 +279,7 @@ const useStyles = makeStyles<Theme, { open: boolean}>( (theme) => createStyles({
     baseItem:{
         borderTopLeftRadius: theme.spacing(2),
         borderBottomLeftRadius: theme.spacing(2),
-        marginTop: theme.spacing(0.5)
+        marginTop: theme.spacing(0.5),
     },
     listIcon:{
         minWidth: theme.spacing(6),
@@ -313,7 +313,9 @@ type LinkItem ={
     url_link?: string,
     disabled?: boolean,
     loadOnClick?: boolean,
+    isA?: boolean,
     subMenu?: Array< {
+        isA?: boolean,
         name: string | JSX.Element,
         icon: JSX.Element | null,
         url_link?: string,
