@@ -127,7 +127,7 @@ const ProfileAvatar = ( props: ProfileAvatarProps ) => {
               primary={"Live Wallet"}
               secondary={ playing 
                 ? "Game Play Mode" 
-                : currentLiveWallet ? `$${currentLiveWallet?.symbolToken} ${currencyFormat(currentLiveWallet?.balance || '0', {isWei: true})}` : "Connect wallet first"}
+                : currentLiveWallet ? `$${currentLiveWallet?.symbolToken} ${currencyFormat(currentLiveWallet?.balance || '0')}` : "Connect wallet first"}
             />
         </ListItem>
         <ListItem button disabled={playing}

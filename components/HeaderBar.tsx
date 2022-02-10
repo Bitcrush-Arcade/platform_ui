@@ -45,16 +45,9 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { pathname } = useRouter()
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
-  const [ allWallets, setAllWallets ] = useImmer<Array<Wallet>>([])
-  const [ walletTokenSelected, setWalletTokenSelected ] = useState<string>('CRUSH')
 
   const { tokenInfo } = useTransactionContext()
   const { toggleSelectModal, selectedWallet, toggleStakeModal } = useLiveWalletContext()
-
-  const walletSelected = useMemo( () => {
-    if(!allWallets.length) return null
-    return find(allWallets, o => o.symbolToken == walletTokenSelected )
-  },[allWallets,walletTokenSelected])
 
   const isGame = pathname.indexOf('/games') > -1
   const isPlaying = pathname === '/games/[gameKey]'
@@ -136,7 +129,7 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
                 <ConnectButton/>
               </Grid>
               <Grid item>
-                <ProfileAvatar playing={isPlaying} currentLiveWallet={walletSelected} changeLiveWallet={toggleSelectModal}/>
+                <ProfileAvatar playing={isPlaying} currentLiveWallet={selectedWallet} changeLiveWallet={toggleSelectModal}/>
               </Grid>
             </Grid>
           </Grid>
