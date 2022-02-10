@@ -188,7 +188,6 @@ function StakeModal( props: StakeModalProps ) {
           </Grid>
           <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
             onClick={ e => { 
-              console.log('click the damn thing', needsApprove)
               if(!needsApprove) return handleSubmit();
               e.preventDefault()
               onApprove && onApprove()
@@ -240,4 +239,4 @@ const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
       </Typography>
     </SliderThumb>
 )}
-export const FormComponent = (p:any) => <Card {...p} background="light" sx={{ padding: 4, minWidth: '300px', maxWidth: '360px' }}/>
+export const FormComponent = (p:any) => <Card {...p} background="light" sx={{ padding: 4, minWidth: '300px', maxWidth: '360px !important' }}/>

@@ -91,7 +91,7 @@ const PoolCard = (props: PoolProps) => {
     .then( response => response.json() )
     .then( data => setApyData(data) )
     .finally( () => hydrateAPY && triggerAPYHydrate() )
-  },[chainId, hydrateAPY, setApyData, triggerAPYHydrate])
+  },[chainId, hydrateAPY, setApyData, triggerAPYHydrate, disabled])
   
   const buttonAction = () =>{
     if(isApproved) 

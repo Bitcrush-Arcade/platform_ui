@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Image from 'next/image'
 import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
@@ -33,9 +34,10 @@ const HowToPlay = () => {
     
     See this medium article for more details and breakdown:
     `}
-    <a href="/" rel="noopener nonreferrer" target="_blank">
-      Flight of the Navigator v17
-    </a>
+    {/* SWAP WITH AN <a> TAG when medium article goes live */}
+    <Link href="/">
+      Pending
+    </Link>
   </Typography>
 }
 export default HowToPlay

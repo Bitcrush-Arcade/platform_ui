@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import { useMemo, useEffect, useState, useCallback } from 'react'
+import { useMemo, useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
+import { useImmer } from 'use-immer'
+import find from 'lodash/find'
 // Material
 import { Theme, useTheme } from '@mui/material/styles';
 import makeStyles from '@mui/styles/makeStyles';
@@ -23,12 +25,15 @@ import Coin from 'components/tokens/Token2'
 // Hooks
 import { useAuthContext } from 'hooks/contextHooks'
 import { shortAddress } from 'utils/text/text'
-import { useTransactionContext } from 'hooks/contextHooks'
-import usePrevLiveWallet from 'hooks/usePrevLw'
+import { useTransactionContext, useLiveWalletContext } from 'hooks/contextHooks'
 // libs
+import { imageBuilder } from 'utils/sanityConfig'
 import { getContracts } from 'data/contracts'
-import { liveWallets } from 'data/liveWallets'
 import { pink } from '@mui/material/colors';
+// Queries
+import BigNumber from 'bignumber.js'
+// Types
+import { Wallet } from 'types/liveWallets'
 
 const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { open, toggleOpen } = props
@@ -41,20 +46,16 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
   const { chainId, account } = useWeb3React()
   const { address: CrushAddress } = getContracts('crushToken', chainId)
 
-  const [ walletSelected, setWalletSelected ] = useState(liveWallets.crush)
+  const { tokenInfo } = useTransactionContext()
+  const { toggleSelectModal, selectedWallet, toggleStakeModal } = useLiveWalletContext()
 
   const isGame = pathname.indexOf('/games') > -1
   const isPlaying = pathname === '/games/[gameKey]'
   const imgReducer = isSm ? 26 : 18
   
-  const { tokenInfo, liveWallet, toggleLwModal } = useTransactionContext()
-  const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
-
   const lwActions = [
-    {name:'Add/Remove', onClick: toggleLwModal },
-    {name:'Withdraw v1', onClick: withdrawAll, highlight: hasFunds},
-    // {name:'View on BSC', onClick: ()=>console.log('action 3')},
-    // {name:'History', onClick: ()=>console.log('action 4')},
+    {name:'Add/Remove', onClick: toggleStakeModal },
+    {name:'Change Wallet', onClick: toggleSelectModal },
   ]
 
   const crushActions = [
@@ -65,75 +66,77 @@ const HeaderBar = ( props: {open: boolean, toggleOpen: () => void } ) => {
     { name: 'BABY Farm', onClick: ()=> window.open(`https://home.babyswap.finance/farms`, '_blank')},
   ]
 
-  return <AppBar className={css.appBar} variant="outlined" elevation={0} position={ isSm ? "sticky" : "absolute"}>
-    <Toolbar>
-      <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
-        {/* LEFT SIDE OF HEADER */}
-        <Grid item>
-          <Grid container alignItems="center">
-            <Grid item>
-              <Button onClick={toggleOpen} className={css.menuOpen}>
-                {svgGradient}{svgGradient2}
-                <MenuIcon fontSize={isSm ? "medium" : "large"} className={ css.gradient } />
-              </Button>
-            </Grid>
-            <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
-            <Grid item>
-              <Link href="/" passHref>
-                <a>
-                  { isGame 
-                    ? <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" alt="Bitcrush Arcade Logo" />
-                    : <Image src={'/bitcrush_logo.png'} width={3895/imgReducer} height={656/imgReducer} title="Bitcrush logo" alt="Bitcrush Logo" />
-                  }
-                </a>
-              </Link>
+  return <>
+    <AppBar className={css.appBar} variant="outlined" elevation={0} position={ isSm ? "sticky" : "absolute"}>
+      <Toolbar>
+        <Grid container justifyContent="space-between" alignItems="center" className={ css.toolbar }>
+          {/* LEFT SIDE OF HEADER */}
+          <Grid item>
+            <Grid container alignItems="center">
+              <Grid item>
+                <Button onClick={toggleOpen} className={css.menuOpen}>
+                  {svgGradient}{svgGradient2}
+                  <MenuIcon fontSize={isSm ? "medium" : "large"} className={ css.gradient } />
+                </Button>
+              </Grid>
+              <Divider orientation="vertical" flexItem className={css.menuLogoDivider} />
+              <Grid item>
+                <Link href="/" passHref>
+                  <a>
+                    { isGame 
+                      ? <Image src={'/logo_light.png'} width={3685/imgReducer} height={676/imgReducer} title="Bitcrush logo" alt="Bitcrush Arcade Logo" />
+                      : <Image src={'/bitcrush_logo.png'} width={3895/imgReducer} height={656/imgReducer} title="Bitcrush logo" alt="Bitcrush Logo" />
+                    }
+                  </a>
+                </Link>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-        {/* RIGHT SIDE OF HEADER */}
-        <Grid item>
-          <Grid container alignItems="center">
-            {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
-            <Grid item className={ css.dropOnSm }> 
-              {/* LIVE WALLET */}
-              <TokenDisplay 
-                amount={liveWallet.balance}
-                icon={<Coin scale={0.25} token="LIVE" />}
-                color="secondary"
-                actions={lwActions}
-                token={ walletSelected }
-                label={ isPlaying 
-                  ? 
-                    <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
-                      Game Mode{'\n'}
-                      <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
-                        CRUSH IT!
+          {/* RIGHT SIDE OF HEADER */}
+          <Grid item>
+            <Grid container alignItems="center">
+              {/* TOKEN DISPLAY DATA TO COME FROM SERVER && BLOCKCHAIN */}
+              <Grid item className={ css.dropOnSm }> 
+                {/* LIVE WALLET */}
+                <TokenDisplay
+                  tokenIcon={ selectedWallet?.walletIcon?.asset?._ref && imageBuilder(selectedWallet?.walletIcon?.asset?._ref).height(50).width(50).url() || undefined}
+                  amount={new BigNumber(selectedWallet?.balance || '0').times(10**18)}
+                  icon={<Coin scale={0.25} token="LIVE" />}
+                  color="secondary"
+                  actions={lwActions}
+                  label={ isPlaying 
+                    ? 
+                      <Typography variant="body2" align="center" component="div" style={{whiteSpace: 'pre-line'}}>
+                        Game Mode{'\n'}
+                        <Typography align="center" style={{fontFamily: 'Zebulon', letterSpacing: 1.2}} component="span" className={css.crushIt}>
+                          CRUSH IT!
+                        </Typography>
                       </Typography>
-                    </Typography>
-                  : undefined
-                }
-              />
-            </Grid>
-            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              {/* CRUSH on Wallet */}
-              <TokenDisplay
-                amount={tokenInfo.weiBalance}
-                icon={<Coin scale={0.25}/>}
-                color="primary"
-                actions={crushActions}
-              />
-            </Grid>
-            <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
-              <ConnectButton/>
-            </Grid>
-            <Grid item>
-              <ProfileAvatar playing={isPlaying}/>
+                    : undefined
+                  }
+                />
+              </Grid>
+              <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
+                {/* CRUSH on Wallet */}
+                <TokenDisplay
+                  amount={tokenInfo.weiBalance}
+                  icon={<Coin scale={0.25}/>}
+                  color="primary"
+                  actions={crushActions}
+                />
+              </Grid>
+              <Grid item className={ css.dropOnSm } style={{marginRight: 8}}>
+                <ConnectButton/>
+              </Grid>
+              <Grid item>
+                <ProfileAvatar playing={isPlaying} currentLiveWallet={selectedWallet} changeLiveWallet={toggleSelectModal}/>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Grid>
-    </Toolbar>
-  </AppBar>
+      </Toolbar>
+    </AppBar>
+  </>
 }
 
 export default HeaderBar

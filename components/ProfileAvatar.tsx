@@ -22,9 +22,17 @@ import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
 import { getContracts } from 'data/contracts'
 // Types
 import { Receipt } from 'types/PromiEvent'
+import { Wallet } from 'types/liveWallets'
 
-const ProfileAvatar = ( props: { playing: boolean }) => {
-  const { playing } = props
+
+type ProfileAvatarProps = {
+  playing: boolean,
+  currentLiveWallet?: Wallet | null,
+  changeLiveWallet: () => void,
+}
+
+const ProfileAvatar = ( props: ProfileAvatarProps ) => {
+  const { playing, changeLiveWallet, currentLiveWallet } = props
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const css = useStyles({})
   const { login, logout, account, chainId } = useAuthContext()
@@ -32,7 +40,7 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
   const { tokenInfo, editTransactions, liveWallet, toggleLwModal } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
-  const { methods: coinMethods, web3 } = useContract(tokenAbi, tokenAddress)
+  const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
 
   const { hasFunds, withdrawAll} = usePrevLiveWallet({ account, chainId })
 
@@ -117,7 +125,19 @@ const ProfileAvatar = ( props: { playing: boolean }) => {
           }}>
             <ListItemText
               primary={"Live Wallet"}
-              secondary={ playing ? "Game Play Mode" : currencyFormat(liveWallet.balance.toString(), {isWei: true})}
+              secondary={ playing 
+                ? "Game Play Mode" 
+                : currentLiveWallet ? `$${currentLiveWallet?.symbolToken} ${currencyFormat(currentLiveWallet?.balance || '0')}` : "Connect wallet first"}
+            />
+        </ListItem>
+        <ListItem button disabled={playing}
+          onClick={() => {
+            changeLiveWallet()
+            toggleDrawer()
+          }}>
+            <ListItemText
+              primary={"Switch Live Wallet"}
+              secondary={"Switch token used in Live Wallet"}
             />
         </ListItem>
         {hasFunds && <ListItem button 
