@@ -31,7 +31,7 @@
     "formik-mui": "^4.0.0-alpha.3",
     "immer": "^9.0.6",
     "lodash": "^4.17.21",
-    "next": "^12.0.2",
+    "next": "^12.0.10",
     "next-sanity": "^0.4.0",
     "pino": "^7.5.1",
     "pino-logflare": "^0.3.12",
@@ -41,9 +41,9 @@
     "react-dom": "^17.0.2",
     "react-material-ui-carousel": "^3.1.1",
     "react-router-dom": "^5.2.0",
-    "tailwindcss": "^3.0.20",
+    "tailwindcss": "^3.0.22",
     "use-immer": "^0.5.2",
-    "web3": "^1.5.2"
+    "web3": "^1.7.0"
   },
   "devDependencies": {
     "eslint": "^7.28.0",

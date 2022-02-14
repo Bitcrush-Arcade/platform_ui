@@ -119,10 +119,19 @@
     font-style: normal;
     src: url('/fonts/Oxanium/Oxanium-ExtraBold.ttf');
   }
+  progress::-webkit-progress-bar{
+    background-color: rgb(5,6,16);
+  }
+  progress::-webkit-progress-value{
+    background-color: rgb(174,82,227);
+  }
 }
 
 @layer utilities{
   .inner-glow-secondary {  
     box-shadow: inset 0 0 15px #1de9b6da;
+  }
+  .inner-glow-primary {  
+    box-shadow: inset 0 0 15px rgb(174,82,227);
   }
 }
