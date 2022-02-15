@@ -36,7 +36,7 @@ const Trade = () => {
           
     </Card>
     
-    <ArrowDownwardIcon color="secondary" sx={{fontSize: 40, bottom: 0, position: 'relative', mx: 0.5}} />
+    <ArrowDownwardIcon color="primary" sx={{fontSize: 40, bottom: 0, position: 'relative', mx: 0.5}} />
 
     <Card background="light" shadow="secondary" sx={{p: 3}}>
       <TextField
