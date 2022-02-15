@@ -118,7 +118,7 @@ const Menu = ( props: MenuProps) => {
         return <Fragment key={`nav-menu-item-${name}`} >
             <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }} isA={isA}>
                 <ListItemButton 
-                    onClick={ click } component={component}
+                    onClick={ click } component={ isA ? "button" : component}
                     className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
                     disabled={disabled}
                     sx={{ width: subMenu ? '-webkit-fill-available' : 'auto'}}
