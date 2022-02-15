@@ -54,13 +54,12 @@ export const useEagerConnect = () => {
   const { login } = useAuth()
   
   useEffect(()=>{
-    
     const connector = window.localStorage.getItem('connectorId') as ConnectorNames
-    if(!connector) return
-    login(connector)
+    if(!connector) return;
+    setTimeout( () => login(connector), 3000)
 
   }, [login])
-}
+} 
 
 const web3 = new Web3(Web3.givenProvider)
 
