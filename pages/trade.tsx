@@ -20,7 +20,6 @@ const Trade = () => {
         Welcome to the  
       </text>
     </Typography>
-
     <h2 className="text-center font-bold text-xl font-zeb tracking-widest">
     Intergalactic Bridge
     </h2>
