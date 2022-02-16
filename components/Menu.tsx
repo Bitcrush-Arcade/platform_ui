@@ -72,7 +72,7 @@ const Menu = ( props: MenuProps) => {
 
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
-        { name: 'Intergalactic Bridge', icon: <TradeIcon/>, url_link: '/trade', disabled: false },
+        { name: 'Intergalactic Bridge', icon: <TradeIcon/>, url_link: '/bridge', disabled: false },
         // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
