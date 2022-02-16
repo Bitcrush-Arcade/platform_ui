@@ -8,7 +8,8 @@ import TextField from '@mui/material/TextField';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 // Bitcrush
 import PageContainer from 'components/PageContainer'
-import GButton from 'components/basics/GeneralUseButton'
+import BridgeCard from 'components/bridge/BridgeCard';
+import BridgeOptions from 'components/bridge/BridgeOptions';
 
 const Trade = () => {
   return <PageContainer>
@@ -83,8 +84,6 @@ const Trade = () => {
       {/* Side chain CARD CONTAINER */}
 
     </div>
-
-    
 
   </PageContainer>
 }
