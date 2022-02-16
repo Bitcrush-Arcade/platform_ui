@@ -96,7 +96,7 @@ const NiceSale = () => {
       console.log('do nothing2')
       return
     }
-    const isPreQualified = await psMethod.qualify().call({from: account}).catch( e => { console.log('error on qualify', e); return false})
+    const isPreQualified = await psMethod.qualify().call({from: account}).catch( (e: any) => { console.log('error on qualify', e); return false})
     console.log({isPreQualified})
     setPrequalified(Boolean(isPreQualified))
   },[account, psMethod, setPrequalified])
