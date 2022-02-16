@@ -3,9 +3,6 @@ import Card from 'components/basics/Card';
 
 // Next
 import Head from 'next/head'
-// Material
-import TextField from '@mui/material/TextField';
-import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 // Bitcrush
 import PageContainer from 'components/PageContainer'
 import BridgeCard from 'components/bridge/BridgeCard';
@@ -29,7 +26,7 @@ const Trade = () => {
 
     <div className="grid rows-3 gap-4 justify-items-center content-center">
 
-      <BridgeCard fromTo="from" borderColor="primary" buttonColor="secondary"/>
+      <BridgeCard textFieldLabel="from" borderColor="primary" buttonColor="primary"/>
 
       {/* Arrow down icon */}  
       <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 " fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,7 +34,7 @@ const Trade = () => {
       </svg>
 
       {/* Side chain CARD CONTAINER */}
-      <BridgeCard fromTo="to" borderColor="secondary" buttonColor="primary"/>
+      <BridgeCard textFieldLabel="to" borderColor="secondary" buttonColor="secondary"/>
 
     </div>
 

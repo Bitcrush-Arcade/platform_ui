@@ -5,19 +5,18 @@ import Card from 'components/basics/Card';
 import Head from 'next/head'
 // Material
 import TextField from '@mui/material/TextField';
-import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 
 {/* BridgeCard props */}
 type BridgeCardProps = {
 
-  fromTo?: "from" | "to" ;
+  textFieldLabel: "from" | "to";
   borderColor?: "primary" | "secondary";
   buttonColor?: "primary" | "secondary";
 
 }
 
 const BridgeCard = (props: BridgeCardProps) => {
-  const { fromTo, borderColor, buttonColor} = props
+  const { textFieldLabel, borderColor, buttonColor} = props
 
   return <div className="grid rows-3 gap-4 justify-items-center content-center">
 
@@ -27,7 +26,7 @@ const BridgeCard = (props: BridgeCardProps) => {
         <TextField
         required
         id="outlined-required"
-        label = {fromTo}
+        label = {textFieldLabel}
         defaultValue="0.0"
         inputProps={{style: {fontSize: 25}}}
         />
@@ -35,7 +34,7 @@ const BridgeCard = (props: BridgeCardProps) => {
         {/* Button column */}   
         <div className="grid grid-cols-2 place-content-between gap-4">
           <button 
-            className="grid place-content-between items-center grid-cols-2 grid-rows-1 gap-10 border-2 border-secondary px-4 py-2 inner-glow-secondary text-xs rounded-full hover:bg-secondary hover:text-black max-w-[15em] disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+            className="grid place-content-between items-center grid-cols-2 grid-rows-1 gap-10 border-2 border-primary px-4 py-2 inner-glow-primary text-xs rounded-full hover:bg-primary hover:text-black max-w-[15em] disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
           >
             <div>
               TOKEN
@@ -51,7 +50,7 @@ const BridgeCard = (props: BridgeCardProps) => {
           </button>
 
           <button 
-            className="grid place-content-between items-center grid-cols-2 grid-rows-1 gap-10 border-2 border-secondary px-4 py-2 inner-glow-secondary text-xs rounded-full hover:bg-secondary hover:text-black max-w-[15em] disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+            className="grid place-content-between items-center grid-cols-2 grid-rows-1 gap-10 border-2 border-primary px-4 py-2 inner-glow-primary text-xs rounded-full hover:bg-primary hover:text-black max-w-[15em] disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
           >
             <div>
               CHAIN
