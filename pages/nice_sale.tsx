@@ -87,6 +87,7 @@ const NiceSale = () => {
     const available = new BigNumber(await psMethod.availableAmount().call())
     const saleStart = new BigNumber(await psMethod.saleStart().call()).times(1000)
     const saleEnd = new BigNumber(await psMethod.saleEnd().call()).times(1000)
+    setSaleEnded( saleEnd.isLessThan(new Date().getTime()) )
 
     setPresaleData({
       whitelisted: tokenUsed,
