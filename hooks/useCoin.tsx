@@ -29,9 +29,9 @@ const useCoin = (coinAddress?: string) => {
     return allowance >= (amountToCheck ?? 1)
   },[coinMethods, account, setIsApproved])
 
-  const approve = useCallback( (contractToApprove: string, approveAmount?: number ) => {
+  const approve = useCallback( (contractToApprove: string, approveAmount?: number| BigNumber ) => {
     if(!coinMethods) return
-    coinMethods.approve( contractToApprove, approveAmount ?? new BigNumber(30000000000000000000000000).toFixed() )
+    coinMethods.approve( contractToApprove, approveAmount?.toFixed() ?? new BigNumber(30000000000000000000000000).toFixed() )
       .send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`)})
       .on('transactionHash', (tx:string) => {
         console.log('hash', tx )

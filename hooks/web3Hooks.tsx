@@ -56,7 +56,7 @@ export const useEagerConnect = () => {
   useEffect(()=>{
     const connector = window.localStorage.getItem('connectorId') as ConnectorNames
     if(!connector) return;
-    setTimeout( () => login(connector), 3000)
+    setTimeout( () => login(connector), 1000)
 
   }, [login])
 } 

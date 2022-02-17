@@ -106,7 +106,7 @@ const theme = (isDark?: boolean) => createTheme({
       styleOverrides: `
       @font-face{
         font-family: 'MarsAttacks';
-        font-weigth: normal;
+        font-weight: normal;
         font-style: normal;
         src: url('/fonts/MarsAttacks/MarsAttacks.ttf');
       }

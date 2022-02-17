@@ -1,5 +1,5 @@
 import { AppProps } from 'next/app';
-
+import '../styles/globals.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import { EmotionCache } from '@emotion/react';
 import createEmotionCache from 'utils/styles/styling'
