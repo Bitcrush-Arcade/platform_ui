@@ -96,7 +96,7 @@ const NiceSale = () => {
       console.log('do nothing2')
       return
     }
-    const isPreQualified = await psMethod.qualify().call({from: account}).catch( e => { console.log('error on qualify', e); return false})
+    const isPreQualified = await psMethod.qualify().call({from: account}).catch( (e: any) => { console.log('error on qualify', e); return false})
     console.log({isPreQualified})
     setPrequalified(Boolean(isPreQualified))
   },[account, psMethod, setPrequalified])
@@ -202,7 +202,7 @@ const NiceSale = () => {
     <PageContainer background='galactic'>
       <div className="flex items-center justify-center px-2">
         {
-          (!chainId || chainId !== 97)
+          (!chainId || chainId !== 56)
             ?
             <h2 className='text-xl font-zeb mt-10'>
               Coming Soon
