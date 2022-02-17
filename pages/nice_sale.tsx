@@ -384,7 +384,26 @@ const NiceSale = () => {
                             if(completed) return null
                             return <h3 className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                                 <span>
-                                  Sale Start
+                                  Sale Start <strong className="text-primary">Mon Feb 21st 00 UTC</strong>
+                                </span>
+                                <span className="text-secondary font-bold">
+                              {days && `${days}D`} {hours && `${hours}H`} {minutes && `${minutes}M`} {seconds}S
+                              </span>
+                            </h3>
+                          }
+                        }
+                      />
+                  }
+                  {
+                    saleStarted && 
+                      <Countdown date={new Date(presaleData.saleEnd.toNumber())}
+                        onComplete={()=>setSaleEnded(true)}
+                        renderer={
+                          ({days, hours, minutes, seconds, completed}) => {
+                            if(completed) return null
+                            return <h3 className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                                <span>
+                                  Sale Ends <strong className='text-secondary'>Thur Feb 24st 00 UTC</strong>
                                 </span>
                                 <span className="text-secondary font-bold">
                               {days && `${days}D`} {hours && `${hours}H`} {minutes && `${minutes}M`} {seconds}S
