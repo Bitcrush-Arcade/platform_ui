@@ -6,7 +6,7 @@ export const ConditionalLinkWrapper = ( props: { children: ReactNode, url?: stri
   if(url){
     return isA 
     ?
-      <a href={url} {...LinkProps} style={{textDecoration: 'none'}}>
+      <a href={url} style={{textDecoration: 'none'}}>
         {children}
       </a>
     : 

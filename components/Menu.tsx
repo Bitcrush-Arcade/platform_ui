@@ -45,7 +45,7 @@ import ArcadeIcon from 'components/svg/ArcadeIcon'
 import RocketIcon from 'components/svg/RocketIcon'
 import UfoIcon from 'components/svg/UfoIcon'
 import Ufo2Icon from 'components/svg/Ufo2Icon'
-// import RechargeIcon from 'components/svg/RechargeIcon'
+import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
 // import WarpIcon from 'components/svg/WarpIcon'
@@ -76,7 +76,7 @@ const Menu = ( props: MenuProps) => {
         // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
-        // { name: `Launch`, icon: <RechargeIcon/>, url_link: '/nice_launch', disabled: false },
+        { name: `Launch`, icon: <RechargeIcon/>, url_link: '/nice_sale', disabled: false },
         { name: `Crush n'Burn Lottery`, icon: <RocketIcon/>, url_link: '/lottery', disabled: false },
         { name: `NFTs`, icon: <Ufo2Icon/>, url_link: 'https://invaderverse.com', isA: true, disabled: false },
         { name: `Black Hodle Referral`, icon: <BlackHoleIcon/>, url_link: '/referral', disabled: true },
@@ -118,7 +118,7 @@ const Menu = ( props: MenuProps) => {
         return <Fragment key={`nav-menu-item-${name}`} >
             <ConditionalLinkWrapper url={url_link} LinkProps={{ passHref: true }} isA={isA}>
                 <ListItemButton 
-                    onClick={ click } component={component}
+                    onClick={ click } component={ isA ? "button" : component}
                     className={ `${ selected ? css.selectedItem : ''} ${css.baseItem}`}
                     disabled={disabled}
                     sx={{ width: subMenu ? '-webkit-fill-available' : 'auto'}}

@@ -75,7 +75,11 @@ export const contracts : { [key: string] : ContractSelect} = {
   },
   presale:{
     56:{
+<<<<<<< HEAD
       address: "",
+=======
+      address: "0x8b0E34aa5442B770aFd404f596d12833B9D73cA3",
+>>>>>>> master
       abi: Presale.abi,
     },
     97:{
