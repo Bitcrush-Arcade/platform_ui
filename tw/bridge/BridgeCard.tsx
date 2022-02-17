@@ -1,3 +1,4 @@
+import { truncate } from "lodash"
 
 // Props
 type BridgeCardProps = {
@@ -9,6 +10,10 @@ type BridgeCardProps = {
 const BridgeCard = (props: BridgeCardProps) => {
 
   const { account, amount, walletBalance } = props
+  let tokenStatus=true
+  const tokenToggle= () => {
+    tokenStatus=!tokenStatus
+  }
   
   return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-11 py-14 rounded-[32px] max-w-[500px]">
           
@@ -25,9 +30,18 @@ const BridgeCard = (props: BridgeCardProps) => {
           </div>
 
           <div className="flex flex-col items-center gap-2">
-            <div>
-            TOKEN SELECTOR ( NICE TOGGLE CRUSH )
-            </div>
+            {
+              tokenStatus
+                ?
+            <button onClick={tokenToggle} className="flex flex-row items-center gap-2 border-2 border-primary inner-glow-primary px-6 py-4 text-xs rounded-full hover:bg-primary hover:text-black">
+            NICE
+            </button>
+            :
+            <button onClick={tokenToggle} className="flex flex-row items-center gap-2 border-2 border-primary inner-glow-primary px-6 py-4 text-xs rounded-full hover:bg-primary hover:text-black">
+            CRUSH
+            </button>
+
+            }
             <div>
             TEXTFIELD FOR AMOUNT
             </div>
