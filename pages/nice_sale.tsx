@@ -212,7 +212,7 @@ const NiceSale = () => {
     <PageContainer background='galactic'>
       <div className="flex items-center justify-center px-2">
         {
-          (!chainId || chainId !== 56)
+          (!chainId || chainId !== 97)
             ?
             <h2 className='text-xl font-zeb mt-10'>
               Coming Soon
@@ -369,7 +369,7 @@ const NiceSale = () => {
                                   Sale Start
                                 </span>
                                 <span className="text-secondary font-bold">
-                              {days}D {hours}H {minutes}H {seconds}S
+                              {days && `${days}D`} {hours && `${hours}H`} {minutes && `${minutes}M`} {seconds}S
                               </span>
                             </h3>
                           }
