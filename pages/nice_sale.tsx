@@ -85,8 +85,8 @@ const NiceSale = () => {
     const maxRaise = new BigNumber( await psMethod.maxRaise().call() )
     const totalRaised = new BigNumber( await psMethod.totalRaised().call() )
     const available = new BigNumber(await psMethod.availableAmount().call())
-    const saleStart = new BigNumber(await psMethod.availableAmount().call())
-    const saleEnd = new BigNumber(await psMethod.availableAmount().call())
+    const saleStart = new BigNumber(await psMethod.saleStart().call()).times(1000)
+    const saleEnd = new BigNumber(await psMethod.saleEnd().call()).times(1000)
 
     setPresaleData({
       whitelisted: tokenUsed,
@@ -202,7 +202,6 @@ const NiceSale = () => {
       })
   }
 
-
   return <>
     <Head>
       <title>$NICE Presale</title>
@@ -230,6 +229,8 @@ const NiceSale = () => {
                   <div className="py-2">
                     <p className="text-justify text-sm">
                       $NICE is the official currency of the Invaderverse. Presale is by whitelist only, you can whitelist yourself if you meet the requirements listed below.
+                      <br/>
+                      Please note that Presale tokens are vested over the course of 8 weeks. You can check back here to claim a portion of your tokens.
                     </p>
                   </div>
                   {/* Fill bar */}
@@ -355,6 +356,8 @@ const NiceSale = () => {
                   {/* COUNTDOWN FOR SALE START */}
                   <hr className='my-3 border-primary opacity-70'/>
 
+                  {
+                    !saleStarted && 
                       <Countdown date={new Date(presaleData.saleStart.toNumber() || 1645401600000)}
                         onComplete={()=>setSaleStarted(true)}
                         renderer={
@@ -371,6 +374,7 @@ const NiceSale = () => {
                           }
                         }
                       />
+                  }
                   <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                     <span>To Raise (BUSD)</span>
                     <span>{currencyFormat(presaleData.maxRaise.toString(), {decimalsToShow: 0, isWei: true})}</span>
