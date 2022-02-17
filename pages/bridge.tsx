@@ -1,13 +1,16 @@
-//Components
-import Card from 'components/basics/Card';
-
 // Next
 import Head from 'next/head';
 // Bitcrush
-import PageContainer from 'components/PageContainer';
 import BridgeCard from 'tw/bridge/BridgeCard';
+import PageContainer from 'components/PageContainer';
+
+// web3-react
+import { useWeb3React } from '@web3-react/core'
 
 const Bridge = () => {
+
+  const { account } = useWeb3React()
+
   return <PageContainer>
     <Head>
       <title>BITCRUSH - Cross Chain BRIDGE</title>
@@ -16,7 +19,7 @@ const Bridge = () => {
     <h2 className="text-center text-4xl whitespace-pre-line font-zeb">
         Intergalactic Bridge
     </h2>
-    <div className="flex flex-row justify-center mt-6">
+    <div className="flex flex-row justify-center mt-9">
       <BridgeCard/>
     </div>
 
