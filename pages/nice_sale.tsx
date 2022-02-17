@@ -212,7 +212,7 @@ const NiceSale = () => {
     <PageContainer background='galactic'>
       <div className="flex items-center justify-center px-2">
         {
-          (!chainId || chainId !== 97)
+          (!chainId || chainId !== 56)
             ?
             <h2 className='text-xl font-zeb mt-10'>
               Coming Soon
