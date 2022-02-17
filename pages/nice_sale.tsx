@@ -34,6 +34,8 @@ type PresaleDataType = {
   claimable: BigNumber,
   claimed: BigNumber,
   totalBought: BigNumber,
+  saleStart: BigNumber,
+  saleEnd: BigNumber,
 }
 const initPresale = {
   whitelisted: 0,
@@ -43,9 +45,13 @@ const initPresale = {
   claimable: new BigNumber(0),
   claimed: new BigNumber(0),
   totalBought: new BigNumber(0),
+  saleStart: new BigNumber(0),
+  saleEnd: new BigNumber(0),
 }
 
 const NiceSale = () => {
+  const [saleStarted, setSaleStarted] = useState<boolean>(() => new Date().getTime() > 1645401600000)
+  const [saleEnded, setSaleEnded] = useState<boolean>(() => new Date().getTime() > 1645401600000)
   const [nftId, setNftId] = useState<string>("")
   const [buyAmount, setBuyAmount] = useState<number>(0)
   const [prequalified, setPrequalified] = useState<boolean>(false)
@@ -79,6 +85,8 @@ const NiceSale = () => {
     const maxRaise = new BigNumber( await psMethod.maxRaise().call() )
     const totalRaised = new BigNumber( await psMethod.totalRaised().call() )
     const available = new BigNumber(await psMethod.availableAmount().call())
+    const saleStart = new BigNumber(await psMethod.availableAmount().call())
+    const saleEnd = new BigNumber(await psMethod.availableAmount().call())
 
     setPresaleData({
       whitelisted: tokenUsed,
@@ -88,6 +96,8 @@ const NiceSale = () => {
       claimed: new BigNumber(userData.amountClaimed),
       claimable: available.minus(userData.amountClaimed),
       totalBought: new BigNumber(userData.amountOwed),
+      saleStart,
+      saleEnd
     })
   },[setPresaleData, psMethod, account])
 
@@ -312,55 +322,55 @@ const NiceSale = () => {
                       </div>
                   }
                   {/* Approve and BUY */}
-                {
+                  {
                     presaleData.whitelisted > 0 && 
-                    <div className='flex flex-row justify-center'>
-                      {
-                        isApproved ?
-                          <TextField 
-                            type="number"
-                            label="BUSD amount"
-                            InputProps={{
-                              style:{ paddingRight: 0},
-                              endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
-                                disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThanOrEqualTo(5000) || buyAmount < 100}
-                                onClick={buyTokens}
-                              >
-                                Buy
-                              </button>
-                            }}
-                            onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
-                            error={buyAmount<100 || buyAmount > 5000}
-                            helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
-                          />
-                        :
-                          <button onClick={approveBUSD}
-                            className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
-                          >
-                            Approve BUSD
-                          </button>
-                      }
-                    </div>
+                      <div className='flex flex-row justify-center'>
+                        {
+                          isApproved ?
+                            <TextField 
+                              type="number"
+                              label="BUSD amount"
+                              InputProps={{
+                                style:{ paddingRight: 0},
+                                endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
+                                  disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThanOrEqualTo(5000) || buyAmount < 100}
+                                  onClick={buyTokens}
+                                >
+                                  Buy
+                                </button>
+                              }}
+                              onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
+                              error={buyAmount<100 || buyAmount > 5000}
+                              helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
+                            />
+                          :
+                            <button onClick={approveBUSD}
+                              className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
+                            >
+                              Approve BUSD
+                            </button>
+                        }
+                      </div>
                   }
                   {/* COUNTDOWN FOR SALE START */}
                   <hr className='my-3 border-primary opacity-70'/>
 
-                  <h3 className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                    <span>
-                      Sale Start
-                    </span>
-                    <span className="text-secondary font-bold">
-                      <Countdown date={new Date(1645333200000)}
+                      <Countdown date={new Date(presaleData.saleStart.toNumber() || 1645401600000)}
+                        onComplete={()=>setSaleStarted(true)}
                         renderer={
-                          ({days, hours, minutes, seconds}) => {
-                            return <>
+                          ({days, hours, minutes, seconds, completed}) => {
+                            if(completed) return null
+                            return <h3 className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                                <span>
+                                  Sale Start
+                                </span>
+                                <span className="text-secondary font-bold">
                               {days}D {hours}H {minutes}H {seconds}S
-                            </>
+                              </span>
+                            </h3>
                           }
                         }
                       />
-                    </span>
-                  </h3>
                   <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                     <span>To Raise (BUSD)</span>
                     <span>{currencyFormat(presaleData.maxRaise.toString(), {decimalsToShow: 0, isWei: true})}</span>
@@ -389,7 +399,7 @@ const NiceSale = () => {
                     <span>Claimed</span>
                     <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
                   </div>
-                  { //presaleData.claimable.isGreaterThan(0) && 
+                  { presaleData.claimable.isGreaterThan(0) && 
                     <div className="flex justify-center">
                       <button
                         className={`
