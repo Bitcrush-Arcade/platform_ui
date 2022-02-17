@@ -327,7 +327,7 @@ const NiceSale = () => {
                       <div className='flex flex-row justify-center'>
                         {
                           isApproved ?
-                            <TextField 
+                            ( saleStarted && !saleEnded && <TextField 
                               type="number"
                               label="BUSD amount"
                               InputProps={{
@@ -342,7 +342,7 @@ const NiceSale = () => {
                               onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
                               error={buyAmount<100 || buyAmount > 5000}
                               helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
-                            />
+                            />)
                           :
                             <button onClick={approveBUSD}
                               className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
@@ -379,39 +379,49 @@ const NiceSale = () => {
                     <span>Presale Price (NICE/BUSD)</span>
                     <span>0.00470</span>
                   </div>
-                  <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                    <span>BUSD Bought</span>
-                    <span>{currencyFormat(presaleData.boughtAmount.toString(), {decimalsToShow: 0, isWei: true})}</span>
-                  </div>
-                  <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                    <span>$NICE Bought</span>
-                    <span
-                      className="text-primary"
-                    >
-                      {currencyFormat(presaleData.totalBought.toString(), { decimalsToShow: 0, isWei: true})}
-                    </span>
-                  </div>
-                  <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                    <span>Claimable</span>
-                    <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
-                  </div>
-                  <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                    <span>Claimed</span>
-                    <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
-                  </div>
-                  { presaleData.claimable.isGreaterThan(0) && 
-                    <div className="flex justify-center">
-                      <button
-                        className={`
-                          border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
-                          hover:bg-primary-dark hover:text-black
-                        `}
-                        onClick={claimNice}
-                      >
-                        Claim
-                      </button>
+                  { saleStarted && <>
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>$BUSD Spent</span>
+                      <span>{currencyFormat(presaleData.boughtAmount.toString(), {decimalsToShow: 0, isWei: true})}</span>
                     </div>
-                  }
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>$NICE Bought</span>
+                      <span
+                        className="text-primary"
+                      >
+                        {currencyFormat(presaleData.totalBought.toString(), { decimalsToShow: 0, isWei: true})}
+                      </span>
+                    </div>
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>Claimable</span>
+                      <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
+                    </div>
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>$NICE Claimable</span>
+                      <span>{currencyFormat(presaleData.claimable.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
+                    </div>
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>Claimed</span>
+                      <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
+                    </div>
+                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                      <span>$NICE Claimed</span>
+                      <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
+                    </div>
+                    { presaleData.claimable.isGreaterThan(0) && 
+                      <div className="flex justify-center">
+                        <button
+                          className={`
+                            border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
+                            hover:bg-primary-dark hover:text-black
+                          `}
+                          onClick={claimNice}
+                        >
+                          Claim
+                        </button>
+                      </div>
+                    }
+                  </>}
                 </div>
               </>
             }
