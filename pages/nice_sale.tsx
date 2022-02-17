@@ -314,6 +314,16 @@ const NiceSale = () => {
                           }}
                           label="NFT ID"
                           className="max-w-[80px]"
+                          InputLabelProps={{
+                            sx:{
+                              color: theme => theme.palette.grey[300]
+                            }
+                          }}
+                          InputProps={{
+                            sx:{
+                              color: 'white',
+                            }
+                          }}
                         />
                         <button disabled={isNaN(parseInt(nftId))}
                           onClick={whitelist}
@@ -333,13 +343,21 @@ const NiceSale = () => {
                               type="number"
                               label="BUSD amount"
                               InputProps={{
-                                style:{ paddingRight: 0},
+                                sx:{
+                                  pr: 0,
+                                  color: 'white'
+                                },
                                 endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
-                                  disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThanOrEqualTo(5000) || buyAmount < 100}
+                                  disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThan(5000) || buyAmount < 100}
                                   onClick={buyTokens}
                                 >
                                   Buy
                                 </button>
+                              }}
+                              InputLabelProps={{
+                                sx:{
+                                  color: theme => theme.palette.grey[300]
+                                }
                               }}
                               onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
                               error={buyAmount<100 || buyAmount > 5000}
