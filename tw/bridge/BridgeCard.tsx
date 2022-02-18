@@ -165,7 +165,7 @@ const ChainSelector = (props: SelectorProps) => {
             text-xs
             leading-tight
             uppercase
-            rounded
+            rounded-[32px]
             shadow-md
             transition
             duration-150
