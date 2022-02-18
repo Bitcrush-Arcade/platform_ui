@@ -21,7 +21,7 @@ const BridgeCard = (props: BridgeCardProps) => {
     setSelectedToken( p => !p)
   },[setSelectedToken])
   
-  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-10 pt-7 pb-10 rounded-[32px] max-w-[500px]">
+  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-10 pt-4 pb-10 rounded-[32px] max-w-[500px]">
 
           <div className="grid grid-col grid-cols-5 grid-rows-2 justify-items-center items-center">
           <h2 className="text-primary col-start-1 col-span-5 self-center">
