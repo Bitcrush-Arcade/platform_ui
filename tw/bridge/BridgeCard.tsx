@@ -47,7 +47,7 @@ const BridgeCard = (props: BridgeCardProps) => {
           <div className="flex flex-col items-center gap-3">
 
             <h2 className="text-primary">
-              Select your token
+              Select token
             </h2>
 
             {
