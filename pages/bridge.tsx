@@ -4,12 +4,8 @@ import Head from 'next/head';
 import BridgeCard from 'tw/bridge/BridgeCard';
 import PageContainer from 'components/PageContainer';
 
-// web3-react
-import { useWeb3React } from '@web3-react/core'
-
 const Bridge = () => {
 
-  const { account } = useWeb3React()
 
   return <PageContainer>
     <Head>
