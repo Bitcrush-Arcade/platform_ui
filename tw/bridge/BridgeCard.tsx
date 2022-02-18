@@ -96,7 +96,7 @@ const BridgeCard = (props: BridgeCardProps) => {
                   text-white
                   bg-paper-bg bg-clip-padding
                   border-2 border-solid border-primary
-                  rounded
+                  rounded-[8px]
                   transition
                   ease-in-out
                   m-0
@@ -165,7 +165,7 @@ const ChainSelector = (props: SelectorProps) => {
             text-xs
             leading-tight
             uppercase
-            rounded-[32px]
+            rounded-[8px]
             shadow-md
             transition
             duration-150
