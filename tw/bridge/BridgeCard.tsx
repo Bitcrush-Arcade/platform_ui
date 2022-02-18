@@ -22,53 +22,85 @@ const BridgeCard = (props: BridgeCardProps) => {
   },[setSelectedToken])
   
   return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg p-10 rounded-[32px] max-w-[500px]">
-          
-          <div className="flex flex-row justify-between">
+          <h2 className="text-primary self-center">
+              Select chains
+          </h2>
+          <div className="grid grid-col grid-cols-3 justify-items-center">
             <div>
-            CHAIN SELECTOR 1
+            From 
             </div>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
             <div>
-            CHAIN SELECTOR 2
+            To 
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-3">
+
+            <h2 className="text-primary">
+              Select your token
+            </h2>
+
             {
               selectedToken
                 ?
 
-            <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
-              <h2 className="justify-self-end text-s">
-                NICE
-              </h2>
-              <button onClick={tokenToggle} className="justify-self-center flex flex-row border-2 border-primary rounded-[32px] w-20 p-1 ">
-                <div className="flex flex-row border-4 border-primary bg-primary rounded-[32px] basis-1/2 px-2 h-6 w-10"/>
-              </button>
-              <h2 className='text-xs text-slate-500'>
-                CRUSH
-              </h2>
-            </div>
-            :
-            <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
-              <h2 className="text-xs justify-self-end text-slate-500">
-                NICE
-              </h2>
-              <button onClick={tokenToggle} className="justify-self-center flex flex-row justify-end border-2 border-primary rounded-[32px] w-20 p-1">
-                <div className="basis-1/2 flex flex-row border-4 border-primary bg-primary rounded-[32px] px-2 h-6 w-10"/>
-              </button>
-              <h2 className="text-s">
-                CRUSH
-              </h2>
-            </div>
-
+                <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
+                  <h2 className="justify-self-end text-s">
+                    NICE
+                  </h2>
+                  <button onClick={tokenToggle} className="justify-self-center flex flex-row border-2 border-primary rounded-[32px] w-20 p-1 ">
+                    <div className="flex flex-row border-4 border-primary bg-primary rounded-[32px] basis-1/2 px-2 h-6 w-10"/>
+                  </button>
+                  <h2 className='text-xs text-slate-500'>
+                    CRUSH
+                  </h2>
+                </div>
+                :
+                <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
+                  <h2 className="text-xs justify-self-end text-slate-500">
+                    NICE
+                  </h2>
+                  <button onClick={tokenToggle} className="justify-self-center flex flex-row justify-end border-2 border-primary rounded-[32px] w-20 p-1">
+                    <div className="basis-1/2 flex flex-row border-4 border-primary bg-primary rounded-[32px] px-2 h-6 w-10"/>
+                  </button>
+                  <h2 className="text-s">
+                    CRUSH
+                  </h2>
+                </div>
             }
+
             <div>
-            TEXTFIELD FOR AMOUNT
+              <h2 className="text-xs text-primary">
+                Amount to bridge
+              </h2>
+              <input
+                type="text"
+                className="
+                  form-control
+                  block
+                  w-full
+                  px-3
+                  py-1.5
+                  text-base
+                  font-normal
+                  text-white
+                  bg-paper-bg bg-clip-padding
+                  border-2 border-solid border-primary
+                  rounded
+                  transition
+                  ease-in-out
+                  m-0
+                  focus:text-white focus:bg-paper-bg focus:outline-none
+                "
+                id="coinAmount"
+                placeholder="0.0"
+              />
             </div>
-            
+          </div>
+          <div className="flex justify-center">
             {
               account
                 ?
@@ -86,7 +118,6 @@ const BridgeCard = (props: BridgeCardProps) => {
                 CONNECT TO WALLET
               </button>
             }
-           
           </div>
 
           <div className="flex border-2 border-primary rounded-[32px] justify-center mx-2 p-4">
