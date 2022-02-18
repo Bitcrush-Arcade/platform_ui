@@ -1,11 +1,17 @@
 // Next
 import Head from 'next/head';
+import { GetStaticProps, InferGetStaticPropsType  } from 'next'
 // Bitcrush
 import BridgeCard from 'tw/bridge/BridgeCard';
 import PageContainer from 'components/PageContainer';
+// utils
+import { getClient } from 'utils/sanityConfig';
+// Query
+import { bridgeChains } from 'queries/bridge'
 
-const Bridge = () => {
+const Bridge = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 
+  const { bridgeChains } = props;
 
   return <PageContainer>
     <Head>
@@ -16,10 +22,20 @@ const Bridge = () => {
         Intergalactic Bridge
     </h2>
     <div className="flex flex-row justify-center mt-9">
-      <BridgeCard/>
+      <BridgeCard bridgeChains={bridgeChains}/>
     </div>
 
   </PageContainer>
 }
 
 export default Bridge
+
+export const getStaticProps: GetStaticProps = async() => {
+  const client = getClient()
+  const validChains = await client.fetch(bridgeChains)
+  return{
+    props:{
+      bridgeChains: validChains
+    }
+  }
+}

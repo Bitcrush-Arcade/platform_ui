@@ -1,20 +1,20 @@
-import { useState, useCallback } from 'react'
+import React, { useState, useCallback } from 'react'
 // Bitcrush UI
 // Hooks
 import { useAuthContext } from 'hooks/contextHooks'
 // Props
 type BridgeCardProps = {
-  account: string;
-  amount: number;
-  walletBalance: number;
+  bridgeChains: Array<any>
 }
 
 const BridgeCard = (props: BridgeCardProps) => {
 
-  const { amount, walletBalance } = props
+  const { bridgeChains } = props
 
   const { login, account, chainId } = useAuthContext()
   const [selectedToken, setSelectedToken] = useState<boolean>(false)
+  const [fromChain, setFromChain] = useState<any>()
+  const [toChain, setToChain] = useState<any>()
 
   
   const tokenToggle= useCallback(() => {
@@ -31,7 +31,7 @@ const BridgeCard = (props: BridgeCardProps) => {
               <h2 className="text-s">
               FROM 
               </h2>
-              <ChainSelector/>
+              <ChainSelector allChains={bridgeChains}/>
             </div>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-3 col-span-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -40,7 +40,7 @@ const BridgeCard = (props: BridgeCardProps) => {
               <h2 className="text-s">
                 TO 
               </h2>
-              <ChainSelector/> 
+              <ChainSelector allChains={bridgeChains}/> 
             </div>
           </div>
 
@@ -84,10 +84,7 @@ const BridgeCard = (props: BridgeCardProps) => {
                 Amount to bridge
               </h2>
               <input
-                type="number"
                 className="
-                  form-control
-                  block
                   w-full
                   px-3
                   py-1.5
@@ -104,6 +101,13 @@ const BridgeCard = (props: BridgeCardProps) => {
                 "
                 id="coinAmount"
                 placeholder="0.0"
+                //value={bridgeAmount}
+                onChange={ (e: React.ChangeEvent<HTMLInputElement>) => {
+                  // get value
+                  // change to BIGNUMBER
+                  // CHECK IF NUMBER IS VALID
+                  // SET STATE
+                }}
               />
             </div>
           </div>
@@ -111,11 +115,13 @@ const BridgeCard = (props: BridgeCardProps) => {
             {
               account
                 ?
-              <button disabled={amount>0 && amount<walletBalance} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-6 py-4 text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+              <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-6 py-4 text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clipRule="evenodd" />
                 </svg>
-                BRIDGE TOKENS
+                <span className="text-sm font-bold">
+                  BRIDGE TOKENS
+                </span>
               </button>
               :
               <button className="flex flex-row items-center gap-2 border-2 border-primary inner-glow-primary px-6 py-4 text-xs rounded-full hover:bg-primary hover:text-black" onClick={login}>
@@ -146,16 +152,18 @@ export default BridgeCard
 type SelectorProps = {
   onChange:(chainToSelect: string) => void,
   currentChain: string
-  defaultChain: string
+  defaultChain: string,
+  allChains: Array<any>
 }
 const ChainSelector = (props: SelectorProps) => {
+
+  const { allChains } = props
   
   return <div className="flex justify-center">
     <div>
-      <div className="dropdown relative">
-        <button
+      <div className="relative">
+        <select
           className="
-            dropdown-toggle
             px-6
             py-2.5
             bg-paper-bg
@@ -174,12 +182,20 @@ const ChainSelector = (props: SelectorProps) => {
             items-center
             whitespace-nowrap
           "
-          type="button"
-          id="dropdownMenuButton1"
+          id="selectChain"
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          DEFAULT CHAIN
+          {
+            allChains.map( (chainInfo, cIndex) => {
+              return <option key={`select-bridge-chain-${cIndex}`}
+                className=""
+              >
+                {chainInfo.symbol}
+              </option>
+            })
+          }
+          {/* DEFAULT CHAIN
           <svg
             aria-hidden="true"
             focusable="false"
@@ -194,92 +210,8 @@ const ChainSelector = (props: SelectorProps) => {
               fill="currentColor"
               d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
             ></path>
-          </svg>
-        </button>
-        <ul
-          className="
-            dropdown-menu
-            min-w-max
-            absolute
-            hidden
-            bg-white
-            text-base
-            z-50
-            float-left
-            py-2
-            list-none
-            text-left
-            rounded-lg
-            shadow-lg
-            mt-1
-            hidden
-            m-0
-            bg-clip-padding
-            border-none
-          "
-          aria-labelledby="dropdownMenuButton1"
-        >
-          <li>
-            <a
-              className="
-                dropdown-item
-                text-sm
-                py-2
-                px-4
-                font-normal
-                block
-                w-full
-                whitespace-nowrap
-                bg-transparent
-                text-gray-700
-                hover:bg-gray-100
-              "
-              href="#"
-              >
-                Action
-            </a>
-          </li>
-          <li>
-            <a
-              className="
-                dropdown-item
-                text-sm
-                py-2
-                px-4
-                font-normal
-                block
-                w-full
-                whitespace-nowrap
-                bg-transparent
-                text-gray-700
-                hover:bg-gray-100
-              "
-              href="#"
-              >
-                Another action
-            </a>
-          </li>
-          <li>
-            <a
-              className="
-                dropdown-item
-                text-sm
-                py-2
-                px-4
-                font-normal
-                block
-                w-full
-                whitespace-nowrap
-                bg-transparent
-                text-gray-700
-                hover:bg-gray-100
-              "
-              href="#"
-            >
-            Something else here
-            </a>
-          </li>
-        </ul>
+          </svg> */}
+        </select>
       </div>
     </div>
   </div>
