@@ -17,7 +17,7 @@ import BigNumber from 'bignumber.js'
 import { useContract } from 'hooks/web3Hooks'
 import usePrevLiveWallet from 'hooks/usePrevLw'
 // Context
-import { useAuthContext, useTransactionContext } from 'hooks/contextHooks'
+import { useAuthContext, useTransactionContext, useLiveWalletContext } from 'hooks/contextHooks'
 // data
 import { getContracts } from 'data/contracts'
 // Types
@@ -37,7 +37,8 @@ const ProfileAvatar = ( props: ProfileAvatarProps ) => {
   const css = useStyles({})
   const { login, logout, account, chainId } = useAuthContext()
 
-  const { tokenInfo, editTransactions, liveWallet, toggleLwModal } = useTransactionContext()
+  const { toggleStakeModal } = useLiveWalletContext()
+  const { tokenInfo, editTransactions, liveWallet } = useTransactionContext()
   const { address: tokenAddress, abi: tokenAbi } = getContracts('crushToken', 56)
   const { address: stakingContract } = getContracts('singleAsset', 56)
   const { methods: coinMethods } = useContract(tokenAbi, tokenAddress)
@@ -120,7 +121,7 @@ const ProfileAvatar = ( props: ProfileAvatarProps ) => {
         </ListItem>}
         <ListItem button
           onClick={() => {
-            toggleLwModal()
+            toggleStakeModal()
             toggleDrawer()
           }}>
             <ListItemText
