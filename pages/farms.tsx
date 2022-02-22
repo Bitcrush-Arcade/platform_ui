@@ -1,11 +1,7 @@
 // Next
 import Head from 'next/head';
-import { GetStaticProps, InferGetStaticPropsType  } from 'next'
-// Bitcrush
-
 import PageContainer from 'components/PageContainer';
-// utils
-import { getClient } from 'utils/sanityConfig';
+
 
 
 const Farm = () => {
