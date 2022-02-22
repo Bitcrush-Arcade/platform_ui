@@ -30,69 +30,50 @@ const BridgeCard = (props: BridgeCardProps) => {
   
   return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-12 pt-1 pb-10 rounded-[32px] max-w-[500px]">
             
-            <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center">
+          <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center">
 
-              <h2 className="text-s self-end col-start-1">
-                FROM 
-              </h2>
-
-              <h2 className="text-primary row-start-1 col-start-2 self-center">
-                  Select chains
-              </h2>
-
-              <h2 className="text-s self-end col-start-3">
-                  TO 
-              </h2>
-
-              <div className="col-start-1 grid justify-items-center">
-                <ChainSelector allChains={bridgeChains}/>
-              </div>
-
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-2 col-span-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-
-              <div className="col-start-3 grid justify-items-center">
-                <ChainSelector allChains={bridgeChains}/> 
-              </div>
+            <div className="text-s self-end col-start-1">
+              FROM 
             </div>
+
+            <h2 className="text-[1.25rem] text-primary row-start-1 col-start-2 self-center">
+                CHAINS
+            </h2>
+
+            <div className="text-s self-end col-start-3">
+                TO 
+            </div>
+
+            <div className="col-start-1 grid justify-items-center">
+              <ChainSelector allChains={bridgeChains}/>
+            </div>
+
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-2 col-span-1 text-secondary" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+
+            <div className="col-start-3 grid justify-items-center">
+              <ChainSelector allChains={bridgeChains}/> 
+            </div>
+          </div>
           
 
           <div className="flex flex-col justify-items-center items-center gap-3">
 
-            <h2 className="text-primary">
-              Select token
-            </h2>
-
-            {
-              selectedToken
-                ?
-
-                <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
-                  <h2 className="justify-self-end text-s">
-                    NICE
-                  </h2>
-                  <button onClick={tokenToggle} className="justify-self-center flex flex-row border-2 border-primary rounded-[32px] w-20 p-1">
-                    <div className="flex flex-row border-4 border-primary bg-primary rounded-[32px] basis-1/2 px-2 h-6 w-10"/>
-                  </button>
-                  <h2 className='text-xs text-slate-500'>
-                    CRUSH
-                  </h2>
-                </div>
-                :
-                <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
-                  <h2 className="text-xs justify-self-end text-slate-500">
-                    NICE
-                  </h2>
-                  <button onClick={tokenToggle} className="justify-self-center flex flex-row justify-end border-2 border-primary rounded-[32px] w-20 p-1">
-                    <div className="basis-1/2 flex flex-row border-4 border-primary bg-primary rounded-[32px] px-2 h-6 w-10"/>
-                  </button>
-                  <h2 className="text-s">
-                    CRUSH
-                  </h2>
-                </div>
-            }
-
+            <h3 className="text-primary text-[1.25rem]">
+              BRIDGE TOKEN
+            </h3>
+            <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
+              <div className={`justify-self-end ${selectedToken ? "text-md" : "text-xs"} ${selectedToken ? "text-white" : "text-slate-500"}`}>
+                NICE
+              </div>
+              <button className="relative w-[80px] rounded-[32px] border-2 border-primary h-[32px]" onClick={tokenToggle}>
+                <div className={`absolute bg-primary rounded-[32px] px-2 h-6 w-10 ${ selectedToken ? "left-0.5" : "right-0.5"} top-0.5`}/>
+              </button>
+              <div className={`${selectedToken ? "text-xs" : "text-md"} ${selectedToken ? "text-slate-500" : "text-white"}`}>
+                CRUSH
+              </div>
+            </div>
             <div>
               <h2 className="text-xs text-primary">
                 Amount to bridge
@@ -182,7 +163,6 @@ const ChainSelector = (props: SelectorProps) => {
       id="chain-select"
       value={chain}
       onChange={handleChange}
-      defaultValue={"?"}
       sx={{
         width: "10rem",
         height: "81px",
