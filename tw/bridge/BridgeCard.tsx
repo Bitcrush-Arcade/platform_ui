@@ -1,7 +1,14 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, ChangeEvent } from 'react'
+import Image from 'next/image'
 // Bitcrush UI
 // Hooks
+import { imageBuilder } from 'utils/sanityConfig'
 import { useAuthContext } from 'hooks/contextHooks'
+
+// MUI
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+
 // Props
 type BridgeCardProps = {
   bridgeChains: Array<any>
@@ -21,30 +28,37 @@ const BridgeCard = (props: BridgeCardProps) => {
     setSelectedToken( p => !p)
   },[setSelectedToken])
   
-  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-10 pt-4 pb-10 rounded-[32px] max-w-[500px]">
+  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-12 pt-1 pb-10 rounded-[32px] max-w-[500px]">
+            
+            <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center">
 
-          <div className="grid grid-col grid-cols-5 grid-rows-2 justify-items-center items-center">
-          <h2 className="text-primary col-start-1 col-span-5 self-center">
-              Select chains
-          </h2>
-            <div className="col-start-1 col-span-2 grid justify-items-center">
-              <h2 className="text-s">
-              FROM 
+              <h2 className="text-s self-end col-start-1">
+                FROM 
               </h2>
-              <ChainSelector allChains={bridgeChains}/>
-            </div>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-3 col-span-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-            <div className="col-start-4 col-span-2 grid justify-items-center">
-              <h2 className="text-s">
-                TO 
-              </h2>
-              <ChainSelector allChains={bridgeChains}/> 
-            </div>
-          </div>
 
-          <div className="flex flex-col items-center gap-3">
+              <h2 className="text-primary row-start-1 col-start-2 self-center">
+                  Select chains
+              </h2>
+
+              <h2 className="text-s self-end col-start-3">
+                  TO 
+              </h2>
+
+              <div className="col-start-1 grid justify-items-center">
+                <ChainSelector allChains={bridgeChains}/>
+              </div>
+
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-2 col-span-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+
+              <div className="col-start-3 grid justify-items-center">
+                <ChainSelector allChains={bridgeChains}/> 
+              </div>
+            </div>
+          
+
+          <div className="flex flex-col justify-items-center items-center gap-3">
 
             <h2 className="text-primary">
               Select token
@@ -58,7 +72,7 @@ const BridgeCard = (props: BridgeCardProps) => {
                   <h2 className="justify-self-end text-s">
                     NICE
                   </h2>
-                  <button onClick={tokenToggle} className="justify-self-center flex flex-row border-2 border-primary rounded-[32px] w-20 p-1 ">
+                  <button onClick={tokenToggle} className="justify-self-center flex flex-row border-2 border-primary rounded-[32px] w-20 p-1">
                     <div className="flex flex-row border-4 border-primary bg-primary rounded-[32px] basis-1/2 px-2 h-6 w-10"/>
                   </button>
                   <h2 className='text-xs text-slate-500'>
@@ -157,64 +171,35 @@ type SelectorProps = {
 }
 const ChainSelector = (props: SelectorProps) => {
 
-  const { allChains } = props
-  
-  return <div className="flex justify-center">
-    <div>
-      <div className="relative">
-        <select
-          className="
-            px-6
-            py-2.5
-            bg-paper-bg
-            border-2 border-secondary 
-            text-white
-            font-medium
-            text-xs
-            leading-tight
-            uppercase
-            rounded-[8px]
-            shadow-md
-            transition
-            duration-150
-            ease-in-out
-            flex
-            items-center
-            whitespace-nowrap
-          "
-          id="selectChain"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          {
-            allChains.map( (chainInfo, cIndex) => {
-              return <option key={`select-bridge-chain-${cIndex}`}
-                className=""
-              >
-                {chainInfo.symbol}
-              </option>
-            })
-          }
-          {/* DEFAULT CHAIN
-          <svg
-            aria-hidden="true"
-            focusable="false"
-            data-prefix="fas"
-            data-icon="caret-down"
-            className="w-2 ml-2"
-            role="img"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 320 512"
-          >
-            <path
-              fill="currentColor"
-              d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z"
-            ></path>
-          </svg> */}
-        </select>
-      </div>
-    </div>
-  </div>
+  const { allChains, currentChain } = props
+  const [chain, setChain] = React.useState('');
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setChain(event.target.value);
+  };
 
+  return <div>
+    <Select
+      id="chain-select"
+      value={chain}
+      onChange={handleChange}
+      defaultValue={"?"}
+      sx={{
+        width: "10rem",
+        height: "81px",
+        borderRadius: "8px",
+      }}
+    >
+      { 
+        allChains.map((chainInfo, cIndex) => {
+          return <MenuItem value={cIndex} disabled={chainInfo.symbol == chain}>
+            <div className="flex flex-row justify-center items-center gap-4 p-1">
+            {chainInfo.chainIcon?.asset._ref && <Image src={imageBuilder(chainInfo.chainIcon.asset._ref).width(40).height(40).url()} width={40} height={40}/>}
+            {chainInfo.symbol}
+            </div>
+          </MenuItem>
+        })
+      }
+    </Select>
+  </div>
 }
 
