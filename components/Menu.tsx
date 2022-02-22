@@ -48,7 +48,7 @@ import Ufo2Icon from 'components/svg/Ufo2Icon'
 import RechargeIcon from 'components/svg/RechargeIcon'
 import BlackHoleIcon from 'components/svg/BlackHoleIcon'
 import TradeIcon from 'components/svg/TradeIcon'
-// import WarpIcon from 'components/svg/WarpIcon'
+import WarpIcon from 'components/svg/WarpIcon'
 import NightIcon from 'components/svg/Night'
 import DayIcon from 'components/svg/Day'
 
@@ -73,7 +73,7 @@ const Menu = ( props: MenuProps) => {
     const linkArray: Array<LinkItem> = [
         { name: 'Home', icon: <HomeIcon color="inherit"/>, url_link: '/' },
         { name: 'Intergalactic Trade', icon: <TradeIcon/>, url_link: '/trade', disabled: true },
-        // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
+        { name: 'Warp Farms', icon: <WarpIcon/>, url_link: '/farms', disabled: false },
         { name: 'Galactic Mining', icon: <UfoIcon/>, url_link: '/mining' },
         { name: 'ARCADE', icon: <ArcadeIcon/>, url_link: '/games', loadOnClick: true },
         { name: `Launch`, icon: <RechargeIcon/>, url_link: '/nice_sale', disabled: false },
