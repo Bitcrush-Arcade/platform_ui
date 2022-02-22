@@ -91,7 +91,7 @@ const BridgeCard = (props: BridgeCardProps) => {
               </div>
               <div>
                 <h2 className="text-xs text-slate-500 pl-2">
-                  Amount to bridge
+                  Amount
                 </h2>
                 <input
                   className="
