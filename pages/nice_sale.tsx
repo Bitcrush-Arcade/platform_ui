@@ -80,25 +80,23 @@ const NiceSale = () => {
       console.log('do nothing1')
       return
     }
-    const userData = await psMethod.userBought(account).call()
-    const tokenUsed = await psMethod.whitelist(account).call()
+    const userData = await psMethod.userData().call({ from: account })
     const maxRaise = new BigNumber( await psMethod.maxRaise().call() )
     const totalRaised = new BigNumber( await psMethod.totalRaised().call() )
-    const available = new BigNumber(await psMethod.availableAmount().call())
     const saleStart = new BigNumber(await psMethod.saleStart().call()).times(1000)
-    const saleEnd = new BigNumber(await psMethod.saleEnd().call()).times(1000)
-    setSaleEnded( saleEnd.isLessThan(new Date().getTime()) )
+    const isPause = await psMethod.pause().call()
+    setSaleEnded( isPause )
 
     setPresaleData({
-      whitelisted: tokenUsed,
-      boughtAmount: new BigNumber(userData.amountBought),
+      whitelisted: 100,
+      boughtAmount: new BigNumber(userData[0]),
       maxRaise,
       totalRaised,
-      claimed: new BigNumber(userData.amountClaimed),
-      claimable: available.minus(userData.amountClaimed),
-      totalBought: new BigNumber(userData.amountOwed),
+      claimed: new BigNumber(userData[2]),
+      claimable: isPause ? new BigNumber(10000) : new BigNumber(0),
+      totalBought: new BigNumber(userData[1]),
       saleStart,
-      saleEnd
+      saleEnd: new BigNumber(0)
     })
   },[setPresaleData, psMethod, account])
 
@@ -229,9 +227,9 @@ const NiceSale = () => {
                   </div>
                   <div className="py-2">
                     <p className="text-justify text-sm">
-                      $NICE is the official currency of the Invaderverse. Presale is by whitelist only, you can whitelist yourself if you meet the requirements listed below.
+                      $NICE is the official currency of the Invaderverse. Presale is open, you can participate if you meet the requirements listed below.
                       <br/>
-                      Please note that Presale tokens are vested over the course of 8 weeks. You can check back here to claim a portion of your tokens.
+                      Tokens are claimable immediately after sale ends.
                     </p>
                   </div>
                   {/* Fill bar */}
@@ -250,7 +248,7 @@ const NiceSale = () => {
                       {presaleData.totalRaised.div(10**18).toFixed(0)} / {presaleData.maxRaise.div(10**18).toFixed(0)}
                     </span>
                   </div>
-                  <div className='flex flex-row justify-between px-2'>
+                  <div className='flex flex-row justify-between px-2 mb-4'>
                     <p>
                       Do I qualify?
                     </p>
@@ -264,7 +262,6 @@ const NiceSale = () => {
                         <Tooltip title={
                           <p className="whitespace-pre-line">
                             Check that you:{"\n"}
-                            * Own a Crush God NFT{"\n"}
                             * Have at least 10k $CRUSH staked in Auto Bitcrush V2{"\n"}
                           </p>
                         }>
@@ -272,30 +269,6 @@ const NiceSale = () => {
                         </Tooltip>
                     }
                   </div>
-                  {
-                    prequalified && 
-                    <div className='flex flex-col md:flex-row justify-between items-center px-2 py-2'>
-                      <p className='mb-2'>
-                        Am I whitelisted?
-                      </p>
-                      {
-                        presaleData.whitelisted > 0
-                        ?
-                          <Tooltip title={`Whitelisted with NFT ID ${presaleData.whitelisted}`}>
-                            <CheckCircleIcon color="secondary"/>
-                          </Tooltip>
-                        :
-                          <Tooltip title={<p className="whitespace-pre-line">
-                                Not whitelisted yet:{"\n"}
-                                * Register your NFT ID{"\n"}
-                                * If it fails, make sure your ID has not been registered before{"\n"}
-                              </p>
-                            }>
-                            <CancelIcon color="error"/>
-                          </Tooltip>
-                      }
-                    </div>
-                  }
                   { 
                     prequalified && presaleData.whitelisted == 0 && 
                       <div className='flex items-center justify-center gap-x-1'>
@@ -434,34 +407,36 @@ const NiceSale = () => {
                         {currencyFormat(presaleData.totalBought.toString(), { decimalsToShow: 0, isWei: true})}
                       </span>
                     </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>Claimable</span>
-                      <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>$NICE Claimable</span>
-                      <span>{currencyFormat(presaleData.claimable.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>Claimed</span>
-                      <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>$NICE Claimed</span>
-                      <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                    </div>
                     { presaleData.claimable.isGreaterThan(0) && 
-                      <div className="flex justify-center">
-                        <button
-                          className={`
-                            border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
-                            hover:bg-primary-dark hover:text-black
-                          `}
-                          onClick={claimNice}
-                        >
-                          Claim
-                        </button>
-                      </div>
+                      <>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>Claimable</span>
+                          <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
+                        </div>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>$NICE Claimable</span>
+                          <span>{currencyFormat(presaleData.claimable.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
+                        </div>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>Claimed</span>
+                          <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
+                        </div>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>$NICE Claimed</span>
+                          <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
+                        </div>
+                        <div className="flex justify-center">
+                          <button
+                            className={`
+                              border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
+                              hover:bg-primary-dark hover:text-black
+                            `}
+                            onClick={claimNice}
+                          >
+                            Claim
+                          </button>
+                        </div>
+                      </>
                     }
                   </>}
                 </div>
