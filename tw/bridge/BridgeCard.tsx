@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from 'react'
+import React, { useState, useCallback, ChangeEvent, useEffect } from 'react'
 import Image from 'next/image'
 // Bitcrush UI
 // Hooks
@@ -7,7 +7,7 @@ import { useAuthContext } from 'hooks/contextHooks'
 
 // MUI
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectProps, SelectChangeEvent } from '@mui/material/Select';
 
 // Props
 type BridgeCardProps = {
@@ -20,15 +20,29 @@ const BridgeCard = (props: BridgeCardProps) => {
 
   const { login, account, chainId } = useAuthContext()
   const [selectedToken, setSelectedToken] = useState<boolean>(false)
-  const [fromChain, setFromChain] = useState<any>()
-  const [toChain, setToChain] = useState<any>()
+  const [fromChain, setFromChain] = useState<number>(0)
+  const [toChain, setToChain] = useState<number>(1)
 
+
+  useEffect(()=>{
+    if(!chainId) return
+    switch(chainId){
+      case 250:
+        setFromChain(0)
+        setToChain(1)
+        break
+      case 56:
+      default:
+        setFromChain(1)
+        setToChain(0)
+    }
+  },[chainId, setFromChain, setToChain])
   
   const tokenToggle= useCallback(() => {
     setSelectedToken( p => !p)
   },[setSelectedToken])
   
-  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-12 pt-1 pb-10 rounded-[32px] max-w-[500px]">
+  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-12 pt-1 pb-10 rounded-[32px] max-w-[500px] text-white">
             
           <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center">
 
@@ -45,7 +59,7 @@ const BridgeCard = (props: BridgeCardProps) => {
             </div>
 
             <div className="col-start-1 grid justify-items-center">
-              <ChainSelector allChains={bridgeChains} defaultChain="0"/>
+              <ChainSelector allChains={bridgeChains} currentChain={fromChain} onChange={ v => setFromChain(v)}/>
             </div>
 
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-2 col-span-1 text-secondary" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,7 +67,7 @@ const BridgeCard = (props: BridgeCardProps) => {
             </svg>
 
             <div className="col-start-3 grid justify-items-center">
-              <ChainSelector allChains={bridgeChains} defaultChain="1"/> 
+              <ChainSelector allChains={bridgeChains} currentChain={toChain} onChange={ v => setToChain(v)} /> 
             </div>
           </div>
           
@@ -145,35 +159,41 @@ const BridgeCard = (props: BridgeCardProps) => {
 export default BridgeCard
 
 type SelectorProps = {
-  onChange:(chainToSelect: string) => void,
-  currentChain: string
-  defaultChain: string,
+  onChange:(chainToSelect: number) => void,
+  currentChain: number
   allChains: Array<any>
 }
 const ChainSelector = (props: SelectorProps) => {
 
-  const { allChains, defaultChain, currentChain } = props
-  const [chain, setChain] = React.useState(defaultChain);
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setChain(event.target.value);
+  const { allChains, currentChain, onChange } = props
+  const handleChange = (event: SelectChangeEvent<number>) => {
+    typeof(event.target.value) == "string" 
+    &&
+      onChange( parseInt(event.target.value) )
+    ||
+      typeof(event.target.value) == "number" 
+    &&
+      onChange(event.target.value)
   };
 
+  
   return <div>
     <Select
       id="chain-select"
-      value={chain}
+      value={currentChain}
       onChange={handleChange}
       sx={{
         width: "10rem",
         height: "81px",
         borderRadius: "8px",
       }}
-    >
+      >
       { 
         allChains.map((chainInfo, cIndex) => {
-          return <MenuItem value={cIndex} disabled={chainInfo.symbol == chain}>
+          const imageUrl = chainInfo.chainIcon?.asset?._ref && imageBuilder(chainInfo.chainIcon.asset._ref).width(40).height(40).url()
+          return <MenuItem value={cIndex} disabled={chainInfo.symbol == currentChain}>
             <div className="flex flex-row justify-center items-center gap-4 p-1">
-            {chainInfo.chainIcon?.asset._ref && <Image src={imageBuilder(chainInfo.chainIcon.asset._ref).width(40).height(40).url()} width={40} height={40}/>}
+            {imageUrl && <Image src={imageUrl} width={40} height={40}/>}
             {chainInfo.symbol}
             </div>
           </MenuItem>
