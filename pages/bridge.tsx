@@ -18,7 +18,7 @@ const Bridge = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       <title>BITCRUSH - Cross Chain BRIDGE</title>
       <meta name="description" content="Cross Chain Bridge"/>
     </Head>
-    <h2 className="text-center text-4xl whitespace-pre-line font-zeb">
+    <h2 className="text-center text-5xl whitespace-pre-line font-zeb">
         Intergalactic Bridge
     </h2>
     <div className="flex flex-row justify-center mt-9">

@@ -46,15 +46,15 @@ const BridgeCard = (props: BridgeCardProps) => {
             
           <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center">
 
-            <div className="text-s self-end col-start-1">
+            <div className="text-s self-end col-start-1 text-primary">
               FROM 
             </div>
 
-            <h2 className="text-[1.25rem] text-primary row-start-1 col-start-2 self-center">
+            <h2 className="text-[1.5rem] text-white font-bold row-start-1 col-start-2 self-center">
                 CHAINS
             </h2>
 
-            <div className="text-s self-end col-start-3">
+            <div className="text-s text-primary self-end col-start-3">
                 TO 
             </div>
 
@@ -74,7 +74,7 @@ const BridgeCard = (props: BridgeCardProps) => {
 
           <div className="flex flex-col justify-items-center items-center gap-3">
 
-            <h3 className="text-primary text-[1.25rem]">
+            <h3 className="text-white text-[1.5rem] font-bold">
               BRIDGE TOKEN
             </h3>
             <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
