@@ -45,7 +45,7 @@ const BridgeCard = (props: BridgeCardProps) => {
             </div>
 
             <div className="col-start-1 grid justify-items-center">
-              <ChainSelector allChains={bridgeChains}/>
+              <ChainSelector allChains={bridgeChains} defaultChain="0"/>
             </div>
 
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 col-start-2 col-span-1 text-secondary" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,7 +53,7 @@ const BridgeCard = (props: BridgeCardProps) => {
             </svg>
 
             <div className="col-start-3 grid justify-items-center">
-              <ChainSelector allChains={bridgeChains}/> 
+              <ChainSelector allChains={bridgeChains} defaultChain="1"/> 
             </div>
           </div>
           
@@ -64,13 +64,13 @@ const BridgeCard = (props: BridgeCardProps) => {
               BRIDGE TOKEN
             </h3>
             <div className="grid grid-cols-3 justify-items-stretch items-center gap-2">
-              <div className={`justify-self-end ${selectedToken ? "text-md" : "text-xs"} ${selectedToken ? "text-white" : "text-slate-500"}`}>
+              <div className={`justify-self-end ${selectedToken ? "text-xs" : "text-md"} ${selectedToken ? "text-slate-500" : "text-white"}`}>
                 NICE
               </div>
               <button className="relative w-[80px] rounded-[32px] border-2 border-primary h-[32px]" onClick={tokenToggle}>
-                <div className={`absolute bg-primary rounded-[32px] px-2 h-6 w-10 ${ selectedToken ? "left-0.5" : "right-0.5"} top-0.5`}/>
+                <div className={`absolute bg-primary rounded-[32px] px-2 h-6 w-10 ${ selectedToken ? "right-0.5" : "left-0.5"} top-0.5`}/>
               </button>
-              <div className={`${selectedToken ? "text-xs" : "text-md"} ${selectedToken ? "text-slate-500" : "text-white"}`}>
+              <div className={`${selectedToken ? "text-md" : "text-xs"} ${selectedToken ? "text-white" : "text-slate-500"}`}>
                 CRUSH
               </div>
             </div>
@@ -152,8 +152,8 @@ type SelectorProps = {
 }
 const ChainSelector = (props: SelectorProps) => {
 
-  const { allChains, currentChain } = props
-  const [chain, setChain] = React.useState('');
+  const { allChains, defaultChain, currentChain } = props
+  const [chain, setChain] = React.useState(defaultChain);
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setChain(event.target.value);
   };
