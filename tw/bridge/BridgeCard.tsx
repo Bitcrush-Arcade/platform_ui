@@ -144,16 +144,17 @@ const BridgeCard = (props: BridgeCardProps) => {
             </div>
         </div>
 
-        <div className="flex border-2 border-primary rounded-[32px] justify-center mx-2 p-4">
-              <h2 className="text-center text-m whitespace-pre-line">
-                CAPTION DATA{'\n'}
-                <span className="text-s">
-                  Lorem Ipsum is simply dummy text of the printing and typesetting
-                  industry. Lorem Ipsum has been the industry's standard dummy text 
-                  ever since the 1500s, when an unknown printer took a galley of type
-                  and scrambled it to make a type specimen book. 
-                </span>
+        <div className="flex flex-col border-2 border-primary rounded-[32px] justify-center mx-2 p-4">
+              <h2 className="text-center text-[1.5rem] font-bold whitespace-pre-line mb-2">
+                CAPTION DATA
               </h2>
+              <span className="text-sm text-justify">
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. Lorem Ipsum has been the industry's standard dummy text 
+                ever since the 1500s, when an unknown printer took a galley of type
+                and scrambled it to make a type specimen book. 
+              </span>
+              
             </div>
           </div> 
     
