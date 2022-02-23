@@ -227,7 +227,7 @@ const NiceSale = () => {
                   </div>
                   <div className="py-2">
                     <p className="text-justify text-sm">
-                      $NICE is the official currency of the Invaderverse. Presale is open, you can participate if you meet the requirements listed below.
+                      $NICE is the official currency of the Invaderverse. Presale is open, you can participate. 
                       <br/>
                       Tokens are claimable immediately after sale ends.
                     </p>
@@ -252,99 +252,45 @@ const NiceSale = () => {
                     <p>
                       Do I qualify?
                     </p>
-                    {
-                      prequalified 
-                      ?
-                        <Tooltip title="All requirements met">
-                          <CheckCircleIcon color="secondary"/>
-                        </Tooltip>
-                      :
-                        <Tooltip title={
-                          <p className="whitespace-pre-line">
-                            Check that you:{"\n"}
-                            * Have at least 10k $CRUSH staked in Auto Bitcrush V2{"\n"}
-                          </p>
-                        }>
-                          <CancelIcon color="error"/>
-                        </Tooltip>
-                    }
+                    <Tooltip title="Everyone qualifies!">
+                      <CheckCircleIcon color="secondary"/>
+                    </Tooltip>
                   </div>
-                  { 
-                    prequalified && presaleData.whitelisted == 0 && 
-                      <div className='flex items-center justify-center gap-x-1'>
-                        <TextField
-                          size="small"
-                          value={nftId}
-                          inputRef={inputRef}
-                          onChange={(e) => {
-                            const selectedId = parseInt(e.target.value)
-                            if(e.target.value == ""){
-                              setNftId("")
-                              return
-                            }
-                            if(isNaN(selectedId)) return
-                            setNftId(e.target.value)
+                  <div className='flex flex-row justify-center'>
+                    {
+                      isApproved ?
+                        ( saleStarted && !saleEnded && <TextField 
+                          type="number"
+                          label="BUSD amount"
+                          InputProps={{
+                            sx:{
+                              pr: 0,
+                              color: 'white'
+                            },
+                            endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
+                              disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThan(5000) || buyAmount < 100}
+                              onClick={buyTokens}
+                            >
+                              Buy
+                            </button>
                           }}
-                          label="NFT ID"
-                          className="max-w-[80px]"
                           InputLabelProps={{
                             sx:{
                               color: theme => theme.palette.grey[300]
                             }
                           }}
-                          InputProps={{
-                            sx:{
-                              color: 'white',
-                            }
-                          }}
-                        />
-                        <button disabled={isNaN(parseInt(nftId))}
-                          onClick={whitelist}
-                          className="border-2 border-secondary px-3 py-1 inner-glow-secondary text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+                          onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
+                          error={buyAmount<100 || buyAmount > 5000}
+                          helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
+                        />)
+                      :
+                        <button onClick={approveBUSD}
+                          className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
                         >
-                          WHITELIST ME
+                          Approve BUSD
                         </button>
-                      </div>
-                  }
-                  {/* Approve and BUY */}
-                  {
-                    presaleData.whitelisted > 0 && 
-                      <div className='flex flex-row justify-center'>
-                        {
-                          isApproved ?
-                            ( saleStarted && !saleEnded && <TextField 
-                              type="number"
-                              label="BUSD amount"
-                              InputProps={{
-                                sx:{
-                                  pr: 0,
-                                  color: 'white'
-                                },
-                                endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
-                                  disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThan(5000) || buyAmount < 100}
-                                  onClick={buyTokens}
-                                >
-                                  Buy
-                                </button>
-                              }}
-                              InputLabelProps={{
-                                sx:{
-                                  color: theme => theme.palette.grey[300]
-                                }
-                              }}
-                              onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
-                              error={buyAmount<100 || buyAmount > 5000}
-                              helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
-                            />)
-                          :
-                            <button onClick={approveBUSD}
-                              className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
-                            >
-                              Approve BUSD
-                            </button>
-                        }
-                      </div>
-                  }
+                    }
+                  </div>
                   {/* COUNTDOWN FOR SALE START */}
                   <hr className='my-3 border-primary opacity-70'/>
 
