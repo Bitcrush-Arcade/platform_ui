@@ -11,13 +11,13 @@ type FarmCardProps = {
 
 const FarmCard = () => {
 
-  return <div className="grid grid-col justify-items-stretch gap-2 p-8 m-2 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] max-w-[18rem] text-white">
+  return <div className="grid text-sm grid-col justify-items-stretch gap-2 p-8 m-3 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] w-[19rem] text-white">
           
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between">
             <div>
               COIN ARTS
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end gap-1">
               <div className="text-[1.5rem] font-bold">
                 NICE-BNB
               </div>
@@ -75,7 +75,7 @@ const FarmCard = () => {
             </div>
 
           <div>
-            <div className="form-label inline-block text-primary text-xs pl-2 font-bold">
+            <div className="form-label inline-block text-primary text-xs pl-1 font-bold">
               NICE-BNB LP STAKED
             </div>
             <div className="flex justify-between">
@@ -123,20 +123,19 @@ const FarmCard = () => {
             <div className="flex gap-1 items-center font-bold">
               NICE-BNB LP
               <button disabled={false} className="text-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[2.5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </button>
-              
             </div>
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-between mb-2">
             <div className= "text-primary">
               TOTAL LIQUIDITY:
             </div> 
             <div className="font-bold">
-              ${currencyFormat(123456789.123456, {decimalsToShow: 2})}
+              ${currencyFormat(21456789.123456, {decimalsToShow: 0})}
             </div>
           </div>
 
