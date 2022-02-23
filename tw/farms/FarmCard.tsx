@@ -1,10 +1,17 @@
+import { useState } from 'react'
+// Bitcrush UI
+// COMPONENTS
+import StakeModal from "components/basics/StakeModal"
+// utils
+import { currencyFormat } from "utils/text/text"
+
 type FarmCardProps = {
   themeColor: string
 }
 
 const FarmCard = () => {
 
-  return <div className="grid grid-col justify-items-stretch gap-2 p-10 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] max-w-[400px] text-white">
+  return <div className="grid grid-col justify-items-stretch gap-2 p-8 m-2 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] max-w-[18rem] text-white">
           
           <div className="flex justify-between items-center">
             <div>
@@ -71,20 +78,26 @@ const FarmCard = () => {
             <div className="form-label inline-block text-primary text-xs pl-2 font-bold">
               NICE-BNB LP STAKED
             </div>
-            <input
-              type="text"
-              className="
-                px-3 py-1.5
-                bg-paper-bg
-                border-2 border-secondary 
-                rounded-[8px]
-                text-slate-500
-              "
-              id="amountEarned"
-              value="0.0"
-              aria-label="readonly amount earned"
-              readOnly
-            />
+            <div className="flex justify-between">
+              <input
+                type="text"
+                className="
+                  px-3 py-1.5
+                  bg-paper-bg
+                  border-2 border-secondary 
+                  rounded-[8px]
+                  text-slate-500
+                  max-w-[8rem]
+                "
+                id="amountEarned"
+                value="0.0"
+                aria-label="readonly amount earned"
+                readOnly
+              />
+              <button disabled={false} className="flex flex-row items-center border-2 border-secondary inner-glow-secondary px-4 py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                    STAKE
+              </button>
+            </div>  
           </div>
 
           
@@ -94,11 +107,11 @@ const FarmCard = () => {
 
           <hr className="border-slate-500"/>
 
-          <div className="flex gap-1 justify-self-center text-secondary text-xs">
+          <div className="flex gap-1 justify-self-center items-center text-secondary text-xs">
             HIDE
             <button disabled={false} className="hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 pb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             </button>
           </div>
@@ -123,7 +136,7 @@ const FarmCard = () => {
               TOTAL LIQUIDITY:
             </div> 
             <div className="font-bold">
-              $21,480,596
+              ${currencyFormat(123456789.123456, {decimalsToShow: 2})}
             </div>
           </div>
 

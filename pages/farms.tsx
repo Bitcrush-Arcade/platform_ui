@@ -14,7 +14,14 @@ const Farms = () => {
     <h2 className="text-center text-6xl whitespace-pre-line font-zeb">
         Warp Farms
     </h2>
-    <FarmCard/>
+    <div className="flex justify-center mt-7">
+    <div className="flex flex-wrap justify-between max-w-[57rem]">
+      <FarmCard/>
+      <FarmCard/>
+      <FarmCard/>
+      <FarmCard/>
+    </div>
+    </div>
   </PageContainer>
 }
 
