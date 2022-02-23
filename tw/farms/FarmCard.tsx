@@ -4,7 +4,7 @@ type FarmCardProps = {
 
 const FarmCard = () => {
 
-  return <div className="grid grid-col justify-items-stretch items-center gap-2 p-10 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] max-w-[400px] text-white">
+  return <div className="grid grid-col justify-items-stretch gap-2 p-10 border-2 border-primary inner-glow-primary bg-paper-bg rounded-[32px] max-w-[400px] text-white">
           
           <div className="flex justify-between items-center">
             <div>
@@ -61,7 +61,7 @@ const FarmCard = () => {
                 <div className="text-4xl">
                   0.0
                 </div>
-                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-4 py-2 text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-4 py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
                   HARVEST
                 </button>
               </div>
@@ -95,10 +95,12 @@ const FarmCard = () => {
           <hr className="border-slate-500"/>
 
           <div className="flex gap-1 justify-self-center text-secondary text-xs">
-            HIDE 
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
+            HIDE
+            <button disabled={false} className="hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
           </div>
 
           <div className="flex justify-between mt-2">
@@ -107,9 +109,12 @@ const FarmCard = () => {
             </div> 
             <div className="flex gap-1 items-center font-bold">
               NICE-BNB LP
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              <button disabled={false} className="text-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[2.5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
+            </button>
+              
             </div>
           </div>
 
