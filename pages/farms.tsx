@@ -4,7 +4,7 @@ import PageContainer from 'components/PageContainer';
 import FarmCard from 'tw/farms/FarmCard';
 
 
-const Farm = () => {
+const Farms = () => {
 
   return <PageContainer>
     <Head>
@@ -18,5 +18,5 @@ const Farm = () => {
   </PageContainer>
 }
 
-export default Farm
+export default Farms
 
