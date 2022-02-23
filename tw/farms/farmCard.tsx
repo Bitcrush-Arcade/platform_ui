@@ -72,22 +72,23 @@ const FarmCard = () => {
               NICE-BNB LP STAKED
             </div>
             <input
-                    type="text"
-                    className="
-                      px-3 py-1.5
-                      bg-paper-bg
-                      border-2 border-secondary 
-                      rounded-[8px]
-                    "
-                    id="amountEarned"
-                    value="0.0"
-                    aria-label="readonly amount earned"
-                    readOnly
-                  />
+              type="text"
+              className="
+                px-3 py-1.5
+                bg-paper-bg
+                border-2 border-secondary 
+                rounded-[8px]
+                text-slate-500
+              "
+              id="amountEarned"
+              value="0.0"
+              aria-label="readonly amount earned"
+              readOnly
+            />
           </div>
 
           
-          <button disabled={false} className="flex flex-row justify-self-center items-center gap-2 border-2 border-secondary inner-glow-secondary px-6 py-4 my-2 text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+          <button disabled={false} className="flex flex-row justify-self-center items-center gap-2 border-2 border-secondary inner-glow-secondary px-6 py-4 my-4 text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
             ENABLE CONTRACT
           </button>
 
