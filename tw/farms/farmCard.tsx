@@ -92,6 +92,8 @@ const FarmCard = () => {
             ENABLE CONTRACT
           </button>
 
+          <hr className="border-slate-500"/>
+
           <div className="flex gap-1 justify-self-center text-secondary text-xs">
             HIDE 
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -99,7 +101,7 @@ const FarmCard = () => {
             </svg>
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-2">
             <div className="text-primary">
               DEPOSIT:
             </div> 
