@@ -16,7 +16,7 @@ const FarmCard = () => {
                           border-2 rounded-[32px] border-primary inner-glow-primary w-[19rem]
                           bg-paper-bg 
                           p-8 my-3 mx-2
-                          box-highlight
+                          box-highlight-primary
                         "
           >
           
