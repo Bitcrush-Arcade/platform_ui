@@ -14,8 +14,8 @@ const Farms = () => {
     <h2 className="text-center text-6xl whitespace-pre-line font-zeb">
         Warp Farms
     </h2>
-    <div className="flex justify-center mt-6">
-      <div className="flex flex-wrap justify-between max-w-[61rem]">
+    <div className="flex justify-center mt-9">
+      <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center md:justify-between max-w-[61rem]">
         <FarmCard/>
         <FarmCard/>
         <FarmCard/>

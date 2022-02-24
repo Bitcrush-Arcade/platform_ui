@@ -11,13 +11,15 @@ type FarmCardProps = {
 
 const FarmCard = () => {
 
-  return <div className="
-                          grid grid-col justify-items-stretch gap-2
-                          border-2 rounded-[32px] border-primary inner-glow-primary w-[19rem]
-                          bg-paper-bg 
-                          p-8 my-3 mx-2
-                          box-highlight-primary
-                        "
+  return 
+          <div 
+            className="
+              grid grid-col justify-items-stretch gap-2
+              border-2 rounded-[32px] border-secondary inner-glow-secondary max-w-[280px] md:max-w-[19rem] 
+              bg-paper-bg 
+              p-8
+              box-highlight-secondary
+            "
           >
           
           <div className="flex justify-between">
