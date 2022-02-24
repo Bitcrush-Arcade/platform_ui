@@ -14,7 +14,7 @@ const FarmCard = () => {
   return( 
           <div 
             className="
-              grid grid-col justify-items-stretch gap-2
+              grid grid-col gap-2
               border-2 rounded-[32px] border-primary inner-glow-primary w-[275px] md:w-[19rem] 
               bg-paper-bg 
               p-8
@@ -77,7 +77,7 @@ const FarmCard = () => {
                 <div className="text-[1.5rem]">
                   0.0
                 </div>
-                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
                   HARVEST
                 </button>
               </div>
@@ -112,14 +112,12 @@ const FarmCard = () => {
 
           <hr className="border-slate-500"/>
 
-          <div className="flex gap-1 justify-self-center items-center text-secondary text-xs">
-            HIDE
-            <button disabled={false} className="hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
+            <button disabled={false} className="flex gap-1 justify-center items-center text-secondary text-xs hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+              HIDE 
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 pb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
               </svg>
             </button>
-          </div>
 
           <div className="flex flex-col gap-2">
             <div className="flex justify-between mt-2">
