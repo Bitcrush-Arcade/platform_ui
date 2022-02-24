@@ -42,7 +42,7 @@ const BridgeCard = (props: BridgeCardProps) => {
     setSelectedToken( p => !p)
   },[setSelectedToken])
   
-  return <div className="flex flex-col gap-10 border-2 border-secondary inner-glow-secondary bg-paper-bg px-8 pt-1 pb-10 rounded-[32px] max-w-[500px] text-white">
+  return <div className="flex flex-col gap-10 border-2 border-secondary box-highlight-secondary bg-paper-bg px-8 pt-1 pb-10 rounded-[32px] max-w-[500px] text-white">
 
           <div className="flex divide-y divide-slate-700 flex flex-col gap-10"> 
             <div className="grid grid-col grid-cols-3 grid-rows-2 justify-items-center items-center px-4">

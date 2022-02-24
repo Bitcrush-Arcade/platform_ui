@@ -134,4 +134,39 @@
   .inner-glow-primary {  
     box-shadow: inset 0 0 15px rgb(174,82,227);
   }
+
+  .box-highlight-primary {
+    animation-name: colorAnimationPrimary;
+    animation-duration: 5s;
+    animation-timing-function: linear;
+    animation-delay: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: reverse;
+  }
+
+  @keyframes colorAnimationPrimary{
+    0% {box-shadow:-10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227);}
+    25% {box-shadow: 0 10px 8px rgb(174,82,227), 0 -10px 8px #1de9b6da, 10px 0 8px #ffffff, -10px 0 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227);}
+    50% {box-shadow: 10px 0 8px rgb(174,82,227), -10px 0 8px #1de9b6da, 0 -10px 8px #ffffff, 0 10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227);}
+    75% {box-shadow: 0 -10px 8px rgb(174,82,227), 0 10px 8px #1de9b6da, -10px 0 8px #ffffff, 10px 0 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227);}
+    100% {box-shadow: -10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227);}
+  }
+
+  .box-highlight-secondary {
+    animation-name: colorAnimationSecondary;
+    animation-duration: 5s;
+    animation-timing-function: linear;
+    animation-delay: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: reverse;
+  }
+
+  @keyframes colorAnimationSecondary{
+    0% {box-shadow:-10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px #1de9b6da;}
+    25% {box-shadow: 0 10px 8px rgb(174,82,227), 0 -10px 8px #1de9b6da, 10px 0 8px #ffffff, -10px 0 8px rgb(100 116 139), inset 0 0 15px #1de9b6da;}
+    50% {box-shadow: 10px 0 8px rgb(174,82,227), -10px 0 8px #1de9b6da, 0 -10px 8px #ffffff, 0 10px 8px rgb(100 116 139), inset 0 0 15px #1de9b6da;}
+    75% {box-shadow: 0 -10px 8px rgb(174,82,227), 0 10px 8px #1de9b6da, -10px 0 8px #ffffff, 10px 0 8px rgb(100 116 139), inset 0 0 15px #1de9b6da;}
+    100% {box-shadow: -10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px #1de9b6da;}
+  }
+  
 }
