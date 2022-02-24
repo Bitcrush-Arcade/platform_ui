@@ -15,7 +15,7 @@ const Farms = () => {
         Warp Farms
     </h2>
     <div className="flex justify-center mt-9">
-      <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center md:justify-between max-w-[61rem]">
+      <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
         <FarmCard/>
         <FarmCard/>
         <FarmCard/>

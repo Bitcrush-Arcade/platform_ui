@@ -15,10 +15,10 @@ const FarmCard = () => {
           <div 
             className="
               grid grid-col justify-items-stretch gap-2
-              border-2 rounded-[32px] border-secondary inner-glow-secondary max-w-[280px] md:max-w-[19rem] 
+              border-2 rounded-[32px] border-primary inner-glow-primary w-[275px] md:w-[19rem] 
               bg-paper-bg 
               p-8
-              box-highlight-secondary
+              box-highlight-primary
             "
           >
           
@@ -77,7 +77,7 @@ const FarmCard = () => {
                 <div className="text-[1.5rem]">
                   0.0
                 </div>
-                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-4 py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                <button disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
                   HARVEST
                 </button>
               </div>
@@ -91,9 +91,14 @@ const FarmCard = () => {
             <div className="text-[1.5rem]">
                   0.0
                 </div>
-              <button disabled={false} className="flex flex-row items-center border-2 border-secondary inner-glow-secondary px-4 py-2 text-xs rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-                    STAKE
-              </button>
+              <div className="flex gap-2">
+                <button disabled={false} className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[14px] text-[1.5rem] rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                  -
+                </button>
+                <button disabled={false} className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[12px] text-[1.5rem] rounded-[8px] hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+                  +
+                </button>
+              </div>
             </div>  
           </div>
 
