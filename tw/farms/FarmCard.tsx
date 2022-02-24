@@ -112,6 +112,8 @@ const FarmCard = () => {
 
           <hr className="border-slate-500"/>
 
+
+
             <button disabled={false} className="flex gap-1 justify-center items-center text-secondary text-xs hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
               HIDE 
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 pb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
