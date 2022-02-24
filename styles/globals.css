@@ -145,9 +145,9 @@
 
   @keyframes colorAnimation{
   0% {box-shadow:-10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139);}
-  33% {box-shadow: 0 10px 8px rgb(174,82,227), 0 -10px 8px #1de9b6da, 10px 0 8px #ffffff, -10px 0 8px rgb(100 116 139);}
-  66% {box-shadow: 10px 0 8px rgb(174,82,227), -10px 0 8px #1de9b6da, 0 -10px 8px #ffffff, 0 10px 8px rgb(100 116 139);}
-  100% {box-shadow: 0 -10px 8px rgb(174,82,227), 0 10px 8px #1de9b6da, -10px 0 8px #ffffff, 10px 0 8px rgb(100 116 139);}
+  25% {box-shadow: 0 10px 8px rgb(174,82,227), 0 -10px 8px #1de9b6da, 10px 0 8px #ffffff, -10px 0 8px rgb(100 116 139);}
+  50% {box-shadow: 10px 0 8px rgb(174,82,227), -10px 0 8px #1de9b6da, 0 -10px 8px #ffffff, 0 10px 8px rgb(100 116 139);}
+  75% {box-shadow: 0 -10px 8px rgb(174,82,227), 0 10px 8px #1de9b6da, -10px 0 8px #ffffff, 10px 0 8px rgb(100 116 139);}
   100% {box-shadow: -10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139);}
   }
   
