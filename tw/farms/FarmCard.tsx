@@ -6,12 +6,15 @@ import StakeModal from "components/basics/StakeModal"
 import { currencyFormat } from "utils/text/text"
 
 type FarmCardProps = {
-  themeColor: string
+  color: string
+  highlight: boolean
 }
 
-const FarmCard = () => {
+const FarmCard = (props: FarmCardProps) => {
 
+  const {color, highlight} = props
   const [info, setInfo] = useState<boolean>(false)
+
   const infoToggle = useCallback(() => {
     setInfo( p => !p)
   },[setInfo])
@@ -20,10 +23,9 @@ const FarmCard = () => {
           <div 
             className={`
               grid grid-col gap-2
-              border-2 rounded-[32px] border-primary inner-glow-primary w-[275px] md:w-[19rem] ${info? "" : "max-h-[538px]"}
+              border-2 rounded-[32px] border-${color} ${highlight? `box-highlight-${color}` : `inner-glow-${color}`} w-[275px] md:w-[19rem] ${info? "" : "max-h-[538px]"}
               bg-paper-bg 
               p-8
-              box-highlight-primary
             `}
           >
           
