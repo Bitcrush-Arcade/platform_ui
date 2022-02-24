@@ -121,36 +121,38 @@ const FarmCard = () => {
             </button>
           </div>
 
-          <div className="flex justify-between mt-2">
-            <div className="text-primary">
-              DEPOSIT:
-            </div> 
-            <div className="flex gap-1 items-center font-bold">
-              NICE-BNB LP
-              <button disabled={false} className="text-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </button>
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between mt-2">
+              <div className="text-primary">
+                DEPOSIT:
+              </div> 
+              <div className="flex gap-1 items-center font-bold">
+                NICE-BNB LP
+                <button disabled={false} className="text-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="flex justify-between mb-2">
-            <div className= "text-primary">
-              TOTAL LIQUIDITY:
-            </div> 
-            <div className="font-bold">
-              ${currencyFormat(21456789.123456, {decimalsToShow: 0})}
+            <div className="flex justify-between mb-2">
+              <div className= "text-primary">
+                TOTAL LIQUIDITY:
+              </div> 
+              <div className="font-bold">
+                ${currencyFormat(21456789.123456, {decimalsToShow: 0})}
+              </div>
             </div>
-          </div>
-          
-          <div className="flex justify-center">
-            <button disabled={false} className="flex items-center gap-1 text-secondary font-bold hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
-              VIEW CONTRACT
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[4px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </button>
+            
+            <div className="flex justify-center">
+              <button disabled={false} className="flex items-center gap-1 text-secondary font-bold hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"> 
+                VIEW CONTRACT
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[4px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </button>
+            </div>
           </div>
 
         </div>
