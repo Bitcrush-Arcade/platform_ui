@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 // Bitcrush UI
 // COMPONENTS
 import StakeModal from "components/basics/StakeModal"
@@ -11,15 +11,20 @@ type FarmCardProps = {
 
 const FarmCard = () => {
 
+  const [info, setInfo] = useState<boolean>(false)
+  const infoToggle = useCallback(() => {
+    setInfo( p => !p)
+  },[setInfo])
+
   return( 
           <div 
-            className="
+            className={`
               grid grid-col gap-2
-              border-2 rounded-[32px] border-primary inner-glow-primary w-[275px] md:w-[19rem] 
+              border-2 rounded-[32px] border-primary inner-glow-primary w-[275px] md:w-[19rem] ${info? "" : "max-h-[538px]"}
               bg-paper-bg 
               p-8
               box-highlight-primary
-            "
+            `}
           >
           
           <div className="flex justify-between">
@@ -112,16 +117,26 @@ const FarmCard = () => {
 
           <hr className="border-slate-500"/>
 
-
-
-            <button disabled={false} className="flex gap-1 justify-center items-center text-secondary text-xs hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-              HIDE 
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 pb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-              </svg>
+            <button disabled={false} onClick={infoToggle} className="flex gap-1 justify-center text-secondary text-xs hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+              <div className={`flex items-center ${info? "hidden" : ""}`}>
+                <div>
+                  SHOW
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div className={`flex items-center ${info? "" : "hidden"}`}>
+                <div>
+                HIDE
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                </svg>
+              </div>
             </button>
 
-          <div className="flex flex-col gap-2">
+          <div className={`flex flex-col gap-2 ${info? "" : "hidden"}`}>
             <div className="flex justify-between mt-2">
               <div className="text-primary">
                 DEPOSIT:
