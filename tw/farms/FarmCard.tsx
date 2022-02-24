@@ -11,7 +11,7 @@ type FarmCardProps = {
 
 const FarmCard = () => {
 
-  return 
+  return( 
           <div 
             className="
               grid grid-col justify-items-stretch gap-2
@@ -150,5 +150,5 @@ const FarmCard = () => {
 
         </div>
 
-}
+  )}
 export default FarmCard 
