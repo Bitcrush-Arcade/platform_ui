@@ -36,6 +36,7 @@ type PresaleDataType = {
   totalBought: BigNumber,
   saleStart: BigNumber,
   saleEnd: BigNumber,
+  hasToken: boolean
 }
 const initPresale = {
   whitelisted: 0,
@@ -47,6 +48,7 @@ const initPresale = {
   totalBought: new BigNumber(0),
   saleStart: new BigNumber(0),
   saleEnd: new BigNumber(0),
+  hasToken: false
 }
 
 const NiceSale = () => {
@@ -85,6 +87,7 @@ const NiceSale = () => {
     const totalRaised = new BigNumber( await psMethod.totalRaised().call() )
     const saleStart = new BigNumber(await psMethod.saleStart().call()).times(1000)
     const isPause = await psMethod.pause().call()
+    const token = await psMethod.niceToken().call()
     setSaleEnded( isPause )
 
     setPresaleData({
@@ -96,7 +99,8 @@ const NiceSale = () => {
       claimable: isPause ? new BigNumber(10000) : new BigNumber(0),
       totalBought: new BigNumber(userData[1]),
       saleStart,
-      saleEnd: new BigNumber(0)
+      saleEnd: new BigNumber(0),
+      hasToken: parseInt(token) > 0
     })
   },[setPresaleData, psMethod, account])
 
@@ -208,6 +212,11 @@ const NiceSale = () => {
       <meta name="author" content="Bitcrush"/>
     </Head>
     <PageContainer background='galactic'>
+      <div className="flex justify-center">
+        <a href="https://gleam.io/731GX/win-a-whitelist-spot-ido-nice" rel="noreferrer noopener" target="_blank">
+          <Image src={"/assets/announcements/whitelist_banner.jpg"} width={1080/2} height={467/2} alt="public sale whitelist banner"/>
+        </a>
+      </div>
       <div className="flex items-center justify-center px-2">
         {
           (!chainId || chainId !== 56)
@@ -233,30 +242,35 @@ const NiceSale = () => {
                     </p>
                   </div>
                   {/* Fill bar */}
-                  <div className="rounded-full overflow-hidden h-6 mb-2">
+                  {/* <div className="rounded-full overflow-hidden h-6 mb-2">
                     <progress id="raise_percent" value={fillPercent} max={100}
                       className="w-full h-6 rounded-full"
                     >
                       {fillPercent}%
                     </progress>
-                  </div>
-                  <div className='flex flex-row justify-between px-2'>
+                  </div> */}
+                  {/* <div className='flex flex-row justify-between px-2'>
                     <label htmlFor="raise_percent">
                       Raise Amount:
                     </label>
                     <span>
                       {presaleData.totalRaised.div(10**18).toFixed(0)} / {presaleData.maxRaise.div(10**18).toFixed(0)}
                     </span>
-                  </div>
-                  <div className='flex flex-row justify-between px-2 mb-4'>
+                  </div> */}
+                  {/* <div className='flex flex-row justify-between px-2 mb-4'>
                     <p>
                       Do I qualify?
                     </p>
                     <Tooltip title="Everyone qualifies!">
                       <CheckCircleIcon color="secondary"/>
                     </Tooltip>
-                  </div>
-                  <div className='flex flex-row justify-center'>
+                  </div> */}
+                  <h3
+                    className="text-center text-2xl font-zeb text-secondary"
+                  >
+                    Pre-Sale Over
+                  </h3>
+                  {/* <div className='flex flex-row justify-center'>
                     {
                       isApproved ?
                         ( saleStarted && !saleEnded && <TextField 
@@ -290,11 +304,11 @@ const NiceSale = () => {
                           Approve BUSD
                         </button>
                     }
-                  </div>
+                  </div> */}
                   {/* COUNTDOWN FOR SALE START */}
                   <hr className='my-3 border-primary opacity-70'/>
 
-                  {
+                  {/* {
                     !saleStarted && 
                       <Countdown date={new Date(presaleData.saleStart.toNumber() || 1645401600000)}
                         onComplete={()=>setSaleStarted(true)}
@@ -339,7 +353,7 @@ const NiceSale = () => {
                   <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                     <span>Presale Price (NICE/BUSD)</span>
                     <span>0.00470</span>
-                  </div>
+                  </div> */}
                   { saleStarted && <>
                     <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                       <span>$BUSD Spent</span>
@@ -357,29 +371,31 @@ const NiceSale = () => {
                       <>
                         <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                           <span>Claimable</span>
-                          <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
+                          <span>{presaleData.hasToken ? "YES" : "NO"}</span>
                         </div>
-                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                        {/* <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                           <span>$NICE Claimable</span>
-                          <span>{currencyFormat(presaleData.claimable.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                        </div>
-                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>{currencyFormat(presaleData.claimable.div(10000).times(presaleData.totalBought).toString(),{decimalsToShow: 0, isWei: true})}</span>
+                        </div> */}
+                        {/* <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                           <span>Claimed</span>
                           <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
                         </div>
                         <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                           <span>$NICE Claimed</span>
                           <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                        </div>
+                        </div> */}
                         <div className="flex justify-center">
                           <button
+                            disabled={!presaleData.hasToken}
                             className={`
+                              disabled:opacity-60 disabled:bg-primary-dark disabled:hover:text-white
                               border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
                               hover:bg-primary-dark hover:text-black
                             `}
                             onClick={claimNice}
                           >
-                            Claim
+                            {presaleData.hasToken ? "Claim Now" : "Coming soon" }
                           </button>
                         </div>
                       </>
