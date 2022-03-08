@@ -212,11 +212,6 @@ const NiceSale = () => {
       <meta name="author" content="Bitcrush"/>
     </Head>
     <PageContainer background='galactic'>
-      <div className="flex justify-center pt-5 lg:pt-0">
-        <a href="https://gleam.io/731GX/win-a-whitelist-spot-ido-nice" rel="noreferrer noopener" target="_blank">
-          <Image src={"/assets/announcements/whitelist_banner.png"} width={1080/1.5} height={567/1.5} alt="public sale whitelist banner"/>
-        </a>
-      </div>
       <div className="flex items-center justify-center px-2">
         {
           (!chainId || chainId !== 56)
