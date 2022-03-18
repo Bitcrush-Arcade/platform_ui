@@ -20,7 +20,7 @@ const poolAssets = {
       title: "Pool Identifier",
       name: "pid",
       type: "string",
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.integer().positive().min(0).required()
     },
     {
       title: "Main Token",
@@ -29,7 +29,7 @@ const poolAssets = {
     },
     {
       title: "Main Token Image",
-      name: "MainTokenImage",
+      name: "mainTokenImage",
       type: "seo_image"
     },
     {
@@ -54,11 +54,12 @@ const poolAssets = {
     },
 
   ],
+
   preview: {
     select: {
       title: 'pid',
       subtitle: 'poolName',
-      media: 'mainTokenenIcon'
+      media: 'mainTokenImage'
     },
   }
 }
