@@ -1,3 +1,5 @@
+
+
 const poolAssets = {
   name: "poolAssets",
   title: "Pools",
@@ -20,7 +22,7 @@ const poolAssets = {
       title: "Pool Identifier",
       name: "pid",
       type: "string",
-      validation: Rule => Rule.integer().positive().min(0).required()
+      validation: Rule => Rule.integer().positive().min(1)
     },
     {
       title: "Main Token",
@@ -30,7 +32,8 @@ const poolAssets = {
     {
       title: "Main Token Image",
       name: "mainTokenImage",
-      type: "seo_image"
+      type: "reference",
+      to: [{ type: "token" }],
     },
     {
       title: "Base Token",
@@ -40,7 +43,8 @@ const poolAssets = {
     {
       title: "Base Token Image",
       name: "baseTokenImage",
-      type: "seo_image"
+      type: "reference",
+      to: [{ type: "token" }],
     },
     {
       title: "Swap",
@@ -49,17 +53,18 @@ const poolAssets = {
     },
     {
       title: "Swap Image",
-      name: "swapImage",
-      type: "seo_image"
+      name: "swapPartner",
+      type: "reference",
+      to: [{ type: "partner" }],
     },
 
   ],
 
   preview: {
     select: {
-      title: 'pid',
-      subtitle: 'poolName',
-      media: 'mainTokenImage'
+      title: 'poolName',
+      subtitle: 'pid',
+
     },
   }
 }

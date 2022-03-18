@@ -146,7 +146,7 @@ const FarmCard = (props: FarmCardProps) => {
           EARN:
         </div>
         <div className="font-bold">
-          NICE+FEES
+          NICE
         </div>
       </div>
 
