@@ -27,8 +27,8 @@ type FarmCardProps = {
     mainTokenImage: string,
 
     pid: number,
-    mainAddress: BigNumber,
-    testAddress: BigNumber
+    // mainAddress: BigNumber,
+    // testAddress: BigNumber
   },
 
 }
@@ -78,8 +78,6 @@ const FarmCard = (props: FarmCardProps) => {
   const getPoolInfo = useCallback(async () => {
     if (!chefMethods || !feeDistributorMethods || !niceTokenMethods) return
     const amountEarned = await chefMethods.pendingRewards(account, poolAssets.pid).call()
-
-
 
   }, [chefMethods, account])
 
