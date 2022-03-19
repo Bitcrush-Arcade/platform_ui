@@ -13,7 +13,7 @@ const Farms = () => {
       <title>BITCRUSH - Farms</title>
       <meta name="description" content="BITCRUSH Farms" />
     </Head>
-    <h2 className="text-center text-6xl whitespace-pre-line font-zeb">
+    <h2 className="text-center text-4xl mt-4 whitespace-pre-line font-zeb md:text-6xl lg:mt-0">
       Stellar Farms
     </h2>
     <div className="flex justify-center mt-9">
