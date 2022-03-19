@@ -66,6 +66,7 @@ const FarmCard = (props: FarmCardProps) => {
   //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuth()
+
   // Nice Token
   const niceTokenContract = getContracts('niceToken', chainId)
   const { methods: niceTokenMethods } = useContract(niceTokenContract.abi, niceTokenContract.address)
@@ -106,7 +107,7 @@ const FarmCard = (props: FarmCardProps) => {
     <div
       className={`
               flex flex-col gap-2
-              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : account ? "max-h-[568px]" : "max-h-[432px]"}
+              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : account ? "max-h-[566px]" : "max-h-[426px]"}
               bg-paper-bg 
               text-white
               p-8
