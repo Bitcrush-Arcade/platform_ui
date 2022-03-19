@@ -277,17 +277,37 @@ const FarmCard = (props: FarmCardProps) => {
         </div>
 
         <div className="flex flex-col items-start">
-          <button disabled={false} className="flex items-center gap-1 text-secondary text-xs  hover:text-white disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-            VIEW POOL
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+          <button
+            disabled={false}
+            className="
+              flex items-center gap-1 
+              text-secondary text-xs  
+              hover:text-white disabled:opacity-60 
+              disabled:hover:bg-transparent disabled:hover:text-white
+            "
+          >
+            <a className="inline-flex items-center gap-1" href="https://testnet.bscscan.com/address/0x9AB60Da7a00d4096498542d9EE6a9fef69Aa8d8B#code" target="_blank" rel="noopener noreferrer">
+              VIEW POOL
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
           </button>
-          <button disabled={false} className="flex items-center gap-1 text-secondary text-xs  hover:text-white disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-            VIEW LP TOKEN
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
+          <button
+            disabled={false}
+            className="
+              flex items-center gap-1 
+              text-secondary text-xs  
+              hover:text-white disabled:opacity-60 
+              disabled:hover:bg-transparent disabled:hover:text-white
+            "
+          >
+            <a className="inline-flex items-center gap-1" href="https://testnet.bscscan.com/address/0x9AB60Da7a00d4096498542d9EE6a9fef69Aa8d8B#code" target="_blank" rel="noopener noreferrer">
+              VIEW LP TOKEN
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
           </button>
         </div>
       </div>
