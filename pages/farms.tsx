@@ -3,10 +3,8 @@ import Head from 'next/head';
 import PageContainer from 'components/PageContainer';
 import FarmCard from 'tw/farms/FarmCard';
 
-
-
-
 const Farms = () => {
+
 
   return <PageContainer>
     <Head>
@@ -18,10 +16,26 @@ const Farms = () => {
     </h2>
     <div className="flex justify-center mt-9">
       <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
-        <FarmCard color="primary" highlight={true} />
-        <FarmCard color="primary" highlight={false} />
-        <FarmCard color="secondary" highlight={true} />
-        <FarmCard color="secondary" highlight={false} />
+        <FarmCard
+          color="primary"
+          highlight={true}
+          poolAssets=
+          {{
+            baseTokenName: "BASE",
+            baseTokenSymbol: "BT",
+            baseTokenImage: "base token url",
+
+            mainTokenName: "MAIN",
+            mainTokenSymbol: "MT",
+            mainTokenImage: "main token url",
+
+            swapName: "SWAPNAME",
+            swapLogo: "ape swap url",
+
+            pid: 1
+          }}
+        />
+
       </div>
     </div>
   </PageContainer>
