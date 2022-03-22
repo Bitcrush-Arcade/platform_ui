@@ -187,7 +187,7 @@ const FarmCard = (props: FarmCardProps) => {
         <div>
           <img className="pb-[2px]" src="https://cdn.sanity.io/images/yirb57h5/production/41e282e4cbb87b5faee99a10b972e25c5f9c4b57-209x209.png?w=50&h=50" height={"20px"} width={"20px"} />
         </div>
-        {swapName}
+        {swapName} ROUTER
       </div>
       {/* Data rows */}
       <div className="flex justify-between mt-4">
@@ -213,7 +213,7 @@ const FarmCard = (props: FarmCardProps) => {
           DEPOSIT FEE:
         </div>
         <div className={`font-bold ${pool.depositFee.isEqualTo(0) ? "text-3xl" : ""}`}>
-          {pool.depositFee.toFixed(2, 1) || "-"}
+          {pool.depositFee.toFixed(2, 1) || "-"}%
         </div>
       </div>
 
