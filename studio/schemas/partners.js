@@ -2,7 +2,7 @@ const partner = {
   name: "partner",
   title: "Partners",
   type: "document",
-  fields:[
+  fields: [
     {
       title: "Partner Name",
       name: "name",
@@ -29,13 +29,23 @@ const partner = {
       type: "string",
     },
     {
+      title: "DEX",
+      name: "dex",
+      type: "string",
+    },
+    {
+      title: "Liquidity Pool",
+      name: "lp",
+      type: "string",
+    },
+    {
       title: "Active",
       name: "active",
       type: "boolean",
     },
   ],
-  preview:{
-    select:{
+  preview: {
+    select: {
       title: 'name',
       media: 'logo'
     }
