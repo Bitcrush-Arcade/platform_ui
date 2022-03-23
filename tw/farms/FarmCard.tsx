@@ -11,6 +11,7 @@ import { getContracts } from 'data/contracts'
 import { imageBuilder } from 'utils/sanityConfig'
 // hooks
 import { useTransactionContext } from 'hooks/contextHooks'
+import useCoin from 'hooks/useCoin'
 import { useWeb3React } from '@web3-react/core'
 import { useContract, useAuth, ConnectorNames } from 'hooks/web3Hooks'
 import { divide } from 'lodash'
@@ -48,7 +49,8 @@ type PoolDetailType = {
   stakedAmount: BigNumber,
   deposit: BigNumber,
   totalLiquidity: BigNumber,
-  isLp: boolean
+  isLp: boolean,
+  tokenAddress: string,
 
 }
 
@@ -61,7 +63,8 @@ const defaultPoolDetails: PoolDetailType = {
   stakedAmount: new BigNumber(0),
   deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  isLp: false
+  isLp: false,
+  tokenAddress: "",
 }
 
 
@@ -78,9 +81,8 @@ const FarmCard = (props: FarmCardProps) => {
   //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuth()
-  // Nice Token
-  const tokenContract = getContracts(tokenAddress, chainId)
-  const { methods: tokenMethods } = useContract(tokenContract.abi, tokenContract.address)
+  // Stake Token
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
 
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
@@ -101,6 +103,7 @@ const FarmCard = (props: FarmCardProps) => {
       draft.depositFee = new BigNumber(chefPoolInfo.fee).div(feeDiv)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
       draft.isLp = chefPoolInfo.isLp
+      draft.tokenAddress = tokenAddress
     })
 
 
@@ -108,16 +111,16 @@ const FarmCard = (props: FarmCardProps) => {
 
   const getPoolEarnings = useCallback(async () => {
 
-    if (!chefMethods || !tokenMethods || !account) return;
+    if (!chefMethods || !pool.tokenAddress || !account) return;
 
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
-    const totalLiquidity = await tokenMethods.balanceOf(chefContract.address)
+    const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
 
     setPool(draft => {
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
     })
 
-  }, [chefMethods, account, pid])
+  }, [chefMethods, account, pid, pool.tokenAddress, coinMethods])
 
   // useEffect for pool earnings
   useEffect(() => {
@@ -155,7 +158,7 @@ const FarmCard = (props: FarmCardProps) => {
     <div
       className={`
               flex flex-col gap-2
-              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : account ? "max-h-[566px]" : "max-h-[426px]"}
+              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : account ? "max-h-[566px]" : "max-h-[500px]"}
               bg-paper-bg 
               text-white
               p-8
@@ -182,7 +185,7 @@ const FarmCard = (props: FarmCardProps) => {
               NO FEES
             </div>
             <div className="border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary">
-              {pool.mult.toFixed(0) || "-"}X
+              {pool.mult.toFixed(0)}X
             </div>
           </div>
         </div>
@@ -218,17 +221,17 @@ const FarmCard = (props: FarmCardProps) => {
           DEPOSIT FEE:
         </div>
         <div className={`font-bold ${pool.depositFee.isEqualTo(0) ? "text-3xl" : ""}`}>
-          {pool.depositFee.toFixed(2, 1) || "-"}%
+          {pool.depositFee.toFixed(2, 1)}%
         </div>
       </div>
 
-      <div className={`${account ? "" : "hidden"}`}>
+      <div className={`${isApproved ? "" : "hidden"}`}>
         <div className="form-label inline-block text-primary text-xs font-bold">
           NICE EARNED:
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
-            {pool.earned.toFixed(2, 1) || "-"}
+            {pool.earned.toFixed(2, 1)}
           </div>
           <button onClick={() => chefMethods.deposit(0, pid)} disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 text-xs rounded-l-full rounded-br-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
             HARVEST
@@ -236,7 +239,7 @@ const FarmCard = (props: FarmCardProps) => {
         </div>
       </div>
 
-      <div className={`${account ? "" : "hidden"}`}>
+      <div className={`${isApproved ? "" : "hidden"}`}>
         <div className="form-label inline-block text-primary text-xs font-bold">
           {mainTokenSymbol}-{baseTokenSymbol} {pool.isLp ? "LP" : ""} STAKED
         </div>
@@ -272,6 +275,7 @@ const FarmCard = (props: FarmCardProps) => {
         </button>
         :
         <button
+          onClick={() => approve(chefContract.address, new BigNumber(5000).times(10 ** 18))}
           disabled={false}
           className="
             flex flex-row justify-center items-center gap-2 
