@@ -57,10 +57,19 @@ const poolAssets = {
       type: "reference",
       to: [{ type: "partner" }],
     },
-
     {
       title: "Display in farm, otherwise pool",
       name: "isFarm",
+      type: "boolean"
+    },
+    {
+      title: "Color scheme primary? otherwise secondary",
+      name: "color",
+      type: "boolean"
+    },
+    {
+      title: "Highlight effect",
+      name: "highlight",
       type: "boolean"
     },
 
@@ -72,6 +81,9 @@ const poolAssets = {
       subtitle: 'pid',
 
     },
+  },
+  initialValue: {
+    color: true
   }
 }
 

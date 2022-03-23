@@ -94,7 +94,7 @@ export const contracts: { [key: string]: ContractSelect } = {
       abi: GalacticChef.abi
     },
     97: {
-      address: '0x9AB60Da7a00d4096498542d9EE6a9fef69Aa8d8B',
+      address: '0x5867979Fe76E9604c0AEe4AE134cC0b55F65f975',
       abi: GalacticChef.abi
     },
   },

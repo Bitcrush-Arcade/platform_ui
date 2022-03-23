@@ -1,18 +1,23 @@
+// Next
+import Head from 'next/head';
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
+import { useState, useCallback } from "react"
 // COMPONENTS
 import BigNumber from 'bignumber.js'
 import PageContainer from 'components/PageContainer';
 
-// Next
-import Head from 'next/head';
-import { GetStaticProps, InferGetStaticPropsType } from 'next'
 
 // Bitcrush UI
 import FarmCard from 'tw/farms/FarmCard';
 
 
 const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
-
+  const { activeFarms, inactiveFarms } = props
   console.log(props)
+
+  const [showActive, setShowActive] = useState<boolean>(true)
+
+  const toggleActive = useCallback(() => setShowActive(p => !p), [setShowActive])
 
   return <PageContainer>
     <Head>
@@ -22,32 +27,39 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
     <h2 className="text-center text-4xl mt-4 whitespace-pre-line font-zeb md:text-6xl lg:mt-0">
       Stellar Farms
     </h2>
+
     <div className="flex justify-center mt-9">
       <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
-        <FarmCard
-          color="primary"
-          highlight={true}
-          poolAssets=
-          {{
-            baseTokenName: "BASE",
-            baseTokenSymbol: "BT",
-            baseTokenImage: "base token url",
+        {
+          showActive && activeFarms.length > 0 && activeFarms.map((farm: string, activeIndex: number) => {
+            const { pid, mult, fee, isLP, token } = JSON.parse(farm)
+            return (
+              <FarmCard key={`active-farm-${activeIndex}`}
+                color="primary"
+                highlight={true}
+                poolAssets=
+                {{
+                  baseTokenName: "BASE",
+                  baseTokenSymbol: "BT",
+                  baseTokenImage: "base token url",
 
-            mainTokenName: "MAIN",
-            mainTokenSymbol: "MT",
-            mainTokenImage: "main token url",
+                  mainTokenName: "MAIN",
+                  mainTokenSymbol: "MT",
+                  mainTokenImage: "main token url",
 
-            swapName: "SWAPNAME",
-            swapLogo: "ape swap url",
+                  swapName: "SWAPNAME",
+                  swapLogo: "ape swap url",
 
-            pid: 1,
-            mult: 1,
-            isLp: true,
-            feeAmount: 0.1,
-            depositFee: new BigNumber(10),
-            tokenAddress: "token address"
-          }}
-        />
+                  pid,
+                  mult,
+                  isLP,
+                  depositFee: fee || 0,
+                  tokenAddress: token
+                }}
+              />
+            )
+          })
+        }
 
       </div>
     </div>
@@ -86,8 +98,8 @@ export const getStaticProps: GetStaticProps = async () => {
       // if (!poolData.isLP)
       //   continue
       const parsedData = {
-        fee: new BigNumber(poolData.fee).toNumber(),
-        mult: new BigNumber(poolData.mult).toNumber(),
+        fee: new BigNumber(poolData.fee).div(100).toNumber(), // DIVISOR IS 10000 so dividing by 100 gives us the % value
+        mult: new BigNumber(poolData.mult).div(10000).toNumber(),
         isLP: Boolean(poolData.isLP),
         pid: i,
         token: String(poolData.token)
@@ -99,7 +111,6 @@ export const getStaticProps: GetStaticProps = async () => {
       else
         inactiveFarms.push(stringData)
     }
-
     // GET POOL DATA FROM CHEF (STATIC DATA)
 
     // GET ASSETS FROM SANITY

@@ -38,9 +38,8 @@ type FarmCardProps = {
     //From blockchain
     pid: number,
     mult?: number,
-    isLp: boolean,
-    feeAmount: number,
-    depositFee: BigNumber,
+    isLP: boolean,
+    depositFee: number,
     tokenAddress: string
   },
 
@@ -80,10 +79,11 @@ const FarmCard = (props: FarmCardProps) => {
   const { login, logout } = useAuthContext()
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
-
+  const tokenHyperlink = "https://testnet.bscscan.com/address/" + pool.tokenAddress.toString() + "#code"
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
+  const chefHyperlink = "https://testnet.bscscan.com/address/" + chefContract.address + "#code"
   // Fee Distributor, only used when fee>0
   const feeDistributorContract = getContracts('feeDistributor', chainId)
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
@@ -152,30 +152,31 @@ const FarmCard = (props: FarmCardProps) => {
     <div
       className={`
               flex flex-col gap-2
-              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[445px]" : ""}
+              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[440px]" : ""}
               bg-paper-bg 
               text-white
-              p-8
+              py-6
+              px-8
             `}
     >
       {/* Tokens, title and tags row */}
       <div className="flex justify-between ">
 
-        <div className="flex h-[80px] w-[80px] relative">
-          <div className="z-10" >
+        <div className={`flex h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
+          <div className={`z-10  ${poolAssets.isLP ? "" : "hidden"}`} >
             <img src="https://cdn.sanity.io/images/yirb57h5/production/41e282e4cbb87b5faee99a10b972e25c5f9c4b57-209x209.png?w=50&h=50" height={"35px"} width={"35px"} />
           </div>
-          <div className="absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0">
+          <div className={`${poolAssets.isLP ? "absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0" : "scale-[110%] pt-1"}`}>
             <img src="https://cdn.sanity.io/images/yirb57h5/production/41e282e4cbb87b5faee99a10b972e25c5f9c4b57-209x209.png?w=50&h=50" height={"60px"} width={"60px"} />
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-1">
           <div className="text-[1.3rem] font-bold md:text-[1.5rem] ">
-            {mainTokenName}{poolAssets.isLp ? "-" + baseTokenName : ""}
+            {mainTokenName}{poolAssets.isLP ? "-" + baseTokenName : ""}
           </div>
           <div className="flex flex-row gap-1">
-            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary ${poolAssets.depositFee.isEqualTo(0) ? "" : "hidden"}`}>
+            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary ${poolAssets.depositFee == 0 ? "" : "hidden"}`}>
               NO FEES
             </div>
             <div className="border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary">
@@ -197,7 +198,7 @@ const FarmCard = (props: FarmCardProps) => {
           APR:
         </div>
         <div className="font-bold">
-          250 %
+          250%
         </div>
       </div>
 
@@ -214,8 +215,8 @@ const FarmCard = (props: FarmCardProps) => {
         <div className="text-primary">
           DEPOSIT FEE:
         </div>
-        <div className={`font-bold ${poolAssets.depositFee.isEqualTo(0) ? "text-3xl" : ""}`}>
-          {poolAssets.depositFee.toFixed(2, 1)}%
+        <div className={`font-bold ${poolAssets.depositFee == 0 ? "text-3xl" : ""}`}>
+          {poolAssets.depositFee.toFixed(2)}%
         </div>
       </div>
 
@@ -235,7 +236,7 @@ const FarmCard = (props: FarmCardProps) => {
 
       <div className={`${isApproved ? "" : "hidden"}`}>
         <div className="form-label inline-block text-primary text-xs font-bold">
-          {mainTokenSymbol}{poolAssets.isLp ? "-" + baseTokenSymbol : ""} {poolAssets.isLp ? "LP" : ""} STAKED
+          {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""} STAKED
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
@@ -305,7 +306,7 @@ const FarmCard = (props: FarmCardProps) => {
             DEPOSIT:
           </div>
           <div className="flex gap-1 items-center font-bold">
-            {mainTokenName}{poolAssets.isLp ? "-" + baseTokenName : ""} {poolAssets.isLp ? "LP" : ""}
+            {mainTokenName}{poolAssets.isLP ? "-" + baseTokenName : ""} {poolAssets.isLP ? "LP" : ""}
 
           </div>
         </div>
@@ -330,7 +331,7 @@ const FarmCard = (props: FarmCardProps) => {
               disabled:hover:bg-transparent disabled:hover:text-white
             "
           >
-            <a className="inline-flex items-center gap-1" href="https://testnet.bscscan.com/address/0x9AB60Da7a00d4096498542d9EE6a9fef69Aa8d8B#code" target="_blank" rel="noopener noreferrer">
+            <a className="inline-flex items-center gap-1" href={chefHyperlink} target="_blank" rel="noopener noreferrer">
               VIEW POOL
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -346,7 +347,7 @@ const FarmCard = (props: FarmCardProps) => {
               disabled:hover:bg-transparent disabled:hover:text-white
             "
           >
-            <a className="inline-flex items-center gap-1" href="https://testnet.bscscan.com/address/0x9AB60Da7a00d4096498542d9EE6a9fef69Aa8d8B#code" target="_blank" rel="noopener noreferrer">
+            <a className="inline-flex items-center gap-1" href={tokenHyperlink} target="_blank" rel="noopener noreferrer">
               VIEW TOKEN
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
