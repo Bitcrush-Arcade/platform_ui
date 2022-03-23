@@ -3,6 +3,15 @@ import Head from 'next/head';
 import PageContainer from 'components/PageContainer';
 import FarmCard from 'tw/farms/FarmCard';
 
+async function getStaticProps() {
+
+
+
+
+  return { props: {} }
+}
+
+
 const Farms = () => {
 
 
