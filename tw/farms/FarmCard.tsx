@@ -67,29 +67,33 @@ const defaultPoolDetails: PoolDetailType = {
 
 const FarmCard = (props: FarmCardProps) => {
   const { color = "primary", highlight, poolAssets } = props
-  const { baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage, swapName, swapLogo, pid } = poolAssets
+  const {
+    baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage,
+    swapName, swapLogo, pid
+  }
+    = poolAssets
   const [showDetails, setShowDetails] = useState<boolean>(false)
   const [pool, setPool] = useImmer<PoolDetailType>(defaultPoolDetails)
   // BLOCKCHAIN
   //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuth()
-
   // Nice Token
-  const niceTokenContract = getContracts('niceToken', chainId)
-  const { methods: niceTokenMethods } = useContract(niceTokenContract.abi, niceTokenContract.address)
+  const tokenContract = getContracts(tokenAddress, chainId)
+  const { methods: tokenMethods } = useContract(tokenContract.abi, tokenContract.address)
+
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
   // Fee Distributor, only used when fee>0
   const feeDistributorContract = getContracts('feeDistributor', chainId)
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
-  // hooks
 
   const getPoolInfo = useCallback(async () => {
-    if (!chefMethods || !feeDistributorMethods || !niceTokenMethods) return;
+    if (!chefMethods || !feeDistributorMethods) return;
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
+    const tokenAddress = await chefPoolInfo.token
     const chefUserInfo = await chefMethods.userInfo(pid).call()
 
     setPool(draft => {
@@ -100,13 +104,14 @@ const FarmCard = (props: FarmCardProps) => {
     })
 
 
-  }, [chefMethods, feeDistributorMethods, niceTokenMethods, account])
+  }, [chefMethods, feeDistributorMethods, account])
 
   const getPoolEarnings = useCallback(async () => {
 
-    if (!chefMethods || !account) return;
+    if (!chefMethods || !tokenMethods || !account) return;
 
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
+    const totalLiquidity = await tokenMethods.balanceOf(chefContract.address)
 
     setPool(draft => {
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
@@ -311,7 +316,8 @@ const FarmCard = (props: FarmCardProps) => {
             TOTAL LIQUIDITY:
           </div>
           <div className="font-bold">
-            ${currencyFormat(21456789.123456, { decimalsToShow: 0 })}
+            {/* STILL NEEDS TO BE CONVERTED TO USD */}
+            {pool.totalLiquidity.toFixed(2, 1)}
           </div>
         </div>
 
