@@ -21,7 +21,7 @@ const poolAssets = {
     {
       title: "Pool Identifier",
       name: "pid",
-      type: "string",
+      type: "number",
       validation: Rule => Rule.integer().positive().min(1)
     },
     {
