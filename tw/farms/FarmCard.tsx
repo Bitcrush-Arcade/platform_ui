@@ -79,7 +79,7 @@ const FarmCard = (props: FarmCardProps) => {
   const { login, logout } = useAuthContext()
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
-  const tokenHyperlink = "https://testnet.bscscan.com/address/" + pool.tokenAddress.toString() + "#code"
+  const tokenHyperlink = "https://bscscan.com/address/" + pool.tokenAddress
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
