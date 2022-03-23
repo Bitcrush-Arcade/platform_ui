@@ -1,19 +1,18 @@
+// COMPONENTS
+import BigNumber from 'bignumber.js'
+import PageContainer from 'components/PageContainer';
+
 // Next
 import Head from 'next/head';
-import PageContainer from 'components/PageContainer';
+import { GetStaticProps, InferGetStaticPropsType } from 'next'
+
+// Bitcrush UI
 import FarmCard from 'tw/farms/FarmCard';
 
-async function getStaticProps() {
 
+const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
 
-
-
-  return { props: {} }
-}
-
-
-const Farms = () => {
-
+  console.log(props)
 
   return <PageContainer>
     <Head>
@@ -41,7 +40,12 @@ const Farms = () => {
             swapName: "SWAPNAME",
             swapLogo: "ape swap url",
 
-            pid: 1
+            pid: 1,
+            mult: 1,
+            isLp: true,
+            feeAmount: 0.1,
+            depositFee: new BigNumber(10),
+            tokenAddress: "token address"
           }}
         />
 
@@ -52,3 +56,59 @@ const Farms = () => {
 
 export default Farms
 
+
+import Web3 from 'web3'
+// CONTRACT
+import { getContracts } from 'data/contracts'
+
+export const getStaticProps: GetStaticProps = async () => {
+  const activeFarms: Array<any> = []
+  const inactiveFarms: Array<any> = []
+
+  // CONNECT TO BLOCKCHAIN
+  //MAINNET
+  // const provider = 'https://bsc-dataseed1.defibit.io/'
+  // TESTNET
+  const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+  const setup = getContracts('galacticChef', 97)
+  console.log("abi length", setup.abi?.length)
+  if (setup.abi) {
+    const contract = await new web3.eth.Contract(setup.abi, setup.address)
+
+    // GET POOL COUNT FROM CHEF
+
+    const poolAmount = await contract.methods.poolCounter().call()
+
+    for (let i = 1; i <= poolAmount; i++) {
+      const poolData = await contract.methods.poolInfo(i).call()
+      // if (!poolData.isLP)
+      //   continue
+      const parsedData = {
+        fee: new BigNumber(poolData.fee).toNumber(),
+        mult: new BigNumber(poolData.mult).toNumber(),
+        isLP: Boolean(poolData.isLP),
+        pid: i,
+        token: String(poolData.token)
+      }
+      const stringData = JSON.stringify(parsedData)
+      if (parsedData.mult > 0) {
+        activeFarms.push(stringData)
+      }
+      else
+        inactiveFarms.push(stringData)
+    }
+
+    // GET POOL DATA FROM CHEF (STATIC DATA)
+
+    // GET ASSETS FROM SANITY
+  }
+
+  return {
+    props: {
+      activeFarms,
+      inactiveFarms
+    }
+  }
+}

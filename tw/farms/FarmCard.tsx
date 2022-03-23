@@ -10,10 +10,10 @@ import { currencyFormat } from "utils/text/text"
 import { getContracts } from 'data/contracts'
 import { imageBuilder } from 'utils/sanityConfig'
 // hooks
-import { useTransactionContext } from 'hooks/contextHooks'
+import { useTransactionContext, useAuthContext } from 'hooks/contextHooks'
 import useCoin from 'hooks/useCoin'
 import { useWeb3React } from '@web3-react/core'
-import { useContract, useAuth, ConnectorNames } from 'hooks/web3Hooks'
+import { useContract, ConnectorNames } from 'hooks/web3Hooks'
 import { divide } from 'lodash'
 import { isBigNumberish } from '@ethersproject/bignumber/lib/bignumber'
 
@@ -21,8 +21,9 @@ import { isBigNumberish } from '@ethersproject/bignumber/lib/bignumber'
 type FarmCardProps = {
   color: "primary" | "secondary",
   highlight: boolean,
-  // Image URL's and asset info will be received from sanity in farm page
+  // Static props
   poolAssets: {
+    //From Sanity
     baseTokenName: string,
     baseTokenSymbol: string,
     baseTokenImage: string,
@@ -34,36 +35,32 @@ type FarmCardProps = {
     swapName: string,
     swapLogo: string,
 
+    //From blockchain
     pid: number,
-
+    mult?: number,
+    isLp: boolean,
+    feeAmount: number,
+    depositFee: BigNumber,
+    tokenAddress: string
   },
 
 }
 // Some will be received from web3 and others will be calculated here
 type PoolDetailType = {
-  hasFee: boolean,
-  mult: BigNumber,
   apr: BigNumber,
-  depositFee: BigNumber,
   earned: BigNumber,
   stakedAmount: BigNumber,
   deposit: BigNumber,
   totalLiquidity: BigNumber,
-  isLp: boolean,
   tokenAddress: string,
-
 }
 
 const defaultPoolDetails: PoolDetailType = {
-  hasFee: false,
-  mult: new BigNumber(0),
   apr: new BigNumber(0),
-  depositFee: new BigNumber(0),
   earned: new BigNumber(0),
   stakedAmount: new BigNumber(0),
   deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  isLp: false,
   tokenAddress: "",
 }
 
@@ -80,7 +77,7 @@ const FarmCard = (props: FarmCardProps) => {
   // BLOCKCHAIN
   //hooks
   const { account, chainId } = useWeb3React()
-  const { login, logout } = useAuth()
+  const { login, logout } = useAuthContext()
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
 
@@ -99,11 +96,8 @@ const FarmCard = (props: FarmCardProps) => {
     const chefUserInfo = await chefMethods.userInfo(pid).call()
 
     setPool(draft => {
-      draft.mult = new BigNumber(chefPoolInfo.mult).div(feeDiv).times(100) //Gives back %format
-      draft.depositFee = new BigNumber(chefPoolInfo.fee).div(feeDiv)
+
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
-      draft.isLp = chefPoolInfo.isLp
-      draft.tokenAddress = tokenAddress
     })
 
 
@@ -158,7 +152,7 @@ const FarmCard = (props: FarmCardProps) => {
     <div
       className={`
               flex flex-col gap-2
-              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : account ? "max-h-[566px]" : "max-h-[500px]"}
+              border-2 rounded-[32px] ${border[color]} ${highlightGlow[color]} w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[445px]" : ""}
               bg-paper-bg 
               text-white
               p-8
@@ -178,14 +172,14 @@ const FarmCard = (props: FarmCardProps) => {
 
         <div className="flex flex-col items-end gap-1">
           <div className="text-[1.3rem] font-bold md:text-[1.5rem] ">
-            {mainTokenName}-{baseTokenName}
+            {mainTokenName}{poolAssets.isLp ? "-" + baseTokenName : ""}
           </div>
           <div className="flex flex-row gap-1">
-            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary ${pool.depositFee.isEqualTo(0) ? "" : "hidden"}`}>
+            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary ${poolAssets.depositFee.isEqualTo(0) ? "" : "hidden"}`}>
               NO FEES
             </div>
             <div className="border-2 border-secondary rounded-full px-2 py-1 text-sm text-secondary">
-              {pool.mult.toFixed(0)}X
+              {poolAssets.mult}X
             </div>
           </div>
         </div>
@@ -220,8 +214,8 @@ const FarmCard = (props: FarmCardProps) => {
         <div className="text-primary">
           DEPOSIT FEE:
         </div>
-        <div className={`font-bold ${pool.depositFee.isEqualTo(0) ? "text-3xl" : ""}`}>
-          {pool.depositFee.toFixed(2, 1)}%
+        <div className={`font-bold ${poolAssets.depositFee.isEqualTo(0) ? "text-3xl" : ""}`}>
+          {poolAssets.depositFee.toFixed(2, 1)}%
         </div>
       </div>
 
@@ -241,7 +235,7 @@ const FarmCard = (props: FarmCardProps) => {
 
       <div className={`${isApproved ? "" : "hidden"}`}>
         <div className="form-label inline-block text-primary text-xs font-bold">
-          {mainTokenSymbol}-{baseTokenSymbol} {pool.isLp ? "LP" : ""} STAKED
+          {mainTokenSymbol}{poolAssets.isLp ? "-" + baseTokenSymbol : ""} {poolAssets.isLp ? "LP" : ""} STAKED
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
@@ -261,7 +255,7 @@ const FarmCard = (props: FarmCardProps) => {
       {!account ?
         <button
           disabled={false}
-          onClick={() => login(ConnectorNames.INJECTED)}
+          onClick={() => login()}
           className="
             flex flex-row justify-center items-center gap-2 
             border-2 border-primary inner-glow-primary px-6 py-4 my-4 text-xs rounded-full 
@@ -275,14 +269,15 @@ const FarmCard = (props: FarmCardProps) => {
         </button>
         :
         <button
-          onClick={() => approve(chefContract.address, new BigNumber(5000).times(10 ** 18))}
-          disabled={false}
-          className="
+          onClick={() => !pool.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
+          disabled={!pool.tokenAddress}
+          className={`
+            ${isApproved ? "hidden" : "block"}
             flex flex-row justify-center items-center gap-2 
             border-2 border-secondary inner-glow-secondary px-6 py-4 my-4 
             text-xs rounded-full hover:bg-secondary 
             hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white
-          "
+          `}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
@@ -291,7 +286,7 @@ const FarmCard = (props: FarmCardProps) => {
         </button>
       }
 
-      <hr className="border-slate-500" />
+      <hr className="border-slate-500 my-3" />
 
       <button disabled={false} onClick={detailToggle} className="flex gap-1 justify-center text-secondary text-xs hover:text-white disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
         <div className={`flex items-center`}>
@@ -310,7 +305,7 @@ const FarmCard = (props: FarmCardProps) => {
             DEPOSIT:
           </div>
           <div className="flex gap-1 items-center font-bold">
-            {mainTokenName}-{baseTokenName} {pool.isLp ? "LP" : ""}
+            {mainTokenName}{poolAssets.isLp ? "-" + baseTokenName : ""} {poolAssets.isLp ? "LP" : ""}
 
           </div>
         </div>

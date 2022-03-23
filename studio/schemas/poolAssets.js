@@ -57,14 +57,10 @@ const poolAssets = {
       type: "reference",
       to: [{ type: "partner" }],
     },
+
     {
-      title: "Is it Third Party?",
-      name: "isTp",
-      type: "boolean"
-    },
-    {
-      title: "Active",
-      name: "isActive",
+      title: "Display in farm, otherwise pool",
+      name: "isFarm",
       type: "boolean"
     },
 
