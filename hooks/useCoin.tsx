@@ -27,7 +27,7 @@ const useCoin = (coinAddress?: string) =>
     }
     try {
       const allowance = await coinMethods.allowance(account, contractToCheck).call()
-        .catch(e => console.log('token not approved', coinAddress))
+        .catch((e: any) => console.log('token not approved', coinAddress))
       console.log(allowance, allowance >= (amountToCheck ?? 1))
       setIsApproved(allowance >= (amountToCheck ?? 1))
       return allowance >= (amountToCheck ?? 1)
