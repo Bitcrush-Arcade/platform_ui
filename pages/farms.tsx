@@ -1,7 +1,7 @@
 // Next
 import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import find from 'lodash/find'
 // Libs
 import { getClient, imageBuilder } from 'utils/sanityConfig'
@@ -9,7 +9,7 @@ import { getClient, imageBuilder } from 'utils/sanityConfig'
 // COMPONENTS
 import BigNumber from 'bignumber.js'
 import PageContainer from 'components/PageContainer';
-
+import StakeModal, { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
 
 // Bitcrush UI
 import FarmCard from 'tw/farms/FarmCard';
@@ -22,7 +22,21 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
 
   const [ showActive, setShowActive ] = useState<boolean>(true)
 
+  const [ openStake, setOpenStake ] = useState<boolean>(false)
+  const [ stakeSelected, setStakeSelected ] = useState<{
+    options: Array<StakeOptionsType>,
+    submitFn: SubmitFunction,
+    init?: number,
+    coinInfo?: StakeModalProps[ 'coinInfo' ]
+  }>({ options: [], submitFn: () => { } })
+
   const toggleActive = useCallback(() => setShowActive(p => !p), [ setShowActive ])
+
+  useEffect(() =>
+  {
+    if (stakeSelected.options.length == 0) return;
+    setTimeout(() => setOpenStake(true), 300)
+  }, [ stakeSelected ])
 
   return <PageContainer>
     <Head>
@@ -65,6 +79,13 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
                   depositFee: fee || 0,
                   tokenAddress: token
                 }}
+
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
               />
             )
           })
@@ -72,6 +93,14 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
 
       </div>
     </div>
+    <StakeModal
+      open={openStake}
+      onClose={() => setOpenStake(false)}
+      options={stakeSelected.options}
+      onSubmit={stakeSelected.submitFn}
+      initAction={stakeSelected.init}
+      coinInfo={stakeSelected.coinInfo}
+    />
   </PageContainer>
 }
 

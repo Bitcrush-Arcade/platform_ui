@@ -1,12 +1,12 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import { useImmer } from 'use-immer'
 import Image from 'next/image'
-// Bitcrush UI
-// COMPONENTS
-import StakeModal from "components/basics/StakeModal"
-import BigNumber from 'bignumber.js'
 // mui
 import Skeleton from "@mui/material/Skeleton"
+// Bitcrush UI
+// COMPONENTS
+import { StakeModalProps, StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
+import BigNumber from 'bignumber.js'
 // utils
 import { currencyFormat } from "utils/text/text"
 import { getContracts } from 'data/contracts'
@@ -48,7 +48,7 @@ type FarmCardProps = {
     depositFee: number,
     tokenAddress: string
   },
-
+  onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps[ 'coinInfo' ]) => void;
 }
 // Some will be received from web3 and others will be calculated here
 type PoolDetailType = {
@@ -57,7 +57,6 @@ type PoolDetailType = {
   stakedAmount: BigNumber,
   deposit: BigNumber,
   totalLiquidity: BigNumber,
-  tokenAddress: string,
 }
 
 const defaultPoolDetails: PoolDetailType = {
@@ -66,38 +65,64 @@ const defaultPoolDetails: PoolDetailType = {
   stakedAmount: new BigNumber(0),
   deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  tokenAddress: "",
 }
 
 
-const FarmCard = (props: FarmCardProps) => {
-  const { color, highlight, poolAssets } = props
+const FarmCard = (props: FarmCardProps) =>
+{
+  const { color, highlight, poolAssets, onAction } = props
   const {
     baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage,
     swapName, swapLogo, swapUrl, swapDexUrl, swapPoolUrl, pid
   }
     = poolAssets
-  const [showDetails, setShowDetails] = useState<boolean>(false)
-  const [pool, setPool] = useImmer<PoolDetailType>(defaultPoolDetails)
+  const [ showDetails, setShowDetails ] = useState<boolean>(false)
+  const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
   // BLOCKCHAIN
+  const options: Array<StakeOptionsType> = useMemo(() => [
+    //Stake
+    {
+      name: "STAKE",
+      maxValue: 100,
+      btnText: "Stake",
+      description: `Stake $${mainTokenSymbol} to earn $NICE`,
+    },
+    //Withdraw
+    {
+      name: "withdraw",
+      maxValue: 200,
+      btnText: "Withdraw",
+      description: `Withdraw staked $${mainTokenSymbol}`
+    }
+  ], [ mainTokenSymbol ])
+
+  const coinInfoForModal = useMemo(() => ({
+    symbol: poolAssets.isLP ? `${mainTokenSymbol}-${baseTokenSymbol}` : mainTokenSymbol,
+    name: poolAssets.isLP ? `${poolAssets.swapName} LP ${mainTokenSymbol}-${baseTokenSymbol}` : mainTokenName,
+    decimals: 18,
+  }), [ mainTokenSymbol, mainTokenName, poolAssets, baseTokenSymbol ])
+
+  const submitFn: SubmitFunction = (values, second) =>
+  {
+    console.log('submit', pid)
+  }
   //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuthContext()
   // Stake Token
-  const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
-  let tokenUrl;
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(poolAssets.tokenAddress)
 
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
-  let chefUrl;
 
   // Fee Distributor, only used when fee>0
   const feeDistributorContract = getContracts('feeDistributor', chainId)
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
 
   // Concatenates string with contract address to obtain BSC Scan url
-  function getBscUrl(contractAddress: string) {
+  function getBscUrl(contractAddress: string)
+  {
     let url;
     if (chainId == 56)
       url = "https://bscscan.com/address/" + contractAddress
@@ -107,58 +132,72 @@ const FarmCard = (props: FarmCardProps) => {
     return url
   }
 
-  const getPoolInfo = useCallback(async () => {
+  const getPoolInfo = useCallback(async () =>
+  {
     if (!chefMethods || !feeDistributorMethods) return;
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
     const tokenAddress = await chefPoolInfo.token
     const chefUserInfo = await chefMethods.userInfo(pid).call()
 
-    setPool(draft => {
+    setPool(draft =>
+    {
 
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
     })
 
 
-  }, [chefMethods, feeDistributorMethods, account])
+  }, [ chefMethods, feeDistributorMethods, account ])
 
-  const getPoolEarnings = useCallback(async () => {
+  const getPoolEarnings = useCallback(async () =>
+  {
 
-    if (!chefMethods || !pool.tokenAddress || !account) return;
+    if (!chefMethods || !poolAssets.tokenAddress || !account) return;
 
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
     const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
 
 
-    setPool(draft => {
+    setPool(draft =>
+    {
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
       draft.apr = new BigNumber(amountEarned).div(10 ** 18)
     })
 
-  }, [chefMethods, account, pid, pool.tokenAddress, coinMethods])
+  }, [ chefMethods, account, pid, poolAssets.tokenAddress, coinMethods ])
 
   // useEffect for pool earnings
-  useEffect(() => {
+  useEffect(() =>
+  {
     if (!account) return;
 
     const interval = setInterval(getPoolEarnings, 5000);
 
-    return () => {
+    return () =>
+    {
       clearInterval(interval)
     }
 
-  }, [account, getPoolEarnings])
+  }, [ account, getPoolEarnings ])
 
   // useEffect for pool info, used when first loading page
-  useEffect(() => {
+  useEffect(() =>
+  {
     if (!account) return;
     getPoolInfo()
-  }, [getPoolInfo, account])
+  }, [ getPoolInfo, account ])
 
+  // useEffect to get approval of tokens
+  useEffect(() =>
+  {
+    if (!poolAssets.tokenAddress || !chefContract.address || isApproved) return;
+    getApproved(chefContract.address)
+  }, [ chefContract, poolAssets, getApproved, isApproved ])
 
-  const detailToggle = useCallback(() => {
+  const detailToggle = useCallback(() =>
+  {
     setShowDetails(p => !p)
-  }, [setShowDetails])
+  }, [ setShowDetails ])
 
   const highlightGlow = {
     primary: highlight ? "box-highlight-primary" : "inner-glow-primary",
@@ -168,13 +207,18 @@ const FarmCard = (props: FarmCardProps) => {
     primary: "border-primary",
     secondary: "border-secondary",
   }
+
+  const depositToken = useCallback((amount: BigNumber) =>
+  {
+
+  }, [ chefMethods, account ])
   return (
     // Farm card
     <div
       className={`
               flex flex-col gap-2
-              border-2 rounded-[32px] ${border[color ? "primary" : "secondary"]} ${highlightGlow[color ? "primary" : "secondary"]} 
-              w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[440px]" : ""}
+              border-2 rounded-[32px] ${border[ color ? "primary" : "secondary" ]} ${highlightGlow[ color ? "primary" : "secondary" ]} 
+              w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[410px]" : ""}
               bg-paper-bg 
               text-white
               py-6
@@ -184,13 +228,22 @@ const FarmCard = (props: FarmCardProps) => {
       {/* Tokens, title and tags row */}
       <div className="flex justify-between ">
 
-        <div className={`flex h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
-          <div className={`z-10  ${poolAssets.isLP ? "" : "hidden"}`} >
-            {baseTokenImage && <Image src={baseTokenImage} height={35} width={35} alt="Farm Base Token" />}
+        <div className={`flex flex-col h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
+          <div>
+            <div className={`z-10  ${poolAssets.isLP ? "" : "hidden"}`} >
+              {baseTokenImage && <Image src={baseTokenImage} height={35} width={35} alt="Farm Base Token" />}
+            </div>
+            <div className={`${poolAssets.isLP ? "absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0" : "scale-[110%] pt-1"}`}>
+              {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />}
+            </div>
           </div>
-          <div className={`${poolAssets.isLP ? "absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0" : "scale-[110%] pt-1"}`}>
-            {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />}
-          </div>
+          <a className="text-xs whitespace-nowrap align-middle" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
+            <span className='align-middle'>
+              <Image src={swapLogo} height={20} width={20} alt="swapLogo" />
+            </span>
+            &nbsp;
+            {swapName}
+          </a>
         </div>
 
         <div className="flex flex-col items-end gap-1">
@@ -198,22 +251,17 @@ const FarmCard = (props: FarmCardProps) => {
             {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenName : ""}
           </div>
           <div className="flex flex-row gap-1 items-center">
-            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-xs text-secondary ${poolAssets.depositFee == 0 ? "" : "hidden"}`}>
+            <div className={`border-2 border-secondary rounded-full px-2 py-1 text-[0.70rem] text-secondary ${poolAssets.depositFee == 0 ? "" : "hidden"}`}>
               NO FEES
             </div>
-            <div className="border-2 border-secondary rounded-full px-2 py-1 text-xs text-secondary">
+            <div className="border-2 border-secondary rounded-full px-2 py-1 text-[0.70rem] text-secondary font-bold">
               {poolAssets.mult}X
             </div>
           </div>
         </div>
 
       </div>
-      <a className="flex items-center justify-start text-xs gap-2" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
-        <div>
-          <img className="pb-[2px]" src={swapLogo} height={"20px"} width={"20px"} />
-        </div>
-        {swapName}
-      </a>
+
       {/* Data rows */}
       <div className="flex justify-between mt-4">
         <div className="text-primary">
@@ -273,10 +321,17 @@ const FarmCard = (props: FarmCardProps) => {
             {pool.stakedAmount.toFixed(2, 1)}
           </div>
           <div className="flex gap-2">
-            <button disabled={false} className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+            <button
+              disabled={false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
+              className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+            >
               +
             </button>
-            <button disabled={false} className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+            <button
+              disabled={false} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
+              className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
               -
             </button>
           </div>
@@ -301,8 +356,8 @@ const FarmCard = (props: FarmCardProps) => {
         </button>
         :
         <button
-          onClick={() => !pool.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
-          disabled={!pool.tokenAddress}
+          onClick={() => poolAssets.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
+          disabled={!poolAssets.tokenAddress}
           className={`
             ${isApproved ? "hidden" : "block"}
             flex flex-row justify-center items-center gap-2 
@@ -378,7 +433,7 @@ const FarmCard = (props: FarmCardProps) => {
               disabled:hover:bg-transparent disabled:hover:text-white
             "
           >
-            <a className="inline-flex items-center gap-1" href={getBscUrl(pool.tokenAddress)} target="_blank" rel="noopener noreferrer">
+            <a className="inline-flex items-center gap-1" href={getBscUrl(poolAssets.tokenAddress)} target="_blank" rel="noopener noreferrer">
               VIEW TOKEN
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
