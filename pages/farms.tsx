@@ -3,6 +3,9 @@ import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useState, useCallback } from "react"
 import find from 'lodash/find'
+// Libs
+import { getClient, imageBuilder } from 'utils/sanityConfig'
+
 // COMPONENTS
 import BigNumber from 'bignumber.js'
 import PageContainer from 'components/PageContainer';
@@ -39,20 +42,20 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
             return (
               <FarmCard key={`active-farm-${activeIndex}`}
                 color="primary"
-                highlight={true}
+                highlight={farm.hightlight}
                 poolAssets=
                 {{
-                  baseTokenName: farm.baseTokenImage.name,
-                  baseTokenSymbol: farm.baseTokenImage.symbol,
-                  baseTokenImage: "base token url",
+                  baseTokenName: farm.baseToken?.name,
+                  baseTokenSymbol: farm.baseToken?.symbol,
+                  baseTokenImage: farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : null,
 
-                  mainTokenName: "MAIN",
-                  mainTokenSymbol: "MT",
-                  mainTokenImage: "main token url",
+                  mainTokenName: farm.mainToken.name,
+                  mainTokenSymbol: farm.mainToken.symbol,
+                  mainTokenImage: imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? "",
 
-                  swapName: "SWAPNAME",
-                  swapLogo: "ape swap url",
-                  swapUrl: "swap url",
+                  swapName: farm.swapPartner.name,
+                  swapLogo: imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "",
+                  swapUrl: farm.swapPartner.url,
 
                   pid,
                   mult,
@@ -75,7 +78,6 @@ export default Farms
 
 import Web3 from 'web3'
 // CONTRACT
-import { getClient } from 'utils/sanityConfig'
 import { getContracts } from 'data/contracts'
 import { farmAssets } from 'queries/pools';
 
