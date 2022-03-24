@@ -15,14 +15,13 @@ import PageContainer from 'components/PageContainer';
 import FarmCard from 'tw/farms/FarmCard';
 
 
-const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
-{
+const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   const { activeFarms, inactiveFarms } = props
   console.log(props)
 
-  const [ showActive, setShowActive ] = useState<boolean>(true)
+  const [showActive, setShowActive] = useState<boolean>(true)
 
-  const toggleActive = useCallback(() => setShowActive(p => !p), [ setShowActive ])
+  const toggleActive = useCallback(() => setShowActive(p => !p), [setShowActive])
 
   return <PageContainer>
     <Head>
@@ -36,8 +35,7 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
     <div className="flex justify-center mt-9">
       <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
         {
-          showActive && activeFarms.length > 0 && activeFarms.map((farm: any, activeIndex: number) =>
-          {
+          showActive && activeFarms.length > 0 && activeFarms.map((farm: any, activeIndex: number) => {
             const { pid, mult, fee, isLP, token } = farm
             return (
               <FarmCard key={`active-farm-${activeIndex}`}
@@ -81,8 +79,7 @@ import Web3 from 'web3'
 import { getContracts } from 'data/contracts'
 import { farmAssets } from 'queries/pools';
 
-export const getStaticProps: GetStaticProps = async () =>
-{
+export const getStaticProps: GetStaticProps = async () => {
   const activeFarms: Array<any> = []
   const inactiveFarms: Array<any> = []
   let data: any;
@@ -125,8 +122,7 @@ export const getStaticProps: GetStaticProps = async () =>
     const farmsQuery = farmAssets(farmIds)
     data = await client.fetch(farmsQuery)
 
-    data.map((farm: any) =>
-    {
+    data.map((farm: any) => {
       const poolFarm = find(farms, o => o.pid == farm.pid)
       const parsedFarm = {
         ...poolFarm,
