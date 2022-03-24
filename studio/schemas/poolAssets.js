@@ -13,12 +13,6 @@ const poolAssets = {
   fields: [
 
     {
-      title: "Pool Name",
-      name: "poolName",
-      type: "string",
-      validation: Rule => Rule.required()
-    },
-    {
       title: "Pool Identifier",
       name: "pid",
       type: "number",
@@ -27,32 +21,18 @@ const poolAssets = {
     {
       title: "Main Token",
       name: "mainToken",
-      type: "string"
-    },
-    {
-      title: "Main Token Image",
-      name: "mainTokenImage",
       type: "reference",
       to: [{ type: "token" }],
     },
+
     {
       title: "Base Token",
       name: "baseToken",
-      type: "string"
-    },
-    {
-      title: "Base Token Image",
-      name: "baseTokenImage",
       type: "reference",
       to: [{ type: "token" }],
     },
     {
       title: "Swap",
-      name: "swap",
-      type: "string"
-    },
-    {
-      title: "Swap Image",
       name: "swapPartner",
       type: "reference",
       to: [{ type: "partner" }],

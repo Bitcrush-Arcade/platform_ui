@@ -52,6 +52,7 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
 
                   swapName: "SWAPNAME",
                   swapLogo: "ape swap url",
+                  swapUrl: "swap url",
 
                   pid,
                   mult,

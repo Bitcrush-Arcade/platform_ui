@@ -34,6 +34,7 @@ type FarmCardProps = {
 
     swapName: string,
     swapLogo: string,
+    swapUrl: string,
 
     //From blockchain
     pid: number,
@@ -68,7 +69,7 @@ const FarmCard = (props: FarmCardProps) => {
   const { color = "primary", highlight, poolAssets } = props
   const {
     baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage,
-    swapName, swapLogo, pid
+    swapName, swapLogo, swapUrl, pid
   }
     = poolAssets
   const [showDetails, setShowDetails] = useState<boolean>(false)
@@ -79,14 +80,27 @@ const FarmCard = (props: FarmCardProps) => {
   const { login, logout } = useAuthContext()
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(pool.tokenAddress)
-  const tokenHyperlink = "https://bscscan.com/address/" + pool.tokenAddress
+  let tokenUrl;
+
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
-  const chefHyperlink = "https://testnet.bscscan.com/address/" + chefContract.address + "#code"
+  let chefUrl;
+
   // Fee Distributor, only used when fee>0
   const feeDistributorContract = getContracts('feeDistributor', chainId)
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
+
+  // Concatenates string with contract address to obtain BSC Scan url
+  function getBscUrl(contractAddress: string) {
+    let url;
+    if (chainId == 56)
+      url = "https://bscscan.com/address/" + contractAddress
+    else
+      url = "https://testnet.bscscan.com/address/" + contractAddress + "#code"
+
+    return url
+  }
 
   const getPoolInfo = useCallback(async () => {
     if (!chefMethods || !feeDistributorMethods) return;
@@ -186,12 +200,12 @@ const FarmCard = (props: FarmCardProps) => {
         </div>
 
       </div>
-      <div className="flex items-center justify-start text-xs gap-2">
+      <a className="flex items-center justify-start text-xs gap-2" href={swapUrl}>
         <div>
           <img className="pb-[2px]" src="https://cdn.sanity.io/images/yirb57h5/production/41e282e4cbb87b5faee99a10b972e25c5f9c4b57-209x209.png?w=50&h=50" height={"20px"} width={"20px"} />
         </div>
-        {swapName} ROUTER
-      </div>
+        {swapName}
+      </a>
       {/* Data rows */}
       <div className="flex justify-between mt-4">
         <div className="text-primary">
@@ -331,7 +345,7 @@ const FarmCard = (props: FarmCardProps) => {
               disabled:hover:bg-transparent disabled:hover:text-white
             "
           >
-            <a className="inline-flex items-center gap-1" href={chefHyperlink} target="_blank" rel="noopener noreferrer">
+            <a className="inline-flex items-center gap-1" href={getBscUrl(chefContract.address)} target="_blank" rel="noopener noreferrer">
               VIEW POOL
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -347,7 +361,7 @@ const FarmCard = (props: FarmCardProps) => {
               disabled:hover:bg-transparent disabled:hover:text-white
             "
           >
-            <a className="inline-flex items-center gap-1" href={tokenHyperlink} target="_blank" rel="noopener noreferrer">
+            <a className="inline-flex items-center gap-1" href={getBscUrl(pool.tokenAddress)} target="_blank" rel="noopener noreferrer">
               VIEW TOKEN
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
