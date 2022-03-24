@@ -57,6 +57,7 @@ type PoolDetailType = {
   stakedAmount: BigNumber,
   deposit: BigNumber,
   totalLiquidity: BigNumber,
+  userTokens: BigNumber,
 }
 
 const defaultPoolDetails: PoolDetailType = {
@@ -65,6 +66,7 @@ const defaultPoolDetails: PoolDetailType = {
   stakedAmount: new BigNumber(0),
   deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
+  userTokens: new BigNumber(0),
 }
 
 
@@ -83,18 +85,18 @@ const FarmCard = (props: FarmCardProps) =>
     //Stake
     {
       name: "STAKE",
-      maxValue: 100,
+      maxValue: pool.userTokens,
       btnText: "Stake",
       description: `Stake $${mainTokenSymbol} to earn $NICE`,
     },
     //Withdraw
     {
       name: "withdraw",
-      maxValue: 200,
+      maxValue: pool.stakedAmount,
       btnText: "Withdraw",
       description: `Withdraw staked $${mainTokenSymbol}`
     }
-  ], [ mainTokenSymbol ])
+  ], [ mainTokenSymbol, pool ])
 
   const coinInfoForModal = useMemo(() => ({
     symbol: poolAssets.isLP ? `${mainTokenSymbol}-${baseTokenSymbol}` : mainTokenSymbol,
@@ -134,20 +136,18 @@ const FarmCard = (props: FarmCardProps) =>
 
   const getPoolInfo = useCallback(async () =>
   {
-    if (!chefMethods || !feeDistributorMethods) return;
+    if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract) return;
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
-    const tokenAddress = await chefPoolInfo.token
-    const chefUserInfo = await chefMethods.userInfo(pid).call()
+    const chefUserInfo = await chefMethods.userInfo(pid, account).call()
 
     setPool(draft =>
     {
-
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
     })
 
 
-  }, [ chefMethods, feeDistributorMethods, account ])
+  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract ])
 
   const getPoolEarnings = useCallback(async () =>
   {
@@ -156,10 +156,13 @@ const FarmCard = (props: FarmCardProps) =>
 
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
     const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
+    const tokenInWallet = await coinMethods.balanceOf(account).call()
 
 
     setPool(draft =>
     {
+      draft.userTokens = new BigNumber(tokenInWallet)
+      draft.totalLiquidity = new BigNumber(totalLiquidity)
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
       draft.apr = new BigNumber(amountEarned).div(10 ** 18)
     })
