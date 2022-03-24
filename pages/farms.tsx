@@ -39,8 +39,8 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
             const { pid, mult, fee, isLP, token } = farm
             return (
               <FarmCard key={`active-farm-${activeIndex}`}
-                color="primary"
-                highlight={farm.hightlight}
+                color={farm.color}
+                highlight={farm.highlight}
                 poolAssets=
                 {{
                   baseTokenName: farm.baseToken?.name,
@@ -54,6 +54,8 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
                   swapName: farm.swapPartner.name,
                   swapLogo: imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "",
                   swapUrl: farm.swapPartner.url,
+                  swapDexUrl: farm.swapPartner.dex,
+                  swapPoolUrl: farm.swapPartner.lp,
 
                   pid,
                   mult,
