@@ -5,6 +5,8 @@ import Image from 'next/image'
 // COMPONENTS
 import StakeModal from "components/basics/StakeModal"
 import BigNumber from 'bignumber.js'
+// mui
+import Skeleton from "@mui/material/Skeleton"
 // utils
 import { currencyFormat } from "utils/text/text"
 import { getContracts } from 'data/contracts'
@@ -16,6 +18,7 @@ import { useWeb3React } from '@web3-react/core'
 import { useContract, ConnectorNames } from 'hooks/web3Hooks'
 import { divide } from 'lodash'
 import { isBigNumberish } from '@ethersproject/bignumber/lib/bignumber'
+import { apiResolver } from 'next/dist/server/api-utils'
 
 
 type FarmCardProps = {
@@ -126,8 +129,10 @@ const FarmCard = (props: FarmCardProps) => {
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
     const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
 
+
     setPool(draft => {
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
+      draft.apr = new BigNumber(amountEarned).div(10 ** 18)
     })
 
   }, [chefMethods, account, pid, pool.tokenAddress, coinMethods])
@@ -217,6 +222,14 @@ const FarmCard = (props: FarmCardProps) => {
         <div className="font-bold">
           250%
         </div>
+        {/* {pool.apr ?
+          <div className="font-bold">
+            {pool.apr}
+          </div>
+          :
+          <Skeleton />
+        } */}
+
       </div>
 
       <div className="flex justify-between">
