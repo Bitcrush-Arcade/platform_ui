@@ -2,6 +2,7 @@
 import Head from 'next/head';
 import { GetStaticProps, InferGetStaticPropsType } from 'next'
 import { useState, useCallback } from "react"
+import find from 'lodash/find'
 // COMPONENTS
 import BigNumber from 'bignumber.js'
 import PageContainer from 'components/PageContainer';
@@ -11,13 +12,14 @@ import PageContainer from 'components/PageContainer';
 import FarmCard from 'tw/farms/FarmCard';
 
 
-const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
+{
   const { activeFarms, inactiveFarms } = props
   console.log(props)
 
-  const [showActive, setShowActive] = useState<boolean>(true)
+  const [ showActive, setShowActive ] = useState<boolean>(true)
 
-  const toggleActive = useCallback(() => setShowActive(p => !p), [setShowActive])
+  const toggleActive = useCallback(() => setShowActive(p => !p), [ setShowActive ])
 
   return <PageContainer>
     <Head>
@@ -31,16 +33,17 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
     <div className="flex justify-center mt-9">
       <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
         {
-          showActive && activeFarms.length > 0 && activeFarms.map((farm: string, activeIndex: number) => {
-            const { pid, mult, fee, isLP, token } = JSON.parse(farm)
+          showActive && activeFarms.length > 0 && activeFarms.map((farm: any, activeIndex: number) =>
+          {
+            const { pid, mult, fee, isLP, token } = farm
             return (
               <FarmCard key={`active-farm-${activeIndex}`}
                 color="primary"
                 highlight={true}
                 poolAssets=
                 {{
-                  baseTokenName: "BASE",
-                  baseTokenSymbol: "BT",
+                  baseTokenName: farm.baseTokenImage.name,
+                  baseTokenSymbol: farm.baseTokenImage.symbol,
                   baseTokenImage: "base token url",
 
                   mainTokenName: "MAIN",
@@ -71,11 +74,15 @@ export default Farms
 
 import Web3 from 'web3'
 // CONTRACT
+import { getClient } from 'utils/sanityConfig'
 import { getContracts } from 'data/contracts'
+import { farmAssets } from 'queries/pools';
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async () =>
+{
   const activeFarms: Array<any> = []
   const inactiveFarms: Array<any> = []
+  let data: any;
 
   // CONNECT TO BLOCKCHAIN
   //MAINNET
@@ -93,6 +100,8 @@ export const getStaticProps: GetStaticProps = async () => {
 
     const poolAmount = await contract.methods.poolCounter().call()
 
+    // GET POOL DATA FROM CHEF (STATIC DATA)
+    const farms: Array<any> = []
     for (let i = 1; i <= poolAmount; i++) {
       const poolData = await contract.methods.poolInfo(i).call()
       // if (!poolData.isLP)
@@ -104,22 +113,35 @@ export const getStaticProps: GetStaticProps = async () => {
         pid: i,
         token: String(poolData.token)
       }
-      const stringData = JSON.stringify(parsedData)
-      if (parsedData.mult > 0) {
-        activeFarms.push(stringData)
-      }
-      else
-        inactiveFarms.push(stringData)
+      farms.push(parsedData)
     }
-    // GET POOL DATA FROM CHEF (STATIC DATA)
-
+    const farmIds = farms.map(farm => farm.pid)
+    console.log(farmIds)
     // GET ASSETS FROM SANITY
+    const client = getClient(false)
+    const farmsQuery = farmAssets(farmIds)
+    data = await client.fetch(farmsQuery)
+
+    data.map((farm: any) =>
+    {
+      const poolFarm = find(farms, o => o.pid == farm.pid)
+      const parsedFarm = {
+        ...poolFarm,
+        ...farm
+      }
+      parsedFarm.mult > 0 ?
+        activeFarms.push(parsedFarm)
+        : inactiveFarms.push(parsedFarm)
+
+    })
+
   }
 
   return {
     props: {
       activeFarms,
-      inactiveFarms
+      inactiveFarms,
+      assetData: data
     }
   }
 }
