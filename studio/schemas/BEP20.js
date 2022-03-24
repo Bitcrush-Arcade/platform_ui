@@ -2,13 +2,13 @@ const token = {
   name: "token",
   title: "Token Info",
   type: "document",
-  groups:[
+  groups: [
     {
       name: "chainInfo",
       title: "Chain Info"
     },
   ],
-  fields:[
+  fields: [
     {
       title: "Token Icon",
       name: "tokenIcon",
@@ -38,8 +38,9 @@ const token = {
       type: "contract"
     },
   ],
+  /// CLEANUP TODO GET POOL NAME FROM TOKENS THAT ARE ADDED
   preview: {
-    select:{
+    select: {
       title: 'symbol',
       subtitle: 'name',
       media: 'tokenIcon'
