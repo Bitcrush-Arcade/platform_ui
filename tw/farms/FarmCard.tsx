@@ -10,15 +10,16 @@ import BigNumber from 'bignumber.js'
 // utils
 import { currencyFormat } from "utils/text/text"
 import { getContracts } from 'data/contracts'
-import { imageBuilder } from 'utils/sanityConfig'
+import { toWei } from 'web3-utils'
 // hooks
 import { useTransactionContext, useAuthContext } from 'hooks/contextHooks'
 import useCoin from 'hooks/useCoin'
 import { useWeb3React } from '@web3-react/core'
-import { useContract, ConnectorNames } from 'hooks/web3Hooks'
-import { divide } from 'lodash'
-import { isBigNumberish } from '@ethersproject/bignumber/lib/bignumber'
-import { apiResolver } from 'next/dist/server/api-utils'
+import { useContract } from 'hooks/web3Hooks'
+
+// Types
+import type { Receipt } from 'types/PromiEvent'
+
 
 
 type FarmCardProps = {
@@ -80,6 +81,8 @@ const FarmCard = (props: FarmCardProps) =>
     = poolAssets
   const [ showDetails, setShowDetails ] = useState<boolean>(false)
   const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
+
+  const { editTransactions } = useTransactionContext()
   // BLOCKCHAIN
   const options: Array<StakeOptionsType> = useMemo(() => [
     //Stake
@@ -104,10 +107,6 @@ const FarmCard = (props: FarmCardProps) =>
     decimals: 18,
   }), [ mainTokenSymbol, mainTokenName, poolAssets, baseTokenSymbol ])
 
-  const submitFn: SubmitFunction = (values, second) =>
-  {
-    console.log('submit', pid)
-  }
   //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuthContext()
@@ -157,17 +156,20 @@ const FarmCard = (props: FarmCardProps) =>
     const amountEarned = await chefMethods.pendingRewards(account, pid).call()
     const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
     const tokenInWallet = await coinMethods.balanceOf(account).call()
+    const chefUserInfo = await chefMethods.userInfo(pid, account).call()
 
 
     setPool(draft =>
     {
       draft.userTokens = new BigNumber(tokenInWallet)
       draft.totalLiquidity = new BigNumber(totalLiquidity)
-      draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT CURRENCY)
+      draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
       draft.apr = new BigNumber(amountEarned).div(10 ** 18)
+      draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
+
     })
 
-  }, [ chefMethods, account, pid, poolAssets.tokenAddress, coinMethods ])
+  }, [ chefMethods, account, pid, poolAssets.tokenAddress, coinMethods, chefContract.address, setPool ])
 
   // useEffect for pool earnings
   useEffect(() =>
@@ -215,6 +217,54 @@ const FarmCard = (props: FarmCardProps) =>
   {
 
   }, [ chefMethods, account ])
+
+  const submitFn: SubmitFunction = useCallback((values, second) =>
+  {
+    const amount = toWei(values.stakeAmount.toFixed(18, 1))
+    if (values.actionType == 0) {
+      chefMethods.deposit(amount, pid).send({ from: account })
+        .on('transactionHash', (tx: string) =>
+        {
+          console.log('hash', tx)
+          editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+        })
+        .on('receipt', (rc: Receipt) =>
+        {
+          console.log('receipt', rc)
+          editTransactions(rc.transactionHash, 'complete')
+          second.setSubmitting(false)
+          getPoolEarnings()
+        })
+        .on('error', (error: any, receipt: Receipt) =>
+        {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+          second.setSubmitting(false)
+        })
+    }
+    if (values.actionType == 1) {
+      chefMethods.withdraw(amount, pid).send({ from: account })
+        .on('transactionHash', (tx: string) =>
+        {
+          console.log('hash', tx)
+          editTransactions(tx, 'pending', { description: `Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} from chef` })
+        })
+        .on('receipt', (rc: Receipt) =>
+        {
+          console.log('receipt', rc)
+          editTransactions(rc.transactionHash, 'complete')
+          second.setSubmitting(false)
+          getPoolEarnings()
+        })
+        .on('error', (error: any, receipt: Receipt) =>
+        {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+          second.setSubmitting(false)
+        })
+    }
+  }, [ account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings ])
+
   return (
     // Farm card
     <div
@@ -321,7 +371,7 @@ const FarmCard = (props: FarmCardProps) =>
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
-            {pool.stakedAmount.toFixed(2, 1)}
+            {pool.stakedAmount.toFixed(4, 1)}
           </div>
           <div className="flex gap-2">
             <button
