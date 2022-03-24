@@ -95,7 +95,7 @@ const FarmCard = (props: FarmCardProps) =>
     //Withdraw
     {
       name: "withdraw",
-      maxValue: pool.stakedAmount,
+      maxValue: pool.stakedAmount.times(10 ** 18),
       btnText: "Withdraw",
       description: `Withdraw staked $${mainTokenSymbol}`
     }
@@ -162,7 +162,7 @@ const FarmCard = (props: FarmCardProps) =>
     setPool(draft =>
     {
       draft.userTokens = new BigNumber(tokenInWallet)
-      draft.totalLiquidity = new BigNumber(totalLiquidity)
+      draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
       draft.apr = new BigNumber(amountEarned).div(10 ** 18)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
@@ -452,7 +452,7 @@ const FarmCard = (props: FarmCardProps) =>
 
         <div className="flex justify-between mb-2">
           <div className="text-primary">
-            TOTAL LIQUIDITY:
+            TOTAL LOCKED:
           </div>
           <div className="font-bold">
             {/* STILL NEEDS TO BE CONVERTED TO USD */}
