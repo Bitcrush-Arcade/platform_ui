@@ -293,7 +293,7 @@ const FarmCard = (props: FarmCardProps) => {
               {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />}
             </div>
           </div>
-          <a className="text-xs whitespace-nowrap align-middle" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
+          <a className={`text-xs whitespace-nowrap align-middle ${poolAssets.isLP ? "" : "hidden"}`}>
             <span className='align-middle'>
               <Image src={swapLogo} height={20} width={20} alt="swapLogo" />
             </span>
@@ -349,7 +349,12 @@ const FarmCard = (props: FarmCardProps) => {
         <div className="text-primary">
           DEPOSIT FEE:
         </div>
-        <div className={`font-bold ${poolAssets.depositFee == 0 ? "text-2xl" : ""}`}>
+        <div
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          title="Fee detail"
+          className={`font-bold ${poolAssets.depositFee == 0 ? "text-2xl" : ""}`}
+        >
           {poolAssets.depositFee.toFixed(2)}%
         </div>
       </div>
@@ -360,9 +365,16 @@ const FarmCard = (props: FarmCardProps) => {
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
-            {pool.earned.toFixed(2, 1)}
+            {pool.earned.toFixed(4, 1)}
           </div>
-          <button onClick={() => harvestFn} disabled={false} className="flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 text-xs rounded-l-full rounded-br-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+          <button
+            onClick={() => harvestFn}
+            disabled={pool.earned == new BigNumber(0) ? true : false}
+            className="
+              flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
+              text-xs rounded-l-full rounded-br-full 
+              hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+          >
             HARVEST
           </button>
         </div>
@@ -378,7 +390,7 @@ const FarmCard = (props: FarmCardProps) => {
           </div>
           <div className="flex gap-2">
             <button
-              disabled={coinMethods.balanceOf(account) == new BigNumber(0) ? true : false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+              disabled={pool.userTokens == new BigNumber(0) ? true : false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
               onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
             >
@@ -394,39 +406,40 @@ const FarmCard = (props: FarmCardProps) => {
         </div>
       </div>
 
-      {!account ?
-        <button
-          disabled={false}
-          onClick={() => login()}
-          className={`
+      {
+        !account ?
+          <button
+            disabled={false}
+            onClick={() => login()}
+            className={`
             flex flex-row justify-center items-center gap-2 
             border-2 border-primary inner-glow-primary px-6 ${poolAssets.depositFee == 0 ? "mt-[8px]" : "mt-4"} py-4 my-4 
             text-xs rounded-full 
             hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white
           `}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          CONNECT WALLET
-        </button>
-        :
-        <button
-          onClick={() => poolAssets.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
-          disabled={!poolAssets.tokenAddress}
-          className={`
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            CONNECT WALLET
+          </button>
+          :
+          <button
+            onClick={() => poolAssets.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
+            disabled={!poolAssets.tokenAddress}
+            className={`
             ${isApproved ? "hidden" : "block"}
             flex flex-row justify-center items-center gap-2 
             border-2 border-secondary inner-glow-secondary px-6 ${poolAssets.depositFee == 0 ? "mt-[8px]" : "mt-4"} py-4 my-4 
             text-xs rounded-full hover:bg-secondary 
             hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white
           `}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
-          APPROVE CONTRACT
-        </button>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[3px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+            </svg>
+            APPROVE CONTRACT
+          </button>
       }
 
       <hr className="border-slate-500 my-3" />
@@ -463,43 +476,41 @@ const FarmCard = (props: FarmCardProps) => {
           </div>
         </div>
 
-        <div className="flex flex-col items-start">
-          <button
-            disabled={false}
-            className="
-              flex items-center gap-1 
-              text-secondary text-xs  
-              hover:text-white disabled:opacity-60 
-              disabled:hover:bg-transparent disabled:hover:text-white
-            "
-          >
-            <a className="inline-flex items-center gap-1" href={getBscUrl(chefContract.address)} target="_blank" rel="noopener noreferrer">
+        <div className="flex flex-row justify-between">
+          <div className="flex flex-col items-start">
+            <a
+              className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
+              href={getBscUrl(chefContract.address)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               VIEW POOL
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </a>
-          </button>
-          <button
-            disabled={false}
-            className="
-              flex items-center gap-1 
-              text-secondary text-xs  
-              hover:text-white disabled:opacity-60 
-              disabled:hover:bg-transparent disabled:hover:text-white
-            "
-          >
-            <a className="inline-flex items-center gap-1" href={getBscUrl(poolAssets.tokenAddress)} target="_blank" rel="noopener noreferrer">
-              VIEW TOKEN
+            <a
+              className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
+              href={getBscUrl(poolAssets.tokenAddress)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {poolAssets.isLP ? "VIEW LP TOKEN" : "VIEW TOKEN"}
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[5px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </a>
-          </button>
+          </div>
+          <a className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-secondary hover:text-white" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
+            {poolAssets.isLP ? "SWAP LP" : "SWAP"}
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+          </a>
         </div>
       </div>
 
-    </div>
+    </div >
 
   )
 }
