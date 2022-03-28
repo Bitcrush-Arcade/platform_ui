@@ -369,7 +369,7 @@ const FarmCard = (props: FarmCardProps) => {
           </div>
           <button
             onClick={() => harvestFn}
-            disabled={pool.earned == new BigNumber(0) ? true : false}
+            disabled={pool.earned.isEqualTo(0)}
             className="
               flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
               text-xs rounded-l-full rounded-br-full 
@@ -390,14 +390,14 @@ const FarmCard = (props: FarmCardProps) => {
           </div>
           <div className="flex gap-2">
             <button
-              disabled={pool.userTokens == new BigNumber(0) ? true : false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+              disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
               onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
             >
               +
             </button>
             <button
-              disabled={pool.stakedAmount == new BigNumber(0) ? true : false} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+              disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
               onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
               -
