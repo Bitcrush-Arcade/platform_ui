@@ -14,6 +14,7 @@ import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
 import PoolCardv2 from 'components/pools/PoolCardv2'
 import BankPool from 'components/pools/BankPool'
+import NicePoolCard from 'tw/mining/NicePoolCard'
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
@@ -74,6 +75,7 @@ const Mining = () => {
     </Grid>
     <Grid container justifyContent="space-evenly" className={css.section}>
       <Grid item>
+        <NicePoolCard />
         <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
       </Grid>
     </Grid>
