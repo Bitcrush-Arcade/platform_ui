@@ -59,9 +59,9 @@ const CompoundingCard = (props: CompoundingCardProps) => {
       <CardContent className={css.cardContent}>
         <Grid container justifyContent="space-between" alignItems="center">
           <Grid item>
-            <Typography className={css.cardTitle}>
+            <div className="flex font-bold justify-between">
               CRUSH Auto Bounty
-            </Typography>
+            </div>
           </Grid>
           <Grid item>
             <Tooltip
@@ -98,6 +98,42 @@ const CompoundingCard = (props: CompoundingCardProps) => {
             </Button>
           </Grid>
         </Grid>
+        <div className="flex flex-col">
+          <div className="flex font-bold mt-3 mb-4 justify-between">
+            NICE Auto Bounty
+            <Tooltip
+              arrow
+              title={
+                <Typography variant="body2" style={{ whiteSpace: 'pre-line', margin: 8 }}>
+                  This bounty is given as a reward for providing a service to other users.{'\n\n'}
+                  Whenever you successfully claim the bounty, you&apos;re also helping out by activating the Auto CRUSH Pool&apos;s compounding function for everyone.{'\n\n'}
+                  <strong>
+                    Auto-compound Bounty of 0.1% of all Auto CRUSH pool users pending yield.
+                  </strong>
+                </Typography>
+              }
+            >
+              <InfoIcon color="disabled" />
+            </Tooltip>
+          </div>
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <Tooltip title={<Typography>
+                <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+              </Typography>} arrow>
+                <Typography color="primary" variant="h5" component="p">
+                  <Currency value={compounderReward} decimals={4} isWei />
+                </Typography>
+              </Tooltip>
+              <Typography color="textSecondary" variant="caption" component="p">
+                $&nbsp;<Currency value={usdReward} decimals={2} isWei />
+              </Typography>
+            </div>
+            <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
+              Claim
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   </>
