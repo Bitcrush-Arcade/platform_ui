@@ -45,7 +45,7 @@ function BankPool()
   const css = useStyles()
   const { account } = useWeb3React()
   const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
-  const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData } = useBank()
+  const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData, niceCompounderMethods } = useBank()
   const { approve, isApproved, getApproved } = useCoin()
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
@@ -198,6 +198,26 @@ function BankPool()
   const launcherPercent = bankInfo.totalFrozen > 0 ? 0 : (bankInfo.profitsPending ? 100 : bankInfo.thresholdPercent)
   const activeSiren = userInfo.staked > 0 && launcherPercent >= 100
 
+  const harvestNice = useCallback(async () =>
+  {
+    niceCompounderMethods.withdrawNiceRewards().send({ from: account })
+      .on('transactionHash', (tx: string) =>
+      {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: "Harvest Nice" })
+      })
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
+        editTransactions(rc.transactionHash, 'complete')
+      })
+      .on('error', (error: any, receipt: Receipt) =>
+      {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+      })
+  }, [ niceCompounderMethods, account, editTransactions ])
+
   return (<>
     <Card className={css.card} background="light">
       <Grid container justifyContent="space-evenly">
@@ -251,7 +271,7 @@ function BankPool()
                   title={<Typography>Rewards earned since last action on {userInfo.lastAction > 0 ? format(new Date(userInfo.lastAction), 'yyyy-MM-dd HH:mm') : 'NEVER'}</Typography>}
                 >
                   <Typography variant="body1" color="textPrimary">
-                    Rewards Earned USD {currencyFormat((userInfo.edgeReward + userInfo.stakingReward) * tokenInfo.crushUsdPrice, { decimalsToShow: 3, isWei: true })}
+                    CRUSH Earned USD {currencyFormat((userInfo.edgeReward + userInfo.stakingReward) * tokenInfo.crushUsdPrice, { decimalsToShow: 3, isWei: true })}
                   </Typography>
                 </Tooltip>
               }
@@ -298,6 +318,11 @@ function BankPool()
                   }
                 </Grid>
               </Tooltip>
+              <Grid item xs={12} sx={{ position: "relative" }} container justifyContent="center">
+                <SmBtn sx={{ px: 3, py: 1 }} color="secondary" onClick={harvestNice}>
+                  Harvest
+                </SmBtn>
+              </Grid>
             </Grid>
             : <Button color="primary" onClick={depositWithdrawClick} width="100%">
               Approve CRUSH
