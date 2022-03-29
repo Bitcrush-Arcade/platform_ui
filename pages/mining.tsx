@@ -57,7 +57,6 @@ const Mining = () => {
       </Grid>
       <Grid item sx={{ pt: { xs: 4, md: 0 } }}>
         <CompoundingCardv3 />
-
       </Grid>
       <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool />
@@ -73,12 +72,13 @@ const Mining = () => {
       </Grid>
       <Grid item style={{ width: 215 }} />
     </Grid>
-    <Grid container justifyContent="space-evenly" className={css.section}>
-      <Grid item>
-        <NicePoolCard />
-        <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
-      </Grid>
-    </Grid>
+    <div className="flex flex-row">
+      <NicePoolCard />
+      <NicePoolCard />
+      <NicePoolCard />
+      <NicePoolCard />
+    </div>
+
     <Grid container justifyContent="space-evenly" className={css.section}>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
@@ -90,6 +90,7 @@ const Mining = () => {
         />
       </Grid>
       <Grid item style={{ width: 215 }} />
+      <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
     </Grid>
     {
       showInactive &&

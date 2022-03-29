@@ -93,9 +93,7 @@ const CompoundingCard = (props: CompoundingCardProps) => {
             </Typography>
           </Grid>
           <Grid item>
-            <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
-              Claim
-            </Button>
+
           </Grid>
         </Grid>
         <div className="flex flex-col">
@@ -116,23 +114,23 @@ const CompoundingCard = (props: CompoundingCardProps) => {
               <InfoIcon color="disabled" />
             </Tooltip>
           </div>
-          <div className="flex flex-row items-center justify-between">
-            <div>
-              <Tooltip title={<Typography>
-                <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
-              </Typography>} arrow>
-                <Typography color="primary" variant="h5" component="p">
-                  <Currency value={compounderReward} decimals={4} isWei />
-                </Typography>
-              </Tooltip>
-              <Typography color="textSecondary" variant="caption" component="p">
-                $&nbsp;<Currency value={usdReward} decimals={2} isWei />
+          <div>
+            <Tooltip title={<Typography>
+              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+            </Typography>} arrow>
+              <Typography color="primary" variant="h5" component="p">
+                <Currency value={compounderReward} decimals={4} isWei />
               </Typography>
-            </div>
-            <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
-              Claim
-            </Button>
+            </Tooltip>
+            <Typography color="textSecondary" variant="caption" component="p">
+              $&nbsp;<Currency value={usdReward} decimals={2} isWei />
+            </Typography>
           </div>
+        </div>
+        <div className="flex justify-center mt-2">
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
+            Claim All
+          </Button>
         </div>
       </CardContent>
     </Card>

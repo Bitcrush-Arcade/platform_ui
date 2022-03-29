@@ -12,7 +12,7 @@ module.exports = {
         'paper-bg': 'rgb(27,30,65)',
         'secondary': '#1de9b6'
       },
-      fontFamily:{
+      fontFamily: {
         oxa: "Oxanium",
         zeb: "Zebulon",
         zc: "Zebulon-Condensed",
