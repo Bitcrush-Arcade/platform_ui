@@ -9,8 +9,7 @@ import GalacticChef from 'abi/GalacticChef.json'
 import FeeDistributor from 'abi/FeeDistributor.json'
 import NICEToken from 'abi/NICEToken.json'
 import Presale from 'abi/Presale.json'
-
-
+import PresaleV2 from 'abi/Presalev2.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -26,16 +25,6 @@ export const contracts: { [ key: string ]: ContractSelect } = {
     97: {
       address: '0xa3ca5df2938126bae7c0df74d3132b5f72bda0b6',
       abi: CrushToken.abi
-    },
-  },
-  singleAsset: {
-    56: {
-      address: '0x4Bc5dCbbF7bd30C301544279545D426886c89b4d',
-      abi: BitcrushStaking_main.abi
-    },
-    97: {
-      address: '0x127dfc82C778aa125564d5B4aD6Fb508c6737341',
-      abi: BitcrushStaking_main.abi
     },
   },
   liveWallet: {
@@ -80,12 +69,16 @@ export const contracts: { [ key: string ]: ContractSelect } = {
   },
   presale: {
     56: {
-      address: "0x8b0E34aa5442B770aFd404f596d12833B9D73cA3",
-      abi: Presale.abi,
+
+      address: "0x87F8e8f9616689808176d3a97a506c8cEeD32674",
+      // address: "0x8b0E34aa5442B770aFd404f596d12833B9D73cA3",
+      abi: PresaleV2.abi,
     },
     97: {
-      address: "0xFa567aC8Ff6C3fFd18B1F7fB711A741164EBd95D",
-      abi: Presale.abi,
+      address: "0x6D7210Dcf8c5BA3f045BdDe0d09c3c63382e3B4b",
+      // address: "0xFa567aC8Ff6C3fFd18B1F7fB711A741164EBd95D",
+      abi: PresaleV2.abi,
+      // abi: Presale.abi,
     },
   },
   galacticChef: {
@@ -116,6 +109,19 @@ export const contracts: { [ key: string ]: ContractSelect } = {
     97: {
       address: '',
       abi: NICEToken.abi
+    },
+  },
+  // -------------------------------------------------------------
+  // Discontinued
+  // -------------------------------------------------------------
+  singleAsset: {
+    56: {
+      address: '0x4Bc5dCbbF7bd30C301544279545D426886c89b4d',
+      abi: BitcrushStaking_main.abi
+    },
+    97: {
+      address: '0x127dfc82C778aa125564d5B4aD6Fb508c6737341',
+      abi: BitcrushStaking_main.abi
     },
   },
   // -------------------------------------------------------------

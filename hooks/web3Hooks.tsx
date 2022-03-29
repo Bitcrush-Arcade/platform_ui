@@ -1,5 +1,5 @@
 // State
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 // Web3
 import Web3 from 'web3'
 import { useWeb3React } from '@web3-react/core'

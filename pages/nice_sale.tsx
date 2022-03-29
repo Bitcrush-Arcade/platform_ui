@@ -36,6 +36,7 @@ type PresaleDataType = {
   totalBought: BigNumber,
   saleStart: BigNumber,
   saleEnd: BigNumber,
+  hasToken: boolean
 }
 const initPresale = {
   whitelisted: 0,
@@ -47,6 +48,7 @@ const initPresale = {
   totalBought: new BigNumber(0),
   saleStart: new BigNumber(0),
   saleEnd: new BigNumber(0),
+  hasToken: false
 }
 
 const NiceSale = () => {
@@ -80,25 +82,25 @@ const NiceSale = () => {
       console.log('do nothing1')
       return
     }
-    const userData = await psMethod.userBought(account).call()
-    const tokenUsed = await psMethod.whitelist(account).call()
+    const userData = await psMethod.userData().call({ from: account })
     const maxRaise = new BigNumber( await psMethod.maxRaise().call() )
     const totalRaised = new BigNumber( await psMethod.totalRaised().call() )
-    const available = new BigNumber(await psMethod.availableAmount().call())
     const saleStart = new BigNumber(await psMethod.saleStart().call()).times(1000)
-    const saleEnd = new BigNumber(await psMethod.saleEnd().call()).times(1000)
-    setSaleEnded( saleEnd.isLessThan(new Date().getTime()) )
+    const isPause = await psMethod.pause().call()
+    const token = await psMethod.niceToken().call()
+    setSaleEnded( isPause )
 
     setPresaleData({
-      whitelisted: tokenUsed,
-      boughtAmount: new BigNumber(userData.amountBought),
+      whitelisted: 100,
+      boughtAmount: new BigNumber(userData[0]),
       maxRaise,
       totalRaised,
-      claimed: new BigNumber(userData.amountClaimed),
-      claimable: available.minus(userData.amountClaimed),
-      totalBought: new BigNumber(userData.amountOwed),
+      claimed: new BigNumber(userData[2]),
+      claimable: isPause ? new BigNumber(10000) : new BigNumber(0),
+      totalBought: new BigNumber(userData[1]),
       saleStart,
-      saleEnd
+      saleEnd: new BigNumber(0),
+      hasToken: parseInt(token) > 0
     })
   },[setPresaleData, psMethod, account])
 
@@ -229,153 +231,79 @@ const NiceSale = () => {
                   </div>
                   <div className="py-2">
                     <p className="text-justify text-sm">
-                      $NICE is the official currency of the Invaderverse. Presale is by whitelist only, you can whitelist yourself if you meet the requirements listed below.
+                      $NICE is the official currency of the Invaderverse. Presale is open, you can participate. 
                       <br/>
-                      Please note that Presale tokens are vested over the course of 8 weeks. You can check back here to claim a portion of your tokens.
+                      Tokens are claimable immediately after sale ends.
                     </p>
                   </div>
                   {/* Fill bar */}
-                  <div className="rounded-full overflow-hidden h-6 mb-2">
+                  {/* <div className="rounded-full overflow-hidden h-6 mb-2">
                     <progress id="raise_percent" value={fillPercent} max={100}
                       className="w-full h-6 rounded-full"
                     >
                       {fillPercent}%
                     </progress>
-                  </div>
-                  <div className='flex flex-row justify-between px-2'>
+                  </div> */}
+                  {/* <div className='flex flex-row justify-between px-2'>
                     <label htmlFor="raise_percent">
                       Raise Amount:
                     </label>
                     <span>
                       {presaleData.totalRaised.div(10**18).toFixed(0)} / {presaleData.maxRaise.div(10**18).toFixed(0)}
                     </span>
-                  </div>
-                  <div className='flex flex-row justify-between px-2'>
+                  </div> */}
+                  {/* <div className='flex flex-row justify-between px-2 mb-4'>
                     <p>
                       Do I qualify?
                     </p>
+                    <Tooltip title="Everyone qualifies!">
+                      <CheckCircleIcon color="secondary"/>
+                    </Tooltip>
+                  </div> */}
+                  <h3
+                    className="text-center text-2xl font-zeb text-secondary"
+                  >
+                    Pre-Sale Over
+                  </h3>
+                  {/* <div className='flex flex-row justify-center'>
                     {
-                      prequalified 
-                      ?
-                        <Tooltip title="All requirements met">
-                          <CheckCircleIcon color="secondary"/>
-                        </Tooltip>
-                      :
-                        <Tooltip title={
-                          <p className="whitespace-pre-line">
-                            Check that you:{"\n"}
-                            * Own a Crush God NFT{"\n"}
-                            * Have at least 10k $CRUSH staked in Auto Bitcrush V2{"\n"}
-                          </p>
-                        }>
-                          <CancelIcon color="error"/>
-                        </Tooltip>
-                    }
-                  </div>
-                  {
-                    prequalified && 
-                    <div className='flex flex-col md:flex-row justify-between items-center px-2 py-2'>
-                      <p className='mb-2'>
-                        Am I whitelisted?
-                      </p>
-                      {
-                        presaleData.whitelisted > 0
-                        ?
-                          <Tooltip title={`Whitelisted with NFT ID ${presaleData.whitelisted}`}>
-                            <CheckCircleIcon color="secondary"/>
-                          </Tooltip>
-                        :
-                          <Tooltip title={<p className="whitespace-pre-line">
-                                Not whitelisted yet:{"\n"}
-                                * Register your NFT ID{"\n"}
-                                * If it fails, make sure your ID has not been registered before{"\n"}
-                              </p>
-                            }>
-                            <CancelIcon color="error"/>
-                          </Tooltip>
-                      }
-                    </div>
-                  }
-                  { 
-                    prequalified && presaleData.whitelisted == 0 && 
-                      <div className='flex items-center justify-center gap-x-1'>
-                        <TextField
-                          size="small"
-                          value={nftId}
-                          inputRef={inputRef}
-                          onChange={(e) => {
-                            const selectedId = parseInt(e.target.value)
-                            if(e.target.value == ""){
-                              setNftId("")
-                              return
-                            }
-                            if(isNaN(selectedId)) return
-                            setNftId(e.target.value)
+                      isApproved ?
+                        ( saleStarted && !saleEnded && <TextField 
+                          type="number"
+                          label="BUSD amount"
+                          InputProps={{
+                            sx:{
+                              pr: 0,
+                              color: 'white'
+                            },
+                            endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
+                              disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThan(5000) || buyAmount < 100}
+                              onClick={buyTokens}
+                            >
+                              Buy
+                            </button>
                           }}
-                          label="NFT ID"
-                          className="max-w-[80px]"
                           InputLabelProps={{
                             sx:{
                               color: theme => theme.palette.grey[300]
                             }
                           }}
-                          InputProps={{
-                            sx:{
-                              color: 'white',
-                            }
-                          }}
-                        />
-                        <button disabled={isNaN(parseInt(nftId))}
-                          onClick={whitelist}
-                          className="border-2 border-secondary px-3 py-1 inner-glow-secondary text-xs rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+                          onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
+                          error={buyAmount<100 || buyAmount > 5000}
+                          helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
+                        />)
+                      :
+                        <button onClick={approveBUSD}
+                          className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
                         >
-                          WHITELIST ME
+                          Approve BUSD
                         </button>
-                      </div>
-                  }
-                  {/* Approve and BUY */}
-                  {
-                    presaleData.whitelisted > 0 && 
-                      <div className='flex flex-row justify-center'>
-                        {
-                          isApproved ?
-                            ( saleStarted && !saleEnded && <TextField 
-                              type="number"
-                              label="BUSD amount"
-                              InputProps={{
-                                sx:{
-                                  pr: 0,
-                                  color: 'white'
-                                },
-                                endAdornment: <button className="bg-primary px-2 w-[120px] h-full ml-2 text-sm hover:bg-primary-dark disabled:opacity-60 disabled:hover:bg-primary"
-                                  disabled={presaleData.boughtAmount.div(10**18).isGreaterThanOrEqualTo(5000) || presaleData.boughtAmount.div(10**18).plus(buyAmount).isGreaterThan(5000) || buyAmount < 100}
-                                  onClick={buyTokens}
-                                >
-                                  Buy
-                                </button>
-                              }}
-                              InputLabelProps={{
-                                sx:{
-                                  color: theme => theme.palette.grey[300]
-                                }
-                              }}
-                              onChange={ (e) => setBuyAmount( parseInt(e.target.value))}
-                              error={buyAmount<100 || buyAmount > 5000}
-                              helperText={!buyAmount && "No decimals" || buyAmount < 100 && "Min: BUSD 100" || buyAmount > 5000 && "Max: BUSD 5000" || " "}
-                            />)
-                          :
-                            <button onClick={approveBUSD}
-                              className='border-2 border-primary px-4 py-3 inner-glow-primary rounded-full hover:bg-primary hover:text-black focus:ring-2 focus:ring-secondary focus:outline-none'
-                            >
-                              Approve BUSD
-                            </button>
-                        }
-                      </div>
-                  }
+                    }
+                  </div> */}
                   {/* COUNTDOWN FOR SALE START */}
                   <hr className='my-3 border-primary opacity-70'/>
 
-                  {
+                  {/* {
                     !saleStarted && 
                       <Countdown date={new Date(presaleData.saleStart.toNumber() || 1645401600000)}
                         onComplete={()=>setSaleStarted(true)}
@@ -420,7 +348,7 @@ const NiceSale = () => {
                   <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                     <span>Presale Price (NICE/BUSD)</span>
                     <span>0.00470</span>
-                  </div>
+                  </div> */}
                   { saleStarted && <>
                     <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
                       <span>$BUSD Spent</span>
@@ -434,34 +362,38 @@ const NiceSale = () => {
                         {currencyFormat(presaleData.totalBought.toString(), { decimalsToShow: 0, isWei: true})}
                       </span>
                     </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>Claimable</span>
-                      <span>{currencyFormat(presaleData.claimable.div(100).toString(),{decimalsToShow: 0})}%</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>$NICE Claimable</span>
-                      <span>{currencyFormat(presaleData.claimable.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>Claimed</span>
-                      <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
-                    </div>
-                    <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
-                      <span>$NICE Claimed</span>
-                      <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
-                    </div>
                     { presaleData.claimable.isGreaterThan(0) && 
-                      <div className="flex justify-center">
-                        <button
-                          className={`
-                            border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
-                            hover:bg-primary-dark hover:text-black
-                          `}
-                          onClick={claimNice}
-                        >
-                          Claim
-                        </button>
-                      </div>
+                      <>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>Claimable</span>
+                          <span>{presaleData.hasToken ? "YES" : "NO"}</span>
+                        </div>
+                        {/* <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>$NICE Claimable</span>
+                          <span>{currencyFormat(presaleData.claimable.div(10000).times(presaleData.totalBought).toString(),{decimalsToShow: 0, isWei: true})}</span>
+                        </div> */}
+                        {/* <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>Claimed</span>
+                          <span>{currencyFormat(presaleData.claimed.div(100).toString(),{decimalsToShow: 0})}%</span>
+                        </div>
+                        <div className='text-lg px-1 flex flex-row justify-between text-[0.9em]'>
+                          <span>$NICE Claimed</span>
+                          <span>{currencyFormat(presaleData.claimed.div(100).times(presaleData.totalBought).toString(),{decimalsToShow: 0})}</span>
+                        </div> */}
+                        <div className="flex justify-center">
+                          <button
+                            disabled={!presaleData.hasToken}
+                            className={`
+                              disabled:opacity-60 disabled:bg-primary-dark disabled:hover:text-white
+                              border-primary border-2 inner-glow-primary px-6 py-2 rounded-full
+                              hover:bg-primary-dark hover:text-black
+                            `}
+                            onClick={claimNice}
+                          >
+                            {presaleData.hasToken ? "Claim Now" : "Coming soon" }
+                          </button>
+                        </div>
+                      </>
                     }
                   </>}
                 </div>

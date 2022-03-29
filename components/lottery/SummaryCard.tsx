@@ -51,100 +51,109 @@ type LotteryRoundInfo = {
   } | null
 }
 
-const SummaryCard = (props: LotterySummaryProps) => {
+const SummaryCard = (props: LotterySummaryProps) =>
+{
   const { onBuy, buyHref } = props
   // These will come from props
-  const [round, setRound] = useState<LotteryRoundInfo | null>(null)
-  const [roundTimeEnded, setRoundTimeEnded] = useState<boolean>(false)
+  const [ round, setRound ] = useState<LotteryRoundInfo | null>(null)
+  const [ roundTimeEnded, setRoundTimeEnded ] = useState<boolean>(false)
   const [ showDetail, setShowDetail ] = useState<boolean>(false)
-  const toggleDetail = () => setShowDetail( p => !p )
-  
+  const toggleDetail = () => setShowDetail(p => !p)
+
   const { account, chainId } = useWeb3React()
   const lotteryContract = getContracts('lottery', chainId)
-  const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
-  
+  const { methods: lotteryMethods } = useContract(lotteryContract.abi, lotteryContract.address)
+
   const percentBase = new BigNumber('100000000000')
   // Context
   const { tokenInfo, editTransactions } = useTransactionContext()
 
-  const getLotteryInfo = useCallback(async () => {
+  const getLotteryInfo = useCallback(async () =>
+  {
     const currentRound = await lotteryMethods.currentRound().call()
     const roundInfo = await lotteryMethods.roundInfo(currentRound).call()
     const isActive = await lotteryMethods.currentIsActive().call()
-    const userTickets = await lotteryMethods.userRoundTickets(account,currentRound).call()
+    const userTickets = await lotteryMethods.userRoundTickets(account, currentRound).call()
     const bonusToken = await lotteryMethods.bonusCoins(currentRound).call()
     const distribution = await lotteryMethods.getRoundDistribution(currentRound).call()
     const burn = await lotteryMethods.burn().call()
-    console.log( new BigNumber(burn).toString() )
-    setRound( {
+    console.log(new BigNumber(burn).toString())
+    setRound({
       id: new BigNumber(currentRound).toNumber(),
       endTime: new BigNumber(roundInfo.endTime).times(1000).toNumber(),
       tickets: userTickets.totalTickets,
       isActive: isActive,
       pool: new BigNumber(roundInfo.pool),
-      distribution: distribution?.map( (d: string) => new BigNumber(d)),
+      distribution: distribution?.map((d: string) => new BigNumber(d)),
       burn: new BigNumber(burn),
       bonusToken: new BigNumber(bonusToken.bonusAmount).isGreaterThan(0)
-        ? { address: bonusToken.bonusToken, amount: new BigNumber( bonusToken.bonusAmount ) }
+        ? { address: bonusToken.bonusToken, amount: new BigNumber(bonusToken.bonusAmount) }
         : null
     })
 
-  }, [lotteryMethods, account,setRound])
+  }, [ lotteryMethods, account, setRound ])
 
-  useEffect(()=>{
-    if(!lotteryMethods) return
+  useEffect(() =>
+  {
+    if (!lotteryMethods) return
     const interval = setInterval(getLotteryInfo, 10000)
-    return () => {
+    return () =>
+    {
       clearInterval(interval)
     }
-  },[lotteryMethods, getLotteryInfo])
+  }, [ lotteryMethods, getLotteryInfo ])
 
 
-  const onAttack = useCallback( ()=>{
-    if(!lotteryMethods) return
+  const onAttack = useCallback(() =>
+  {
+    if (!lotteryMethods) return
     lotteryMethods.endRound().send({ from: account })
-      .on('transactionHash', (tx:string) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: `Launch Lottery Invasion`})
+      .on('transactionHash', (tx: string) =>
+      {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: `Launch Lottery Invasion` })
       })
-      .on('receipt', ( rc: Receipt ) => {
-        console.log('receipt',rc)
-        editTransactions(rc.transactionHash,'complete')
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
+        editTransactions(rc.transactionHash, 'complete')
         getLotteryInfo()
       })
-      .on('error', (error: any, receipt: Receipt ) => {
+      .on('error', (error: any, receipt: Receipt) =>
+      {
         console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
         getLotteryInfo()
       })
-  },[ lotteryMethods, account, editTransactions, getLotteryInfo ])
-  
-  
-  
-  const matchDisplays = new Array(7).fill(null).map( (x,i) => {
-    let percent: BigNumber = round?.distribution?.[6-i] || new BigNumber(0)
-    const text = i== 0 ? 'JACKPOT!' : `Match ${6-i}`
+  }, [ lotteryMethods, account, editTransactions, getLotteryInfo ])
+
+
+
+  const matchDisplays = new Array(7).fill(null).map((x, i) =>
+  {
+    let percent: BigNumber = round?.distribution?.[ 6 - i ] || new BigNumber(0)
+    const text = i == 0 ? 'JACKPOT!' : `Match ${6 - i}`
     const crushReward = round?.pool.times(percent || 0).div(percentBase) || new BigNumber(0)
     return <Grid item xs={5} md={3} lg={'auto'} key={`match-amounts-${i}`}>
       <Typography align="center">
         {text}
       </Typography>
       <Typography align="center" variant="h5" color="secondary" fontWeight={600}>
-        <Currency value={crushReward} isWei decimals={0}/>
+        <Currency value={crushReward} isWei decimals={0} />
       </Typography>
       <Typography align="center" variant="subtitle2" color="textSecondary">
-        $<Currency value={crushReward.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
+        $<Currency value={crushReward.times(tokenInfo.crushUsdPrice)} isWei decimals={2} />
       </Typography>
 
     </Grid>
-  } )
+  })
 
   const roundEnded = (round?.endTime || 0) < new Date().getTime()
 
   return <Card background="dark">
     {/* CARD HEADER */}
-    <Stack justifyContent="space-between" alignItems="center" direction={{ xs: "column", md: "row"}}
-      sx={ theme => ({ px: 3, py:1, background: theme.palette.mode == 'dark' ? 'rgba(25,10,41,0.7)' : 'rgba(25,10,41,0.4)' })}
+    <Stack justifyContent="space-between" alignItems="center" direction={{ xs: "column", md: "row" }}
+      sx={theme => ({ px: 3, py: 1, background: theme.palette.mode == 'dark' ? 'rgba(25,10,41,0.7)' : 'rgba(25,10,41,0.4)' })}
     >
       <div>
         <Typography color="textSecondary" variant="body2" component="div">
@@ -158,7 +167,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
           </Typography>
         </Typography>
       </div>
-      { round && (roundEnded || roundTimeEnded) && round.isActive &&
+      {round && (roundEnded || roundTimeEnded) && round.isActive &&
         <div>
           <Button onClick={onAttack}
             sx={theme => ({
@@ -194,13 +203,13 @@ const SummaryCard = (props: LotterySummaryProps) => {
         {
           round && <>
             <Typography variant="body2" fontWeight={500} color="secondary" display="inline">
-              NEXT DRAW <ArrowForwardIcon sx={{fontSize: 18, bottom: -4, position: 'relative' }} /> &nbsp;&nbsp;
+              NEXT DRAW <ArrowForwardIcon sx={{ fontSize: 18, bottom: -4, position: 'relative' }} /> &nbsp;&nbsp;
             </Typography>
             <Typography variant="body2" color="textSecondary" display="inline">
-              { 
+              {
                 round && <>
-                    #{round?.id}&nbsp;
-                  </>
+                  #{round?.id}&nbsp;
+                </>
               }
             </Typography>
             <Typography variant="body2" display="inline">
@@ -208,56 +217,57 @@ const SummaryCard = (props: LotterySummaryProps) => {
             </Typography>
           </>
           ||
-          <Skeleton width={200}/>
+          <Skeleton width={200} />
         }
       </div>
     </Stack>
     <CardContent>
-      <Stack direction={{ xs: "column", lg: "row"}} justifyContent="space-between" alignItems="center">
+      <Stack direction={{ xs: "column", lg: "row" }} justifyContent="space-between" alignItems="center">
         <div>
-          <Typography variant="body2" color="textSecondary" sx={{ textAlign: { xs: 'center', md:'left'}}}>
+          <Typography variant="body2" color="textSecondary" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             PRIZE POT:
           </Typography>
           <Stack>
             <Typography variant="h4" color="primary" fontWeight="bold">
               {round && <>
-                <Currency value={round.pool} isWei decimals={0}/>&nbsp;CRUSH
+                <Currency value={round.pool} isWei decimals={0} />&nbsp;CRUSH
               </>
-              || <Skeleton width={200}/>}
+                || <Skeleton width={200} />}
             </Typography>
-            <Typography variant="caption" color="textSecondary" component="div" sx={{ textAlign: { xs: 'center', md:'left'}}}>
-              { round ? <>
-                  $
-                  <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2}/>
-                  &nbsp;
-                </>
-                : <Skeleton width={400}/>
+            <Typography variant="caption" color="textSecondary" component="div" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+              {round ? <>
+                $
+                <Currency value={round.pool.times(tokenInfo.crushUsdPrice)} isWei decimals={2} />
+                &nbsp;
+              </>
+                : <Skeleton width={400} />
               }
             </Typography>
           </Stack>
         </div>
-        <Stack 
-          direction={{ xs: 'column', lg: 'row'}}
+        <Stack
+          direction={{ xs: 'column', lg: 'row' }}
           divider={<Divider orientation="vertical" flexItem />}
           alignItems="center"
           spacing={2}
         >
-          { round &&
+          {round &&
             (round.isActive ?
-              <Typography color="secondary" variant="h5" display="inline" component="div" sx={{ whiteSpace: { xs: 'pre-line', md: 'normal'}, textAlign: { xs: 'center', md:'left'}}}>
+              <Typography color="secondary" variant="h5" display="inline" component="div" sx={{ whiteSpace: { xs: 'pre-line', md: 'normal' }, textAlign: { xs: 'center', md: 'left' } }}>
                 <Countdown
-                  onStart={()=> setRoundTimeEnded(false)}
-                  onComplete={ () => setRoundTimeEnded(true)}
-                  date={ new Date(round.endTime) }
-                  renderer={({ days, hours, minutes, seconds }) => {
+                  onStart={() => setRoundTimeEnded(false)}
+                  onComplete={() => setRoundTimeEnded(true)}
+                  date={new Date(round.endTime)}
+                  renderer={({ days, hours, minutes, seconds }) =>
+                  {
                     return <>
                       {
                         days ? <>
                           <strong>{days < 10 && `0${days}` || days}</strong>
                           <sub>D</sub>
                           &nbsp;
-                          </>
-                        : null
+                        </>
+                          : null
                       }
                       <strong>{hours < 10 && `0${hours}` || hours}</strong>
                       <sub>H</sub>
@@ -277,7 +287,7 @@ const SummaryCard = (props: LotterySummaryProps) => {
                 &nbsp;
               </Typography>
               :
-              <Typography color="secondary" variant="h4" fontWeight={600} sx={ theme => ({ animation: `${winnerFlash(theme)} 1s ease infinite`})}>
+              <Typography color="secondary" variant="h4" fontWeight={600} sx={theme => ({ animation: `${winnerFlash(theme)} 1s ease infinite` })}>
                 Picking Winner
               </Typography>)
           }
@@ -286,34 +296,34 @@ const SummaryCard = (props: LotterySummaryProps) => {
           onClick={onBuy}
           href={buyHref}
           background="primary"
-          disabled={!round?.isActive}
-          sx={{ width: { xs: '60%', lg: '200px' }, mt:{ xs: 3, lg: 0}}}
+          disabled={true || !round?.isActive}
+          sx={{ width: { xs: '60%', lg: '200px' }, mt: { xs: 3, lg: 0 } }}
         >
           Buy Tickets
         </GButton>}
       </Stack>
-      {!round && <LinearProgress color="secondary"/>}
+      {!round && <LinearProgress color="secondary" />}
       <Collapse in={showDetail}>
-        <Typography variant="h5" sx={{pt:3, pb:3}} align="center">
+        <Typography variant="h5" sx={{ pt: 3, pb: 3 }} align="center">
           Match Invaders and their colors in exact order to win!
         </Typography>
         <Grid container justifyContent="space-evenly" spacing={4}>
-            {matchDisplays}
+          {matchDisplays}
         </Grid>
-        <Typography variant="h6" sx={{pt:3}} align="center" color="textSecondary">
-          {round?.burn.div(percentBase).times(100).toFixed(2,1)}% is burned when tickets bought are more than 10% of prize pool
+        <Typography variant="h6" sx={{ pt: 3 }} align="center" color="textSecondary">
+          {round?.burn.div(percentBase).times(100).toFixed(2, 1)}% is burned when tickets bought are more than 10% of prize pool
         </Typography>
       </Collapse>
     </CardContent>
-      <SmButton color="secondary" onClick={toggleDetail} sx={{ pl: 4, pr:2, borderTopLeftRadius: 0, borderTopRightRadius: 80, borderBottomRightRadius: 0, borderBottom: 'none'}}>
-        Details&nbsp;<ExpandMoreIcon sx={{ transform: showDetail ? 'rotate(180deg)' : 'none', position: 'relative', bottom: 2}}/>
-      </SmButton>
+    <SmButton color="secondary" onClick={toggleDetail} sx={{ pl: 4, pr: 2, borderTopLeftRadius: 0, borderTopRightRadius: 80, borderBottomRightRadius: 0, borderBottom: 'none' }}>
+      Details&nbsp;<ExpandMoreIcon sx={{ transform: showDetail ? 'rotate(180deg)' : 'none', position: 'relative', bottom: 2 }} />
+    </SmButton>
   </Card>
 }
 
 export default SummaryCard
 
-const winnerFlash = (theme:Theme) =>  keyframes`
+const winnerFlash = (theme: Theme) => keyframes`
   0% { 
     color: ${theme.palette.primary.main};
   }

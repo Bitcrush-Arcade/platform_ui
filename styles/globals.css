@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base{
+  html{
+    background-color: rgb(5,6,16);
+  }
   @font-face{
     font-family: 'MarsAttacks';
     font-weight: normal;
