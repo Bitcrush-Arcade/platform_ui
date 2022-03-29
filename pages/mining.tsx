@@ -81,7 +81,100 @@ const Mining = () => {
       </Grid>
       <Grid item style={{ width: 215 }} />
     </Grid>
-    <div className="flex flex-row mx-[7rem]">
+    <div className="flex flex-row mx-[7rem] gap-12">
+      <NicePoolCard
+        color={true}
+        highlight={true}
+        poolAssets={{
+          baseTokenName: "base token name",
+          baseTokenSymbol: "BT",
+          baseTokenImage: "baseToken image url",
+
+          mainTokenName: "main token name",
+          mainTokenSymbol: "MT",
+          mainTokenImage: "mainToken image url",
+
+          swapName: "swap partner name",
+          swapLogo: "swap partner logo url",
+          swapUrl: "swap url",
+          swapDexUrl: "dex url",
+          swapPoolUrl: "pool url",
+
+          pid: 1,
+          mult: 1,
+          isLP: false,
+          depositFee: 0,
+          tokenAddress: "token address url from contract"
+        }}
+        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+          options: options,
+          submitFn: fn,
+          init: initAction,
+          coinInfo: coinInfo
+        })}
+      />
+      <NicePoolCard
+        color={true}
+        highlight={true}
+        poolAssets={{
+          baseTokenName: "base token name",
+          baseTokenSymbol: "BT",
+          baseTokenImage: "baseToken image url",
+
+          mainTokenName: "main token name",
+          mainTokenSymbol: "MT",
+          mainTokenImage: "mainToken image url",
+
+          swapName: "swap partner name",
+          swapLogo: "swap partner logo url",
+          swapUrl: "swap url",
+          swapDexUrl: "dex url",
+          swapPoolUrl: "pool url",
+
+          pid: 1,
+          mult: 1,
+          isLP: false,
+          depositFee: 0,
+          tokenAddress: "token address url from contract"
+        }}
+        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+          options: options,
+          submitFn: fn,
+          init: initAction,
+          coinInfo: coinInfo
+        })}
+      />
+      <NicePoolCard
+        color={true}
+        highlight={true}
+        poolAssets={{
+          baseTokenName: "base token name",
+          baseTokenSymbol: "BT",
+          baseTokenImage: "baseToken image url",
+
+          mainTokenName: "main token name",
+          mainTokenSymbol: "MT",
+          mainTokenImage: "mainToken image url",
+
+          swapName: "swap partner name",
+          swapLogo: "swap partner logo url",
+          swapUrl: "swap url",
+          swapDexUrl: "dex url",
+          swapPoolUrl: "pool url",
+
+          pid: 1,
+          mult: 1,
+          isLP: false,
+          depositFee: 0,
+          tokenAddress: "token address url from contract"
+        }}
+        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+          options: options,
+          submitFn: fn,
+          init: initAction,
+          coinInfo: coinInfo
+        })}
+      />
       <NicePoolCard
         color={true}
         highlight={true}
