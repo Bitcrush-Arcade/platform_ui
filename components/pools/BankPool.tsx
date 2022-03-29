@@ -375,39 +375,6 @@ function BankPool()
                     {currencyFormat(userInfo.niceEarned, { decimalsToShow: 4 })}
                   </Typography>
                 </Grid>
-                <Grid item xs={12}>
-                  <Typography color="primary">
-                    +
-                  </Typography>
-                </Grid>
-                <Grid item style={{ height: 25 }}>
-                  <Tooltip title={<Typography style={{ padding: 8 }}>Claim Auto Bounty!</Typography>}
-                    arrow
-                    disableHoverListener={!activeSiren}
-                    disableTouchListener={!activeSiren}
-                    disableFocusListener={!activeSiren}
-                  >
-                    <Typography className={activeSiren ? css.profitSiren : ''}>Profit Distribution</Typography>
-                  </Tooltip>
-                </Grid>
-                <Grid item>
-                  <Typography color="primary">{currencyFormat(userInfo.edgeReward, { isWei: true, decimalsToShow: 4 })}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography color="secondary">
-                    =
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography variant="h5" color="secondary">
-                    Total Reward
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography color="secondary" variant="h5">
-                    {currencyFormat(userInfo.edgeReward + userInfo.stakingReward, { isWei: true, decimalsToShow: 4 })}
-                  </Typography>
-                </Grid>
               </Grid>
             </Grid>
             <Grid item xs={12}>
