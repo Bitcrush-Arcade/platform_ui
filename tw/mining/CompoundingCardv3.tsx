@@ -21,38 +21,44 @@ import useCalculator from 'hooks/compounder/useCalculator'
 import { useTransactionContext } from "hooks/contextHooks"
 import { Receipt } from "types/PromiEvent";
 
-const CompoundingCard = (props: CompoundingCardProps) => {
+const CompoundingCard = (props: CompoundingCardProps) =>
+{
 
   const css = useStyles({})
 
   const { account } = useWeb3React()
 
   const { tokenInfo, editTransactions } = useTransactionContext()
-  const { compounderReward, calculate, contractMethods } = useCalculator()
+  const { compounderReward, calculate, contractMethods, niceReward } = useCalculator()
 
   const usdReward = compounderReward.times(tokenInfo?.crushUsdPrice || 0)
 
-  const claim = () => {
+  const claim = () =>
+  {
     contractMethods.compoundAll().send({ from: account })
       .on('transactionHash', (tx: string) => editTransactions(tx, 'pending', { description: "Execute Auto Compound" }))
-      .on('receipt', (rct: Receipt) => {
+      .on('receipt', (rct: Receipt) =>
+      {
         editTransactions(rct.transactionHash, 'complete')
         console.log('receipt', rct)
         calculate()
       })
-      .on('error', (error: any, rct: Receipt) => {
+      .on('error', (error: any, rct: Receipt) =>
+      {
         console.log('error compounding', error, 'receipt', rct)
         rct?.transactionHash && editTransactions(rct.transactionHash, 'error')
         calculate()
       })
   }
 
-  useEffect(() => {
+  useEffect(() =>
+  {
     const interval = setInterval(calculate, 10000)
-    return () => {
+    return () =>
+    {
       clearInterval(interval)
     }
-  }, [calculate])
+  }, [ calculate ])
 
   return <>
     <Card background="light" shadow="dark" className={css.claimCard} >
@@ -80,27 +86,27 @@ const CompoundingCard = (props: CompoundingCardProps) => {
         <div className="flex flex-row justify-center gap-12 my-4">
           <div className="flex flex-col">
             <Tooltip title={<Typography>
-              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+              <Currency value={compounderReward} decimals={18} isWei />&nbsp;$CRUSH
             </Typography>} arrow>
               <Typography color="primary" variant="h5" component="p">
                 <Currency value={compounderReward} decimals={4} isWei />
               </Typography>
             </Tooltip>
-            <Typography color="textSecondary" variant="caption" component="p">
+            {/* <Typography color="textSecondary" variant="caption" component="p">
               $&nbsp;<Currency value={usdReward} decimals={2} isWei />
-            </Typography>
+            </Typography> */}
           </div>
           <div className="flex flex-col">
             <Tooltip title={<Typography>
-              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+              <Currency value={niceReward} decimals={18} isWei />&nbsp;$NICE
             </Typography>} arrow>
-              <Typography color="primary" variant="h5" component="p">
-                <Currency value={compounderReward} decimals={4} isWei />
+              <Typography color="secondary" variant="h5" component="p">
+                <Currency value={niceReward} decimals={4} isWei />
               </Typography>
             </Tooltip>
-            <Typography color="textSecondary" variant="caption" component="p">
+            {/* <Typography color="textSecondary" variant="caption" component="p">
               $&nbsp;<Currency value={usdReward} decimals={2} isWei />
-            </Typography>
+            </Typography> */}
           </div>
         </div>
         <div className="flex justify-center mt-2">
@@ -127,7 +133,7 @@ const useStyles = makeStyles<Theme>(theme => createStyles({
     padding: theme.spacing(3)
   },
   claimCard: {
-    [theme.breakpoints.down(888)]: {
+    [ theme.breakpoints.down(888) ]: {
       marginTop: theme.spacing(4)
     },
     width: 280,
