@@ -52,15 +52,29 @@ const poolAssets = {
       name: "highlight",
       type: "boolean"
     },
+    {
+      title: "Hidden",
+      name: "hidden",
+      type: "boolean"
+    },
 
   ],
 
   preview: {
     select: {
-      title: 'poolName',
+      mainToken: 'mainToken.symbol',
+      baseToken: 'baseToken.symbol',
+      isFarm: 'isFarm',
       subtitle: 'pid',
-
     },
+    prepare(selection)
+    {
+      const { mainToken, baseToken, subtitle, isFarm } = selection
+      return {
+        title: isFarm ? `${mainToken}-${baseToken}` : mainToken,
+        subtitle
+      }
+    }
   },
   initialValue: {
     color: true
