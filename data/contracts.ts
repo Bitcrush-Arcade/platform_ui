@@ -98,7 +98,7 @@ export const contracts: { [ key: string ]: ContractSelect } = {
       abi: FeeDistributor.abi
     },
     97: {
-      address: '',
+      address: '0x82306aB3edB8A4BD7725a0b40B85f8975A2C6849',
       abi: FeeDistributor.abi
     },
   },
