@@ -221,11 +221,11 @@ const Mining = () => {
         />
       </Grid>
       <Grid item style={{ width: 215 }} />
-      <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
     </Grid>
     {
       showInactive &&
-      <Grid container justifyContent="center" className={css.section}>
+      <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[3.5rem] 2xl:ml-[19rem]">
+        <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
         <Grid item>
           <PoolCardv2
             abi={prevPool.abi}
@@ -234,7 +234,7 @@ const Mining = () => {
             subtext="Simple Reward APR Pool"
           />
         </Grid>
-      </Grid>
+      </div>
     }
   </PageContainer>
 }
