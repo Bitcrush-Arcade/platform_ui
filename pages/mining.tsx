@@ -15,6 +15,7 @@ import PoolCard from 'components/pools/PoolCard'
 import PoolCardv2 from 'components/pools/PoolCardv2'
 import BankPool from 'components/pools/BankPool'
 import NicePoolCard from 'tw/mining/NicePoolCard'
+import StakeModal, { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
@@ -30,6 +31,14 @@ const Mining = () => {
   const firstPool = useMemo(() => getContracts('singleAsset', chainId), [chainId])
   const prevPool = useMemo(() => getContracts('prevStaking2', chainId), [chainId])
   const token = useMemo(() => getContracts('crushToken', chainId), [chainId])
+
+  // Pool Cards
+  const [stakeSelected, setStakeSelected] = useState<{
+    options: Array<StakeOptionsType>,
+    submitFn: SubmitFunction,
+    init?: number,
+    coinInfo?: StakeModalProps['coinInfo']
+  }>({ options: [], submitFn: () => { } })
 
   return <PageContainer background="galactic">
     <Head>
@@ -72,15 +81,39 @@ const Mining = () => {
       </Grid>
       <Grid item style={{ width: 215 }} />
     </Grid>
-    <div className="flex flex-row">
+    <div className="flex flex-row mx-[7rem]">
       <NicePoolCard
         color={true}
         highlight={true}
-        poolAssets={
-          baseTokenName: "base token name"
-      baseTokenSymbol: "BT"
-        }
+        poolAssets={{
+          baseTokenName: "base token name",
+          baseTokenSymbol: "BT",
+          baseTokenImage: "baseToken image url",
+
+          mainTokenName: "main token name",
+          mainTokenSymbol: "MT",
+          mainTokenImage: "mainToken image url",
+
+          swapName: "swap partner name",
+          swapLogo: "swap partner logo url",
+          swapUrl: "swap url",
+          swapDexUrl: "dex url",
+          swapPoolUrl: "pool url",
+
+          pid: 1,
+          mult: 1,
+          isLP: false,
+          depositFee: 0,
+          tokenAddress: "token address url from contract"
+        }}
+        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+          options: options,
+          submitFn: fn,
+          init: initAction,
+          coinInfo: coinInfo
+        })}
       />
+
 
     </div>
 

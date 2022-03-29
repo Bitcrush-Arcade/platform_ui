@@ -106,19 +106,19 @@ const NicePoolCard = (props: FarmCardProps) => {
     decimals: 18,
   }), [mainTokenSymbol, mainTokenName, poolAssets, baseTokenSymbol])
 
-  //hooks
+  // //hooks
   const { account, chainId } = useWeb3React()
-  const { login, logout } = useAuthContext()
-  // Stake Token
-  const { coinMethods, isApproved, getApproved, approve } = useCoin(poolAssets.tokenAddress)
+  // const { login, logout } = useAuthContext()
+  // // Stake Token
+  // const { coinMethods, isApproved, getApproved, approve } = useCoin(poolAssets.tokenAddress)
 
-  // Galactic Chef
-  const chefContract = getContracts('galacticChef', chainId)
-  const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
+  // // Galactic Chef
+  // const chefContract = getContracts('galacticChef', chainId)
+  // const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
 
-  // Fee Distributor, only used when fee>0
-  const feeDistributorContract = getContracts('feeDistributor', chainId)
-  const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
+  // // Fee Distributor, only used when fee>0
+  // const feeDistributorContract = getContracts('feeDistributor', chainId)
+  // const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
 
   // Concatenates string with contract address to obtain BSC Scan url
   function getBscUrl(contractAddress: string) {
@@ -131,63 +131,63 @@ const NicePoolCard = (props: FarmCardProps) => {
     return url
   }
 
-  const getPoolInfo = useCallback(async () => {
-    if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract) return;
-    const feeDiv = await chefMethods.FEE_DIV().call()
-    const chefPoolInfo = await chefMethods.poolInfo(pid).call()
-    const chefUserInfo = await chefMethods.userInfo(pid, account).call()
+  // const getPoolInfo = useCallback(async () => {
+  //   if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract) return;
+  //   const feeDiv = await chefMethods.FEE_DIV().call()
+  //   const chefPoolInfo = await chefMethods.poolInfo(pid).call()
+  //   const chefUserInfo = await chefMethods.userInfo(pid, account).call()
 
-    setPool(draft => {
-      draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
-    })
-
-
-  }, [chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract])
-
-  const getPoolEarnings = useCallback(async () => {
-
-    if (!chefMethods || !poolAssets.tokenAddress || !account) return;
-
-    const amountEarned = await chefMethods.pendingRewards(account, pid).call()
-    const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
-    const tokenInWallet = await coinMethods.balanceOf(account).call()
-    const chefUserInfo = await chefMethods.userInfo(pid, account).call()
+  //   setPool(draft => {
+  //     draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
+  //   })
 
 
-    setPool(draft => {
-      draft.userTokens = new BigNumber(tokenInWallet)
-      draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
-      draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
-      draft.apr = new BigNumber(amountEarned).div(10 ** 18)
-      draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
+  // }, [chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract])
 
-    })
+  // const getPoolEarnings = useCallback(async () => {
 
-  }, [chefMethods, account, pid, poolAssets.tokenAddress, coinMethods, chefContract.address, setPool])
+  //   if (!chefMethods || !poolAssets.tokenAddress || !account) return;
 
-  // useEffect for pool earnings
-  useEffect(() => {
-    if (!account) return;
+  //   const amountEarned = await chefMethods.pendingRewards(account, pid).call()
+  //   const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
+  //   const tokenInWallet = await coinMethods.balanceOf(account).call()
+  //   const chefUserInfo = await chefMethods.userInfo(pid, account).call()
 
-    const interval = setInterval(getPoolEarnings, 5000);
 
-    return () => {
-      clearInterval(interval)
-    }
+  //   setPool(draft => {
+  //     draft.userTokens = new BigNumber(tokenInWallet)
+  //     draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
+  //     draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
+  //     draft.apr = new BigNumber(amountEarned).div(10 ** 18)
+  //     draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
 
-  }, [account, getPoolEarnings])
+  //   })
 
-  // useEffect for pool info, used when first loading page
-  useEffect(() => {
-    if (!account) return;
-    getPoolInfo()
-  }, [getPoolInfo, account])
+  // }, [chefMethods, account, pid, poolAssets.tokenAddress, coinMethods, chefContract.address, setPool])
 
-  // useEffect to get approval of tokens
-  useEffect(() => {
-    if (!poolAssets.tokenAddress || !chefContract.address || isApproved) return;
-    getApproved(chefContract.address)
-  }, [chefContract, poolAssets, getApproved, isApproved])
+  // // useEffect for pool earnings
+  // useEffect(() => {
+  //   if (!account) return;
+
+  //   const interval = setInterval(getPoolEarnings, 5000);
+
+  //   return () => {
+  //     clearInterval(interval)
+  //   }
+
+  // }, [account, getPoolEarnings])
+
+  // // useEffect for pool info, used when first loading page
+  // useEffect(() => {
+  //   if (!account) return;
+  //   getPoolInfo()
+  // }, [getPoolInfo, account])
+
+  // // useEffect to get approval of tokens
+  // useEffect(() => {
+  //   if (!poolAssets.tokenAddress || !chefContract.address || isApproved) return;
+  //   getApproved(chefContract.address)
+  // }, [chefContract, poolAssets, getApproved, isApproved])
 
   const detailToggle = useCallback(() => {
     setShowDetails(p => !p)
@@ -202,72 +202,72 @@ const NicePoolCard = (props: FarmCardProps) => {
     secondary: "border-secondary",
   }
 
-  const depositToken = useCallback((amount: BigNumber) => {
+  // const depositToken = useCallback((amount: BigNumber) => {
 
-  }, [chefMethods, account])
+  // }, [chefMethods, account])
 
-  const submitFn: SubmitFunction = useCallback((values, second) => {
-    const amount = toWei(values.stakeAmount.toFixed(18, 1))
-    if (values.actionType == 0) {
-      chefMethods.deposit(amount, pid).send({ from: account })
-        .on('transactionHash', (tx: string) => {
-          console.log('hash', tx)
-          editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
-        })
-        .on('receipt', (rc: Receipt) => {
-          console.log('receipt', rc)
-          editTransactions(rc.transactionHash, 'complete')
-          second.setSubmitting(false)
-          getPoolEarnings()
-        })
-        .on('error', (error: any, receipt: Receipt) => {
-          console.log('error', error, receipt)
-          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
-          second.setSubmitting(false)
-        })
-    }
-    if (values.actionType == 1) {
-      chefMethods.withdraw(amount, pid).send({ from: account })
-        .on('transactionHash', (tx: string) => {
-          console.log('hash', tx)
-          editTransactions(tx, 'pending', { description: `Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} from chef` })
-        })
-        .on('receipt', (rc: Receipt) => {
-          console.log('receipt', rc)
-          editTransactions(rc.transactionHash, 'complete')
-          second.setSubmitting(false)
-          getPoolEarnings()
-        })
-        .on('error', (error: any, receipt: Receipt) => {
-          console.log('error', error, receipt)
-          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
-          second.setSubmitting(false)
-        })
-    }
-  }, [account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings])
+  // const submitFn: SubmitFunction = useCallback((values, second) => {
+  //   const amount = toWei(values.stakeAmount.toFixed(18, 1))
+  //   if (values.actionType == 0) {
+  //     chefMethods.deposit(amount, pid).send({ from: account })
+  //       .on('transactionHash', (tx: string) => {
+  //         console.log('hash', tx)
+  //         editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+  //       })
+  //       .on('receipt', (rc: Receipt) => {
+  //         console.log('receipt', rc)
+  //         editTransactions(rc.transactionHash, 'complete')
+  //         second.setSubmitting(false)
+  //         getPoolEarnings()
+  //       })
+  //       .on('error', (error: any, receipt: Receipt) => {
+  //         console.log('error', error, receipt)
+  //         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+  //         second.setSubmitting(false)
+  //       })
+  //   }
+  //   if (values.actionType == 1) {
+  //     chefMethods.withdraw(amount, pid).send({ from: account })
+  //       .on('transactionHash', (tx: string) => {
+  //         console.log('hash', tx)
+  //         editTransactions(tx, 'pending', { description: `Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} from chef` })
+  //       })
+  //       .on('receipt', (rc: Receipt) => {
+  //         console.log('receipt', rc)
+  //         editTransactions(rc.transactionHash, 'complete')
+  //         second.setSubmitting(false)
+  //         getPoolEarnings()
+  //       })
+  //       .on('error', (error: any, receipt: Receipt) => {
+  //         console.log('error', error, receipt)
+  //         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+  //         second.setSubmitting(false)
+  //       })
+  //   }
+  // }, [account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings])
 
-  // HARVEST FUNCTION
-  const harvestFn = useCallback((pid, second) => {
-    const amount = new BigNumber(0)
-    chefMethods.deposit(amount, pid).send({ from: account })
-      .on('transactionHash', (tx: string) => {
-        console.log('hash', tx)
-        editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
-      })
-      .on('receipt', (rc: Receipt) => {
-        console.log('receipt', rc)
-        editTransactions(rc.transactionHash, 'complete')
-        second.setSubmitting(false)
-        getPoolEarnings()
-      })
-      .on('error', (error: any, receipt: Receipt) => {
-        console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
-        second.setSubmitting(false)
-      })
+  // // HARVEST FUNCTION
+  // const harvestFn = useCallback((pid, second) => {
+  //   const amount = new BigNumber(0)
+  //   chefMethods.deposit(amount, pid).send({ from: account })
+  //     .on('transactionHash', (tx: string) => {
+  //       console.log('hash', tx)
+  //       editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+  //     })
+  //     .on('receipt', (rc: Receipt) => {
+  //       console.log('receipt', rc)
+  //       editTransactions(rc.transactionHash, 'complete')
+  //       second.setSubmitting(false)
+  //       getPoolEarnings()
+  //     })
+  //     .on('error', (error: any, receipt: Receipt) => {
+  //       console.log('error', error, receipt)
+  //       receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+  //       second.setSubmitting(false)
+  //     })
 
-  }, [account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings])
-
+  // }, [account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings])
+  const isApproved = true
   return (
     // Farm card
     <div
@@ -287,15 +287,17 @@ const NicePoolCard = (props: FarmCardProps) => {
         <div className={`flex flex-col h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
           <div>
             <div className={`z-10  ${poolAssets.isLP ? "" : "hidden"}`} >
-              {baseTokenImage && <Image src={baseTokenImage} height={35} width={35} alt="Farm Base Token" />}
+              {/* {baseTokenImage && <Image src={baseTokenImage} height={35} width={35} alt="Farm Base Token" />} */}
+              BASE TOKEN IMAGE
             </div>
             <div className={`${poolAssets.isLP ? "absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0" : "scale-[110%] pt-1"}`}>
-              {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />}
+              {/* {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />} */}
+              MAIN TOKEN IMAGE
             </div>
           </div>
           <a className={`text-xs whitespace-nowrap align-middle ${poolAssets.isLP ? "" : "hidden"}`}>
             <span className='align-middle'>
-              <Image src={swapLogo} height={20} width={20} alt="swapLogo" />
+              {/* <Image src={swapLogo} height={20} width={20} alt="swapLogo" /> */} SWAP LOGO AND NAME/
             </span>
             &nbsp;
             {swapName}
@@ -368,7 +370,7 @@ const NicePoolCard = (props: FarmCardProps) => {
             {pool.earned.toFixed(4, 1)}
           </div>
           <button
-            onClick={() => harvestFn}
+
             disabled={pool.earned.isEqualTo(0)}
             className="
               flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
@@ -390,15 +392,15 @@ const NicePoolCard = (props: FarmCardProps) => {
           </div>
           <div className="flex gap-2">
             <button
-              disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
-              onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
+              disabled={false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+
               className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
             >
               +
             </button>
             <button
-              disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
-              onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
+              disabled={false} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+
               className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
               -
             </button>
@@ -410,7 +412,7 @@ const NicePoolCard = (props: FarmCardProps) => {
         !account ?
           <button
             disabled={false}
-            onClick={() => login()}
+
             className={`
             flex flex-row justify-center items-center gap-2 
             border-2 border-primary inner-glow-primary px-6 ${poolAssets.depositFee == 0 ? "mt-[8px]" : "mt-4"} py-4 my-4 
@@ -425,8 +427,8 @@ const NicePoolCard = (props: FarmCardProps) => {
           </button>
           :
           <button
-            onClick={() => poolAssets.tokenAddress && approve(chefContract.address, new BigNumber(5000000000).times(10 ** 18))}
-            disabled={!poolAssets.tokenAddress}
+
+            disabled={false}
             className={`
             ${isApproved ? "hidden" : "block"}
             flex flex-row justify-center items-center gap-2 
@@ -480,7 +482,7 @@ const NicePoolCard = (props: FarmCardProps) => {
           <div className="flex flex-col items-start">
             <a
               className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
-              href={getBscUrl(chefContract.address)}
+              href={getBscUrl("url")}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -491,7 +493,7 @@ const NicePoolCard = (props: FarmCardProps) => {
             </a>
             <a
               className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
-              href={getBscUrl(poolAssets.tokenAddress)}
+              href={getBscUrl("url")}
               target="_blank"
               rel="noopener noreferrer"
             >
