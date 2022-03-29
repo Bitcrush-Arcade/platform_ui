@@ -81,7 +81,7 @@ const Mining = () => {
       </Grid>
       <Grid item style={{ width: 215 }} />
     </Grid>
-    <div className="flex flex-row mx-[7rem] gap-12">
+    <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[5.5rem] 2xl:ml-[20rem]">
       <NicePoolCard
         color={true}
         highlight={true}
