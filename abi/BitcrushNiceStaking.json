@@ -3,18 +3,8 @@
     {
       "inputs": [
         {
-          "internalType": "contract CRUSHToken",
-          "name": "_crush",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_crushPerBlock",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_reserveAddress",
+          "internalType": "contract IERC20",
+          "name": "_nice",
           "type": "address"
         }
       ],
@@ -44,46 +34,27 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
+          "indexed": false,
           "internalType": "uint256",
-          "name": "_totalPool",
+          "name": "newFee",
           "type": "uint256"
         }
       ],
-      "name": "RewardPoolUpdated",
+      "name": "PerformanceFeeUpdated",
       "type": "event"
     },
     {
       "anonymous": false,
       "inputs": [
         {
-          "indexed": true,
-          "internalType": "address",
-          "name": "recipeint",
-          "type": "address"
-        },
-        {
-          "indexed": true,
+          "indexed": false,
           "internalType": "uint256",
-          "name": "_amount",
+          "name": "poolId",
           "type": "uint256"
         }
       ],
-      "name": "StakeUpdated",
+      "name": "PoolIdUpdated",
       "type": "event"
-    },
-    {
-      "inputs": [],
-      "name": "MAX_CRUSH_PER_BLOCK",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
     },
     {
       "inputs": [],
@@ -113,145 +84,9 @@
     },
     {
       "inputs": [],
-      "name": "accRewardPerShare",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "addRewardToPool",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "addressIndexes",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "apyBoost",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "autoCompoundLimit",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "bankroll",
-      "outputs": [
-        {
-          "internalType": "contract BitcrushBankroll",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "batchStartingIndex",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "blockPerSecond",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "compoundAll",
       "outputs": [],
       "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "crush",
-      "outputs": [
-        {
-          "internalType": "contract CRUSHToken",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "crushPerBlock",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -282,107 +117,19 @@
     },
     {
       "inputs": [],
-      "name": "earlyWithdrawFee",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "earlyWithdrawFeeTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "emergencyWithdraw",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "enterStaking",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_recipient",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_lwAddress",
-          "type": "address"
-        }
-      ],
-      "name": "freezeStaking",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
-      "name": "frozenEarlyWithdrawFee",
+      "name": "galacticChef",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "contract GalacticChef",
           "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "frozenEarlyWithdrawFeeTime",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "indexesLength",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "_addressesLength",
-          "type": "uint256"
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -403,12 +150,12 @@
     },
     {
       "inputs": [],
-      "name": "lastRewardBlock",
+      "name": "nice",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "contract IERC20",
           "name": "",
-          "type": "uint256"
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -417,29 +164,17 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "_liveWallet",
-          "type": "bool"
-        }
-      ],
-      "name": "leaveStaking",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "liveWallet",
-      "outputs": [
-        {
-          "internalType": "contract BitcrushLiveWallet",
+          "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "name": "niceRewards",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -474,39 +209,7 @@
           "type": "uint256"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_address",
-          "type": "address"
-        }
-      ],
-      "name": "pendingReward",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "performanceFeeBurn",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -524,7 +227,7 @@
     },
     {
       "inputs": [],
-      "name": "performanceFeeReserve",
+      "name": "poolId",
       "outputs": [
         {
           "internalType": "uint256",
@@ -543,105 +246,14 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "reserveAddress",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "address",
-          "name": "",
+          "internalType": "contract GalacticChef",
+          "name": "_galacticChef",
           "type": "address"
         }
       ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_limit",
-          "type": "uint256"
-        }
-      ],
-      "name": "setAutoCompoundLimit",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract BitcrushBankroll",
-          "name": "_bankroll",
-          "type": "address"
-        }
-      ],
-      "name": "setBankroll",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "setCrushPerBlock",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_fee",
-          "type": "uint256"
-        }
-      ],
-      "name": "setEarlyWithdrawFee",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_time",
-          "type": "uint256"
-        }
-      ],
-      "name": "setEarlyWithdrawFeeTime",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "contract BitcrushLiveWallet",
-          "name": "_liveWallet",
-          "type": "address"
-        }
-      ],
-      "name": "setLiveWallet",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_fee",
-          "type": "uint256"
-        }
-      ],
-      "name": "setPerformanceFeeBurn",
+      "name": "setGalacticChef",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -663,13 +275,39 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_fee",
+          "name": "_poolId",
           "type": "uint256"
         }
       ],
-      "name": "setPerformanceFeeReserve",
+      "name": "setPoolId",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IStaking",
+          "name": "_staking",
+          "type": "address"
+        }
+      ],
+      "name": "setStakingPool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stakingPool",
+      "outputs": [
+        {
+          "internalType": "contract IStaking",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -689,41 +327,6 @@
         },
         {
           "internalType": "uint256",
-          "name": "stakedAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "claimedAmount",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "lastBlockCompounded",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "lastBlockStaked",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "index",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "lastFrozenWithdraw",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "apyBaseline",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
           "name": "profitBaseline",
           "type": "uint256"
         }
@@ -733,85 +336,7 @@
     },
     {
       "inputs": [],
-      "name": "totalClaimed",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalFrozen",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalPool",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
       "name": "totalProfitDistributed",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalProfitsClaimed",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalShares",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "totalStaked",
       "outputs": [
         {
           "internalType": "uint256",
@@ -836,28 +361,15 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_amount",
-          "type": "uint256"
-        }
-      ],
-      "name": "unfreezeStaking",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "updateDistribution",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "updateProfits",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdrawNiceRewards",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
