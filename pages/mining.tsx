@@ -73,10 +73,15 @@ const Mining = () => {
       <Grid item style={{ width: 215 }} />
     </Grid>
     <div className="flex flex-row">
-      <NicePoolCard />
-      <NicePoolCard />
-      <NicePoolCard />
-      <NicePoolCard />
+      <NicePoolCard
+        color={true}
+        highlight={true}
+        poolAssets={
+          baseTokenName: "base token name"
+      baseTokenSymbol: "BT"
+        }
+      />
+
     </div>
 
     <Grid container justifyContent="space-evenly" className={css.section}>
