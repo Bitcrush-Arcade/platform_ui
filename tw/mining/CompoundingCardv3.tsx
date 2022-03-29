@@ -57,48 +57,10 @@ const CompoundingCard = (props: CompoundingCardProps) => {
   return <>
     <Card background="light" shadow="dark" className={css.claimCard} >
       <CardContent className={css.cardContent}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
-            <div className="flex font-bold justify-between">
-              CRUSH Auto Bounty
-            </div>
-          </Grid>
-          <Grid item>
-            <Tooltip
-              arrow
-              title={
-                <Typography variant="body2" style={{ whiteSpace: 'pre-line', margin: 8 }}>
-                  This bounty is given as a reward for providing a service to other users.{'\n\n'}
-                  Whenever you successfully claim the bounty, you&apos;re also helping out by activating the Auto CRUSH Pool&apos;s compounding function for everyone.{'\n\n'}
-                  <strong>
-                    Auto-compound Bounty of 0.1% of all Auto CRUSH pool users pending yield.
-                  </strong>
-                </Typography>
-              }
-            >
-              <InfoIcon color="disabled" />
-            </Tooltip>
-          </Grid>
-          <Grid item xs={12} style={{ height: 16 }} />
-          <Grid item>
-            <Tooltip title={<Typography>
-              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
-            </Typography>} arrow>
-              <Typography color="primary" variant="h5" component="p">
-                <Currency value={compounderReward} decimals={4} isWei />
-              </Typography>
-            </Tooltip>
-            <Typography color="textSecondary" variant="caption" component="p">
-              $&nbsp;<Currency value={usdReward} decimals={2} isWei />
-            </Typography>
-          </Grid>
-          <Grid item>
 
-          </Grid>
-        </Grid>
-        <div className="flex flex-col">
-          <div className="flex font-bold mt-3 mb-4 justify-between">
-            NICE Auto Bounty
+        <div className="relative flex text-center justify-center text-md font-bold whitespace-pre-line">
+          CRUSH &amp; NICE {'\n'} Auto Bounty
+          <div className="absolute top-0 right-0">
             <Tooltip
               arrow
               title={
@@ -114,7 +76,21 @@ const CompoundingCard = (props: CompoundingCardProps) => {
               <InfoIcon color="disabled" />
             </Tooltip>
           </div>
-          <div>
+        </div>
+        <div className="flex flex-row justify-center gap-12 my-4">
+          <div className="flex flex-col">
+            <Tooltip title={<Typography>
+              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+            </Typography>} arrow>
+              <Typography color="primary" variant="h5" component="p">
+                <Currency value={compounderReward} decimals={4} isWei />
+              </Typography>
+            </Tooltip>
+            <Typography color="textSecondary" variant="caption" component="p">
+              $&nbsp;<Currency value={usdReward} decimals={2} isWei />
+            </Typography>
+          </div>
+          <div className="flex flex-col">
             <Tooltip title={<Typography>
               <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
             </Typography>} arrow>
