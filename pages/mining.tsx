@@ -86,25 +86,22 @@ const Mining = () => {
         color={true}
         highlight={true}
         poolAssets={{
-          baseTokenName: "base token name",
-          baseTokenSymbol: "BT",
-          baseTokenImage: "baseToken image url",
+          poolContractAddress: "pool contract address",
 
-          mainTokenName: "main token name",
-          mainTokenSymbol: "MT",
-          mainTokenImage: "mainToken image url",
+          rewardTokenName: "reward token name",
+          rewardTokenSymbol: "RT",
+          rewardTokenImage: "rewardToken image url",
 
-          swapName: "swap partner name",
-          swapLogo: "swap partner logo url",
-          swapUrl: "swap url",
-          swapDexUrl: "dex url",
-          swapPoolUrl: "pool url",
+          stakeTokenName: "Nice Token",
+          stakeTokenSymbol: "NICE",
+          stakeTokenImage: "stakedToken image url",
 
-          pid: 1,
-          mult: 1,
-          isLP: false,
+          projectName: "partner name",
+          projectLogo: "partner logo url",
+          projectUrl: "partner url",
+
+          mult: 10,
           depositFee: 0,
-          tokenAddress: "token address url from contract"
         }}
         onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
           options: options,
@@ -113,101 +110,6 @@ const Mining = () => {
           coinInfo: coinInfo
         })}
       />
-      <NicePoolCard
-        color={true}
-        highlight={true}
-        poolAssets={{
-          baseTokenName: "base token name",
-          baseTokenSymbol: "BT",
-          baseTokenImage: "baseToken image url",
-
-          mainTokenName: "main token name",
-          mainTokenSymbol: "MT",
-          mainTokenImage: "mainToken image url",
-
-          swapName: "swap partner name",
-          swapLogo: "swap partner logo url",
-          swapUrl: "swap url",
-          swapDexUrl: "dex url",
-          swapPoolUrl: "pool url",
-
-          pid: 1,
-          mult: 1,
-          isLP: false,
-          depositFee: 0,
-          tokenAddress: "token address url from contract"
-        }}
-        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
-          options: options,
-          submitFn: fn,
-          init: initAction,
-          coinInfo: coinInfo
-        })}
-      />
-      <NicePoolCard
-        color={true}
-        highlight={true}
-        poolAssets={{
-          baseTokenName: "base token name",
-          baseTokenSymbol: "BT",
-          baseTokenImage: "baseToken image url",
-
-          mainTokenName: "main token name",
-          mainTokenSymbol: "MT",
-          mainTokenImage: "mainToken image url",
-
-          swapName: "swap partner name",
-          swapLogo: "swap partner logo url",
-          swapUrl: "swap url",
-          swapDexUrl: "dex url",
-          swapPoolUrl: "pool url",
-
-          pid: 1,
-          mult: 1,
-          isLP: false,
-          depositFee: 0,
-          tokenAddress: "token address url from contract"
-        }}
-        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
-          options: options,
-          submitFn: fn,
-          init: initAction,
-          coinInfo: coinInfo
-        })}
-      />
-      <NicePoolCard
-        color={true}
-        highlight={true}
-        poolAssets={{
-          baseTokenName: "base token name",
-          baseTokenSymbol: "BT",
-          baseTokenImage: "baseToken image url",
-
-          mainTokenName: "main token name",
-          mainTokenSymbol: "MT",
-          mainTokenImage: "mainToken image url",
-
-          swapName: "swap partner name",
-          swapLogo: "swap partner logo url",
-          swapUrl: "swap url",
-          swapDexUrl: "dex url",
-          swapPoolUrl: "pool url",
-
-          pid: 1,
-          mult: 1,
-          isLP: false,
-          depositFee: 0,
-          tokenAddress: "token address url from contract"
-        }}
-        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
-          options: options,
-          submitFn: fn,
-          init: initAction,
-          coinInfo: coinInfo
-        })}
-      />
-
-
     </div>
 
     <Grid container justifyContent="space-evenly" className={css.section}>

@@ -177,7 +177,7 @@ const FarmCard = (props: FarmCardProps) => {
 
   }, [account, getPoolEarnings])
 
-  // useEffect for pool info, used when first loading page
+  // useEffect for pool info when chaning account or the pool info changes
   useEffect(() => {
     if (!account) return;
     getPoolInfo()
