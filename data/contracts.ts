@@ -10,6 +10,7 @@ import FeeDistributor from 'abi/FeeDistributor.json'
 import NICEToken from 'abi/NICEToken.json'
 import Presale from 'abi/Presale.json'
 import PresaleV2 from 'abi/Presalev2.json'
+import NiceStaking from 'abi/BitcrushNiceStaking.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -100,6 +101,16 @@ export const contracts: { [ key: string ]: ContractSelect } = {
       address: '',
       abi: FeeDistributor.abi
     },
+  },
+  niceCompounder: {
+    56: {
+      address: '',
+      abi: NiceStaking.abi
+    },
+    97: {
+      address: '0xb8522747Ac79Dc8cE089CfD745fE7eE9CA01D157',
+      abi: NiceStaking.abi
+    }
   },
   niceToken: {
     56: {
