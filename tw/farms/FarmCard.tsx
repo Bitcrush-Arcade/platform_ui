@@ -56,18 +56,16 @@ type PoolDetailType = {
   apr: BigNumber,
   earned: BigNumber,
   stakedAmount: BigNumber,
-  deposit: BigNumber,
   totalLiquidity: BigNumber,
-  userTokens: BigNumber,
+  userTokens: BigNumber
 }
 
 const defaultPoolDetails: PoolDetailType = {
   apr: new BigNumber(0),
   earned: new BigNumber(0),
   stakedAmount: new BigNumber(0),
-  deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  userTokens: new BigNumber(0),
+  userTokens: new BigNumber(0)
 }
 
 

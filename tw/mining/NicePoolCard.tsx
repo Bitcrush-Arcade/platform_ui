@@ -30,13 +30,15 @@ type FarmCardProps = {
     //From Sanity
     poolContractAddress: string,
 
-    rewardTokenName?: string | null,
-    rewardTokenSymbol?: string | null,
-    rewardTokenImage?: string | null,
+    rewardTokenName: string,
+    rewardTokenSymbol: string,
+    rewardTokenImage: string,
+
 
     stakeTokenName: string,
     stakeTokenSymbol: string,
     stakeTokenImage: string,
+    stakeTokenContract?: string,
 
     projectName: string,
     projectLogo: string,
@@ -53,31 +55,28 @@ type PoolDetailType = {
   apr: BigNumber,
   earned: BigNumber,
   stakedAmount: BigNumber,
-  deposit: BigNumber,
   totalLiquidity: BigNumber,
-  userTokens: BigNumber,
+  userTokens: BigNumber
 }
 
 const defaultPoolDetails: PoolDetailType = {
   apr: new BigNumber(0),
   earned: new BigNumber(0),
   stakedAmount: new BigNumber(0),
-  deposit: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  userTokens: new BigNumber(0),
+  userTokens: new BigNumber(0)
 }
 
 
 const NicePoolCard = (props: FarmCardProps) => {
   const { color, highlight, poolAssets, onAction } = props
   const {
-    poolContractAddress, rewardTokenName, rewardTokenSymbol, rewardTokenImage, stakeTokenName, stakeTokenSymbol, stakeTokenImage,
-    projectName, projectLogo, projectUrl, mult, depositFee
+    poolContractAddress, rewardTokenName, rewardTokenSymbol, rewardTokenImage, stakeTokenName,
+    stakeTokenSymbol, stakeTokenImage, stakeTokenContract, projectName, projectLogo, projectUrl, mult, depositFee
   }
     = poolAssets
   const [showDetails, setShowDetails] = useState<boolean>(false)
   const [pool, setPool] = useImmer<PoolDetailType>(defaultPoolDetails)
-
   const { editTransactions } = useTransactionContext()
   // BLOCKCHAIN
   const options: Array<StakeOptionsType> = useMemo(() => [
@@ -101,17 +100,134 @@ const NicePoolCard = (props: FarmCardProps) => {
     symbol: rewardTokenSymbol,
     name: rewardTokenName,
     decimals: 18,
-  }), [rewardTokenSymbol, rewardTokenName, poolAssets])
+  }), [rewardTokenSymbol, rewardTokenName, poolAssets, poolAssets])
 
-  // //hooks
+  //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuthContext()
-  // Stake Token
-  const { coinMethods, isApproved, getApproved, approve } = useCoin(poolContractAddress)
 
-  // Invader Pools
-  const invaderPoolContract = getContracts('invaderPools', chainId)
-  const { methods: invaderPoolMethods } = useContract(invaderPoolContract.abi, invaderPoolContract.address)
+  // Staked Token 
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(stakeTokenContract)
+
+  // Pool 
+  const poolContract = getContracts(poolContractAddress)
+  const { methods: poolMethods } = useContract(poolContract.abi, poolContract.address)
+
+  // Fee Distributor, only used when fee>0
+  const feeDistributorContract = getContracts('feeDistributor', chainId)
+  const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
+
+  // Getting/sending the data
+  const getPoolInfo = useCallback(async () => {
+    if (!coinMethods || !poolMethods) return;
+    const poolUserInfo = await poolMethods.userInfo(account).call()
+
+    setPool(draft => {
+      draft.stakedAmount = new BigNumber(poolUserInfo.amount)
+    })
+  }, [coinMethods, poolMethods, account, setPool])
+
+  const getPoolEarnings = useCallback(async () => {
+    if (!coinMethods || !poolMethods || !feeDistributorMethods) return;
+    const poolUserInfo = await poolMethods.userInfo(account).call()
+    const totalLiquidity = await coinMethods.balanceOf(poolContractAddress).call()
+    const tokenInWallet = await coinMethods.balanceOf(account).call()
+
+    setPool(draft => {
+      draft.earned = new BigNumber(poolUserInfo.accClaim).div(10 ** 18)
+      draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
+      draft.userTokens = new BigNumber(tokenInWallet)
+    })
+  }, [coinMethods, poolMethods, feeDistributorMethods, account, setPool])
+
+  // useEffect for pool info when chaning account or the pool info changes
+  useEffect(() => {
+    if (!account) return;
+
+    getPoolInfo()
+
+  }, [getPoolInfo, account])
+
+  // useEffect for pool earnings, refreshed every 5 seconds
+  useEffect(() => {
+    if (!account) return;
+
+    const interval = setInterval(getPoolEarnings, 5000);
+
+    return () => {
+      clearInterval(interval)
+    }
+  }, [account, getPoolEarnings])
+
+  // useEffect to get approval of tokens for the pool contract
+  useEffect(() => {
+    if (!stakeTokenContract || !stakeTokenContract || isApproved) return;
+    getApproved(poolContractAddress)
+  }, [poolContract, poolAssets, getApproved, isApproved])
+
+  // functions
+  // submit function for the coin modal
+  const submitFn: SubmitFunction = useCallback((values, second) => {
+    const amount = toWei(values.stakeAmount.toFixed(18, 1))
+    if (values.actionType == 0) {
+      poolMethods.deposit(amount).send({ from: account })
+        .on('transactionHash', (tx: string) => {
+          console.log('hash', tx)
+          editTransactions(tx, 'pending', { description: `Stake ${stakeTokenSymbol} in pool` })
+        })
+        .on('receipt', (rc: Receipt) => {
+          console.log('receipt', rc)
+          editTransactions(rc.transactionHash, 'complete')
+          second.setSubmitting(false)
+          getPoolEarnings()
+        })
+        .on('error', (error: any, receipt: Receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+          second.setSubmitting(false)
+        })
+    }
+    if (values.actionType == 1) {
+      poolMethods.withdraw(amount).send({ from: account })
+        .on('transactionHash', (tx: string) => {
+          console.log('hash', tx)
+          editTransactions(tx, 'pending', { description: `Withdraw ${stakeTokenSymbol} from pool` })
+        })
+        .on('receipt', (rc: Receipt) => {
+          console.log('receipt', rc)
+          editTransactions(rc.transactionHash, 'complete')
+          second.setSubmitting(false)
+          getPoolEarnings()
+        })
+        .on('error', (error: any, receipt: Receipt) => {
+          console.log('error', error, receipt)
+          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+          second.setSubmitting(false)
+        })
+    }
+  }, [account, poolMethods, editTransactions, stakeTokenSymbol, getPoolEarnings])
+
+  // HARVEST FUNCTION
+  const harvestFn = useCallback((pid, second) => {
+    const amount = new BigNumber(0)
+    poolMethods.deposit(amount, pid).send({ from: account })
+      .on('transactionHash', (tx: string) => {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: `Stake ${stakeTokenSymbol} in pool` })
+      })
+      .on('receipt', (rc: Receipt) => {
+        console.log('receipt', rc)
+        editTransactions(rc.transactionHash, 'complete')
+        second.setSubmitting(false)
+        getPoolEarnings()
+      })
+      .on('error', (error: any, receipt: Receipt) => {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+        second.setSubmitting(false)
+      })
+
+  }, [account, poolMethods, editTransactions, stakeTokenSymbol, getPoolEarnings])
 
   // Concatenates string with contract address to obtain BSC Scan url
   function getBscUrl(contractAddress: string) {
@@ -136,7 +252,6 @@ const NicePoolCard = (props: FarmCardProps) => {
     primary: "border-primary",
     secondary: "border-secondary",
   }
-
 
   return (
     // Farm card
@@ -222,14 +337,14 @@ const NicePoolCard = (props: FarmCardProps) => {
 
       <div className={`${isApproved ? "" : "hidden"}`}>
         <div className="form-label inline-block text-primary text-xs font-bold">
-          NICE EARNED:
+          {rewardTokenSymbol} EARNED:
         </div>
         <div className="flex justify-between items-center">
           <div className="text-[1.5rem]">
             {pool.earned.toFixed(4, 1)}
           </div>
           <button
-
+            onClick={() => harvestFn}
             disabled={pool.earned.isEqualTo(0)}
             className="
               flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
@@ -251,15 +366,15 @@ const NicePoolCard = (props: FarmCardProps) => {
           </div>
           <div className="flex gap-2">
             <button
-              disabled={false} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
-
+              disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
             >
-              +
+
             </button>
             <button
-              disabled={false} //DISABLE ONLY WHEN STAKED AMOUNT == 0
-
+              disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
               -
             </button>

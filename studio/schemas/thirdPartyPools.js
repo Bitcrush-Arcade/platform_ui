@@ -21,7 +21,6 @@ const pools = {
       type: "reference",
       to: [{ type: "token" }],
     },
-
     {
       title: "Stake Token",
       name: "stakeToken",

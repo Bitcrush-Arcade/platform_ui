@@ -95,6 +95,7 @@ const Mining = () => {
           stakeTokenName: "Nice Token",
           stakeTokenSymbol: "NICE",
           stakeTokenImage: "stakedToken image url",
+          stakeTokenContract: "stakeTokenContract",
 
           projectName: "partner name",
           projectLogo: "partner logo url",
