@@ -86,7 +86,7 @@ const Mining = () => {
         color={true}
         highlight={true}
         poolAssets={{
-          poolContractAddress: "pool contract address",
+          poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
 
           rewardTokenName: "reward token name",
           rewardTokenSymbol: "RT",

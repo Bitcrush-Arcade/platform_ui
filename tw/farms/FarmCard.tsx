@@ -326,14 +326,6 @@ const FarmCard = (props: FarmCardProps) => {
         <div className="font-bold">
           250%
         </div>
-        {/* {pool.apr ?
-          <div className="font-bold">
-            {pool.apr}
-          </div>
-          :
-          <Skeleton />
-        } */}
-
       </div>
 
       <div className="flex justify-between">

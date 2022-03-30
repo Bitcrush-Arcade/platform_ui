@@ -106,6 +106,14 @@ const NicePoolCard = (props: FarmCardProps) => {
   // //hooks
   const { account, chainId } = useWeb3React()
   const { login, logout } = useAuthContext()
+  // Stake Token
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(poolContractAddress)
+
+  // Invader Pools
+  const invaderPoolContract = getContracts('invaderPools', chainId)
+  const { methods: invaderPoolMethods } = useContract(invaderPoolContract.abi, invaderPoolContract.address)
+
+  // Concatenates string with contract address to obtain BSC Scan url
   function getBscUrl(contractAddress: string) {
     let url;
     if (chainId == 56)
@@ -129,7 +137,7 @@ const NicePoolCard = (props: FarmCardProps) => {
     secondary: "border-secondary",
   }
 
-  const isApproved = false
+
   return (
     // Farm card
     <div
