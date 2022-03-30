@@ -159,7 +159,8 @@ function useBank()
     },
     bankMethods,
     stakingMethods,
-    getApyData
+    getApyData,
+    niceCompounderMethods,
   }
 }
 
