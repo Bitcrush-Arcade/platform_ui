@@ -89,36 +89,37 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =
         !showInactive && activePools.map((pool, poolIndex) =>
         {
           return (
-            <NicePoolCard key={`partner-pool-active-${poolIndex}`}
-              color={true}
-              highlight={true}
-              tags={pool.tags}
-              poolAssets={{
-                poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
+            <div key={`partner-pool-active-${poolIndex}`}>
+              <NicePoolCard
+                color={true}
+                highlight={true}
+                tags={pool.tags}
+                poolAssets={{
+                  poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
 
-                rewardTokenName: pool.rewardToken.name,
-                rewardTokenSymbol: pool.rewardToken.symbol,
-                rewardTokenImage: imageBuilder(pool.rewardToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                  rewardTokenName: pool.rewardToken.name,
+                  rewardTokenSymbol: pool.rewardToken.symbol,
+                  rewardTokenImage: imageBuilder(pool.rewardToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                  rewardTokenContract: pool.rewardToken.tokenContract,
 
-                stakeTokenName: pool.stakeToken.name,
-                stakeTokenSymbol: pool.stakeToken.symbol,
-                stakeTokenImage: imageBuilder(pool.stakeToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
-                stakeTokenContract: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
+                  stakeTokenName: pool.stakeToken.name,
+                  stakeTokenSymbol: pool.stakeToken.symbol,
+                  stakeTokenImage: imageBuilder(pool.stakeToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                  stakeTokenContract: pool.stakeToken.tokenContract,
 
-                projectName: "partner name",
-                projectLogo: "partner logo url",
-                projectUrl: "partner url",
+                  projectName: "partner name",
+                  projectLogo: "partner logo url",
+                  projectUrl: "partner url",
 
-                mult: 10,
-                depositFee: 0,
-              }}
-              onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
-                options: options,
-                submitFn: fn,
-                init: initAction,
-                coinInfo: coinInfo
-              })}
-            />
+                }}
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
+              />
+            </div>
           )
         })
       }
