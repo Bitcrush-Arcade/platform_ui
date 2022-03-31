@@ -45,6 +45,7 @@ export const pools = groq`
     },
     color,
     highlight,
-    active
+    active,
+    tags
   }
 `
