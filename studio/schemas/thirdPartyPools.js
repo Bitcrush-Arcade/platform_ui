@@ -42,6 +42,12 @@ const pools = {
       name: "active",
       type: "boolean"
     },
+    {
+      title: "Hidden",
+      name: "hidden",
+      type: "boolean"
+    },
+
   ],
 
   preview: {
