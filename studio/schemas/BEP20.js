@@ -37,6 +37,11 @@ const token = {
       name: "tokenContract",
       type: "contract"
     },
+    {
+      title: "Project URL",
+      name: "projectUrl",
+      type: "string"
+    },
   ],
   preview: {
     select: {
