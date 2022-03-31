@@ -34,20 +34,23 @@ type FarmCardProps = {
     rewardTokenName: string,
     rewardTokenSymbol: string,
     rewardTokenImage: string,
+    rewardTokenContract: {
+      mainAddress: string,
+      testAddress: string,
+    },
 
 
     stakeTokenName: string,
     stakeTokenSymbol: string,
     stakeTokenImage: string,
-    stakeTokenContract?: string,
+    stakeTokenContract: {
+      mainAddress: string,
+      testAddress: string,
+    },
 
     projectName: string,
     projectLogo: string,
     projectUrl: string,
-
-    //From blockchain
-    mult?: number,
-    depositFee: number,
   },
   onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps[ 'coinInfo' ]) => void;
 }
@@ -57,7 +60,8 @@ type PoolDetailType = {
   earned: BigNumber,
   stakedAmount: BigNumber,
   totalLiquidity: BigNumber,
-  userTokens: BigNumber
+  userTokens: BigNumber,
+  depositFee: BigNumber,
 }
 
 const defaultPoolDetails: PoolDetailType = {
@@ -65,7 +69,8 @@ const defaultPoolDetails: PoolDetailType = {
   earned: new BigNumber(0),
   stakedAmount: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  userTokens: new BigNumber(0)
+  userTokens: new BigNumber(0),
+  depositFee: new BigNumber(0),
 }
 
 
@@ -74,7 +79,7 @@ const NicePoolCard = (props: FarmCardProps) =>
   const { color, highlight, poolAssets, onAction, tags } = props
   const {
     poolContractAddress, rewardTokenName, rewardTokenSymbol, rewardTokenImage, stakeTokenName,
-    stakeTokenSymbol, stakeTokenImage, stakeTokenContract, projectName, projectLogo, projectUrl, mult, depositFee
+    stakeTokenSymbol, stakeTokenImage, stakeTokenContract, projectName, projectLogo, projectUrl, rewardTokenContract
   }
     = poolAssets
   const [ showDetails, setShowDetails ] = useState<boolean>(false)
@@ -96,20 +101,20 @@ const NicePoolCard = (props: FarmCardProps) =>
       btnText: "Withdraw",
       description: `Withdraw staked $${rewardTokenSymbol}`
     }
-  ], [ rewardTokenSymbol, pool ])
+  ], [ rewardTokenSymbol, pool, stakeTokenSymbol ])
 
   const coinInfoForModal = useMemo(() => ({
     symbol: rewardTokenSymbol,
     name: rewardTokenName,
     decimals: 18,
-  }), [ rewardTokenSymbol, rewardTokenName, poolAssets, poolAssets ])
+  }), [ rewardTokenSymbol, rewardTokenName ])
 
   //hooks
   const { account, chainId } = useWeb3React()
   const { login } = useAuthContext()
 
   // Staked Token 
-  const { coinMethods, isApproved, getApproved, approve } = useCoin(stakeTokenContract)
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(stakeTokenContract[ chainId === 56 ? 'mainAddress' : 'testAddress' ])
 
   // Pool 
   const poolContract = getContracts(poolContractAddress)
@@ -144,7 +149,7 @@ const NicePoolCard = (props: FarmCardProps) =>
       draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
       draft.userTokens = new BigNumber(tokenInWallet)
     })
-  }, [ coinMethods, poolMethods, feeDistributorMethods, account, setPool ])
+  }, [ coinMethods, poolMethods, feeDistributorMethods, account, setPool, poolContractAddress ])
 
   // useEffect for pool info when chaning account or the pool info changes
   useEffect(() =>
@@ -171,9 +176,9 @@ const NicePoolCard = (props: FarmCardProps) =>
   // useEffect to get approval of tokens for the pool contract
   useEffect(() =>
   {
-    if (!stakeTokenContract || !stakeTokenContract || isApproved) return;
+    if (!stakeTokenContract || isApproved) return;
     getApproved(poolContractAddress)
-  }, [ poolContract, poolAssets, getApproved, isApproved ])
+  }, [ poolContract, poolAssets, getApproved, isApproved, poolContractAddress, stakeTokenContract ])
 
   // functions
   // submit function for the coin modal
@@ -273,6 +278,13 @@ const NicePoolCard = (props: FarmCardProps) =>
     secondary: "border-secondary",
   }
 
+  const approveContract = useCallback(async () =>
+  {
+    if (!coinMethods) return;
+    const amountToApprove = new BigNumber(await coinMethods.totalSupply().call()).times(1000)
+    approve(poolContractAddress, amountToApprove)
+  }, [ approve, coinMethods, poolContractAddress ])
+
   return (
     // Farm card
     <div
@@ -345,9 +357,9 @@ const NicePoolCard = (props: FarmCardProps) =>
           data-bs-toggle="tooltip"
           data-bs-placement="bottom"
           title="Fee detail"
-          className={`font-bold ${depositFee == 0 ? "text-2xl" : ""}`}
+          className={`font-bold ${pool.depositFee.isEqualTo(0) ? "text-2xl" : ""}`}
         >
-          {depositFee.toFixed(2)}%
+          {pool.depositFee.toFixed(2)}%
         </div>
       </div>
 
@@ -386,7 +398,7 @@ const NicePoolCard = (props: FarmCardProps) =>
               onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
               className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
             >
-
+              +
             </button>
             <button
               disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
@@ -405,7 +417,7 @@ const NicePoolCard = (props: FarmCardProps) =>
             onClick={login}
             className={`
             flex flex-row justify-center items-center gap-2 
-            border-2 border-primary inner-glow-primary px-6 ${depositFee == 0 ? "mt-[8px]" : "mt-4"} py-4 my-4 
+            border-2 border-primary inner-glow-primary px-6 ${pool.depositFee.isEqualTo(0) ? "mt-[8px]" : "mt-4"} py-4 my-4 
             text-xs rounded-full 
             hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white
           `}
@@ -417,12 +429,12 @@ const NicePoolCard = (props: FarmCardProps) =>
           </button>
           :
           <button
-
+            onClick={approveContract}
             disabled={false}
             className={`
             ${isApproved ? "hidden" : "block"}
             flex flex-row justify-center items-center gap-2 
-            border-2 border-secondary inner-glow-secondary px-6 ${depositFee == 0 ? "mt-[8px]" : "mt-4"} py-4 my-4 
+            border-2 border-secondary inner-glow-secondary px-6 ${pool.depositFee.isEqualTo(0) ? "mt-[8px]" : "mt-4"} py-4 my-4 
             text-xs rounded-full hover:bg-secondary 
             hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white
           `}
@@ -472,7 +484,7 @@ const NicePoolCard = (props: FarmCardProps) =>
           <div className="flex flex-col items-start">
             <a
               className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
-              href={getBscUrl("url")}
+              href={getBscUrl(poolContractAddress)}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -483,7 +495,7 @@ const NicePoolCard = (props: FarmCardProps) =>
             </a>
             <a
               className="inline-flex items-center gap-1 text-secondary text-xs hover:text-white disabled:opacity-60 "
-              href={getBscUrl("url")}
+              href={getBscUrl(rewardTokenContract.mainAddress)}
               target="_blank"
               rel="noopener noreferrer"
             >
