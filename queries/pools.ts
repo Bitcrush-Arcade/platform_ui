@@ -30,3 +30,21 @@ export const farmAssets = (ids: Array<number>) =>
   }
 `
 }
+export const pools = groq`
+  *[_type=="tp_pool" && !hidden] | order(created_date){
+    contract,
+    rewardToken->{
+      name,
+      symbol,
+      tokenIcon,
+    },
+    stakeToken->{
+      name,
+      symbol,
+      tokenIcon,
+    },
+    color,
+    highlight,
+    active
+  }
+`
