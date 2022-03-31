@@ -47,6 +47,12 @@ const pools = {
       name: "hidden",
       type: "boolean"
     },
+    {
+      title: "Tags",
+      name: "tags",
+      type: "array",
+      of: [{ type: 'string' }]
+    },
 
   ],
 
