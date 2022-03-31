@@ -15,29 +15,32 @@ import PoolCard from 'components/pools/PoolCard'
 import PoolCardv2 from 'components/pools/PoolCardv2'
 import BankPool from 'components/pools/BankPool'
 import NicePoolCard from 'tw/mining/NicePoolCard'
-import StakeModal, { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
+import { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
+import { getClient, imageBuilder } from 'utils/sanityConfig'
+
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
 
-const Mining = () => {
-
+const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =>
+{
+  const { activePools, inactivePools } = props
   const css = useStyles({})
   const { chainId } = useWeb3React()
 
-  const [showInactive, setShowInactive] = useState<boolean>(false)
+  const [ showInactive, setShowInactive ] = useState<boolean>(false)
   const toggleInactive = () => setShowInactive(p => !p)
 
-  const firstPool = useMemo(() => getContracts('singleAsset', chainId), [chainId])
-  const prevPool = useMemo(() => getContracts('prevStaking2', chainId), [chainId])
-  const token = useMemo(() => getContracts('crushToken', chainId), [chainId])
+  const firstPool = useMemo(() => getContracts('singleAsset', chainId), [ chainId ])
+  const prevPool = useMemo(() => getContracts('prevStaking2', chainId), [ chainId ])
+  const token = useMemo(() => getContracts('crushToken', chainId), [ chainId ])
 
   // Pool Cards
-  const [stakeSelected, setStakeSelected] = useState<{
+  const [ stakeSelected, setStakeSelected ] = useState<{
     options: Array<StakeOptionsType>,
     submitFn: SubmitFunction,
     init?: number,
-    coinInfo?: StakeModalProps['coinInfo']
+    coinInfo?: StakeModalProps[ 'coinInfo' ]
   }>({ options: [], submitFn: () => { } })
 
   return <PageContainer background="galactic">
@@ -48,7 +51,7 @@ const Mining = () => {
     <Grid container justifyContent="space-evenly"
       sx={theme => ({
         mt: 0,
-        [theme.breakpoints.down('md')]: {
+        [ theme.breakpoints.down('md') ]: {
           mt: theme.spacing(4)
         }
       })}
@@ -82,35 +85,43 @@ const Mining = () => {
       <Grid item style={{ width: 215 }} />
     </Grid>
     <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[5.5rem] 2xl:ml-[20rem]">
-      <NicePoolCard
-        color={true}
-        highlight={true}
-        poolAssets={{
-          poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
+      {
+        !showInactive && activePools.map((pool, poolIndex) =>
+        {
+          return (
+            <NicePoolCard key={`partner-pool-active-${poolIndex}`}
+              color={true}
+              highlight={true}
+              tags={pool.tags}
+              poolAssets={{
+                poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
 
-          rewardTokenName: "reward token name",
-          rewardTokenSymbol: "RT",
-          rewardTokenImage: "rewardToken image url",
+                rewardTokenName: pool.rewardToken.name,
+                rewardTokenSymbol: pool.rewardToken.symbol,
+                rewardTokenImage: imageBuilder(pool.rewardToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
 
-          stakeTokenName: "Nice Token",
-          stakeTokenSymbol: "NICE",
-          stakeTokenImage: "stakedToken image url",
-          stakeTokenContract: "stakeTokenContract",
+                stakeTokenName: pool.stakeToken.name,
+                stakeTokenSymbol: pool.stakeToken.symbol,
+                stakeTokenImage: imageBuilder(pool.stakeToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                stakeTokenContract: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
 
-          projectName: "partner name",
-          projectLogo: "partner logo url",
-          projectUrl: "partner url",
+                projectName: "partner name",
+                projectLogo: "partner logo url",
+                projectUrl: "partner url",
 
-          mult: 10,
-          depositFee: 0,
-        }}
-        onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
-          options: options,
-          submitFn: fn,
-          init: initAction,
-          coinInfo: coinInfo
-        })}
-      />
+                mult: 10,
+                depositFee: 0,
+              }}
+              onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                options: options,
+                submitFn: fn,
+                init: initAction,
+                coinInfo: coinInfo
+              })}
+            />
+          )
+        })
+      }
     </div>
 
     <Grid container justifyContent="space-evenly" className={css.section}>
@@ -166,7 +177,8 @@ const useDescriptorStyles = makeStyles<Theme, {}>((theme) => createStyles({
   },
 }))
 
-const Descriptor = (props: { title: string, description: React.ReactNode }) => {
+const Descriptor = (props: { title: string, description: React.ReactNode }) =>
+{
   const css = useDescriptorStyles({})
   return <div className={css.textContainer}>
     <Typography variant="h4" component="h1" paragraph>
@@ -176,4 +188,21 @@ const Descriptor = (props: { title: string, description: React.ReactNode }) => {
       {props.description}
     </Typography>
   </div>
+}
+
+import { GetStaticProps, InferGetServerSidePropsType } from 'next'
+import { pools } from 'queries/pools'
+export const getStaticProps: GetStaticProps = async () =>
+{
+  let data: Array<any>;
+  // GET ASSETS FROM SANITY
+  const client = getClient(false)
+  data = await client.fetch(pools)
+
+  return {
+    props: {
+      activePools: data.filter((d: any) => d.active),
+      inactivePools: data.filter((d: any) => !d.active)
+    }
+  }
 }
