@@ -37,11 +37,19 @@ export const pools = groq`
       name,
       symbol,
       tokenIcon,
+      tokenContract{
+        testAddress,
+        mainAddress
+      }
     },
     stakeToken->{
       name,
       symbol,
       tokenIcon,
+      tokenContract{
+        testAddress,
+        mainAddress
+      }
     },
     color,
     highlight,
