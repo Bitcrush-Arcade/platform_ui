@@ -38,7 +38,6 @@ const token = {
       type: "contract"
     },
   ],
-  /// CLEANUP TODO GET POOL NAME FROM TOKENS THAT ARE ADDED
   preview: {
     select: {
       title: 'symbol',
