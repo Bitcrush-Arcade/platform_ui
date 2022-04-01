@@ -5,12 +5,13 @@ import BitcrushLiveWallet from 'abi/BitcrushLiveWallet.json'
 import BitcrushStaking from 'abi/BitcrushStakingv2.json'
 import BitcrushBankroll from 'abi/BitcrushBankroll.json'
 import BitcrushLottery from 'abi/BitcrushLottery.json'
-import GalacticChef from 'abi/GalacticChef.json'
 import FeeDistributor from 'abi/FeeDistributor.json'
+import GalacticChef from 'abi/GalacticChef.json'
+import InvaderPool from 'abi/InvaderPool.json'
+import NiceStaking from 'abi/BitcrushNiceStaking.json'
 import NICEToken from 'abi/NICEToken.json'
 import Presale from 'abi/Presale.json'
 import PresaleV2 from 'abi/Presalev2.json'
-import NiceStaking from 'abi/BitcrushNiceStaking.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -120,6 +121,16 @@ export const contracts: { [key: string]: ContractSelect } = {
     97: {
       address: '',
       abi: NICEToken.abi
+    },
+  },
+  invaderPool: {
+    56: {
+      address: '',
+      abi: InvaderPool.abi
+    },
+    97: {
+      address: '',
+      abi: InvaderPool.abi
     },
   },
   // -------------------------------------------------------------
