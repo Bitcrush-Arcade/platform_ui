@@ -46,9 +46,10 @@ function BankPool()
   const { account } = useWeb3React()
   const { tokenInfo, hydrateToken, editTransactions } = useTransactionContext()
   const { bankInfo, userInfo, addresses, bankMethods, stakingMethods, hydrateData, getApyData, niceCompounderMethods } = useBank()
-  const { approve, isApproved, getApproved } = useCoin()
+  const { approve, isApproved, getApproved, coinMethods } = useCoin()
   const theme = useTheme()
   const isSm = useMediaQuery(theme.breakpoints.down('md'))
+
   useEffect(() =>
   {
     if (!getApyData) return
@@ -219,14 +220,14 @@ function BankPool()
   }, [ niceCompounderMethods, account, editTransactions ])
 
   return (<>
-    <Card className={css.card} background="light">
+    <Card className={`${css.card} ${css.cardHighlight}`} background="light">
       <Grid container justifyContent="space-evenly">
         {/* STAKE INTERACTIVE AREA */}
         <Grid item xs={12} md={5}>
           <Grid container justifyContent="space-between" className={css.spacing}>
             <Grid item>
               <Typography variant="h4" component="div" className={css.heavier}>
-                AUTO BITCRUSH V2&nbsp;&nbsp;
+                Staking 2.0&nbsp;&nbsp;
                 <InfoTooltip
                   tooltipProps={{
                     leaveDelay: 1000,
@@ -318,11 +319,6 @@ function BankPool()
                   }
                 </Grid>
               </Tooltip>
-              <Grid item xs={12} sx={{ position: "relative" }} container justifyContent="center">
-                <SmBtn sx={{ px: 3, py: 1 }} color="secondary" onClick={harvestNice}>
-                  Harvest
-                </SmBtn>
-              </Grid>
             </Grid>
             : <Button color="primary" onClick={depositWithdrawClick} width="100%">
               Approve CRUSH
@@ -388,12 +384,26 @@ function BankPool()
               <Divider className={css.divider} />
             </Grid>
             <Grid item xs={12}>
-              <Typography color="textSecondary" variant="body2">
-                Nice Earned
-              </Typography>
+              <Grid container justifyContent="space-between">
+                <Grid item style={{ height: 25 }}>
+                  <Tooltip title={<Typography style={{ padding: 8 }}>Claim Auto Bounty!</Typography>}
+                    arrow
+                    disableHoverListener={!activeSiren}
+                    disableTouchListener={!activeSiren}
+                    disableFocusListener={!activeSiren}
+                  >
+                    <Typography className={activeSiren ? css.profitSiren : ''}>$CRUSH Distribution</Typography>
+                  </Tooltip>
+                </Grid>
+                <Grid item>
+                  <Typography color="primary">{currencyFormat(userInfo.edgeReward, { isWei: true, decimalsToShow: 4 })}</Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
               <Grid container justifyContent="space-between">
                 <Grid item>
-                  <Typography>APY Rewards</Typography>
+                  <Typography>$NICE Rewards</Typography>
                 </Grid>
                 <Grid item>
                   <Typography color="primary">
@@ -402,53 +412,10 @@ function BankPool()
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <Typography color="textSecondary" variant="body2">
-                Crush Earned
-              </Typography>
-              <Grid container justifyContent="space-between">
-                <Grid item>
-                  <Typography>APY Rewards</Typography>
-                </Grid>
-                <Grid item>
-                  <Typography color="primary">
-                    {currencyFormat(userInfo.stakingReward, { isWei: true, decimalsToShow: 4 })}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography color="primary">
-                    +
-                  </Typography>
-                </Grid>
-                <Grid item style={{ height: 25 }}>
-                  <Tooltip title={<Typography style={{ padding: 8 }}>Claim Auto Bounty!</Typography>}
-                    arrow
-                    disableHoverListener={!activeSiren}
-                    disableTouchListener={!activeSiren}
-                    disableFocusListener={!activeSiren}
-                  >
-                    <Typography className={activeSiren ? css.profitSiren : ''}>Profit Distribution</Typography>
-                  </Tooltip>
-                </Grid>
-                <Grid item>
-                  <Typography color="primary">{currencyFormat(userInfo.edgeReward, { isWei: true, decimalsToShow: 4 })}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography color="secondary">
-                    =
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography variant="h5" color="secondary">
-                    Total Reward
-                  </Typography>
-                </Grid>
-                <Grid item>
-                  <Typography color="secondary" variant="h5">
-                    {currencyFormat(userInfo.edgeReward + userInfo.stakingReward, { isWei: true, decimalsToShow: 4 })}
-                  </Typography>
-                </Grid>
-              </Grid>
+            <Grid item xs={12} sx={{ position: "relative" }} container justifyContent="center">
+              <SmBtn sx={{ px: 3, py: 1, mt: 3 }} color="secondary" onClick={harvestNice}>
+                Harvest $NICE
+              </SmBtn>
             </Grid>
           </Grid>
         </Grid>
@@ -477,6 +444,20 @@ function BankPool()
           <Grid container justifyContent="space-between" alignItems="center">
             <Grid item>
               <Typography>
+                Total Value Locked:
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              {/* @DEV please ADD ALL OTHER STAKED AMOUNT IN OTHER POOLS  */}
+              <Typography color="primary" align="right" variant="h6" component="div">
+                {currencyFormat(totalBankroll, { isWei: true, decimalsToShow: 4 })}
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                {usdBankRoll} USD
+              </Typography>
+            </Grid>
+            {/* <Grid item>
+              <Typography>
                 Total Bankroll:
               </Typography>
             </Grid>
@@ -487,9 +468,22 @@ function BankPool()
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {usdBankRoll} USD
               </Typography>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} className={css.invisibleDivider} />
             <Grid item>
+              <Typography>
+                Total $CRUSH Burned
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography color="primary" align="right" variant="h6" component="div">
+                {currencyFormat(tokenInfo.burned, { isWei: false, decimalsToShow: 4 })}
+              </Typography>
+              <Typography color="textSecondary" variant="caption" component="div" align="right">
+                {currencyFormat(tokenInfo.burned * tokenInfo.crushUsdPrice, { isWei: false, decimalsToShow: 2 })} USD
+              </Typography>
+            </Grid>
+            {/* <Grid item>
               <Typography>
                 House Profit Distributed:
               </Typography>
@@ -501,7 +495,7 @@ function BankPool()
               <Typography color="textSecondary" variant="caption" component="div" align="right">
                 {currencyFormat(bankInfo.bankDistributed * tokenInfo.crushUsdPrice, { isWei: true, decimalsToShow: 2 })} USD
               </Typography>
-            </Grid>
+            </Grid> */}
             <Grid item xs={12} className={css.invisibleDivider} />
             <Grid item>
               <Typography>
@@ -578,6 +572,19 @@ const useStyles = makeStyles<Theme>(theme => createStyles({
       fontSize: theme.typography.h4.fontSize,
       color: theme.palette.primary.main,
     },
+  },
+  "@keyframes cardGlow": {
+    "0%": { boxShadow: "-10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227)" },
+    "25%": { boxShadow: "0 10px 8px rgb(174,82,227), 0 -10px 8px #1de9b6da, 10px 0 8px #ffffff, -10px 0 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227)" },
+    "50%": { boxShadow: "10px 0 8px rgb(174,82,227), -10px 0 8px #1de9b6da, 0 -10px 8px #ffffff, 0 10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227)" },
+    "75%": { boxShadow: "0 -10px 8px rgb(174,82,227), 0 10px 8px #1de9b6da, -10px 0 8px #ffffff, 10px 0 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227)" },
+    "100%": { boxShadow: "-10px 0 8px rgb(174,82,227), 10px 0 8px #1de9b6da, 0 10px 8px #ffffff, 0 -10px 8px rgb(100 116 139), inset 0 0 15px rgb(174,82,227)" },
+  },
+  cardHighlight: {
+    animationName: '$cardGlow',
+    animationDuration: '5s',
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
   },
   profitSiren: {
     animationName: '$profitSiren',
