@@ -107,7 +107,7 @@ export default function Home()
 
   const v1Distributed = new BigNumber(1766900).times(new BigNumber(10).pow(18)).toNumber()
 
-  const totalValueLocked = tvl + bankInfo.totalStaked
+  const totalValueLocked = bankInfo.totalStaked // + tvl (NEED TO GET ALL STAKED IN ALL POOLS)
   const maxWin = (bankInfo.totalBankroll + bankInfo.totalStaked) * 0.01
   const totalDistributed = bankInfo.stakingDistributed + v1Distributed
 
