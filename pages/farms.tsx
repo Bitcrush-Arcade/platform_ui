@@ -137,8 +137,8 @@ export const getStaticProps: GetStaticProps = async () =>
     const farms: Array<any> = []
     for (let i = 1; i <= poolAmount; i++) {
       const poolData = await contract.methods.poolInfo(i).call()
-      // if (!poolData.isLP)
-      //   continue
+      if (!poolData.isLP)
+        continue;
       const parsedData = {
         fee: new BigNumber(poolData.fee).div(100).toNumber(), // DIVISOR IS 10000 so dividing by 100 gives us the % value
         mult: new BigNumber(poolData.mult).div(10000).toNumber(),
