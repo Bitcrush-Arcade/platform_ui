@@ -18,7 +18,7 @@ import { AbiItem } from 'web3-utils'
 * TESTNET: 97
 * MAINNET: 56
 */
-export const contracts: { [key: string]: ContractSelect } = {
+export const contracts: { [ key: string ]: ContractSelect } = {
   crushToken: {
     56: {
       address: '0x0ef0626736c2d484a792508e99949736d0af807e',
@@ -119,7 +119,7 @@ export const contracts: { [key: string]: ContractSelect } = {
       abi: NICEToken.abi
     },
     97: {
-      address: '',
+      address: '0xAD026d8ae28bafa81030a76548efdE1EA796CB2C',
       abi: NICEToken.abi
     },
   },
@@ -172,17 +172,18 @@ export const contracts: { [key: string]: ContractSelect } = {
 
 }
 
-export const getContracts = (contract: string, chainId?: number): { address: string, abi: AbiItem | null } => {
+export const getContracts = (contract: string, chainId?: number): { address: string, abi: AbiItem | null } =>
+{
   if (!chainId)
     return { address: '', abi: null }
-  const data = contracts[contract][chainId]
+  const data = contracts[ contract ][ chainId ]
   return {
     address: data?.address || '',
     abi: data?.abi || ''
   }
 }
 type ContractSelect = {
-  [key: number]: {
+  [ key: number ]: {
     address: string,
     abi: any
   }
