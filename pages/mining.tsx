@@ -96,6 +96,9 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         !showInactive && activeFarmPool.map((farm, farmIndex) =>
         {
           const { pid, mult, fee, isLP, token } = farm
+          const baseImage = imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url()
+          const mainImage = imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? ""
+          const swapImage = imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? ""
           return (
             <div key={`active-nice-reward-pool-${farmIndex}`}>
               <FarmCard
@@ -105,14 +108,14 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
                 {{
                   baseTokenName: farm.baseToken?.name,
                   baseTokenSymbol: farm.baseToken?.symbol,
-                  baseTokenImage: farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : null,
+                  baseTokenImage: baseImage,
 
                   mainTokenName: farm.mainToken.name,
                   mainTokenSymbol: farm.mainToken.symbol,
-                  mainTokenImage: imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? "",
+                  mainTokenImage: mainImage,
 
                   swapName: farm.swapPartner.name,
-                  swapLogo: imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "",
+                  swapLogo: swapImage,
                   swapUrl: farm.swapPartner.url,
                   swapDexUrl: farm.swapPartner.dex,
                   swapPoolUrl: farm.swapPartner.lp,
@@ -145,7 +148,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
                 highlight={true}
                 tags={pool.tags}
                 poolAssets={{
-                  poolContractAddress: "0x087b1681b2b492309AcE1768604914cC32b6a647",
+                  poolContractAddress: pool.poolContract,
 
                   rewardTokenName: pool.rewardToken.name,
                   rewardTokenSymbol: pool.rewardToken.symbol,
