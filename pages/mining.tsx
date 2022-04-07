@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 // Next
 import Head from 'next/head'
 // Material
@@ -15,19 +15,20 @@ import PoolCard from 'components/pools/PoolCard'
 import PoolCardv2 from 'components/pools/PoolCardv2'
 import BankPool from 'components/pools/BankPool'
 import NicePoolCard from 'tw/mining/NicePoolCard'
-import { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
+import StakeModal, { StakeModalProps, StakeOptionsType, SubmitFunction } from 'components/basics/StakeModal';
 import { getClient, imageBuilder } from 'utils/sanityConfig'
 
 // libs
 import { getContracts } from "data/contracts"
 import { useWeb3React } from "@web3-react/core"
 
-const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =>
+const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, activeFarmPool: Array<any>, inactiveFarmPool: Array<any> }) =>
 {
-  const { activePools, inactivePools } = props
+  const { activePools, inactivePools, activeFarmPool, inactiveFarmPool } = props
   const css = useStyles({})
   const { chainId } = useWeb3React()
 
+  const [ openStake, setOpenStake ] = useState<boolean>(false)
   const [ showInactive, setShowInactive ] = useState<boolean>(false)
   const toggleInactive = () => setShowInactive(p => !p)
 
@@ -42,6 +43,12 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =
     init?: number,
     coinInfo?: StakeModalProps[ 'coinInfo' ]
   }>({ options: [], submitFn: () => { } })
+
+  useEffect(() =>
+  {
+    if (stakeSelected.options.length == 0) return;
+    setTimeout(() => setOpenStake(true), 300)
+  }, [ stakeSelected ])
 
   return <PageContainer background="galactic">
     <Head>
@@ -86,6 +93,49 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =
     </Grid>
     <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[5.5rem] 2xl:ml-[20rem]">
       {
+        !showInactive && activeFarmPool.map((farm, farmIndex) =>
+        {
+          const { pid, mult, fee, isLP, token } = farm
+          return (
+            <div key={`active-nice-reward-pool-${farmIndex}`}>
+              <FarmCard
+                color={farm.color}
+                highlight={farm.highlight}
+                poolAssets=
+                {{
+                  baseTokenName: farm.baseToken?.name,
+                  baseTokenSymbol: farm.baseToken?.symbol,
+                  baseTokenImage: farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : null,
+
+                  mainTokenName: farm.mainToken.name,
+                  mainTokenSymbol: farm.mainToken.symbol,
+                  mainTokenImage: imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? "",
+
+                  swapName: farm.swapPartner.name,
+                  swapLogo: imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "",
+                  swapUrl: farm.swapPartner.url,
+                  swapDexUrl: farm.swapPartner.dex,
+                  swapPoolUrl: farm.swapPartner.lp,
+
+                  pid,
+                  mult,
+                  isLP,
+                  depositFee: fee || 0,
+                  tokenAddress: token
+                }}
+
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
+              />
+            </div>
+          )
+        })
+      }
+      {
         !showInactive && activePools.map((pool, poolIndex) =>
         {
           return (
@@ -95,7 +145,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =
                 highlight={true}
                 tags={pool.tags}
                 poolAssets={{
-                  poolContractAddress: "0xAD026d8ae28bafa81030a76548efdE1EA796CB2C",
+                  poolContractAddress: "0x087b1681b2b492309AcE1768604914cC32b6a647",
 
                   rewardTokenName: pool.rewardToken.name,
                   rewardTokenSymbol: pool.rewardToken.symbol,
@@ -124,7 +174,14 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any> }) =
         })
       }
     </div>
-
+    <StakeModal
+      open={openStake}
+      onClose={() => setOpenStake(false)}
+      options={stakeSelected.options}
+      onSubmit={stakeSelected.submitFn}
+      initAction={stakeSelected.init}
+      coinInfo={stakeSelected.coinInfo}
+    />
     <Grid container justifyContent="space-evenly" className={css.section}>
       <Grid item xs={10} sm={8} md={6}>
         <Descriptor
@@ -192,18 +249,81 @@ const Descriptor = (props: { title: string, description: React.ReactNode }) =>
 }
 
 import { GetStaticProps, InferGetServerSidePropsType } from 'next'
-import { pools } from 'queries/pools'
+import { pools, nicePools } from 'queries/pools'
+import BigNumber from 'bignumber.js'
+import Web3 from 'web3'
+import find from 'lodash/find'
+import FarmCard from 'tw/farms/FarmCard';
 export const getStaticProps: GetStaticProps = async () =>
 {
-  let data: Array<any>;
+  let activePools: Array<any> = [];
+  let inActivePools: Array<any> = [];
+  let nicePoolData: Array<any> = [];
+
+  // CONNECT TO BLOCKCHAIN
+  //MAINNETy
+  // const provider = 'https://bsc-dataseed1.defibit.io/'
+  // TESTNET
+  const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+  const setup = getContracts('galacticChef', 97)
+  if (setup.abi) {
+    const contract = await new web3.eth.Contract(setup.abi, setup.address)
+
+    // GET POOL COUNT FROM CHEF
+
+    const poolAmount = await contract.methods.poolCounter().call()
+
+    // GET POOL DATA FROM CHEF (STATIC DATA)
+    const farms: Array<any> = []
+    for (let i = 1; i <= poolAmount; i++) {
+      const poolData = await contract.methods.poolInfo(i).call()
+      if (poolData.isLP)
+        continue;
+      const parsedData = {
+        fee: new BigNumber(poolData.fee).div(100).toNumber(), // DIVISOR IS 10000 so dividing by 100 gives us the % value
+        mult: new BigNumber(poolData.mult).div(10000).toNumber(),
+        isLP: Boolean(poolData.isLP),
+        pid: i,
+        token: String(poolData.token)
+      }
+      farms.push(parsedData)
+    }
+    const farmIds = farms.map(farm => farm.pid)
+    console.log(farmIds)
+    // GET ASSETS FROM SANITY
+    const client = getClient(false)
+    const farmsQuery = nicePools(farmIds)
+    nicePoolData = await client.fetch(farmsQuery)
+
+    nicePoolData.map((farm: any) =>
+    {
+      const poolFarm = find(farms, o => o.pid == farm.pid)
+      const parsedFarm = {
+        ...poolFarm,
+        ...farm
+      }
+      parsedFarm.mult > 0 ?
+        activePools.push(parsedFarm)
+        : inActivePools.push(parsedFarm)
+
+    })
+
+  }
+
+  let poolData: Array<any>;
   // GET ASSETS FROM SANITY
   const client = getClient(false)
-  data = await client.fetch(pools)
+  // nicePoolData = await client.fetch()
+  poolData = await client.fetch(pools)
 
   return {
     props: {
-      activePools: data.filter((d: any) => d.active),
-      inactivePools: data.filter((d: any) => !d.active)
+      activeFarmPool: activePools,
+      inactveFarmPool: inActivePools,
+      activePools: poolData.filter((d: any) => d.active),
+      inactivePools: poolData.filter((d: any) => !d.active)
     }
   }
 }
