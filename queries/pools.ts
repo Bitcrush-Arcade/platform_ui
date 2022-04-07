@@ -5,8 +5,8 @@ export const farmAssets = (ids: Array<number>) =>
   const numberArr = ids.map(n => '' + n).join(', ')
   return groq`
   *[_type=="poolAssets" && pid in [${numberArr}]] | order(pid){
-      pid,
-      baseToken->{
+    pid,
+    baseToken->{
       name,
       symbol,
       tokenIcon,
@@ -30,6 +30,37 @@ export const farmAssets = (ids: Array<number>) =>
   }
 `
 }
+export const nicePools = (ids: Array<number>) =>
+{
+  const numberArr = ids.map(n => '' + n).join(', ')
+  return groq`
+  *[_type=="poolAssets" && pid in [${numberArr}] ] | order(pid){
+    pid,
+    baseToken->{
+      name,
+      symbol,
+      tokenIcon,
+    },
+    mainToken->{
+      name,
+      symbol,
+      tokenIcon,
+    },
+    swapPartner->{
+      dex,
+      lp,
+      name,
+      url,
+      logo,
+      logo_light
+    },
+    isFarm,
+    color,
+    highlight
+  }
+`
+}
+
 export const pools = groq`
   *[_type=="tp_pool" && !hidden] | order(created_date){
     contract,
