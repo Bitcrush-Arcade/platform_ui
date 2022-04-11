@@ -185,7 +185,11 @@ const FarmCard = (props: FarmCardProps) =>
   useEffect(() =>
   {
     if (!account) return;
-    getPoolInfo()
+    const interval = setInterval(getPoolInfo, 5000)
+    return () =>
+    {
+      clearInterval(interval)
+    }
   }, [ getPoolInfo, account ])
 
   // useEffect to get approval of tokens
