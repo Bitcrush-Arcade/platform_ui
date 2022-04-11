@@ -78,7 +78,16 @@ const poolAssets = {
   },
   initialValue: {
     color: true
-  }
+  },
+  orderings: [
+    {
+      title: "Pool ID Asc",
+      name: "poolIdAsc",
+      by: [
+        { field: "pid", direction: 'asc' }
+      ]
+    }
+  ]
 }
 
 export default poolAssets
