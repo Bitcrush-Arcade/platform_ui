@@ -12,6 +12,7 @@ import NiceStaking from 'abi/BitcrushNiceStaking.json'
 import NICEToken from 'abi/NICEToken.json'
 import Presale from 'abi/Presale.json'
 import PresaleV2 from 'abi/Presalev2.json'
+import TokenLock from 'abi/TokenLock.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -85,7 +86,7 @@ export const contracts: { [ key: string ]: ContractSelect } = {
   },
   galacticChef: {
     56: {
-      address: '',
+      address: '0x510C617f990143eC9165C1978D70c0b4c7E369f1',
       abi: GalacticChef.abi
     },
     97: {
@@ -95,12 +96,22 @@ export const contracts: { [ key: string ]: ContractSelect } = {
   },
   feeDistributor: {
     56: {
-      address: '',
+      address: '0x45f194a1F2269904a181d6d29727aee4882B7995',
       abi: FeeDistributor.abi
     },
     97: {
       address: '0x82306aB3edB8A4BD7725a0b40B85f8975A2C6849',
       abi: FeeDistributor.abi
+    },
+  },
+  tokenLocker: {
+    56: {
+      address: "0xaeF0c6Db4C7B3EAF27C63B32Ea7397f296ed4247",
+      abi: TokenLock.abi,
+    },
+    97: {
+      address: "",
+      abi: TokenLock.abi,
     },
   },
   niceCompounder: {
