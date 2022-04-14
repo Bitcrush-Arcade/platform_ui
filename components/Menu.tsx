@@ -26,6 +26,7 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 // Icons
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArticleIcon from '@mui/icons-material/Article';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import HomeIcon from '@mui/icons-material/Home'
@@ -60,7 +61,8 @@ type MenuProps = {
   alwaysSm?: boolean
 }
 
-const Menu = (props: MenuProps) => {
+const Menu = (props: MenuProps) =>
+{
   const { open, toggleOpen, alwaysSm } = props
   const router = useRouter()
   const css = useStyles(props)
@@ -73,16 +75,17 @@ const Menu = (props: MenuProps) => {
   const linkArray: Array<LinkItem> = [
     { name: 'Home', icon: <HomeIcon color="inherit" />, url_link: '/' },
     { name: 'Intergalactic Trade', icon: <TradeIcon />, url_link: '/trade', disabled: true },
-    { name: 'Stellar Farms', icon: <WarpIcon />, url_link: '/farms', disabled: false },
+    // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
     { name: 'Galactic Mining', icon: <UfoIcon />, url_link: '/mining' },
     { name: 'ARCADE', icon: <ArcadeIcon />, url_link: '/games', loadOnClick: true },
     { name: `Launch`, icon: <RechargeIcon />, url_link: '/nice_sale', disabled: false },
     { name: `Crush n'Burn Lottery`, icon: <RocketIcon />, url_link: '/lottery', disabled: false },
-    { name: `NFTs`, icon: <Ufo2Icon />, url_link: 'https://invaderverse.com', isA: true, disabled: false },
+    { name: `NFTs`, icon: <Ufo2Icon />, url_link: 'https://invaderverse.com/NFT/sale', isA: true, disabled: false },
     { name: `Black Hodle Referral`, icon: <BlackHoleIcon />, url_link: '/referral', disabled: true },
     {
       name: 'MORE', icon: null, subMenu: [
         { name: 'GitHub', icon: <GitHubIcon color="inherit" fontSize="small" />, url_link: 'https://github.com/Bitcrush-Arcade' },
+        { name: 'Gitbook', icon: <ArticleIcon color="inherit" fontSize="small" />, url_link: 'https://bitcrush.gitbook.io/invaderverse/' },
         {
           name: <Grid container alignItems="center">
             <Grid item>
@@ -99,17 +102,20 @@ const Menu = (props: MenuProps) => {
     },
   ]
 
-  const [showLoad, setShowLoad] = useImmer<Array<boolean>>(new Array(linkArray.length).fill(false))
+  const [ showLoad, setShowLoad ] = useImmer<Array<boolean>>(new Array(linkArray.length).fill(false))
 
-  const [subMenuOpen, setSubMenuOpen] = useImmer<Array<boolean>>(new Array(linkArray.length).fill(false))
+  const [ subMenuOpen, setSubMenuOpen ] = useImmer<Array<boolean>>(new Array(linkArray.length).fill(false))
 
-  const linkItems = linkArray.map((link, linkIndex) => {
+  const linkItems = linkArray.map((link, linkIndex) =>
+  {
     const { name, icon, url_link, subMenu, disabled, loadOnClick, isA } = link
-    const click = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const click = (e: React.MouseEvent<HTMLAnchorElement>) =>
+    {
       e.stopPropagation()
-      !subMenu && setShowLoad(draft => { draft[linkIndex] = !draft[linkIndex] })
-      subMenu && setSubMenuOpen(draft => {
-        draft[linkIndex] = !draft[linkIndex]
+      !subMenu && setShowLoad(draft => { draft[ linkIndex ] = !draft[ linkIndex ] })
+      subMenu && setSubMenuOpen(draft =>
+      {
+        draft[ linkIndex ] = !draft[ linkIndex ]
       })
       !open && toggleOpen()
     }
@@ -132,18 +138,19 @@ const Menu = (props: MenuProps) => {
           </ListItemIcon>
           <ListItemText
             primary={<>
-              {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{ transform: subMenuOpen[linkIndex] ? 'rotate( 180deg )' : undefined }} />}
+              {name} {subMenu && <ExpandMoreIcon fontSize="inherit" style={{ transform: subMenuOpen[ linkIndex ] ? 'rotate( 180deg )' : undefined }} />}
               {disabled && <Typography variant="caption" className={css.disabled}>(coming soon)</Typography>}
-              {showLoad[linkIndex] && <CircularProgress size={12} color="primary" thickness={10} />}
+              {showLoad[ linkIndex ] && <CircularProgress size={12} color="primary" thickness={10} />}
             </>}
             primaryTypographyProps={{ noWrap: true, color: mainColor, variant: 'body1', className: `${css.menuTextPrimary} ${!selected && !subMenu ? css.menuTextPrimaryNotSelected : ''} ${subMenu ? css.subMenu : ''}` }}
           />
         </ListItemButton>
       </ConditionalLinkWrapper>
       {subMenu && <ListItem disableGutters>
-        <Collapse in={subMenuOpen[linkIndex]} sx={{ width: '-webkit-fill-available' }}>
+        <Collapse in={subMenuOpen[ linkIndex ]} sx={{ width: '-webkit-fill-available' }}>
           <List dense className={css.subList}>
-            {subMenu.map(sub => {
+            {subMenu.map(sub =>
+            {
               const isLink = sub.url_link ? true : undefined
               return <ListItemButton
                 key={`sub-menu-${link.name}-${sub.name}`}
@@ -166,7 +173,8 @@ const Menu = (props: MenuProps) => {
 
   return <>
     <Drawer open={open} variant={isSm ? "temporary" : "permanent"} className={`${css.drawerContainer}`} PaperProps={{ className: css.drawer }}>
-      <ClickAwayListener onClickAway={() => {
+      <ClickAwayListener onClickAway={() =>
+      {
         if (!isSm || !open) return
         toggleOpen()
       }}>
@@ -244,7 +252,7 @@ const useStyles = makeStyles<Theme, { open: boolean }>((theme) => createStyles({
     paddingTop: theme.spacing(1),
     borderTopRightRadius: theme.spacing(3),
     borderBottomRightRadius: theme.spacing(3),
-    borderColor: theme.palette.border[theme.palette.mode],
+    borderColor: theme.palette.border[ theme.palette.mode ],
     borderWidth: 1,
     borderStyle: 'solid',
     borderLeftStyle: 'none',
@@ -301,7 +309,7 @@ const useStyles = makeStyles<Theme, { open: boolean }>((theme) => createStyles({
   disabled: {
     fontSize: 8,
     textTransform: 'uppercase',
-    color: theme.palette.mode == 'dark' ? theme.palette.grey[200] : theme.palette.grey[400],
+    color: theme.palette.mode == 'dark' ? theme.palette.grey[ 200 ] : theme.palette.grey[ 400 ],
   },
   subMenu: {
     color: theme.palette.mode == "light" ? theme.palette.secondary.light : theme.palette.secondary.main,
