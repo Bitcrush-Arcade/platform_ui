@@ -75,7 +75,7 @@ const Menu = (props: MenuProps) =>
   const linkArray: Array<LinkItem> = [
     { name: 'Home', icon: <HomeIcon color="inherit" />, url_link: '/' },
     { name: 'Intergalactic Trade', icon: <TradeIcon />, url_link: '/trade', disabled: true },
-    // { name: 'Warp Speed', icon: <WarpIcon/>, url_link: '/warp', disabled: true },
+    { name: 'Stellar Farms', icon: <WarpIcon />, url_link: '/farms', disabled: false },
     { name: 'Galactic Mining', icon: <UfoIcon />, url_link: '/mining' },
     { name: 'ARCADE', icon: <ArcadeIcon />, url_link: '/games', loadOnClick: true },
     { name: `Launch`, icon: <RechargeIcon />, url_link: '/nice_sale', disabled: false },
