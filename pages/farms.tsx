@@ -120,12 +120,12 @@ export const getStaticProps: GetStaticProps = async () =>
 
   // CONNECT TO BLOCKCHAIN
   //MAINNET
-  // const provider = 'https://bsc-dataseed1.defibit.io/'
+  const provider = 'https://bsc-dataseed1.defibit.io/'
   // TESTNET
-  const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+  // const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
 
   const web3 = new Web3(new Web3.providers.HttpProvider(provider))
-  const setup = getContracts('galacticChef', 97)
+  const setup = getContracts('galacticChef', 56)
   if (setup.abi) {
     const contract = await new web3.eth.Contract(setup.abi, setup.address)
 
