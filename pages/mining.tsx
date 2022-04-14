@@ -96,9 +96,9 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         !showInactive && activeFarmPool.map((farm, farmIndex) =>
         {
           const { pid, mult, fee, isLP, token } = farm
-          const baseImage = imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url()
+          const baseImage = farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : ""
           const mainImage = imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? ""
-          const swapImage = imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? ""
+          const swapImage = farm.swapPartner ? imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "" : ""
           return (
             <div key={`active-nice-reward-pool-${farmIndex}`}>
               <FarmCard
@@ -114,11 +114,11 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
                   mainTokenSymbol: farm.mainToken.symbol,
                   mainTokenImage: mainImage,
 
-                  swapName: farm.swapPartner.name,
+                  swapName: farm.swapPartner?.name,
                   swapLogo: swapImage,
-                  swapUrl: farm.swapPartner.url,
-                  swapDexUrl: farm.swapPartner.dex,
-                  swapPoolUrl: farm.swapPartner.lp,
+                  swapUrl: farm.swapPartner?.url,
+                  swapDexUrl: farm.swapPartner?.dex,
+                  swapPoolUrl: farm.swapPartner?.lp,
 
                   pid,
                   mult,
@@ -265,12 +265,12 @@ export const getStaticProps: GetStaticProps = async () =>
 
   // CONNECT TO BLOCKCHAIN
   //MAINNETy
-  // const provider = 'https://bsc-dataseed1.defibit.io/'
+  const provider = 'https://bsc-dataseed1.defibit.io/'
   // TESTNET
-  const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+  // const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
 
   const web3 = new Web3(new Web3.providers.HttpProvider(provider))
-  const setup = getContracts('galacticChef', 97)
+  const setup = getContracts('galacticChef', 56)
   if (setup.abi) {
     const contract = await new web3.eth.Contract(setup.abi, setup.address)
 
@@ -294,7 +294,6 @@ export const getStaticProps: GetStaticProps = async () =>
       farms.push(parsedData)
     }
     const farmIds = farms.map(farm => farm.pid)
-    console.log(farmIds)
     // GET ASSETS FROM SANITY
     const client = getClient(false)
     const farmsQuery = nicePools(farmIds)
