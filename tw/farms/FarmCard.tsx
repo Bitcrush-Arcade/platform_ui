@@ -19,7 +19,8 @@ import { useContract } from 'hooks/web3Hooks'
 
 // Types
 import type { Receipt } from 'types/PromiEvent'
-
+import tokenAbi from 'abi/LPToken.json'
+import { AbiItem } from 'web3-utils'
 
 
 type FarmCardProps = {
@@ -115,7 +116,7 @@ const FarmCard = (props: FarmCardProps) =>
   const { login, logout } = useAuthContext()
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(poolAssets.tokenAddress)
-
+  const { methods: tokenMethods } = useContract(tokenAbi.abi as AbiItem[], poolAssets.tokenAddress)
   // Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
@@ -154,25 +155,24 @@ const FarmCard = (props: FarmCardProps) =>
   const getPoolEarnings = useCallback(async () =>
   {
 
-    if (!chefMethods || !poolAssets.tokenAddress || !account) return;
+    if (!chefMethods || !poolAssets.tokenAddress || !account || !tokenMethods) return;
 
-    const amountEarned = await chefMethods.pendingRewards(account, pid).call()
-    const totalLiquidity = await coinMethods.balanceOf(chefContract.address).call()
-    const tokenInWallet = await coinMethods.balanceOf(account).call()
-    const chefUserInfo = await chefMethods.userInfo(pid, account).call()
-
+    const amountEarned = await chefMethods.pendingRewards(account, pid).call().catch(() => { console.log('pending failed', pid); return 0 })
+    const totalLiquidity = await tokenMethods.balanceOf(chefContract.address).call().catch(() => { console.log('chef bal failed'); return 0 })
+    const tokenInWallet = await tokenMethods.balanceOf(account).call().catch(() => { console.log('user tokenfailed'); return 0 })
+    const chefUserInfo = await chefMethods.userInfo(pid, account).call().catch(() => { console.log('chef user failed'); return 0 })
 
     setPool(draft =>
     {
       draft.userTokens = new BigNumber(tokenInWallet)
-      draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
+      draft.totalLiquidity = new BigNumber(totalLiquidity || 0).div(10 ** 18)
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
       draft.apr = new BigNumber(amountEarned).div(10 ** 18)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
 
     })
 
-  }, [ chefMethods, account, pid, poolAssets.tokenAddress, coinMethods, chefContract.address, setPool ])
+  }, [ chefMethods, account, pid, poolAssets.tokenAddress, tokenMethods, chefContract.address, setPool ])
 
   // useEffect for pool earnings
   useEffect(() =>
