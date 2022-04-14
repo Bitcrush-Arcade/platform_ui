@@ -7,7 +7,9 @@ const STUDIO_REWRITE = {
 }
 
 module.exports = {
-  
+  images: {
+    domains: ['cdn.sanity.io'],
+  },
   rewrites: () => [
     STUDIO_REWRITE
   ]

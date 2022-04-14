@@ -2,13 +2,13 @@ const token = {
   name: "token",
   title: "Token Info",
   type: "document",
-  groups:[
+  groups: [
     {
       name: "chainInfo",
       title: "Chain Info"
     },
   ],
-  fields:[
+  fields: [
     {
       title: "Token Icon",
       name: "tokenIcon",
@@ -37,9 +37,14 @@ const token = {
       name: "tokenContract",
       type: "contract"
     },
+    {
+      title: "Project URL",
+      name: "projectUrl",
+      type: "string"
+    },
   ],
   preview: {
-    select:{
+    select: {
       title: 'symbol',
       subtitle: 'name',
       media: 'tokenIcon'

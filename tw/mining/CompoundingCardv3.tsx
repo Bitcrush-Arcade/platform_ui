@@ -16,7 +16,7 @@ import Currency from 'components/basics/Currency'
 // libs
 import { currencyFormat } from 'utils/text/text'
 import { useWeb3React } from "@web3-react/core"
-import useCalculator from 'hooks/compounder/useCalculatorv1'
+import useCalculator from 'hooks/compounder/useCalculator'
 // Context
 import { useTransactionContext } from "hooks/contextHooks"
 import { Receipt } from "types/PromiEvent";
@@ -29,7 +29,7 @@ const CompoundingCard = (props: CompoundingCardProps) =>
   const { account } = useWeb3React()
 
   const { tokenInfo, editTransactions } = useTransactionContext()
-  const { compounderReward, calculate, contractMethods } = useCalculator()
+  const { compounderReward, calculate, contractMethods, niceReward } = useCalculator()
 
   const usdReward = compounderReward.times(tokenInfo?.crushUsdPrice || 0)
 
@@ -63,13 +63,10 @@ const CompoundingCard = (props: CompoundingCardProps) =>
   return <>
     <Card background="light" shadow="dark" className={css.claimCard} >
       <CardContent className={css.cardContent}>
-        <Grid container justifyContent="space-between" alignItems="center">
-          <Grid item>
-            <Typography className={css.cardTitle}>
-              CRUSH Auto Bounty
-            </Typography>
-          </Grid>
-          <Grid item>
+
+        <div className="relative flex text-center justify-center text-md font-bold whitespace-pre-line">
+          CRUSH &amp; NICE {'\n'} Auto Bounty
+          <div className="absolute top-0 right-0">
             <Tooltip
               arrow
               title={
@@ -84,26 +81,39 @@ const CompoundingCard = (props: CompoundingCardProps) =>
             >
               <InfoIcon color="disabled" />
             </Tooltip>
-          </Grid>
-          <Grid item xs={12} style={{ height: 16 }} />
-          <Grid item>
+          </div>
+        </div>
+        <div className="flex flex-row justify-center gap-12 my-4">
+          <div className="flex flex-col">
             <Tooltip title={<Typography>
-              <Currency value={compounderReward} decimals={18} isWei />&nbsp;CRUSH
+              <Currency value={compounderReward} decimals={18} isWei />&nbsp;$CRUSH
             </Typography>} arrow>
               <Typography color="primary" variant="h5" component="p">
                 <Currency value={compounderReward} decimals={4} isWei />
               </Typography>
             </Tooltip>
-            <Typography color="textSecondary" variant="caption" component="p">
+            {/* <Typography color="textSecondary" variant="caption" component="p">
               $&nbsp;<Currency value={usdReward} decimals={2} isWei />
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
-              Claim
-            </Button>
-          </Grid>
-        </Grid>
+            </Typography> */}
+          </div>
+          <div className="flex flex-col">
+            <Tooltip title={<Typography>
+              <Currency value={niceReward} decimals={18} isWei />&nbsp;$NICE
+            </Typography>} arrow>
+              <Typography color="secondary" variant="h5" component="p">
+                <Currency value={niceReward} decimals={4} isWei />
+              </Typography>
+            </Tooltip>
+            {/* <Typography color="textSecondary" variant="caption" component="p">
+              $&nbsp;<Currency value={usdReward} decimals={2} isWei />
+            </Typography> */}
+          </div>
+        </div>
+        <div className="flex justify-center mt-2">
+          <Button size="small" width={80} color="primary" onClick={claim} disabled={!contractMethods || !account}>
+            Claim All
+          </Button>
+        </div>
       </CardContent>
     </Card>
   </>

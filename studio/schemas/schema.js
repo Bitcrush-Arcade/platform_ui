@@ -10,6 +10,8 @@ import team from './team'
 import partner from './partners'
 import page from './page'
 import faq from './faq'
+import poolAssets from './poolAssets'
+import thirdPartyPools from './thirdPartyPools'
 // OBJECTS
 import seoImage from './objects/seoImage'
 import contract from './objects/contract'
@@ -27,6 +29,8 @@ export default createSchema({
     liveWallet,
     team,
     partner,
+    poolAssets,
+    thirdPartyPools,
     // OBJECTS
     seoImage,
     contract

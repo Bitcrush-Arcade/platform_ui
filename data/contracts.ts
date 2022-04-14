@@ -5,8 +5,14 @@ import BitcrushLiveWallet from 'abi/BitcrushLiveWallet.json'
 import BitcrushStaking from 'abi/BitcrushStakingv2.json'
 import BitcrushBankroll from 'abi/BitcrushBankroll.json'
 import BitcrushLottery from 'abi/BitcrushLottery.json'
+import FeeDistributor from 'abi/FeeDistributor.json'
+import GalacticChef from 'abi/GalacticChef.json'
+import InvaderPool from 'abi/InvaderPool.json'
+import NiceStaking from 'abi/BitcrushNiceStaking.json'
+import NICEToken from 'abi/NICEToken.json'
 import Presale from 'abi/Presale.json'
 import PresaleV2 from 'abi/Presalev2.json'
+import TokenLock from 'abi/TokenLock.json'
 // 
 import { AbiItem } from 'web3-utils'
 /*
@@ -78,7 +84,66 @@ export const contracts: { [ key: string ]: ContractSelect } = {
       // abi: Presale.abi,
     },
   },
-
+  galacticChef: {
+    56: {
+      address: '0x510C617f990143eC9165C1978D70c0b4c7E369f1',
+      abi: GalacticChef.abi
+    },
+    97: {
+      address: '0x1ccbfe1E7046d6aaaC68f6C17BD01628fd5F638e',
+      abi: GalacticChef.abi
+    },
+  },
+  feeDistributor: {
+    56: {
+      address: '0x45f194a1F2269904a181d6d29727aee4882B7995',
+      abi: FeeDistributor.abi
+    },
+    97: {
+      address: '0x82306aB3edB8A4BD7725a0b40B85f8975A2C6849',
+      abi: FeeDistributor.abi
+    },
+  },
+  tokenLocker: {
+    56: {
+      address: "0xaeF0c6Db4C7B3EAF27C63B32Ea7397f296ed4247",
+      abi: TokenLock.abi,
+    },
+    97: {
+      address: "",
+      abi: TokenLock.abi,
+    },
+  },
+  niceCompounder: {
+    56: {
+      address: '',
+      abi: NiceStaking.abi
+    },
+    97: {
+      address: '0xb8522747Ac79Dc8cE089CfD745fE7eE9CA01D157',
+      abi: NiceStaking.abi
+    }
+  },
+  niceToken: {
+    56: {
+      address: '',
+      abi: NICEToken.abi
+    },
+    97: {
+      address: '0xAD026d8ae28bafa81030a76548efdE1EA796CB2C',
+      abi: NICEToken.abi
+    },
+  },
+  invaderPool: {
+    56: {
+      address: '',
+      abi: InvaderPool.abi
+    },
+    97: {
+      address: '',
+      abi: InvaderPool.abi
+    },
+  },
   // -------------------------------------------------------------
   // Discontinued
   // -------------------------------------------------------------

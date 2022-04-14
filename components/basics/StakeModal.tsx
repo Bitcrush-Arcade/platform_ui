@@ -31,7 +31,7 @@ import { currencyFormat } from 'utils/text/text'
  */
 export type StakeOptionsType = {
   name: string,
-  maxValue: BigNumber | number ,
+  maxValue: BigNumber | number,
   btnText: string,
   description: string,
   onSelectOption?: () => void,
@@ -41,7 +41,7 @@ export type StakeOptionsType = {
 
 export type FormValues = { stakeAmount: BigNumber, actionType: number }
 
-export type SubmitFunction = ( values : FormValues, second: { setSubmitting: (newSubmit: boolean) => void } ) => void
+export type SubmitFunction = (values: FormValues, second: { setSubmitting: (newSubmit: boolean) => void }) => void
 
 export type StakeModalProps = {
   open: boolean,
@@ -55,147 +55,156 @@ export type StakeModalProps = {
   onActionSelected?: (actionType: number) => void,
 }
 
-BigNumber.config({ ROUNDING_MODE: 1})
+BigNumber.config({ ROUNDING_MODE: 1 })
 
-function StakeModal( props: StakeModalProps ) {
-  const {open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected, initAction} = props
+function StakeModal(props: StakeModalProps)
+{
+  const { open, onClose, options, onSubmit, coinInfo, needsApprove, onApprove, onActionSelected, initAction } = props
   const css = useStyles({})
 
-  const InfoText = () => {
+  const InfoText = () =>
+  {
     return <>
-      {options.map( (option, opIdx) => <Typography key={`option-description-tooltip-${opIdx}-${option.name}`} paragraph>
+      {options.map((option, opIdx) => <Typography key={`option-description-tooltip-${opIdx}-${option.name}`} paragraph>
         <strong>{option.name}:</strong>&nbsp;{option.description}
       </Typography>)}
     </>
   }
   return (
-    <Dialog 
+    <Dialog
       PaperComponent={FormComponent}
       open={open}
-      onClose={ onClose }
+      onClose={onClose}
     >
       <Formik
-        initialValues = {{
+        initialValues={{
           stakeAmount: new BigNumber(0),
           actionType: initAction || 0
         }}
-        onSubmit={ (vals, ops) => {
-          needsApprove ? onApprove && onApprove() : onSubmit(vals,ops)
+        onSubmit={(vals, ops) =>
+        {
+          needsApprove ? onApprove && onApprove() : onSubmit(vals, ops)
         }}
-        validate ={ ( values ) => {
+        validate={(values) =>
+        {
           let errors: any = {}
           const bigValue = new BigNumber(values.stakeAmount)
-          const maxValue = new BigNumber( options[values.actionType].maxValue ).div( new BigNumber(10).pow(18) )
-          if( bigValue.isGreaterThan( maxValue ) )
+          const maxValue = new BigNumber(options[ values.actionType ].maxValue).div(new BigNumber(10).pow(18))
+          if (bigValue.isGreaterThan(maxValue))
             errors.stakeAmount = "Insufficient Funds"
-          if( bigValue.isLessThanOrEqualTo( 0 ) )
+          if (bigValue.isLessThanOrEqualTo(0))
             errors.stakeAmount = "Invalid Input"
           return errors
         }}
         validateOnChange
       >
-      { ({values, setFieldValue, isSubmitting, errors, handleSubmit}) =>{
-        const { actionType, stakeAmount } = values
-        const {maxValue: maxUsed, disableAction} = options[actionType]
-        const percent = new BigNumber( stakeAmount ).div( new BigNumber(maxUsed).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) ).times(100)
-        const hasErrors = Object.keys( errors ).length > 0
-        const sliderChange = (e: any, value: number | number[]) => {
-          if(Array.isArray(value)) return
-          const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
-          setFieldValue('stakeAmount', new BigNumber(newValue).div( new BigNumber(10).pow(coinInfo?.decimals || 18 ) ) )
-        }
-        const switchAction = (stakeActionValue: number) => {
-          setFieldValue('actionType', stakeActionValue )
-          setFieldValue('stakeAmount', 0 )
+        {({ values, setFieldValue, isSubmitting, errors, handleSubmit }) =>
+        {
+          const { actionType, stakeAmount } = values
+          const { maxValue: maxUsed, disableAction } = options[ actionType ]
+          const percent = new BigNumber(stakeAmount).div(new BigNumber(maxUsed).div(new BigNumber(10).pow(coinInfo?.decimals || 18))).times(100)
+          const hasErrors = Object.keys(errors).length > 0
+          const sliderChange = (e: any, value: number | number[]) =>
+          {
+            if (Array.isArray(value)) return
+            const newValue = value === 100 ? maxUsed : new BigNumber(value).times(maxUsed).div(100)
+            setFieldValue('stakeAmount', new BigNumber(newValue).div(new BigNumber(10).pow(coinInfo?.decimals || 18)))
+          }
+          const switchAction = (stakeActionValue: number) =>
+          {
+            setFieldValue('actionType', stakeActionValue)
+            setFieldValue('stakeAmount', 0)
 
-          const selectedAction = options[stakeActionValue]?.onSelectOption
-          selectedAction && selectedAction()
-          onActionSelected && onActionSelected( stakeActionValue )
-        }
-        const maxUsedAvailable = maxUsed ?? false
-        const isMaxAvailable = typeof(maxUsedAvailable) !== 'boolean'
+            const selectedAction = options[ stakeActionValue ]?.onSelectOption
+            selectedAction && selectedAction()
+            onActionSelected && onActionSelected(stakeActionValue)
+          }
+          const maxUsedAvailable = maxUsed ?? false
+          const isMaxAvailable = typeof (maxUsedAvailable) !== 'boolean'
 
-        const doMore = options[actionType]?.more
+          const doMore = options[ actionType ]?.more
 
-        return(<Form>
-          <Grid container className={ css.stakeActionBtnContainer } alignItems="center">
-            {options.map((option, index) => {
-              const { name, btnText, maxValue } = option
-              return <Fragment key={`stake-option-${btnText}-${index}`}>
-                { index > 0 && 
+          return (<Form>
+            <Grid container className={css.stakeActionBtnContainer} alignItems="center">
+              {options.map((option, index) =>
+              {
+                const { name, btnText, maxValue } = option
+                return <Fragment key={`stake-option-${btnText}-${index}`}>
+                  {index > 0 &&
+                    <Grid item>
+                      <Divider orientation="vertical" />
+                    </Grid>
+                  }
                   <Grid item>
-                    <Divider orientation="vertical"/>
+                    <MButton className={css.stakeActionBtn} color={actionType == index ? "secondary" : "info"} onClick={() => switchAction(index)} disabled={maxValue <= 0}>
+                      {name}
+                    </MButton>
                   </Grid>
-                }
-                <Grid item>
-                  <MButton className={ css.stakeActionBtn } color={ actionType == index ? "secondary" : "info"} onClick={() => switchAction(index)} disabled={ maxValue <=0 }>
-                    {name}
-                  </MButton>
-                </Grid>
-              </Fragment>
-            })}
-            <Grid item>
-              <Tooltip 
-                title={<InfoText/>}
-              >
-                <InfoIcon color="action" fontSize="small"/>
-              </Tooltip>
+                </Fragment>
+              })}
+              <Grid item>
+                <Tooltip
+                  title={<InfoText />}
+                >
+                  <InfoIcon color="action" fontSize="small" />
+                </Tooltip>
+              </Grid>
             </Grid>
-          </Grid>
-          <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            {options[actionType].btnText} {coinInfo?.symbol}: {isMaxAvailable ? currencyFormat( maxUsed?.toString() || 0, { isWei: true }) : <Skeleton/>}
-          </Typography>
-          <Field
-            type="number"
-            fullWidth
-            label={actionType ? 'Withdraw Amount' : `Stake Amount`}
-            id="stakeAmount"
-            name="stakeAmount"
-            placeholder="0.00"
-            variant="outlined"
-            component={TextField}
-            InputProps={{
-              endAdornment: <MButton color="secondary" onClick={ () => sliderChange(null, 100)}>
-                MAX
-              </MButton>,
-              className: css.textField,
-              onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
-            }}
-          />
-          <div className={ css.sliderContainer }>
-            <Slider
-              value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
-              onChange={sliderChange}
-              step={ 10 }
-              components={{
-                Thumb: function IThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/> },
+            <Typography variant="body2" color="textSecondary" component="div" align="right" className={css.currentTokenText}>
+              {options[ actionType ].btnText} {coinInfo?.symbol}: {isMaxAvailable ? currencyFormat(maxUsed?.toString() || 0, { isWei: true }) : <Skeleton />}
+            </Typography>
+            <Field
+              type="number"
+              fullWidth
+              label={actionType ? 'Withdraw Amount' : `Stake Amount`}
+              id="stakeAmount"
+              name="stakeAmount"
+              placeholder="0.00"
+              variant="outlined"
+              component={TextField}
+              InputProps={{
+                endAdornment: <MButton color="secondary" onClick={() => sliderChange(null, 100)}>
+                  MAX
+                </MButton>,
+                className: css.textField,
+                onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
               }}
             />
-          </div>
-          <Grid container justifyContent="space-evenly">
-            <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
-              25%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,50)}>
-              50%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,75)}>
-              75%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,100)}>
-              MAX
-            </SmallButton>
-          </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={ needsApprove ? false : (disableAction || isSubmitting || hasErrors) }
-            onClick={ e => { 
-              if(!needsApprove) return handleSubmit();
-              e.preventDefault()
-              onApprove && onApprove()
-          }}>
-            {`${ needsApprove ? "Approve" : options[actionType].name } ${coinInfo?.symbol}`}
-          </Button>
-          {doMore && doMore(values)}
-        </Form>)
+            <div className={css.sliderContainer}>
+              <Slider
+                value={isNaN(percent.toNumber()) ? 0 : percent.toNumber()}
+                onChange={sliderChange}
+                step={10}
+                components={{
+                  Thumb: function IThumb(p) { return <InvaderThumb thumbProps={p} percent={percent} /> },
+                }}
+              />
+            </div>
+            <Grid container justifyContent="space-evenly">
+              <SmallButton color="primary" onClick={() => sliderChange(null, 25)}>
+                25%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 50)}>
+                50%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 75)}>
+                75%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 100)}>
+                MAX
+              </SmallButton>
+            </Grid>
+            <Button color="primary" type="submit" width="100%" className={css.submitBtn} disabled={needsApprove ? false : (disableAction || isSubmitting || hasErrors)}
+              onClick={e =>
+              {
+                if (!needsApprove) return handleSubmit();
+                e.preventDefault()
+                onApprove && onApprove()
+              }}>
+              {`${needsApprove ? "Approve" : options[ actionType ].name} ${coinInfo?.symbol}`}
+            </Button>
+            {doMore && doMore(values)}
+          </Form>)
         }}
       </Formik>
     </Dialog>
@@ -204,39 +213,41 @@ function StakeModal( props: StakeModalProps ) {
 
 export default StakeModal
 
-const useStyles = makeStyles<Theme>( theme => createStyles({
-  submitBtn:{
+const useStyles = makeStyles<Theme>(theme => createStyles({
+  submitBtn: {
     marginTop: theme.spacing(2),
     textTransform: 'uppercase'
   },
-  sliderContainer:{
+  sliderContainer: {
     padding: theme.spacing(2),
   },
-  textField:{
+  textField: {
     borderRadius: theme.spacing(4),
     paddingLeft: theme.spacing(1),
   },
-  currentTokenText:{
+  currentTokenText: {
     marginBottom: theme.spacing(1.5),
     paddingRight: theme.spacing(2)
   },
-  stakeActionBtn:{
+  stakeActionBtn: {
     fontWeight: 600,
   },
-  stakeActionBtnContainer:{
+  stakeActionBtnContainer: {
     marginBottom: theme.spacing(0.5),
   },
 }))
 
-const InvaderThumb = (allProps: {thumbProps: any, percent: BigNumber}) => {
+const InvaderThumb = (allProps: { thumbProps: any, percent: BigNumber }) =>
+{
   const isMax = allProps.percent.toNumber() === 100
-  return(
-    <SliderThumb {...allProps.thumbProps} sx={{color: 'transparent'}}>
+  return (
+    <SliderThumb {...allProps.thumbProps} sx={{ color: 'transparent' }}>
       {allProps.thumbProps.children}
-      <InvaderIcon color="secondary"/>
-      <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -2 : -8, bottom: -25 }} color="textPrimary" variant="caption">
-        { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
+      <InvaderIcon color="secondary" />
+      <Typography style={{ marginTop: 24, position: 'absolute', left: isMax ? -2 : -8, bottom: -25 }} color="textPrimary" variant="caption">
+        {isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
       </Typography>
     </SliderThumb>
-)}
-export const FormComponent = (p:any) => <Card {...p} background="light" sx={{ padding: 4, minWidth: '300px', maxWidth: '360px !important' }}/>
+  )
+}
+export const FormComponent = (p: any) => <Card {...p} background="light" sx={{ padding: 4, minWidth: '300px', maxWidth: '360px !important' }} />
