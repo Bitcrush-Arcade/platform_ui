@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import Switch from '@mui/material/Switch'
 // Bitcrush
+import CompoundingCardv2 from 'components/pools/CompoundingCardv2'
 import CompoundingCardv3 from 'tw/mining/CompoundingCardv3'
 import PageContainer from 'components/PageContainer'
 import PoolCard from 'components/pools/PoolCard'
@@ -75,7 +76,8 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         />
       </Grid>
       <Grid item sx={{ pt: { xs: 4, md: 0 } }}>
-        <CompoundingCardv3 />
+        {/* <CompoundingCardv3 /> */}
+        <CompoundingCardv2 />
       </Grid>
       <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool />
