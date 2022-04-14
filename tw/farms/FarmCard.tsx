@@ -267,30 +267,28 @@ const FarmCard = (props: FarmCardProps) =>
   }, [ account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings ])
 
   // HARVEST FUNCTION
-  const harvestFn = useCallback((pid, second) =>
+  const harvestFn = useCallback(() =>
   {
     const amount = new BigNumber(0)
     chefMethods.deposit(amount, pid).send({ from: account })
       .on('transactionHash', (tx: string) =>
       {
         console.log('hash', tx)
-        editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+        editTransactions(tx, 'pending', { description: `Harvest NICE` })
       })
       .on('receipt', (rc: Receipt) =>
       {
         console.log('receipt', rc)
         editTransactions(rc.transactionHash, 'complete')
-        second.setSubmitting(false)
         getPoolEarnings()
       })
       .on('error', (error: any, receipt: Receipt) =>
       {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
-        second.setSubmitting(false)
       })
 
-  }, [ account, chefMethods, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings ])
+  }, [ account, chefMethods, editTransactions, getPoolEarnings, pid ])
 
   const emergencyWithdraw = () =>
   {
@@ -417,7 +415,7 @@ const FarmCard = (props: FarmCardProps) =>
             {pool.earned.toFixed(4, 1)}
           </div>
           <button
-            onClick={() => harvestFn}
+            onClick={() => harvestFn()}
             disabled={pool.earned.isEqualTo(0)}
             className="
               flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
