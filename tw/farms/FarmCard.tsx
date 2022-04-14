@@ -306,10 +306,10 @@ const FarmCard = (props: FarmCardProps) =>
         <div className={`flex flex-col h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
           <div>
             {poolAssets.isLP && <div className={`z-10`} >
-              {baseTokenImage && <Image src={baseTokenImage} height={35} width={35} alt="Farm Base Token" />}
+              {baseTokenImage && <Image src={baseTokenImage} height={40} width={40} alt="Farm Base Token" />}
             </div>}
-            <div className={`${poolAssets.isLP ? "absolute top-[calc(50%-25px)] left-[calc(50%-25px)] z-0" : "scale-[110%] pt-1"}`}>
-              {mainTokenImage && <Image src={mainTokenImage} height={60} width={60} alt="Farm Main Token" />}
+            <div className={`${poolAssets.isLP ? "absolute top-[0] left-[calc(50%-15px)] z-0" : "scale-[100%] pt-1"}`}>
+              {mainTokenImage && <Image src={mainTokenImage} height={40} width={40} alt="Farm Main Token" />}
             </div>
           </div>
           {poolAssets.isLP && <a className={`text-xs whitespace-nowrap align-middle`}>
@@ -322,8 +322,8 @@ const FarmCard = (props: FarmCardProps) =>
         </div>
 
         <div className="flex flex-col items-end gap-1">
-          <div className="text-[1.3rem] font-bold md:text-[1.5rem] ">
-            {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenName : ""}
+          <div className="text-[1.3rem] font-bold md:text-[1.3rem] ">
+            {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""}
           </div>
           <div className="flex flex-row gap-1 items-center">
             <div className={`border-2 border-secondary rounded-full px-2 py-1 text-[0.70rem] text-secondary ${poolAssets.depositFee == 0 ? "" : "hidden"}`}>
@@ -343,7 +343,8 @@ const FarmCard = (props: FarmCardProps) =>
           APR:
         </div>
         <div className="font-bold">
-          250%
+          {/* 250% */}
+          <Skeleton width={90} />
         </div>
       </div>
 
