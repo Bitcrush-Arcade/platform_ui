@@ -80,6 +80,11 @@ const FarmCard = (props: FarmCardProps) =>
   const [ showDetails, setShowDetails ] = useState<boolean>(false)
   const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
 
+  const isPool = useMemo(() =>
+  {
+    return !baseTokenSymbol
+  }, [ baseTokenSymbol ])
+
   const { editTransactions } = useTransactionContext()
   // BLOCKCHAIN
   const options: Array<StakeOptionsType> = useMemo(() => [
@@ -301,7 +306,7 @@ const FarmCard = (props: FarmCardProps) =>
             `}
     >
       {/* Tokens, title and tags row */}
-      <div className="flex justify-between ">
+      <div className={`flex justify-between ${isPool ? "flex-row-reverse" : ""}`}>
 
         <div className={`flex flex-col h-[80px] w-[80px] relative ${poolAssets.isLP ? "" : "justify-center"}`}>
           <div>
@@ -309,7 +314,7 @@ const FarmCard = (props: FarmCardProps) =>
               {baseTokenImage && <Image src={baseTokenImage} height={40} width={40} alt="Farm Base Token" />}
             </div>}
             <div className={`${poolAssets.isLP ? "absolute top-[0] left-[calc(50%-15px)] z-0" : "scale-[100%] pt-1"}`}>
-              {mainTokenImage && <Image src={mainTokenImage} height={40} width={40} alt="Farm Main Token" />}
+              {mainTokenImage && <Image src={mainTokenImage} height={isPool ? 60 : 40} width={isPool ? 60 : 40} alt="Farm Main Token" />}
             </div>
           </div>
           {poolAssets.isLP && <a className={`text-xs whitespace-nowrap align-middle`}>
@@ -321,8 +326,8 @@ const FarmCard = (props: FarmCardProps) =>
           </a>}
         </div>
 
-        <div className="flex flex-col items-end gap-1">
-          <div className="text-[1.3rem] font-bold md:text-[1.3rem] ">
+        <div className={`flex flex-col ${isPool ? "items-start" : "items-end"} gap-1`}>
+          <div className={`text-[1.3rem] font-bold md:text-[1.3rem] ${isPool ? "text-left pl-2" : "text-right"} w-full`}>
             {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""}
           </div>
           <div className="flex flex-row gap-1 items-center">
@@ -347,7 +352,18 @@ const FarmCard = (props: FarmCardProps) =>
           <Skeleton width={90} />
         </div>
       </div>
+      {
+        isPool &&
+        <div className="flex justify-between mt-2">
+          <div className="text-primary">
+            DEPOSIT:
+          </div>
+          <div className="flex gap-1 items-center font-bold">
+            {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""}
 
+          </div>
+        </div>
+      }
       <div className="flex justify-between">
         <div className="text-primary">
           EARN:
