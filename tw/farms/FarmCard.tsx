@@ -298,7 +298,7 @@ const FarmCard = (props: FarmCardProps) =>
       className={`
               flex flex-col gap-2
               border-2 rounded-[32px] ${border[ color ? "primary" : "secondary" ]} ${highlightGlow[ color ? "primary" : "secondary" ]} 
-              w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[410px]" : ""}
+              w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[440px]" : ""}
               bg-paper-bg 
               text-white
               py-6
@@ -529,12 +529,12 @@ const FarmCard = (props: FarmCardProps) =>
               </svg>
             </a>
           </div>
-          <a className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-secondary hover:text-white" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
+          {(poolAssets.swapPoolUrl || poolAssets.swapDexUrl) && <a className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-secondary hover:text-white" href={poolAssets.isLP ? swapPoolUrl : swapDexUrl} target="_blank" rel="noopener noreferrer">
             {poolAssets.isLP ? "SWAP LP" : "SWAP"}
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
-          </a>
+          </a>}
         </div>
       </div>
 
