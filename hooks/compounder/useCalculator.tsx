@@ -23,11 +23,11 @@ const useCalculator = () =>
       if (!methods || !chefMethods) return
       // TODO edit the niceEmissions to grab the accurate poolID
       const niceEmissions = new BigNumber(await chefMethods.getCurrentEmissions(2).call())
-      const niceCompoundFee = new BigNumber(await compounderMethods.performanceFeeCompounder().call()).div(10000)
+      const niceCompoundFee = compounderMethods ? new BigNumber(await compounderMethods.performanceFeeCompounder().call()).div(10000) : new BigNumber(0)
       const totalShares = new BigNumber(await methods.totalShares().call())
 
       /// NICE EMITTED
-      const accNiceReward = new BigNumber(await compounderMethods.accProfitPerShare().call()).plus(niceEmissions.times(1e12).div(totalShares))
+      const accNiceReward = compounderMethods ? new BigNumber(await compounderMethods.accProfitPerShare().call()).plus(niceEmissions.times(1e12).div(totalShares)) : new BigNumber(0)
 
       const autoLimit = parseInt(await methods.autoCompoundLimit().call())
       const startIndex = parseInt(await methods.batchStartingIndex().call())
@@ -54,12 +54,12 @@ const useCalculator = () =>
       for (let i = startIndex; i < batchLimit; i++) {
         const indexedAddress = await methods.addressIndexes(i).call()
         const userInfo = await methods.stakings(indexedAddress).call()
-        const niceUserInfo = await compounderMethods.stakings(indexedAddress).call()
+        const niceUserInfo = compounderMethods && await compounderMethods.stakings(indexedAddress).call()
         const reward = await methods.pendingReward(indexedAddress).call()
         const calcShare = new BigNumber(await methods.pendingProfits(indexedAddress).call())
         stakeReward = stakeReward.plus(reward).plus(calcShare)
 
-        niceReward = niceReward.plus(new BigNumber(userInfo.shares).times(accNiceReward).div(1e12).minus(niceUserInfo.profitBaseline))
+        niceReward = !compounderMethods ? new BigNumber(0) : niceReward.plus(new BigNumber(userInfo.shares).times(accNiceReward).div(1e12).minus(niceUserInfo.profitBaseline))
       }
       setCompounderReward(stakeReward.times(compounderFee))
       setNiceReward(niceReward.times(niceCompoundFee))
