@@ -22,7 +22,7 @@ function useBank()
   const [ bankInfo, setBankInfo ] = useImmer<BankInfo>(initBank)
   const [ userInfo, setUserInfo ] = useImmer<UserInfo>(initUser)
 
-  const getApyData = () =>
+  const getApyData = useCallback(() =>
   {
     if (!chainId) return
     fetch('/api/bankAPY', {
@@ -36,9 +36,9 @@ function useBank()
       {
         draft.apyPercent = data.compoundRewards
       }))
-  }
+  }, [ chainId, setBankInfo ])
 
-  useEffect(() => { getApyData() }, [ chainId ])
+  useEffect(() => { getApyData() }, [ chainId, getApyData ])
 
 
 
