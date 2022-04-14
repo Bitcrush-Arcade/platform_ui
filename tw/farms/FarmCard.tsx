@@ -292,6 +292,27 @@ const FarmCard = (props: FarmCardProps) =>
 
   }, [ account, chefMethods, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings ])
 
+  const emergencyWithdraw = () =>
+  {
+    chefMethods.emergencyWithdraw(pid).send({ from: account })
+      .on('transactionHash', (tx: string) =>
+      {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: `E. Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+      })
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
+        editTransactions(rc.transactionHash, 'complete')
+        getPoolEarnings()
+      })
+      .on('error', (error: any, receipt: Receipt) =>
+      {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+      })
+  }
+
   return (
     // Farm card
     <div
@@ -535,7 +556,14 @@ const FarmCard = (props: FarmCardProps) =>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
           </a>}
+
         </div>
+        <button
+          className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-secondary hover:text-white"
+          onClick={emergencyWithdraw}
+        >
+          Emergency Withdraw
+        </button>
       </div>
 
     </div >
