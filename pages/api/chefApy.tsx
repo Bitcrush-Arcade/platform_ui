@@ -10,13 +10,23 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== "POST")
     return res.status(400).json({ error: "Invalid Request" });
 
-  // GET SENT DATA (PID)
+  // // GET SENT DATA (PID)
   const body = JSON.parse(req.body || "{}")
+
+  const host = req.headers.host
+  const isLocal = (host || '').indexOf('localhost:') > -1
+  if (!isLocal && (req.method !== 'POST' || !body.chainId))
+    return res.status(400).json({ error: "Request Invalid" })
+
+  // Fetch current crushPrice
+  const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then(r => r.json())
+  const { niceUsdPrice } = price
+
   if (!body.pid || !body.chainId)
     return res.status(400).json({ error: "Invalid Request" });
-  const { pid, chainId } = body
+  const { pid } = body
   // CONNECT TO BLOCKCHAIN
-  const usedChain = body?.chainId ? parseInt(body.chainId) : 97
+  const usedChain = 56
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
   const web3 = new Web3(new Web3.providers.HttpProvider(provider))
   const contractSetup = getContracts('galacticChef', usedChain)
@@ -32,16 +42,15 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   if (!tokenSetup.abi)
     return res.status(400).json({ message: 'No token contract ABI' });
   const tokenContract = await new web3.eth.Contract(tokenSetup.abi, token)
-  const totalStaked = await tokenContract.methods.balanceOf(contractSetup.address).call()
+  let totalStaked = new BigNumber(await tokenContract.methods.balanceOf(contractSetup.address).call())
   // --------
   // TODO - get years since chef was deployed
   const allEmissions = await chefContract.methods.getAllEmissions(0).call()
   // --------
   const { _defi } = allEmissions
   const pidEmissions = new BigNumber(_defi).times(mult).div(1000000)
-  const perShare = pidEmissions.div(totalStaked).times(3600).times(24).div(10 ** 18) // PER day
-  let tokenPrice: BigNumber = new BigNumber(0);
-  const bnbPrice = await calcBNBPrice() // $/bnb
+  let tokenPrice: number = 0;
+  const bnbPrice = new BigNumber(await calcBNBPrice()).toNumber() // $/bnb
   if (isLP) {
     const tokenPair = await new web3.eth.Contract(pairAbi, token)
     // GET TOKEN0
@@ -51,7 +60,7 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
       token0Price = bnbPrice
     }
     else
-      token0Price = (await calcSell(1, token0)).div(10 ** 18)
+      token0Price = (await calcSell(1, token0)).div(10 ** 18).toNumber()
     // GET TOKEN1
     let token1Price;
     const token1 = await tokenPair.methods.token1().call()
@@ -59,33 +68,64 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
       token1Price = bnbPrice
     }
     else
-      token1Price = (await calcSell(1, token1)).div(10 ** 18)
+      token1Price = (await calcSell(1, token1)).div(10 ** 18).toNumber()
+
     // GET TOTAL RESERVES
     const reserves = await tokenPair.methods.getReserves().call()
     // GET TOTAL PRICE IN RESERVES
-    const pairSupply = await tokenPair.methods.totalSupply().call()
-    tokenPrice = new BigNumber(reserves.reserve0).times(token0Price).plus(new BigNumber(reserves.reseve1).times(token1Price)).div(pairSupply)
+    const pairSupply = new BigNumber(await tokenPair.methods.totalSupply().call()).toNumber()
+    tokenPrice = (token0Price * parseInt(reserves.reserve0) + parseInt(reserves.reserve1) * token1Price) / pairSupply
   }
   else {
-    const maxOut = (await calcSell(1, token)).div(10 ** 18) // BNB PER TOKEN 
-    tokenPrice = maxOut.times(bnbPrice) // USD PER TOKEN
+    const maxOut = (await calcSell(1, token)).div(10 ** 18).toNumber() // BNB PER TOKEN 
+    tokenPrice = maxOut * (bnbPrice) // USD PER TOKEN
   }
-  const shares = new BigNumber(1).div(tokenPrice).times(1000) // tokens per 1000USD
+  let shares = new BigNumber(1).div(tokenPrice).times(1000).toNumber() // tokens per 1000USD
+  if (totalStaked.isEqualTo(0))
+    totalStaked = new BigNumber(1);
+
 
   // TOKEN PRICE * 1000 USD AS SHARE AMOUNT
   // NICE EMITTED
-  const emissionPerDay = shares.times(perShare)
-  let weekEm;
-  let monthEm;
-  let yearEm;
+  const emissions = pidEmissions.times(3600).times(24).div(10 ** 18).toNumber()// PER day)
 
+  const emissionPerDay = totalStaked.div(10 ** 18).isLessThan(shares) ? shares * emissions / totalStaked.div(10 ** 18).plus(shares).toNumber() : shares * emissions / totalStaked.div(10 ** 18).toNumber()
+  let accumulated = 0;
+  let totalShares = totalStaked.div(10 ** 18).toNumber()
+  let day1 = 0;
+  let day7 = 0;
+  let day30 = 0;
+  let day365 = 0;
+  for (let i = 1; i <= 365; i++) {
+    const current = shares * emissions / totalShares
+    accumulated += current
+    if (i == 1)
+      day1 = accumulated
+    if (i == 7)
+      day7 = accumulated
+    if (i == 30)
+      day30 = accumulated
+    if (i == 365)
+      day365 = accumulated
+    const sharesIfCompounded = accumulated * niceUsdPrice / tokenPrice
+    totalShares += sharesIfCompounded
+    shares += sharesIfCompounded
+  }
 
   // NICE PRICE
   // EACH RETURN * NICE PRICE
   res.status(200).json({
-    apr: emissionPerDay.times(365).toFixed(18, 1),
-    d1: emissionPerDay.toFixed(18, 1),
-
+    tokenPrice,
+    emissionPerDay,
+    apr: emissionPerDay * 365 * niceUsdPrice / 1000,
+    d1: day1.toFixed(18),
+    d7: day7.toFixed(18),
+    d30: day30.toFixed(18),
+    d365: day365.toFixed(18),
+    d1Usd: day1 * niceUsdPrice / 1000,
+    d7Usd: day7 * niceUsdPrice / 1000,
+    d30Usd: day30 * niceUsdPrice / 1000,
+    d365Usd: day365 * niceUsdPrice / 1000,
   })
 }
 
