@@ -95,7 +95,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
     </Grid>
     <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[5.5rem] 2xl:ml-[20rem]">
       {
-        !showInactive && activeFarmPool.map((farm, farmIndex) =>
+        activeFarmPool.map((farm, farmIndex) =>
         {
           const { pid, mult, fee, isLP, token } = farm
           const baseImage = farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : ""
@@ -141,7 +141,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         })
       }
       {
-        !showInactive && activePools.map((pool, poolIndex) =>
+        activePools.map((pool, poolIndex) =>
         {
           return (
             <div key={`partner-pool-active-${poolIndex}`}>
@@ -199,20 +199,101 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
       </Grid>
       <Grid item style={{ width: 215 }} />
     </Grid>
-    {
-      showInactive &&
-      <div className="flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[3.5rem] 2xl:ml-[19rem]">
-        <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
-        <Grid item>
-          <PoolCardv2
-            abi={prevPool.abi}
-            address={prevPool.address}
-            name="Expiring SAS Pool"
-            subtext="Simple Reward APR Pool"
-          />
-        </Grid>
-      </div>
-    }
+    <div className={`flex flex-wrap gap-x-6 gap-y-8 my-[4rem] justify-center lg:justify-evenly max-w-[61rem] xl:ml-[3.5rem] 2xl:ml-[19rem] ${showInactive ? "" : "hidden"}`}>
+      {
+        inactiveFarmPool.map((farm, farmIndex) =>
+        {
+          const { pid, mult, fee, isLP, token } = farm
+          const baseImage = farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : ""
+          const mainImage = imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? ""
+          const swapImage = farm.swapPartner ? imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "" : ""
+          return (
+            <div key={`active-nice-reward-pool-${farmIndex}`}>
+              <FarmCard
+                color={farm.color}
+                highlight={farm.highlight}
+                poolAssets=
+                {{
+                  baseTokenName: farm.baseToken?.name,
+                  baseTokenSymbol: farm.baseToken?.symbol,
+                  baseTokenImage: baseImage,
+
+                  mainTokenName: farm.mainToken.name,
+                  mainTokenSymbol: farm.mainToken.symbol,
+                  mainTokenImage: mainImage,
+
+                  swapName: farm.swapPartner?.name,
+                  swapLogo: swapImage,
+                  swapUrl: farm.swapPartner?.url,
+                  swapDexUrl: farm.swapPartner?.dex,
+                  swapPoolUrl: farm.swapPartner?.lp,
+
+                  pid,
+                  mult,
+                  isLP,
+                  depositFee: fee || 0,
+                  tokenAddress: token
+                }}
+
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
+              />
+            </div>
+          )
+        })
+      }
+      {
+        inactivePools.map((pool, poolIndex) =>
+        {
+          return (
+            <div key={`partner-pool-active-${poolIndex}`}>
+              <NicePoolCard
+                color={true}
+                highlight={true}
+                tags={pool.tags}
+                poolAssets={{
+                  poolContractAddress: pool.poolContract,
+
+                  rewardTokenName: pool.rewardToken.name,
+                  rewardTokenSymbol: pool.rewardToken.symbol,
+                  rewardTokenImage: imageBuilder(pool.rewardToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                  rewardTokenContract: pool.rewardToken.tokenContract,
+
+                  stakeTokenName: pool.stakeToken.name,
+                  stakeTokenSymbol: pool.stakeToken.symbol,
+                  stakeTokenImage: imageBuilder(pool.stakeToken.tokenIcon.asset._ref).height(50).width(50).url() || '',
+                  stakeTokenContract: pool.stakeToken.tokenContract,
+
+                  projectName: "partner name",
+                  projectLogo: "partner logo url",
+                  projectUrl: "partner url",
+
+                }}
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
+              />
+            </div>
+          )
+        })
+      }
+      <PoolCard disabled abi={firstPool.abi} contractAddress={firstPool.address} tokenAbi={token.abi} tokenAddress={token.address} infoText="No fees! - Crush It!" />
+      <Grid item>
+        <PoolCardv2
+          abi={prevPool.abi}
+          address={prevPool.address}
+          name="Expiring SAS Pool"
+          subtext="Simple Reward APR Pool"
+        />
+      </Grid>
+    </div>
   </PageContainer>
 }
 
@@ -284,7 +365,7 @@ export const getStaticProps: GetStaticProps = async () =>
     const farms: Array<any> = []
     for (let i = 1; i <= poolAmount; i++) {
       const poolData = await contract.methods.poolInfo(i).call()
-      if (poolData.isLP)
+      if (poolData.isLP || poolData.type)
         continue;
       const parsedData = {
         fee: new BigNumber(poolData.fee).div(100).toNumber(), // DIVISOR IS 10000 so dividing by 100 gives us the % value
@@ -296,6 +377,7 @@ export const getStaticProps: GetStaticProps = async () =>
       farms.push(parsedData)
     }
     const farmIds = farms.map(farm => farm.pid)
+    console.log(farmIds)
     // GET ASSETS FROM SANITY
     const client = getClient(false)
     const farmsQuery = nicePools(farmIds)
@@ -325,7 +407,7 @@ export const getStaticProps: GetStaticProps = async () =>
   return {
     props: {
       activeFarmPool: activePools,
-      inactveFarmPool: inActivePools,
+      inactiveFarmPool: inActivePools,
       activePools: poolData.filter((d: any) => d.active),
       inactivePools: poolData.filter((d: any) => !d.active)
     }

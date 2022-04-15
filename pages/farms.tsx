@@ -46,11 +46,59 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
     <h2 className="text-center text-4xl mt-4 whitespace-pre-line font-zeb md:text-6xl lg:mt-0">
       Stellar Farms
     </h2>
-
-    <div className="flex justify-center mt-9">
+    <div className='mt-6'>
+      Show Inactive <input type="checkbox" checked={!showActive} onChange={e => setShowActive(!e.target.checked)} />
+    </div>
+    <div className={`flex justify-center mt-3 ${showActive ? "" : "hidden"}`}>
       <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
         {
-          showActive && activeFarms.length > 0 && activeFarms.map((farm: any, activeIndex: number) =>
+          activeFarms.length > 0 && activeFarms.map((farm: any, activeIndex: number) =>
+          {
+            const { pid, mult, fee, isLP, token } = farm
+            return (
+              <FarmCard key={`active-farm-${activeIndex}`}
+                color={farm.color}
+                highlight={farm.highlight}
+                poolAssets=
+                {{
+                  baseTokenName: farm.baseToken?.name,
+                  baseTokenSymbol: farm.baseToken?.symbol,
+                  baseTokenImage: farm.baseToken ? imageBuilder(farm.baseToken.tokenIcon.asset._ref).height(35).width(35).url() : null,
+
+                  mainTokenName: farm.mainToken.name,
+                  mainTokenSymbol: farm.mainToken.symbol,
+                  mainTokenImage: imageBuilder(farm.mainToken.tokenIcon.asset._ref).height(50).width(50).url() ?? "",
+
+                  swapName: farm.swapPartner.name,
+                  swapLogo: imageBuilder(farm.swapPartner.logo.asset._ref).height(20).width(20).url() ?? "",
+                  swapUrl: farm.swapPartner.url,
+                  swapDexUrl: farm.swapPartner.dex,
+                  swapPoolUrl: farm.swapPartner.lp,
+
+                  pid,
+                  mult,
+                  isLP,
+                  depositFee: fee || 0,
+                  tokenAddress: token
+                }}
+
+                onAction={(options, fn, initAction, coinInfo) => setStakeSelected({
+                  options: options,
+                  submitFn: fn,
+                  init: initAction,
+                  coinInfo: coinInfo
+                })}
+              />
+            )
+          })
+        }
+
+      </div>
+    </div>
+    <div className={`flex justify-center mt-3 ${showActive ? "hidden" : ""}`}>
+      <div className="flex flex-wrap gap-x-6 gap-y-8 justify-center lg:justify-evenly max-w-[61rem]">
+        {
+          inactiveFarms.length > 0 && inactiveFarms.map((farm: any, activeIndex: number) =>
           {
             const { pid, mult, fee, isLP, token } = farm
             return (

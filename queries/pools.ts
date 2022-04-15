@@ -34,7 +34,7 @@ export const nicePools = (ids: Array<number>) =>
 {
   const numberArr = ids.map(n => '' + n).join(', ')
   return groq`
-  *[_type=="poolAssets" && pid in [${numberArr}] ] | order(pid){
+  *[_type=="poolAssets" && pid in [${numberArr}] && !hidden ] | order(pid){
     pid,
     baseToken->{
       name,

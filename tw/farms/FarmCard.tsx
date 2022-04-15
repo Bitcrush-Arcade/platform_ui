@@ -150,14 +150,16 @@ const FarmCard = (props: FarmCardProps) =>
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
     const chefUserInfo = await chefMethods.userInfo(pid, account).call()
+    const totalLiquidity = await tokenMethods.balanceOf(chefContract.address).call().catch(() => { console.log('chef bal failed'); return 0 })
 
     setPool(draft =>
     {
+      draft.totalLiquidity = new BigNumber(totalLiquidity || 0).div(10 ** 18)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
     })
 
 
-  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract ])
+  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract, tokenMethods ])
 
   const getPoolEarnings = useCallback(async () =>
   {
@@ -397,16 +399,18 @@ const FarmCard = (props: FarmCardProps) =>
           APR:
         </div>
         <div className="font-bold">
-          {
-            apyData.apr
+          {(poolAssets.mult ?? 0) == 0 ?
+            "0.00%"
+            :
+            (apyData.apr
               ?
               currencyFormat(apyData.apr, { decimalsToShow: 2 }) + "%"
               :
-              <Skeleton width={90} />
+              <Skeleton width={90} />)
           }
         </div>
       </div>
-      <div className="flex justify-between">
+      {(poolAssets.mult ?? 0) > 0 && <div className="flex justify-between">
         <div className="text-primary text-[1rem]">
           Token Price:
         </div>
@@ -419,7 +423,7 @@ const FarmCard = (props: FarmCardProps) =>
               <Skeleton width={90} />
           }
         </div>
-      </div>
+      </div>}
       {
         isPool &&
         <div className="flex justify-between mt-2">
