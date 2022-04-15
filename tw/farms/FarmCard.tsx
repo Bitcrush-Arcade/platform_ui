@@ -269,7 +269,7 @@ const FarmCard = (props: FarmCardProps) =>
   // HARVEST FUNCTION
   const harvestFn = useCallback(() =>
   {
-    const amount = new BigNumber(0)
+    const amount = new BigNumber(0).toString()
     chefMethods.deposit(amount, pid).send({ from: account })
       .on('transactionHash', (tx: string) =>
       {
