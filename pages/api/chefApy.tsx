@@ -7,24 +7,25 @@ import PancakeAbi from 'abi/PancakeAbi.json'
 
 export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
 {
-  if (req.method !== "POST")
-    return res.status(400).json({ error: "Invalid Request" });
+  // if (req.method !== "POST")
+  //   return res.status(400).json({ error: "Invalid Request" });
 
   // // GET SENT DATA (PID)
-  const body = JSON.parse(req.body || "{}")
+  // const body = JSON.parse(req.body || "{}")
 
   const host = req.headers.host
   const isLocal = (host || '').indexOf('localhost:') > -1
-  if (!isLocal && (req.method !== 'POST' || !body.chainId))
-    return res.status(400).json({ error: "Request Invalid" })
+  // if (!isLocal && (req.method !== 'POST' || !body.chainId))
+  //   return res.status(400).json({ error: "Request Invalid" })
 
   // Fetch current crushPrice
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then(r => r.json())
   const { niceUsdPrice } = price
 
-  if (!body.pid || !body.chainId)
-    return res.status(400).json({ error: "Invalid Request" });
-  const { pid } = body
+  // if (!body.pid || !body.chainId)
+  //   return res.status(400).json({ error: "Invalid Request" });
+  // const { pid } = body
+  const pid = 8
   // CONNECT TO BLOCKCHAIN
   const usedChain = 56
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
@@ -89,7 +90,7 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   // NICE EMITTED
   const emissions = pidEmissions.times(3600).times(24).div(10 ** 18).toNumber()// PER day)
 
-  const emissionPerDay = totalStaked.div(10 ** 18).isLessThan(shares) ? shares * emissions / totalStaked.div(10 ** 18).plus(shares).toNumber() : shares * emissions / totalStaked.div(10 ** 18).toNumber()
+  const emissionPerDay = emissions * 1000 / totalStaked.times(tokenPrice).div(10 ** 18).toNumber()
   let accumulated = 0;
   let totalShares = totalStaked.div(10 ** 18).toNumber()
   let day1 = 0;
@@ -117,15 +118,15 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   res.status(200).json({
     tokenPrice,
     emissionPerDay,
-    apr: emissionPerDay * 365 * niceUsdPrice / 1000,
+    apr: emissionPerDay * 365 * niceUsdPrice * 100 / 1000,
     d1: day1.toFixed(18),
     d7: day7.toFixed(18),
     d30: day30.toFixed(18),
     d365: day365.toFixed(18),
-    d1Usd: day1 * niceUsdPrice / 1000,
-    d7Usd: day7 * niceUsdPrice / 1000,
-    d30Usd: day30 * niceUsdPrice / 1000,
-    d365Usd: day365 * niceUsdPrice / 1000,
+    d1Usd: day1 * niceUsdPrice * 100 / 1000,
+    d7Usd: day7 * niceUsdPrice * 100 / 1000,
+    d30Usd: day30 * niceUsdPrice * 100 / 1000,
+    d365Usd: day365 * niceUsdPrice * 100 / 1000,  // All are multiplied by 100 to get the % value instead of the decimal value
   })
 }
 

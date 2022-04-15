@@ -208,7 +208,7 @@ const FarmCard = (props: FarmCardProps) =>
   useEffect(() =>
   {
     if (!poolAssets.tokenAddress || !chefContract.address || isApproved) return;
-    let interval = setInterval(() => getApproved(chefContract.address), 5000)
+    let interval = setInterval(() => getApproved(chefContract.address), 1500)
     return () => clearInterval(interval)
   }, [ chefContract, poolAssets, getApproved, isApproved ])
 
