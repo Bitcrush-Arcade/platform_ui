@@ -3,12 +3,13 @@ import { useImmer } from 'use-immer'
 import Image from 'next/image'
 // mui
 import Skeleton from "@mui/material/Skeleton"
+import BigNumber from 'bignumber.js'
+import { AbiItem } from 'web3-utils'
 // Bitcrush UI
 // COMPONENTS
 import { StakeModalProps, StakeOptionsType, SubmitFunction } from "components/basics/StakeModal"
-import BigNumber from 'bignumber.js'
+import Currency from 'components/basics/Currency'
 // utils
-import { currencyFormat } from "utils/text/text"
 import { getContracts } from 'data/contracts'
 import { toWei } from 'web3-utils'
 // hooks
@@ -20,7 +21,6 @@ import { useContract } from 'hooks/web3Hooks'
 // Types
 import type { Receipt } from 'types/PromiEvent'
 import tokenAbi from 'abi/LPToken.json'
-import { AbiItem } from 'web3-utils'
 
 
 type FarmCardProps = {
@@ -411,8 +411,8 @@ const FarmCard = (props: FarmCardProps) =>
           NICE EARNED:
         </div>
         <div className="flex justify-between items-center">
-          <div className="text-[1.5rem]">
-            {pool.earned.toFixed(4, 1)}
+          <div className="text-[1.2rem]">
+            <Currency value={pool.earned.toFixed(18, 1)} decimals={2} />
           </div>
           <button
             onClick={() => harvestFn()}
@@ -431,25 +431,23 @@ const FarmCard = (props: FarmCardProps) =>
         <div className="form-label inline-block text-primary text-xs font-bold">
           {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""} STAKED
         </div>
-        <div className="flex justify-between items-center">
-          <div className="text-[1.5rem]">
-            {pool.stakedAmount.toFixed(4, 1)}
-          </div>
-          <div className="flex gap-2">
-            <button
-              disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
-              onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
-              className="flex flex-row justify-center items-center border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
-            >
-              +
-            </button>
-            <button
-              disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
-              onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
-              className="flex flex-row justify-center items-center border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-              -
-            </button>
-          </div>
+        <div className="text-[1.4rem] w-full text-right">
+          <Currency value={pool.stakedAmount.toFixed(18, 1)} decimals={2} />
+        </div>
+        <div className="flex gap-2 justify-end w-full">
+          <button
+            disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+            onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
+            className="flex border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+          >
+            +
+          </button>
+          <button
+            disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+            onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
+            className="flex border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+            -
+          </button>
         </div>
       </div>
 
@@ -513,14 +511,12 @@ const FarmCard = (props: FarmCardProps) =>
           </div>
         </div>
 
-        <div className="flex justify-between mb-2">
-          <div className="text-primary">
-            TOTAL LOCKED:
-          </div>
-          <div className="font-bold">
-            {/* STILL NEEDS TO BE CONVERTED TO USD */}
-            {pool.totalLiquidity.toFixed(2, 1)}
-          </div>
+        <div className="text-primary w-full text-left">
+          TOTAL LOCKED:
+        </div>
+        <div className="font-bold text-right">
+          {/* STILL NEEDS TO BE CONVERTED TO USD */}
+          <Currency value={pool.totalLiquidity.toFixed(2, 1)} decimals={2} />
         </div>
 
         <div className="flex flex-row justify-between">
@@ -557,7 +553,7 @@ const FarmCard = (props: FarmCardProps) =>
 
         </div>
         <button
-          className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-secondary hover:text-white"
+          className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-red hover:text-white"
           onClick={emergencyWithdraw}
         >
           Emergency Withdraw
