@@ -196,6 +196,18 @@ const Menu = (props: MenuProps) =>
               </Grid>
             </Grid>
             <Grid item>
+              <Grid container alignItems="center">
+                <Grid item style={{ paddingRight: 8 }}>
+                  <Image src="/token/glowy.png" height={30} width={30} alt="Nice Token logo" />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body2" color="textPrimary">
+                    $ {currencyFormat(tokenInfo.niceUsdPrice, { decimalsToShow: 3 })}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item container justifyContent="right">
               <IconButton size="small" component="a" href="https://t.me/Bcarcadechat" target="_blank">
                 <TelegramIcon className={css.baseIcon} />
               </IconButton>
