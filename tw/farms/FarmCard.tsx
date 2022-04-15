@@ -21,6 +21,7 @@ import { useContract } from 'hooks/web3Hooks'
 // Types
 import type { Receipt } from 'types/PromiEvent'
 import tokenAbi from 'abi/LPToken.json'
+import { currencyFormat } from 'utils/text/text'
 
 
 type FarmCardProps = {
@@ -80,6 +81,12 @@ const FarmCard = (props: FarmCardProps) =>
     = poolAssets
   const [ showDetails, setShowDetails ] = useState<boolean>(false)
   const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
+  const [ apyData, setApyData ] = useState<any>({
+    d1: 0,
+    d7: 0,
+    d30: 0,
+    d365: 0,
+  })
 
   const isPool = useMemo(() =>
   {
@@ -311,6 +318,29 @@ const FarmCard = (props: FarmCardProps) =>
       })
   }
 
+  const getApy = useCallback(async () =>
+  {
+    const data = await fetch('/api/chefApy', {
+      method: 'POST',
+      body: JSON.stringify({ pid, chainId })
+    })
+      .then(r => r.json())
+      .catch(e =>
+      {
+        console.log('ERROR', e)
+        return {
+          d1: 0
+        }
+      })
+    setApyData(data)
+  }, [ pid, chainId ])
+
+  useEffect(() =>
+  {
+    if (!chainId || !pid) return;
+    getApy()
+  }, [ getApy, chainId, pid ])
+
   return (
     // Farm card
     <div
@@ -362,13 +392,32 @@ const FarmCard = (props: FarmCardProps) =>
       </div>
 
       {/* Data rows */}
-      <div className="flex justify-between mt-4">
+      <div className="flex justify-between">
         <div className="text-primary">
           APR:
         </div>
         <div className="font-bold">
-          {/* 250% */}
-          <Skeleton width={90} />
+          {
+            apyData.apr
+              ?
+              currencyFormat(apyData.apr, { decimalsToShow: 2 }) + "%"
+              :
+              <Skeleton width={90} />
+          }
+        </div>
+      </div>
+      <div className="flex justify-between">
+        <div className="text-primary text-[1rem]">
+          Token Price:
+        </div>
+        <div className="font-bold">
+          {
+            apyData.tokenPrice
+              ?
+              apyData.tokenPrice < 0.01 ? currencyFormat(apyData.tokenPrice, { decimalsToShow: 4, isWei: false }) : currencyFormat(apyData.tokenPrice, { decimalsToShow: 2, isWei: false })
+              :
+              <Skeleton width={90} />
+          }
         </div>
       </div>
       {
@@ -489,18 +538,16 @@ const FarmCard = (props: FarmCardProps) =>
 
       <hr className="border-slate-500 my-3" />
 
-      <button disabled={false} onClick={detailToggle} className="flex gap-1 justify-center text-secondary text-xs hover:text-white disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-        <div className={`flex items-center`}>
-          <div>
-            {showDetails ? "HIDE" : "SHOW"}
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 mb-[2px] ${showDetails ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+      <button disabled={false} onClick={detailToggle} className="flex justify-center items-center text-secondary text-xs hover:text-white disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+        <div>
+          {showDetails ? "HIDE" : "SHOW"}
         </div>
+        <svg xmlns="http://www.w3.org/2000/svg" className={`h-6 w-6 mb-[2px] ${showDetails ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
-      <div className={`flex flex-col gap-2 ${showDetails ? "" : "hidden"}`}>
+      <div className={`flex flex-col gap-1 ${showDetails ? "" : "hidden"}`}>
         <div className="flex justify-between mt-2">
           <div className="text-primary">
             DEPOSIT:
@@ -514,9 +561,15 @@ const FarmCard = (props: FarmCardProps) =>
         <div className="text-primary w-full text-left">
           TOTAL LOCKED:
         </div>
-        <div className="font-bold text-right">
-          {/* STILL NEEDS TO BE CONVERTED TO USD */}
-          <Currency value={pool.totalLiquidity.toFixed(2, 1)} decimals={2} />
+        <div>
+          <div className="font-bold text-right ">
+            {/* STILL NEEDS TO BE CONVERTED TO USD */}
+            USD <Currency value={pool.totalLiquidity.times(apyData.tokenPrice).toFixed(2, 1)} decimals={2} />
+          </div>
+          <div className="font-bold text-right text-slate-400">
+            {/* STILL NEEDS TO BE CONVERTED TO USD */}
+            <Currency value={pool.totalLiquidity.toFixed(2, 1)} decimals={2} />
+          </div>
         </div>
 
         <div className="flex flex-row justify-between">
