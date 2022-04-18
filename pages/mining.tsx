@@ -106,6 +106,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
               <FarmCard
                 color={farm.color}
                 highlight={farm.highlight}
+                closeModal={() => setOpenStake(false)}
                 poolAssets=
                 {{
                   baseTokenName: farm.baseToken?.name,

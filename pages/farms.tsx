@@ -18,7 +18,6 @@ import FarmCard from 'tw/farms/FarmCard';
 const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
 {
   const { activeFarms, inactiveFarms } = props
-  console.log(props)
 
   const [ showActive, setShowActive ] = useState<boolean>(true)
 
@@ -59,6 +58,7 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
               <FarmCard key={`active-farm-${activeIndex}`}
                 color={farm.color}
                 highlight={farm.highlight}
+                closeModal={() => setOpenStake(false)}
                 poolAssets=
                 {{
                   baseTokenName: farm.baseToken?.name,
@@ -105,6 +105,7 @@ const Farms = (props: InferGetStaticPropsType<typeof getStaticProps>) =>
               <FarmCard key={`active-farm-${activeIndex}`}
                 color={farm.color}
                 highlight={farm.highlight}
+                closeModal={() => setOpenStake(false)}
                 poolAssets=
                 {{
                   baseTokenName: farm.baseToken?.name,
