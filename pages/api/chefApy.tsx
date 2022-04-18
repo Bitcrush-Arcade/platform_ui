@@ -7,25 +7,25 @@ import PancakeAbi from 'abi/PancakeAbi.json'
 
 export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
 {
-  if (req.method !== "POST")
-    return res.status(400).json({ error: "Invalid Request" });
+  // if (req.method !== "POST")
+  //   return res.status(400).json({ error: "Invalid Request" });
 
-  // GET SENT DATA (PID)
-  const body = JSON.parse(req.body || "{}")
+  // // GET SENT DATA (PID)
+  // const body = JSON.parse(req.body || "{}")
 
   const host = req.headers.host
   const isLocal = (host || '').indexOf('localhost:') > -1
-  if (!isLocal && (req.method !== 'POST' || !body.chainId))
-    return res.status(400).json({ error: "Request Invalid" })
+  // if (!isLocal && (req.method !== 'POST' || !body.chainId))
+  //   return res.status(400).json({ error: "Request Invalid" })
 
-  // Fetch current crushPrice
+  // // Fetch current crushPrice
   const price = await fetch(`http${isLocal ? '' : 's'}://${host}/api/getPrice`).then(r => r.json())
   const { niceUsdPrice } = price
 
-  if (!body.pid || !body.chainId)
-    return res.status(400).json({ error: "Invalid Request" });
-  const { pid } = body
-  // const pid = 8
+  // if (!body.pid || !body.chainId)
+  //   return res.status(400).json({ error: "Invalid Request" });
+  // const { pid } = body
+  const pid = 1
   // CONNECT TO BLOCKCHAIN
   const usedChain = 56
   const provider = usedChain == 56 ? 'https://bsc-dataseed1.defibit.io/' : 'https://data-seed-prebsc-2-s2.binance.org:8545/'
@@ -57,24 +57,22 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
     // GET TOKEN0
     let token0Price;
     const token0 = await tokenPair.methods.token0().call()
-    if (token0 == BNBTokenAddress) {
-      token0Price = bnbPrice
-    }
+    if (token0 == BNBTokenAddress)
+      token0Price = bnbPrice;
     else
-      token0Price = (await calcSell(1, token0)).div(10 ** 18).toNumber()
+      token0Price = (await calcSell(1, token0)).div(10 ** 18).times(bnbPrice).toNumber();
     // GET TOKEN1
     let token1Price;
     const token1 = await tokenPair.methods.token1().call()
-    if (token1 == BNBTokenAddress) {
-      token1Price = bnbPrice
-    }
+    if (token1 == BNBTokenAddress)
+      token1Price = bnbPrice;
     else
-      token1Price = (await calcSell(1, token1)).div(10 ** 18).toNumber()
-
+      token1Price = (await calcSell(1, token1)).div(10 ** 18).times(bnbPrice).toNumber();
     // GET TOTAL RESERVES
     const reserves = await tokenPair.methods.getReserves().call()
     // GET TOTAL PRICE IN RESERVES
     const pairSupply = new BigNumber(await tokenPair.methods.totalSupply().call()).toNumber()
+    console.log({ token0Price, token1Price, reserves, pairSupply })
     tokenPrice = (token0Price * parseInt(reserves.reserve0) + parseInt(reserves.reserve1) * token1Price) / pairSupply
   }
   else {
@@ -83,7 +81,7 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   }
   let shares = new BigNumber(1).div(tokenPrice).times(1000).toNumber() // tokens per 1000USD
   if (totalStaked.isEqualTo(0))
-    totalStaked = new BigNumber(1);
+    totalStaked = new BigNumber(1).times(10 ** 18);
 
 
   // TOKEN PRICE * 1000 USD AS SHARE AMOUNT
