@@ -491,7 +491,7 @@ const FarmCard = (props: FarmCardProps) => {
           <div className="text-[1.4rem] w-full text-left break-all max-w-[17rem]">
             <Currency value={pool.stakedAmount.toFixed(18, 1)} decimals={2} />
           </div>
-          <div className="flex gap-2 justify-end w-full mt-2">
+          <div className="flex gap-2 justify-end w-full">
             <button
               disabled={pool.userTokens.isEqualTo(0) || mult == 0} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
               onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
