@@ -81,7 +81,7 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
   }
   let shares = new BigNumber(1).div(tokenPrice).times(1000).toNumber() // tokens per 1000USD
   if (totalStaked.isEqualTo(0))
-    totalStaked = new BigNumber(1).times(10 ** 18);
+    totalStaked = new BigNumber(1 / tokenPrice).times(10 ** 18);
 
 
   // TOKEN PRICE * 1000 USD AS SHARE AMOUNT
