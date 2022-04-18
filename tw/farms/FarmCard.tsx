@@ -354,7 +354,7 @@ const FarmCard = (props: FarmCardProps) =>
   const withdrawV1 = useCallback(() =>
   {
     if (!V1ChefMethods || pool.v1Staked.isEqualTo(0) || !chainId || !account) return;
-    V1ChefMethods.withdraw(pool.v1Staked.times(10 ** 18).toString(), pid)
+    V1ChefMethods.withdraw(toWei(pool.v1Staked.toFixed(18, 1)), pid)
       .send({ from: account })
       .on('transactionHash', (tx: string) =>
       {
