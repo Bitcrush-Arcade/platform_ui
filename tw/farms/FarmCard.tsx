@@ -351,14 +351,15 @@ const FarmCard = (props: FarmCardProps) =>
       })
   }
 
-  const withdrawV1 = useCallback(async () =>
+  const withdrawV1 = useCallback(() =>
   {
-    V1ChefMethods.withdraw(pid, pool.v1Staked.times(10 ** 18).toString())
+    if (!V1ChefMethods || pool.v1Staked.isEqualTo(0) || !chainId || !account) return;
+    V1ChefMethods.withdraw(pool.v1Staked.times(10 ** 18).toString(), pid)
       .send({ from: account })
       .on('transactionHash', (tx: string) =>
       {
         console.log('hash', tx)
-        editTransactions(tx, 'pending', { description: `V1 Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
+        editTransactions(tx, 'pending', { description: `V1 Withdraw` })
       })
       .on('receipt', (rc: Receipt) =>
       {
@@ -371,7 +372,7 @@ const FarmCard = (props: FarmCardProps) =>
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
       })
-  }, [ V1ChefMethods, account, pid, pool.v1Staked, editTransactions, getPoolInfo, mainTokenSymbol, poolAssets.isLP ])
+  }, [ V1ChefMethods, account, pid, pool.v1Staked, editTransactions, getPoolInfo, chainId ])
 
   useEffect(() =>
   {
