@@ -211,6 +211,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
           return (
             <div key={`active-nice-reward-pool-${farmIndex}`}>
               <FarmCard
+                closeModal={() => setOpenStake(false)}
                 color={farm.color}
                 highlight={farm.highlight}
                 poolAssets=
