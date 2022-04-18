@@ -72,7 +72,6 @@ export default async function chefApy(req: NextApiRequest, res: NextApiResponse)
     const reserves = await tokenPair.methods.getReserves().call()
     // GET TOTAL PRICE IN RESERVES
     const pairSupply = new BigNumber(await tokenPair.methods.totalSupply().call()).toNumber()
-    console.log({ token0Price, token1Price, reserves, pairSupply })
     tokenPrice = (token0Price * parseInt(reserves.reserve0) + parseInt(reserves.reserve1) * token1Price) / pairSupply
   }
   else {
