@@ -76,8 +76,8 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         />
       </Grid>
       <Grid item sx={{ pt: { xs: 4, md: 0 } }}>
-        {/* <CompoundingCardv3 /> */}
-        <CompoundingCardv2 />
+        <CompoundingCardv3 />
+        {/* <CompoundingCardv2 /> */}
       </Grid>
       <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool />
