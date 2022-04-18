@@ -27,6 +27,7 @@ import { currencyFormat } from 'utils/text/text'
 type FarmCardProps = {
   color: boolean,
   highlight: boolean,
+  closeModal: () => void,
   // Static props
   poolAssets: {
     //From Sanity
@@ -59,7 +60,8 @@ type PoolDetailType = {
   earned: BigNumber,
   stakedAmount: BigNumber,
   totalLiquidity: BigNumber,
-  userTokens: BigNumber
+  userTokens: BigNumber,
+  v1Staked: BigNumber
 }
 
 const defaultPoolDetails: PoolDetailType = {
@@ -67,16 +69,17 @@ const defaultPoolDetails: PoolDetailType = {
   earned: new BigNumber(0),
   stakedAmount: new BigNumber(0),
   totalLiquidity: new BigNumber(0),
-  userTokens: new BigNumber(0)
+  userTokens: new BigNumber(0),
+  v1Staked: new BigNumber(0)
 }
 
 
 const FarmCard = (props: FarmCardProps) =>
 {
-  const { color, highlight, poolAssets, onAction } = props
+  const { color, highlight, poolAssets, onAction, closeModal } = props
   const {
     baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage,
-    swapName, swapLogo, swapUrl, swapDexUrl, swapPoolUrl, pid
+    swapName, swapLogo, swapUrl, swapDexUrl, swapPoolUrl, pid, mult
   }
     = poolAssets
   const [ showDetails, setShowDetails ] = useState<boolean>(false)
@@ -124,9 +127,13 @@ const FarmCard = (props: FarmCardProps) =>
   // Stake Token
   const { coinMethods, isApproved, getApproved, approve } = useCoin(poolAssets.tokenAddress)
   const { methods: tokenMethods } = useContract(tokenAbi.abi as AbiItem[], poolAssets.tokenAddress)
-  // Galactic Chef
+  //  @dev NEW Galactic Chef
   const chefContract = getContracts('galacticChef', chainId)
   const { methods: chefMethods } = useContract(chefContract.abi, chefContract.address)
+
+  // @dev OLD Galactic Chef B1 
+  const V1ChefContract = getContracts('oldGalacticChef', chainId)
+  const { methods: V1ChefMethods } = useContract(V1ChefContract.abi, V1ChefContract.address)
 
   // Fee Distributor, only used when fee>0
   const feeDistributorContract = getContracts('feeDistributor', chainId)
@@ -146,20 +153,22 @@ const FarmCard = (props: FarmCardProps) =>
 
   const getPoolInfo = useCallback(async () =>
   {
-    if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract) return;
+    if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract || !V1ChefMethods) return;
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
     const chefUserInfo = await chefMethods.userInfo(pid, account).call()
     const totalLiquidity = await tokenMethods.balanceOf(chefContract.address).call().catch(() => { console.log('chef bal failed'); return 0 })
+    const oldStaked = await V1ChefMethods.userInfo(pid, account).call().catch(() => { console.log('user v1 bal failed'); return 0 })
 
     setPool(draft =>
     {
       draft.totalLiquidity = new BigNumber(totalLiquidity || 0).div(10 ** 18)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
+      draft.v1Staked = new BigNumber(oldStaked.amount).div(10 ** 18)
     })
 
 
-  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract, tokenMethods ])
+  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract, tokenMethods, V1ChefMethods ])
 
   const getPoolEarnings = useCallback(async () =>
   {
@@ -228,6 +237,23 @@ const FarmCard = (props: FarmCardProps) =>
     secondary: "border-secondary",
   }
 
+  const getApy = useCallback(async () =>
+  {
+    const data = await fetch('/api/chefApy', {
+      method: 'POST',
+      body: JSON.stringify({ pid, chainId })
+    })
+      .then(r => r.json())
+      .catch(e =>
+      {
+        console.log('ERROR', e)
+        return {
+          d1: 0
+        }
+      })
+    setApyData(data)
+  }, [ pid, chainId ])
+
   const submitFn: SubmitFunction = useCallback((values, second) =>
   {
     const amount = toWei(values.stakeAmount.toFixed(18, 1))
@@ -244,6 +270,7 @@ const FarmCard = (props: FarmCardProps) =>
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
+          getApy()
         })
         .on('error', (error: any, receipt: Receipt) =>
         {
@@ -251,6 +278,7 @@ const FarmCard = (props: FarmCardProps) =>
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
         })
+        .finally(closeModal)
     }
     if (values.actionType == 1) {
       chefMethods.withdraw(amount, pid).send({ from: account })
@@ -265,6 +293,7 @@ const FarmCard = (props: FarmCardProps) =>
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
+          getApy()
         })
         .on('error', (error: any, receipt: Receipt) =>
         {
@@ -272,8 +301,10 @@ const FarmCard = (props: FarmCardProps) =>
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
         })
+        .finally(closeModal)
+
     }
-  }, [ account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings ])
+  }, [ account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings, getApy, closeModal ])
 
   // HARVEST FUNCTION
   const harvestFn = useCallback(() =>
@@ -320,22 +351,27 @@ const FarmCard = (props: FarmCardProps) =>
       })
   }
 
-  const getApy = useCallback(async () =>
+  const withdrawV1 = useCallback(async () =>
   {
-    const data = await fetch('/api/chefApy', {
-      method: 'POST',
-      body: JSON.stringify({ pid, chainId })
-    })
-      .then(r => r.json())
-      .catch(e =>
+    V1ChefMethods.withdraw(pid, pool.v1Staked.times(10 ** 18).toString())
+      .send({ from: account })
+      .on('transactionHash', (tx: string) =>
       {
-        console.log('ERROR', e)
-        return {
-          d1: 0
-        }
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: `V1 Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
       })
-    setApyData(data)
-  }, [ pid, chainId ])
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
+        editTransactions(rc.transactionHash, 'complete')
+        getPoolInfo()
+      })
+      .on('error', (error: any, receipt: Receipt) =>
+      {
+        console.log('error', error, receipt)
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
+      })
+  }, [ V1ChefMethods, account, pid, pool.v1Staked, editTransactions, getPoolInfo, mainTokenSymbol, poolAssets.isLP ])
 
   useEffect(() =>
   {
@@ -412,7 +448,7 @@ const FarmCard = (props: FarmCardProps) =>
       </div>
       {(poolAssets.mult ?? 0) > 0 && <div className="flex justify-between">
         <div className="text-primary text-[1rem]">
-          Token Price:
+          TOKEN PRICE:
         </div>
         <div className="font-bold">
           {
@@ -481,27 +517,54 @@ const FarmCard = (props: FarmCardProps) =>
       </div>
 
       <div className={`${isApproved ? "" : "hidden"}`}>
-        <div className="form-label inline-block text-primary text-xs font-bold">
-          {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""} STAKED
-        </div>
-        <div className="text-[1.4rem] w-full text-right">
-          <Currency value={pool.stakedAmount.toFixed(18, 1)} decimals={2} />
-        </div>
-        <div className="flex gap-2 justify-end w-full">
-          <button
-            disabled={pool.userTokens.isEqualTo(0)} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
-            onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
-            className="flex border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
-          >
-            +
-          </button>
-          <button
-            disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
-            onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
-            className="flex border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
-            -
-          </button>
-        </div>
+        <>
+          <div className="form-label inline-block text-primary text-xs font-bold">
+            {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""} STAKED
+          </div>
+          <div className="text-[1.4rem] w-full text-right">
+            <Currency value={pool.stakedAmount.toFixed(18, 1)} decimals={2} />
+          </div>
+          <div className="flex gap-2 justify-end w-full">
+            <button
+              disabled={pool.userTokens.isEqualTo(0) || mult == 0} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
+              className="flex border-2 border-primary inner-glow-primary px-[21px] text-[1.5rem] rounded-full hover:bg-primary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+            >
+              +
+            </button>
+            <button
+              disabled={pool.stakedAmount.isEqualTo(0)} //DISABLE ONLY WHEN STAKED AMOUNT == 0
+              onClick={() => onAction(options, submitFn, 1, coinInfoForModal)}
+              className="flex border-2 border-secondary inner-glow-secondary px-[24px] text-[1.5rem] rounded-full hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white">
+              -
+            </button>
+          </div>
+        </>
+        {
+          pool.v1Staked.isGreaterThan(0) &&
+          <>
+            <div className="form-label inline-block text-primary text-xs font-bold">
+              V1 STAKED
+            </div>
+            <div className="text-[1.4rem] w-full text-right">
+              <Currency value={pool.v1Staked.toFixed(18, 1)} decimals={2} />
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={withdrawV1}
+                className="
+                flex flex-row items-center gap-2 
+                border-2 border-secondary inner-glow-secondary
+                px-[17px] py-2.5 mt-1 
+                text-xs rounded-l-full rounded-br-full 
+                hover:bg-secondary hover:text-black 
+                disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
+              >
+                WITHDRAW FROM V1
+              </button>
+            </div>
+          </>
+        }
       </div>
 
       {
@@ -610,10 +673,13 @@ const FarmCard = (props: FarmCardProps) =>
 
         </div>
         <button
-          className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-red hover:text-white"
+          className="inline-flex whitespace-nowrap items-center gap-1 text-xs text-red hover:text-black"
           onClick={emergencyWithdraw}
         >
-          Emergency Withdraw
+          EMERGENCY WITHDRAW
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mb-[2px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
         </button>
       </div>
 

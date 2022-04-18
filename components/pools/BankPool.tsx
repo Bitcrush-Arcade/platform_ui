@@ -400,7 +400,7 @@ function BankPool()
                 </Grid>
               </Grid>
             </Grid>
-            {/* <Grid item xs={12}>
+            <Grid item xs={12}>
               <Grid container justifyContent="space-between">
                 <Grid item>
                   <Typography>$NICE Rewards</Typography>
@@ -416,7 +416,7 @@ function BankPool()
               <SmBtn sx={{ px: 3, py: 1, mt: 3 }} color="secondary" onClick={harvestNice}>
                 Harvest $NICE
               </SmBtn>
-            </Grid> */}
+            </Grid>
           </Grid>
         </Grid>
         {/* INVADER LAUNCHER */}

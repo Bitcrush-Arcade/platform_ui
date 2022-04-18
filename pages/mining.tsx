@@ -76,8 +76,8 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
         />
       </Grid>
       <Grid item sx={{ pt: { xs: 4, md: 0 } }}>
-        {/* <CompoundingCardv3 /> */}
-        <CompoundingCardv2 />
+        <CompoundingCardv3 />
+        {/* <CompoundingCardv2 /> */}
       </Grid>
       <Grid item xs={12} sx={{ pt: 4 }}>
         <BankPool />
@@ -106,6 +106,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
               <FarmCard
                 color={farm.color}
                 highlight={farm.highlight}
+                closeModal={() => setOpenStake(false)}
                 poolAssets=
                 {{
                   baseTokenName: farm.baseToken?.name,
@@ -210,6 +211,7 @@ const Mining = (props: { activePools: Array<any>, inactivePools: Array<any>, act
           return (
             <div key={`active-nice-reward-pool-${farmIndex}`}>
               <FarmCard
+                closeModal={() => setOpenStake(false)}
                 color={farm.color}
                 highlight={farm.highlight}
                 poolAssets=
