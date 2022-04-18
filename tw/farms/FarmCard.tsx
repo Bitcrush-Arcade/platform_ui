@@ -551,7 +551,7 @@ const FarmCard = (props: FarmCardProps) =>
             </div>
             <div className="flex justify-end">
               <button
-                onClick={withdrawV1}
+                onClick={() => withdrawV1()}
                 className="
                 flex flex-row items-center gap-2 
                 border-2 border-secondary inner-glow-secondary
