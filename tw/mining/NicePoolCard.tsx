@@ -52,7 +52,7 @@ type FarmCardProps = {
     projectLogo: string,
     projectUrl: string,
   },
-  onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps[ 'coinInfo' ]) => void;
+  onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps['coinInfo']) => void;
 }
 // Some will be received from web3 and others will be calculated here
 type PoolDetailType = {
@@ -74,16 +74,15 @@ const defaultPoolDetails: PoolDetailType = {
 }
 
 
-const NicePoolCard = (props: FarmCardProps) =>
-{
+const NicePoolCard = (props: FarmCardProps) => {
   const { color, highlight, poolAssets, onAction, tags } = props
   const {
     poolContractAddress, rewardTokenName, rewardTokenSymbol, rewardTokenImage, stakeTokenName,
     stakeTokenSymbol, stakeTokenImage, stakeTokenContract, projectName, projectLogo, projectUrl, rewardTokenContract
   }
     = poolAssets
-  const [ showDetails, setShowDetails ] = useState<boolean>(false)
-  const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+  const [pool, setPool] = useImmer<PoolDetailType>(defaultPoolDetails)
   const { editTransactions } = useTransactionContext()
   // BLOCKCHAIN
   const options: Array<StakeOptionsType> = useMemo(() => [
@@ -101,20 +100,20 @@ const NicePoolCard = (props: FarmCardProps) =>
       btnText: "Withdraw",
       description: `Withdraw staked $${stakeTokenSymbol}`
     }
-  ], [ rewardTokenSymbol, pool, stakeTokenSymbol ])
+  ], [rewardTokenSymbol, pool, stakeTokenSymbol])
 
   const coinInfoForModal = useMemo(() => ({
     symbol: stakeTokenSymbol,
     name: stakeTokenName,
     decimals: 18,
-  }), [ stakeTokenSymbol, stakeTokenName ])
+  }), [stakeTokenSymbol, stakeTokenName])
 
   //hooks
   const { account, chainId } = useWeb3React()
   const { login } = useAuthContext()
 
   // Staked Token 
-  const { coinMethods, isApproved, getApproved, approve } = useCoin(stakeTokenContract[ chainId === 56 ? 'mainAddress' : 'testAddress' ])
+  const { coinMethods, isApproved, getApproved, approve } = useCoin(stakeTokenContract[chainId === 56 ? 'mainAddress' : 'testAddress'])
 
   // Pool 
   const poolContract = getContracts('invaderPool', chainId)
@@ -125,82 +124,70 @@ const NicePoolCard = (props: FarmCardProps) =>
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
 
   // Getting/sending the data
-  const getPoolInfo = useCallback(async () =>
-  {
+  const getPoolInfo = useCallback(async () => {
     if (!coinMethods || !poolMethods) return;
     const poolUserInfo = await poolMethods.userInfo(account).call()
 
-    setPool(draft =>
-    {
+    setPool(draft => {
       draft.stakedAmount = new BigNumber(poolUserInfo.amount)
     })
-  }, [ coinMethods, poolMethods, account, setPool ])
+  }, [coinMethods, poolMethods, account, setPool])
 
-  const getPoolEarnings = useCallback(async () =>
-  {
+  const getPoolEarnings = useCallback(async () => {
     if (!coinMethods || !poolMethods || !feeDistributorMethods) return;
     const poolUserInfo = await poolMethods.userInfo(account).call()
     const totalLiquidity = await coinMethods.balanceOf(poolContractAddress).call()
     const tokenInWallet = await coinMethods.balanceOf(account).call()
 
-    setPool(draft =>
-    {
+    setPool(draft => {
       draft.earned = new BigNumber(poolUserInfo.accReward).div(10 ** 18)
       draft.totalLiquidity = new BigNumber(totalLiquidity).div(10 ** 18)
       draft.userTokens = new BigNumber(tokenInWallet)
     })
-  }, [ coinMethods, poolMethods, feeDistributorMethods, account, setPool, poolContractAddress ])
+  }, [coinMethods, poolMethods, feeDistributorMethods, account, setPool, poolContractAddress])
 
   // useEffect for pool info when chaning account or the pool info changes
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!account) return;
 
     getPoolInfo()
 
-  }, [ getPoolInfo, account ])
+  }, [getPoolInfo, account])
 
   // useEffect for pool earnings, refreshed every 5 seconds
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!account) return;
 
     const interval = setInterval(getPoolEarnings, 5000);
 
-    return () =>
-    {
+    return () => {
       clearInterval(interval)
     }
-  }, [ account, getPoolEarnings ])
+  }, [account, getPoolEarnings])
 
   // useEffect to get approval of tokens for the pool contract
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!stakeTokenContract || isApproved) return;
     getApproved(poolContractAddress)
-  }, [ poolContract, poolAssets, getApproved, isApproved, poolContractAddress, stakeTokenContract ])
+  }, [poolContract, poolAssets, getApproved, isApproved, poolContractAddress, stakeTokenContract])
 
   // functions
   // submit function for the coin modal
-  const submitFn: SubmitFunction = useCallback((values, second) =>
-  {
+  const submitFn: SubmitFunction = useCallback((values, second) => {
     const amount = toWei(values.stakeAmount.toFixed(18, 1))
     if (values.actionType == 0) {
       poolMethods.deposit(amount).send({ from: account })
-        .on('transactionHash', (tx: string) =>
-        {
+        .on('transactionHash', (tx: string) => {
           console.log('hash', tx)
           editTransactions(tx, 'pending', { description: `Stake ${stakeTokenSymbol} in pool` })
         })
-        .on('receipt', (rc: Receipt) =>
-        {
+        .on('receipt', (rc: Receipt) => {
           console.log('receipt', rc)
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
         })
-        .on('error', (error: any, receipt: Receipt) =>
-        {
+        .on('error', (error: any, receipt: Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
@@ -208,53 +195,45 @@ const NicePoolCard = (props: FarmCardProps) =>
     }
     if (values.actionType == 1) {
       poolMethods.withdraw(amount).send({ from: account })
-        .on('transactionHash', (tx: string) =>
-        {
+        .on('transactionHash', (tx: string) => {
           console.log('hash', tx)
           editTransactions(tx, 'pending', { description: `Withdraw ${stakeTokenSymbol} from pool` })
         })
-        .on('receipt', (rc: Receipt) =>
-        {
+        .on('receipt', (rc: Receipt) => {
           console.log('receipt', rc)
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
         })
-        .on('error', (error: any, receipt: Receipt) =>
-        {
+        .on('error', (error: any, receipt: Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
         })
     }
-  }, [ account, poolMethods, editTransactions, stakeTokenSymbol, getPoolEarnings ])
+  }, [account, poolMethods, editTransactions, stakeTokenSymbol, getPoolEarnings])
 
   // HARVEST FUNCTION
-  const harvestFn = useCallback(() =>
-  {
+  const harvestFn = useCallback(() => {
     poolMethods.deposit(0).send({ from: account })
-      .on('transactionHash', (tx: string) =>
-      {
+      .on('transactionHash', (tx: string) => {
         console.log('hash', tx)
         editTransactions(tx, 'pending', { description: `Harvest ${rewardTokenSymbol}` })
       })
-      .on('receipt', (rc: Receipt) =>
-      {
+      .on('receipt', (rc: Receipt) => {
         console.log('receipt', rc)
         editTransactions(rc.transactionHash, 'complete')
         getPoolEarnings()
       })
-      .on('error', (error: any, receipt: Receipt) =>
-      {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
       })
 
-  }, [ account, poolMethods, editTransactions, getPoolEarnings, rewardTokenSymbol ])
+  }, [account, poolMethods, editTransactions, getPoolEarnings, rewardTokenSymbol])
 
   // Concatenates string with contract address to obtain BSC Scan url
-  function getBscUrl(contractAddress: string)
-  {
+  function getBscUrl(contractAddress: string) {
     let url;
     if (chainId == 56)
       url = "https://bscscan.com/address/" + contractAddress
@@ -264,10 +243,9 @@ const NicePoolCard = (props: FarmCardProps) =>
     return url
   }
 
-  const detailToggle = useCallback(() =>
-  {
+  const detailToggle = useCallback(() => {
     setShowDetails(p => !p)
-  }, [ setShowDetails ])
+  }, [setShowDetails])
 
   const highlightGlow = {
     primary: highlight ? "box-highlight-primary" : "inner-glow-primary",
@@ -278,20 +256,19 @@ const NicePoolCard = (props: FarmCardProps) =>
     secondary: "border-secondary",
   }
 
-  const approveContract = useCallback(async () =>
-  {
+  const approveContract = useCallback(async () => {
     if (!coinMethods) return;
     const amountToApprove = new BigNumber(await coinMethods.totalSupply().call()).times(1000)
     approve(poolContractAddress, amountToApprove)
-  }, [ approve, coinMethods, poolContractAddress ])
+  }, [approve, coinMethods, poolContractAddress])
 
   return (
     // Farm card
     <div
       className={`
         flex flex-col gap-2
-        border-2 rounded-[32px] ${border[ color ? "primary" : "secondary" ]} ${highlightGlow[ color ? "primary" : "secondary" ]} 
-        w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[410px]" : ""}
+        border-2 rounded-[32px] ${border[color ? "primary" : "secondary"]} ${highlightGlow[color ? "primary" : "secondary"]} 
+        w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[440px]" : ""}
         bg-paper-bg 
         text-white
         py-6
@@ -315,8 +292,7 @@ const NicePoolCard = (props: FarmCardProps) =>
           </div>
           <div className="flex flex-row gap-1 items-center">
             {
-              tags?.length && tags.map((tag: string, tagIdx) =>
-              {
+              tags?.length && tags.map((tag: string, tagIdx) => {
                 return (
                   <div key={`${rewardTokenName}-${tagIdx}`} className={`border-2 border-secondary rounded-full px-2 py-1 text-[0.70rem] text-secondary`}>
                     {tag.toUpperCase()}

@@ -52,7 +52,7 @@ type FarmCardProps = {
     depositFee: number,
     tokenAddress: string
   },
-  onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps[ 'coinInfo' ]) => void;
+  onAction: (options: Array<StakeOptionsType>, fn: SubmitFunction, initAction?: number, coinInfo?: StakeModalProps['coinInfo']) => void;
 }
 // Some will be received from web3 and others will be calculated here
 type PoolDetailType = {
@@ -74,27 +74,25 @@ const defaultPoolDetails: PoolDetailType = {
 }
 
 
-const FarmCard = (props: FarmCardProps) =>
-{
+const FarmCard = (props: FarmCardProps) => {
   const { color, highlight, poolAssets, onAction, closeModal } = props
   const {
     baseTokenName, baseTokenSymbol, baseTokenImage, mainTokenName, mainTokenSymbol, mainTokenImage,
     swapName, swapLogo, swapUrl, swapDexUrl, swapPoolUrl, pid, mult
   }
     = poolAssets
-  const [ showDetails, setShowDetails ] = useState<boolean>(false)
-  const [ pool, setPool ] = useImmer<PoolDetailType>(defaultPoolDetails)
-  const [ apyData, setApyData ] = useState<any>({
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+  const [pool, setPool] = useImmer<PoolDetailType>(defaultPoolDetails)
+  const [apyData, setApyData] = useState<any>({
     d1: 0,
     d7: 0,
     d30: 0,
     d365: 0,
   })
 
-  const isPool = useMemo(() =>
-  {
+  const isPool = useMemo(() => {
     return !baseTokenSymbol
-  }, [ baseTokenSymbol ])
+  }, [baseTokenSymbol])
 
   const { editTransactions } = useTransactionContext()
   // BLOCKCHAIN
@@ -113,13 +111,13 @@ const FarmCard = (props: FarmCardProps) =>
       btnText: "Withdraw",
       description: `Withdraw staked $${mainTokenSymbol}`
     }
-  ], [ mainTokenSymbol, pool ])
+  ], [mainTokenSymbol, pool])
 
   const coinInfoForModal = useMemo(() => ({
     symbol: poolAssets.isLP ? `${mainTokenSymbol}-${baseTokenSymbol}` : mainTokenSymbol,
     name: poolAssets.isLP ? `${poolAssets.swapName} LP ${mainTokenSymbol}-${baseTokenSymbol}` : mainTokenName,
     decimals: 18,
-  }), [ mainTokenSymbol, mainTokenName, poolAssets, baseTokenSymbol ])
+  }), [mainTokenSymbol, mainTokenName, poolAssets, baseTokenSymbol])
 
   //hooks
   const { account, chainId } = useWeb3React()
@@ -140,8 +138,7 @@ const FarmCard = (props: FarmCardProps) =>
   const { methods: feeDistributorMethods } = useContract(feeDistributorContract.abi, feeDistributorContract.address)
 
   // Concatenates string with contract address to obtain BSC Scan url
-  function getBscUrl(contractAddress: string)
-  {
+  function getBscUrl(contractAddress: string) {
     let url;
     if (chainId == 56)
       url = "https://bscscan.com/address/" + contractAddress
@@ -151,8 +148,7 @@ const FarmCard = (props: FarmCardProps) =>
     return url
   }
 
-  const getPoolInfo = useCallback(async () =>
-  {
+  const getPoolInfo = useCallback(async () => {
     if (!chefMethods || !feeDistributorMethods || !coinMethods || !chefContract || !V1ChefMethods) return;
     const feeDiv = await chefMethods.FEE_DIV().call()
     const chefPoolInfo = await chefMethods.poolInfo(pid).call()
@@ -160,18 +156,16 @@ const FarmCard = (props: FarmCardProps) =>
     const totalLiquidity = await tokenMethods.balanceOf(chefContract.address).call().catch(() => { console.log('chef bal failed'); return 0 })
     const oldStaked = await V1ChefMethods.userInfo(pid, account).call().catch(() => { console.log('user v1 bal failed'); return 0 })
 
-    setPool(draft =>
-    {
+    setPool(draft => {
       draft.totalLiquidity = new BigNumber(totalLiquidity || 0).div(10 ** 18)
       draft.stakedAmount = new BigNumber(chefUserInfo.amount).div(10 ** 18)
       draft.v1Staked = new BigNumber(oldStaked.amount).div(10 ** 18)
     })
 
 
-  }, [ chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract, tokenMethods, V1ChefMethods ])
+  }, [chefMethods, feeDistributorMethods, account, pid, setPool, coinMethods, chefContract, tokenMethods, V1ChefMethods])
 
-  const getPoolEarnings = useCallback(async () =>
-  {
+  const getPoolEarnings = useCallback(async () => {
 
     if (!chefMethods || !poolAssets.tokenAddress || !account || !tokenMethods) return;
 
@@ -180,8 +174,7 @@ const FarmCard = (props: FarmCardProps) =>
     const tokenInWallet = await tokenMethods.balanceOf(account).call().catch(() => { console.log('user tokenfailed'); return 0 })
     const chefUserInfo = await chefMethods.userInfo(pid, account).call().catch(() => { console.log('chef user failed'); return 0 })
 
-    setPool(draft =>
-    {
+    setPool(draft => {
       draft.userTokens = new BigNumber(tokenInWallet)
       draft.totalLiquidity = new BigNumber(totalLiquidity || 0).div(10 ** 18)
       draft.earned = new BigNumber(amountEarned).div(10 ** 18) // Value in ether dimension (NOT WEI)
@@ -190,43 +183,37 @@ const FarmCard = (props: FarmCardProps) =>
 
     })
 
-  }, [ chefMethods, account, pid, poolAssets.tokenAddress, tokenMethods, chefContract.address, setPool ])
+  }, [chefMethods, account, pid, poolAssets.tokenAddress, tokenMethods, chefContract.address, setPool])
 
   // useEffect for pool earnings
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!account) return;
     const interval = setInterval(getPoolEarnings, 5000);
-    return () =>
-    {
+    return () => {
       clearInterval(interval)
     }
 
-  }, [ account, getPoolEarnings ])
+  }, [account, getPoolEarnings])
 
   // useEffect for pool info when chaning account or the pool info changes
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!account) return;
     const interval = setInterval(getPoolInfo, 5000)
-    return () =>
-    {
+    return () => {
       clearInterval(interval)
     }
-  }, [ getPoolInfo, account ])
+  }, [getPoolInfo, account])
 
   // useEffect to get approval of tokens
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!poolAssets.tokenAddress || !chefContract.address || isApproved) return;
     let interval = setInterval(() => getApproved(chefContract.address), 1500)
     return () => clearInterval(interval)
-  }, [ chefContract, poolAssets, getApproved, isApproved ])
+  }, [chefContract, poolAssets, getApproved, isApproved])
 
-  const detailToggle = useCallback(() =>
-  {
+  const detailToggle = useCallback(() => {
     setShowDetails(p => !p)
-  }, [ setShowDetails ])
+  }, [setShowDetails])
 
   const highlightGlow = {
     primary: highlight ? "box-highlight-primary" : "inner-glow-primary",
@@ -237,43 +224,37 @@ const FarmCard = (props: FarmCardProps) =>
     secondary: "border-secondary",
   }
 
-  const getApy = useCallback(async () =>
-  {
+  const getApy = useCallback(async () => {
     const data = await fetch('/api/chefApy', {
       method: 'POST',
       body: JSON.stringify({ pid, chainId })
     })
       .then(r => r.json())
-      .catch(e =>
-      {
+      .catch(e => {
         console.log('ERROR', e)
         return {
           d1: 0
         }
       })
     setApyData(data)
-  }, [ pid, chainId ])
+  }, [pid, chainId])
 
-  const submitFn: SubmitFunction = useCallback((values, second) =>
-  {
+  const submitFn: SubmitFunction = useCallback((values, second) => {
     const amount = toWei(values.stakeAmount.toFixed(18, 1))
     if (values.actionType == 0) {
       chefMethods.deposit(amount, pid).send({ from: account })
-        .on('transactionHash', (tx: string) =>
-        {
+        .on('transactionHash', (tx: string) => {
           console.log('hash', tx)
           editTransactions(tx, 'pending', { description: `Stake ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
         })
-        .on('receipt', (rc: Receipt) =>
-        {
+        .on('receipt', (rc: Receipt) => {
           console.log('receipt', rc)
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
           getApy()
         })
-        .on('error', (error: any, receipt: Receipt) =>
-        {
+        .on('error', (error: any, receipt: Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
@@ -282,21 +263,18 @@ const FarmCard = (props: FarmCardProps) =>
     }
     if (values.actionType == 1) {
       chefMethods.withdraw(amount, pid).send({ from: account })
-        .on('transactionHash', (tx: string) =>
-        {
+        .on('transactionHash', (tx: string) => {
           console.log('hash', tx)
           editTransactions(tx, 'pending', { description: `Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} from chef` })
         })
-        .on('receipt', (rc: Receipt) =>
-        {
+        .on('receipt', (rc: Receipt) => {
           console.log('receipt', rc)
           editTransactions(rc.transactionHash, 'complete')
           second.setSubmitting(false)
           getPoolEarnings()
           getApy()
         })
-        .on('error', (error: any, receipt: Receipt) =>
-        {
+        .on('error', (error: any, receipt: Receipt) => {
           console.log('error', error, receipt)
           receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
           second.setSubmitting(false)
@@ -304,89 +282,78 @@ const FarmCard = (props: FarmCardProps) =>
         .finally(closeModal)
 
     }
-  }, [ account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings, getApy, closeModal ])
+  }, [account, chefMethods, pid, poolAssets.isLP, editTransactions, mainTokenSymbol, getPoolEarnings, getApy, closeModal])
 
   // HARVEST FUNCTION
-  const harvestFn = useCallback(() =>
-  {
+  const harvestFn = useCallback(() => {
     const amount = new BigNumber(0).toString()
     chefMethods.deposit(amount, pid).send({ from: account })
-      .on('transactionHash', (tx: string) =>
-      {
+      .on('transactionHash', (tx: string) => {
         console.log('hash', tx)
         editTransactions(tx, 'pending', { description: `Harvest NICE` })
       })
-      .on('receipt', (rc: Receipt) =>
-      {
+      .on('receipt', (rc: Receipt) => {
         console.log('receipt', rc)
         editTransactions(rc.transactionHash, 'complete')
         getPoolEarnings()
       })
-      .on('error', (error: any, receipt: Receipt) =>
-      {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
       })
 
-  }, [ account, chefMethods, editTransactions, getPoolEarnings, pid ])
+  }, [account, chefMethods, editTransactions, getPoolEarnings, pid])
 
-  const emergencyWithdraw = () =>
-  {
+  const emergencyWithdraw = () => {
     chefMethods.emergencyWithdraw(pid).send({ from: account })
-      .on('transactionHash', (tx: string) =>
-      {
+      .on('transactionHash', (tx: string) => {
         console.log('hash', tx)
         editTransactions(tx, 'pending', { description: `E. Withdraw ${poolAssets.isLP ? "LP" : mainTokenSymbol} in chef` })
       })
-      .on('receipt', (rc: Receipt) =>
-      {
+      .on('receipt', (rc: Receipt) => {
         console.log('receipt', rc)
         editTransactions(rc.transactionHash, 'complete')
         getPoolEarnings()
       })
-      .on('error', (error: any, receipt: Receipt) =>
-      {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
       })
   }
+
 
   const withdrawV1 = useCallback(() =>
   {
     if (!V1ChefMethods || pool.v1Staked.isEqualTo(0) || !chainId || !account) return;
     V1ChefMethods.withdraw(toWei(pool.v1Staked.toFixed(18, 1)), pid)
       .send({ from: account })
-      .on('transactionHash', (tx: string) =>
-      {
+      .on('transactionHash', (tx: string) => {
         console.log('hash', tx)
         editTransactions(tx, 'pending', { description: `V1 Withdraw` })
       })
-      .on('receipt', (rc: Receipt) =>
-      {
+      .on('receipt', (rc: Receipt) => {
         console.log('receipt', rc)
         editTransactions(rc.transactionHash, 'complete')
         getPoolInfo()
       })
-      .on('error', (error: any, receipt: Receipt) =>
-      {
+      .on('error', (error: any, receipt: Receipt) => {
         console.log('error', error, receipt)
         receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
       })
   }, [ V1ChefMethods, account, pid, pool.v1Staked, editTransactions, getPoolInfo, chainId ])
 
-  useEffect(() =>
-  {
+  useEffect(() => {
     if (!chainId || !pid) return;
     getApy()
-  }, [ getApy, chainId, pid ])
+  }, [getApy, chainId, pid])
 
   return (
     // Farm card
     <div
       className={`
-              flex flex-col gap-2
-              border-2 rounded-[32px] ${border[ color ? "primary" : "secondary" ]} ${highlightGlow[ color ? "primary" : "secondary" ]} 
-              w-[275px] md:w-[19rem] ${showDetails ? "" : !account || !isApproved ? "max-h-[440px]" : ""}
+              flex flex-wrap flex-col gap-2
+              border-2 rounded-[32px] ${border[color ? "primary" : "secondary"]} ${highlightGlow[color ? "primary" : "secondary"]} 
+              w-[275px] md:w-[19rem] 
               bg-paper-bg 
               text-white
               py-6
@@ -500,15 +467,17 @@ const FarmCard = (props: FarmCardProps) =>
         <div className="form-label inline-block text-primary text-xs font-bold">
           NICE EARNED:
         </div>
-        <div className="flex justify-between items-center">
+        <div className="break-all max-w-[17rem]">
           <div className="text-[1.2rem]">
             <Currency value={pool.earned.toFixed(18, 1)} decimals={2} />
           </div>
+        </div>
+        <div className=" flex justify-end">
           <button
             onClick={() => harvestFn()}
             disabled={pool.earned.isEqualTo(0)}
             className="
-              flex flex-row items-center gap-2 border-2 border-secondary inner-glow-secondary px-[17px] py-2.5 
+              flex flex-row items-center border-2 border-secondary inner-glow-secondary px-[17px] min-w-[100px] py-2.5 mt-2
               text-xs rounded-l-full rounded-br-full 
               hover:bg-secondary hover:text-black disabled:opacity-60 disabled:hover:bg-transparent disabled:hover:text-white"
           >
@@ -522,10 +491,10 @@ const FarmCard = (props: FarmCardProps) =>
           <div className="form-label inline-block text-primary text-xs font-bold">
             {mainTokenSymbol}{poolAssets.isLP ? "-" + baseTokenSymbol : ""} {poolAssets.isLP ? "LP" : ""} STAKED
           </div>
-          <div className="text-[1.4rem] w-full text-right">
+          <div className="text-[1.4rem] w-full text-left break-all max-w-[17rem]">
             <Currency value={pool.stakedAmount.toFixed(18, 1)} decimals={2} />
           </div>
-          <div className="flex gap-2 justify-end w-full">
+          <div className="flex gap-2 justify-end w-full mt-2">
             <button
               disabled={pool.userTokens.isEqualTo(0) || mult == 0} //DISABLE ONLY WHEN TOKEN WALLET AMOUNT == 0
               onClick={() => onAction(options, submitFn, 0, coinInfoForModal)}
@@ -547,7 +516,7 @@ const FarmCard = (props: FarmCardProps) =>
             <div className="form-label inline-block text-primary text-xs font-bold">
               V1 STAKED
             </div>
-            <div className="text-[1.4rem] w-full text-right">
+            <div className="text-[1.4rem] w-full text-right break-all">
               <Currency value={pool.v1Staked.toFixed(18, 1)} decimals={2} />
             </div>
             <div className="flex justify-end">
