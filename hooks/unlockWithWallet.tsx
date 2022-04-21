@@ -3,18 +3,20 @@ import { useWeb3React } from '@web3-react/core'
 import { useAuth } from './web3Hooks'
 
 
-export function useWithWallet<T>(options:walletOptions<T>) {
+export function useWithWallet<T>(options: walletOptions<T>)
+{
   const { account } = useWeb3React()
   const { login } = useAuth()
 
   const action = useCallback(
-    (e) => {
-      if(account)
+    (e: any) =>
+    {
+      if (account)
         options.action(e)
-      else 
+      else
         login()
     },
-    [options.action, account]
+    [ options.action, account ]
   )
 
   return {
@@ -22,6 +24,6 @@ export function useWithWallet<T>(options:walletOptions<T>) {
   }
 }
 
-type walletOptions<T> ={
-  action: (e:T) => void,
+type walletOptions<T> = {
+  action: (e: T) => void,
 }

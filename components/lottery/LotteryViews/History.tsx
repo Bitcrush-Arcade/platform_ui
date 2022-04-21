@@ -29,118 +29,127 @@ import { partnerTokens } from 'data/partnerTokens'
 // types
 import { RoundInfo } from 'types/lottery'
 
-{/* History table props */}
+{/* History table props */ }
 type HistoryViewProps = {
   currentPageView: number,
   onPagination: (newPage: number) => void,
   onLastRoundView: (isCurrent?: boolean) => void,
-  rowsPerPage:number,
+  rowsPerPage: number,
   isInView: boolean,
 }
 
-{/* History table props and formatting */}
-const History = (props: HistoryViewProps) => {
+{/* History table props and formatting */ }
+const History = (props: HistoryViewProps) =>
+{
   const { currentPageView, onPagination, rowsPerPage, isInView, onLastRoundView } = props
 
   // BLOCKCHAIN
   const { account, chainId } = useWeb3React()
   const lotteryContract = getContracts('lottery', chainId)
-  const { methods: lotteryMethods } = useContract( lotteryContract.abi, lotteryContract.address )
+  const { methods: lotteryMethods } = useContract(lotteryContract.abi, lotteryContract.address)
   const { editTransactions } = useTransactionContext()
 
   // STATE
   const [ currentRound, setCurrentRound ] = useState<string>('0')
-  const [ history, setHistory ] = useImmer<Array< RoundInfo&{id: string} | null >>(new Array(4).fill(null))
+  const [ history, setHistory ] = useImmer<Array<RoundInfo & { id: string } | null>>(new Array(4).fill(null))
   const [ loadingHistory, setLoadingHistory ] = useState<boolean>(false)
   const [ selectedRound, setSelectedRound ] = useState<number | null>(null)
 
-  const getRoundData = useCallback( async (roundId: string) => {
-    if(!lotteryMethods) return
+  const getRoundData = useCallback(async (roundId: string) =>
+  {
+    if (!lotteryMethods) return
     const roundInfo = await lotteryMethods.roundInfo(roundId).call()
     const roundBonus = await lotteryMethods.bonusCoins(roundId).call()
-    const userTickets = !account ? [] : await lotteryMethods.getRoundTickets(roundId).call({from: account})
-    setHistory( draft => {
+    const userTickets = !account ? [] : await lotteryMethods.getRoundTickets(roundId).call({ from: account })
+    setHistory(draft =>
+    {
       const modRound = new BigNumber(roundId).mod(rowsPerPage).toNumber()
       const roundToChange = modRound > 0 ? modRound - 1 : 3
-      draft[roundToChange] = {
+      draft[ roundToChange ] = {
         ...roundInfo,
         bonusInfo: roundBonus,
         userTickets,
         id: roundId
       }
     })
-  },[lotteryMethods, account, setHistory, rowsPerPage])
+  }, [ lotteryMethods, account, setHistory, rowsPerPage ])
 
-  const getCurrentRound = useCallback(async () => {
-    if(!lotteryMethods) return
+  const getCurrentRound = useCallback(async () =>
+  {
+    if (!lotteryMethods) return
     const currentRound = new BigNumber(await lotteryMethods.currentRound().call())
     setCurrentRound(currentRound.toString())
-    const roundFetchStart = currentRound.minus(3).isGreaterThan(0) 
-      ? ( 
-          currentRound.mod(rowsPerPage).isEqualTo(0)
-            ? currentRound.minus( rowsPerPage )
-            : currentRound.minus( currentRound.mod(rowsPerPage) )
-        )
+    const roundFetchStart = currentRound.minus(3).isGreaterThan(0)
+      ? (
+        currentRound.mod(rowsPerPage).isEqualTo(0)
+          ? currentRound.minus(rowsPerPage)
+          : currentRound.minus(currentRound.mod(rowsPerPage))
+      )
       : new BigNumber(0)
 
-    for(let initRound = roundFetchStart; currentRound.isGreaterThanOrEqualTo(initRound) ; initRound = initRound.plus(1)){
+    for (let initRound = roundFetchStart; currentRound.isGreaterThanOrEqualTo(initRound); initRound = initRound.plus(1)) {
       getRoundData(initRound.toString())
     }
-  },[lotteryMethods, setCurrentRound, getRoundData, rowsPerPage])
+  }, [ lotteryMethods, setCurrentRound, getRoundData, rowsPerPage ])
 
-  const onRoundView = useCallback( (selectedRound: number) => {
-    if(new BigNumber(selectedRound).isEqualTo( currentRound ))
+  const onRoundView = useCallback((selectedRound: number) =>
+  {
+    if (new BigNumber(selectedRound).isEqualTo(currentRound))
       onLastRoundView(true)
-    else if(new BigNumber(selectedRound).isEqualTo( new BigNumber(currentRound).minus(1) ))
+    else if (new BigNumber(selectedRound).isEqualTo(new BigNumber(currentRound).minus(1)))
       onLastRoundView()
     else
       setSelectedRound(selectedRound)
-  },[setSelectedRound, currentRound, onLastRoundView])
+  }, [ setSelectedRound, currentRound, onLastRoundView ])
 
   // EFFECTS
-  useEffect( () => {
-    if(!lotteryMethods)  return
+  useEffect(() =>
+  {
+    if (!lotteryMethods) return
     getCurrentRound()
-  },[lotteryMethods, getCurrentRound])
+  }, [ lotteryMethods, getCurrentRound ])
 
 
-  const pagination = useCallback( ( newPage: number ) => {
+  const pagination = useCallback((newPage: number) =>
+  {
     setLoadingHistory(true)
     const promises: Array<Promise<void>> = []
-    for(let i = newPage*4 + 1; i<= (newPage+1)*4; i++)
-      promises.push( getRoundData(`${i}`))
+    for (let i = newPage * 4 + 1; i <= (newPage + 1) * 4; i++)
+      promises.push(getRoundData(`${i}`))
     Promise.all(promises)
-      .finally( () => {
+      .finally(() =>
+      {
         setLoadingHistory(false)
         onPagination(newPage)
       })
-  },[onPagination, getRoundData])
+  }, [ onPagination, getRoundData ])
 
 
-  {/*History table rows data formatting*/}
-  const tableRows = history.map( (roundInfo, index) => {
-    if(!roundInfo)
+  {/*History table rows data formatting*/ }
+  const tableRows = history.map((roundInfo, index) =>
+  {
+    if (!roundInfo)
       return <TableRow key={`roundData-${index}-nullValue`}>
         <TableCell colSpan={5}>
           -
         </TableCell>
-      </TableRow> 
+      </TableRow>
     return <TableRow key={`roundData-${index}-${roundInfo.id}`}>
       <TableCell align='center'>{roundInfo.id}</TableCell>
       <TableCell align='center'>
-        { format(new Date( new BigNumber(roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
+        {format(new Date(new BigNumber(roundInfo.endTime).times(1000).toNumber()), 'yyyy-MMM-dd HHaa')}
       </TableCell>
-      <TableCell 
-        align ="center">{roundInfo.totalTickets}
+      <TableCell
+        align="center">{roundInfo.totalTickets.toFixed(0)}
       </TableCell>
-      <TableCell align ="center">
+      <TableCell align="center">
         <Stack direction="row" justifyContent="center" alignItems="center">
           <div>
             {(roundInfo.userTickets || []).length}
           </div>
           <div>
-            <IconButton color="primary" onClick={() => onRoundView(+roundInfo.id)} sx={{ml: 0.5}}>
-              <RemoveRedEyeIcon/>
+            <IconButton color="primary" onClick={() => onRoundView(+roundInfo.id)} sx={{ ml: 0.5 }}>
+              <RemoveRedEyeIcon />
             </IconButton>
           </div>
 
@@ -149,42 +158,42 @@ const History = (props: HistoryViewProps) => {
       <TableCell align="center">
         {/* { parseInt(roundInfo.bonusInfo?.bonusAmount || '0',16) || '-'} */}
         {
-         new BigNumber(roundInfo.bonusInfo?.bonusAmount || 0).isGreaterThan(0) ? new BigNumber(roundInfo.bonusInfo?.bonusAmount || '0').div(10**18).toFixed(2) : '-'
+          new BigNumber(roundInfo.bonusInfo?.bonusAmount || 0).isGreaterThan(0) ? new BigNumber(roundInfo.bonusInfo?.bonusAmount || '0').div(10 ** 18).toFixed(2) : '-'
         }
         &nbsp;
-        {partnerTokens[roundInfo.bonusInfo?.bonusToken.toLowerCase() || '']?.name ?? ''}
+        {partnerTokens[ roundInfo.bonusInfo?.bonusToken.toLowerCase() || '' ]?.name ?? ''}
       </TableCell>
-   
+
     </TableRow>
   })
 
-  if(!isInView)
+  if (!isInView)
     return null
-  {/*Building the table with header*/}
-  if(typeof(selectedRound) == 'number'){
-    const roundSel = selectedRound%rowsPerPage > 0 ? selectedRound%rowsPerPage : 3
-    const roundToView = history[roundSel]
-    if(!roundToView)
+  {/*Building the table with header*/ }
+  if (typeof (selectedRound) == 'number') {
+    const roundSel = selectedRound % rowsPerPage > 0 ? selectedRound % rowsPerPage : 3
+    const roundToView = history[ roundSel ]
+    if (!roundToView)
       return null
     return <Stack>
-        <Button color="secondary" onClick={() => setSelectedRound(null)}>
-          Back to History
-        </Button>
-        <LastRound
-          winningTeamTicket={roundToView.winnerNumber} 
-          tickets={roundToView.userTickets || []}
-          lastDate={ new BigNumber(roundToView.endTime).toNumber()} 
-          selectTicket={() => {}} 
-          lastRound={roundToView.id}
-          token={roundToView.bonusInfo?.bonusToken}
-          tokenAmount={roundToView.bonusInfo?.bonusAmount}
-          globalTickets={new BigNumber(roundToView.totalTickets).toNumber()}
-        />
-      </Stack>
+      <Button color="secondary" onClick={() => setSelectedRound(null)}>
+        Back to History
+      </Button>
+      <LastRound
+        winningTeamTicket={roundToView.winnerNumber}
+        tickets={roundToView.userTickets || []}
+        lastDate={new BigNumber(roundToView.endTime).toNumber()}
+        selectTicket={() => { }}
+        lastRound={roundToView.id}
+        token={roundToView.bonusInfo?.bonusToken}
+        tokenAmount={roundToView.bonusInfo?.bonusAmount}
+        globalTickets={new BigNumber(roundToView.totalTickets).toNumber()}
+      />
+    </Stack>
   }
   return <Table>
     <TableHead>
-      <TableRow> 
+      <TableRow>
         <TableCell align="center">Round</TableCell>
         <TableCell align="center">Played</TableCell>
         <TableCell align="center">Total Squads</TableCell>
@@ -193,41 +202,41 @@ const History = (props: HistoryViewProps) => {
       </TableRow>
     </TableHead>
     <TableBody>
-      { currentRound 
+      {currentRound
         ? <>
           {tableRows}
-          <TableRow sx={{ position:"relative"}}>
+          <TableRow sx={{ position: "relative" }}>
             {loadingHistory && <TableCell>
-              <CircularProgress thickness={5} size={30} sx={{position:'absolute', top: 10, right: 200}}/>
+              <CircularProgress thickness={5} size={30} sx={{ position: 'absolute', top: 10, right: 200 }} />
             </TableCell>
             }
-            <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={parseInt(currentRound) || 1} page={currentPageView} onPageChange={(e,p) => pagination(p)}/>
+            <TablePagination rowsPerPageOptions={[]} rowsPerPage={rowsPerPage} count={parseInt(currentRound) || 1} page={currentPageView} onPageChange={(e, p) => pagination(p)} />
           </TableRow>
         </>
         : <>
           <TableRow>
             <TableCell colSpan={5}>
-              <Skeleton/>
+              <Skeleton />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={5}>
-              <Skeleton/>
+              <Skeleton />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={5}>
-              <Skeleton/>
+              <Skeleton />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={5}>
-              <Skeleton/>
+              <Skeleton />
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell colSpan={5}>
-              <Skeleton/>
+              <Skeleton />
             </TableCell>
           </TableRow>
         </>

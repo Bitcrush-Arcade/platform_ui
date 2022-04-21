@@ -45,8 +45,9 @@ import BigNumber from 'bignumber.js'
 import { toWei } from 'web3-utils'
 import { Receipt } from 'types/PromiEvent'
 
-const PoolCard = (props: PoolProps) => {
-  const { abi, tokenAddress, contractAddress, tokenAbi, infoText,disabled } = props
+const PoolCard = (props: PoolProps) =>
+{
+  const { abi, tokenAddress, contractAddress, tokenAbi, infoText, disabled } = props
   // Web3
   const { account, chainId } = useWeb3React()
   const { contract: coinContract, methods: coinMethods } = useContract(tokenAbi, tokenAddress)
@@ -59,99 +60,116 @@ const PoolCard = (props: PoolProps) => {
   const [ openRoi, setOpenRoi ] = useState<boolean>(false)
   const [ hydrate, setHydrate ] = useState<boolean>(false)
   const [ hydrateAPY, setHydrateAPY ] = useState<boolean>(true)
-  const [apyData, setApyData] = useState<RoiProps['apyData']>(undefined)
+  const [ apyData, setApyData ] = useState<RoiProps[ 'apyData' ]>(undefined)
 
-  const triggerHydrate = useCallback(() => {
-    setHydrate( p => !p )
-  }, [setHydrate])
+  const triggerHydrate = useCallback(() =>
+  {
+    setHydrate(p => !p)
+  }, [ setHydrate ])
 
-  const triggerAPYHydrate = useCallback( () => {
+  const triggerAPYHydrate = useCallback(() =>
+  {
     setHydrateAPY(p => !p)
-  },[setHydrateAPY])
+  }, [ setHydrateAPY ])
 
-  const FormComponent = useCallback( p => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }}/>, [] )
+  const FormComponent = useCallback((p: any) => <Card {...p} background="light" style={{ padding: 32, maxWidth: 360 }} />, [])
 
-  const toggleStakeModal = useCallback( () => setOpenStakeModal(p => !p), [setOpenStakeModal] )
+  const toggleStakeModal = useCallback(() => setOpenStakeModal(p => !p), [ setOpenStakeModal ])
 
-  const toggleRoi = useCallback(()=>setOpenRoi( p => !p ),[setOpenRoi])
+  const toggleRoi = useCallback(() => setOpenRoi(p => !p), [ setOpenRoi ])
 
-  const [items, setItems] = useImmer({ balance : 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
-  const [coinInfo, setCoinInfo] = useState({ name: '', symbol: '', decimals: 18 })
+  const [ items, setItems ] = useImmer({ balance: 0, approved: 0, userInfo: { stakedAmount: 0, claimedAmount: 0, compoundedAmount: 0 }, totalStaked: 0, totalPool: 0, pendingReward: 0 })
+  const [ coinInfo, setCoinInfo ] = useState({ name: '', symbol: '', decimals: 18 })
 
-  const isApproved = useMemo( () => items.approved > 0 , [items])
+  const isApproved = useMemo(() => items.approved > 0, [ items ])
 
-  useEffect(() => {
-    if(!hydrateAPY || disabled) return
-    fetch('/api/getAPY',{
+  useEffect(() =>
+  {
+    if (!hydrateAPY || disabled) return
+    fetch('/api/getAPY', {
       method: 'POST',
       body: JSON.stringify({
         chainId: chainId || 56
       })
     })
-    .then( response => response.json() )
-    .then( data => setApyData(data) )
-    .finally( () => hydrateAPY && triggerAPYHydrate() )
-  },[chainId, hydrateAPY, setApyData, triggerAPYHydrate, disabled])
-  
-  const buttonAction = () =>{
-    if(isApproved) 
-      setOpenStakeModal( p => !p )
-    else{
-      coinMethods.approve( contractAddress, new BigNumber(30000000000000000000000000).toFixed() ).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
-        .on('transactionHash', (tx:string) => {
-          console.log('hash', tx )
-          editTransactions(tx,'pending', { description: `Approve CRUSH spend`})
+      .then(response => response.json())
+      .then(data => setApyData(data))
+      .finally(() => hydrateAPY && triggerAPYHydrate())
+  }, [ chainId, hydrateAPY, setApyData, triggerAPYHydrate, disabled ])
+
+  const buttonAction = () =>
+  {
+    if (isApproved)
+      setOpenStakeModal(p => !p)
+    else {
+      coinMethods.approve(contractAddress, new BigNumber(30000000000000000000000000).toFixed()).send({ from: account, gasPrice: parseInt(`${new BigNumber(10).pow(10)}`) })
+        .on('transactionHash', (tx: string) =>
+        {
+          console.log('hash', tx)
+          editTransactions(tx, 'pending', { description: `Approve CRUSH spend` })
         })
-        .on('receipt', ( rc:Receipt) => {
-          console.log('receipt',rc)
+        .on('receipt', (rc: Receipt) =>
+        {
+          console.log('receipt', rc)
           triggerHydrate()
-          editTransactions(rc.transactionHash,'complete')
+          editTransactions(rc.transactionHash, 'complete')
         })
-        .on('error', (error:any, receipt:Receipt) => {
+        .on('error', (error: any, receipt: Receipt) =>
+        {
           console.log('error', error, receipt)
-          receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+          receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
         })
     }
   }
 
   const { action: cardPreStake } = useWithWallet({ action: buttonAction })
 
-  const harvest = () => {
+  const harvest = () =>
+  {
     mainMethods?.claim().send({ from: account })
-      .on('transactionHash', (tx:string) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: 'Harvest Rewards'})
+      .on('transactionHash', (tx: string) =>
+      {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: 'Harvest Rewards' })
       })
-      .on('receipt', ( rc:Receipt) => {
-        console.log('receipt',rc)
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
         triggerHydrate()
-        editTransactions(rc.transactionHash,'complete')
+        editTransactions(rc.transactionHash, 'complete')
       })
-      .on('error', (error:any, receipt:Receipt) => {
+      .on('error', (error: any, receipt: Receipt) =>
+      {
         console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error',{ errorData: error })
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', { errorData: error })
       })
   }
-  const manualCompound = () => {
+  const manualCompound = () =>
+  {
     mainMethods?.singleCompound().send({ from: account })
-      .on('transactionHash', (tx:string) => {
-        console.log('hash', tx )
-        editTransactions(tx,'pending', { description: "Compound My Assets" })
+      .on('transactionHash', (tx: string) =>
+      {
+        console.log('hash', tx)
+        editTransactions(tx, 'pending', { description: "Compound My Assets" })
       })
-      .on('receipt', ( rc:Receipt) => {
-        console.log('receipt',rc)
+      .on('receipt', (rc: Receipt) =>
+      {
+        console.log('receipt', rc)
         triggerHydrate()
-        editTransactions(rc.transactionHash,'complete')
+        editTransactions(rc.transactionHash, 'complete')
       })
-      .on('error', (error:any, receipt:Receipt) => {
+      .on('error', (error: any, receipt: Receipt) =>
+      {
         console.log('error', error, receipt)
-        receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', { errorData: error} )
+        receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', { errorData: error })
       })
   }
 
-  useEffect(()=>{
-    if(!coinMethods) return
-    const getCoinData = async () => {
+  useEffect(() =>
+  {
+    if (!coinMethods) return
+    const getCoinData = async () =>
+    {
       const tokenName = await coinMethods.name().call()
       const tokenSymbol = await coinMethods.symbol().call()
       const tokenDecimals = await coinMethods.decimals().call()
@@ -162,12 +180,15 @@ const PoolCard = (props: PoolProps) => {
       })
     }
     getCoinData()
-  },[coinMethods])
-// Hydrate changing Data
-  useEffect( ()=>{
-    const getPoolData = async () => {
-      if(!coinContract || !account || !chainId || [56,97].indexOf(chainId) == -1 ) {
-        setItems( draft => {
+  }, [ coinMethods ])
+  // Hydrate changing Data
+  useEffect(() =>
+  {
+    const getPoolData = async () =>
+    {
+      if (!coinContract || !account || !chainId || [ 56, 97 ].indexOf(chainId) == -1) {
+        setItems(draft =>
+        {
           draft.balance = 0
           draft.approved = 0
           draft.userInfo.stakedAmount = 0
@@ -183,8 +204,9 @@ const PoolCard = (props: PoolProps) => {
       const userInfo = await mainMethods?.stakings(account).call()
       const totalPool = await mainMethods?.totalPool().call()
       const totalStaked = await mainMethods?.totalStaked().call()
-      const pending = await mainMethods?.pendingReward(account).call().catch( (err:any) => {console.log('error', err); return 0})
-      setItems( draft => {
+      const pending = await mainMethods?.pendingReward(account).call().catch((err: any) => { console.log('error', err); return 0 })
+      setItems(draft =>
+      {
         draft.balance = availTokens
         draft.approved = approved
         draft.userInfo.stakedAmount = +userInfo.stakedAmount
@@ -195,44 +217,48 @@ const PoolCard = (props: PoolProps) => {
       })
     }
     getPoolData()
-  },[coinContract, account, coinMethods, mainMethods, setItems, chainId, hydrate, contractAddress])
+  }, [ coinContract, account, coinMethods, mainMethods, setItems, chainId, hydrate, contractAddress ])
 
-  useEffect(() => {
-    const hydrateInterval = setInterval(triggerHydrate,5000)
+  useEffect(() =>
+  {
+    const hydrateInterval = setInterval(triggerHydrate, 5000)
     return () => clearInterval(hydrateInterval)
-  },[ setHydrate, triggerHydrate ])
-  
+  }, [ setHydrate, triggerHydrate ])
+
   const userStaked = new BigNumber(items.userInfo.stakedAmount).toNumber()
   const userProfit = new BigNumber(items.userInfo.claimedAmount).plus(items.pendingReward).toNumber()
   const pendingRewards = new BigNumber(items.pendingReward).toNumber()
-  const stakedPercent = new BigNumber(userStaked).div( new BigNumber(items.totalStaked) ).times( new BigNumber(100) ).toNumber() //missing total staked amount
+  const stakedPercent = new BigNumber(userStaked).div(new BigNumber(items.totalStaked)).times(new BigNumber(100)).toNumber() //missing total staked amount
 
-  const maxBalance = new BigNumber(items.balance).div( new BigNumber(10).pow(18) )
-  const maxStaked = new BigNumber(userStaked).div( new BigNumber(10).pow(18) )
+  const maxBalance = new BigNumber(items.balance).div(new BigNumber(10).pow(18))
+  const maxStaked = new BigNumber(userStaked).div(new BigNumber(10).pow(18))
   const css = useStyles(props)
 
-  const shownInfo = useCallback( ( amount: number, decimals?: number ) => {
-    if(!account)
+  const shownInfo = useCallback((amount: number, decimals?: number) =>
+  {
+    if (!account)
       return "--.--"
     return currencyFormat(amount, { decimalsToShow: decimals, isWei: true })
-  },[account])
-  
-  const InvaderThumb = useCallback( (allProps: {thumbProps: any, percent: BigNumber}) => {
+  }, [ account ])
+
+  const InvaderThumb = useCallback((allProps: { thumbProps: any, percent: BigNumber }) =>
+  {
     const isMax = allProps.percent.toNumber() === 100
-    return(
+    return (
       <SliderThumb {...allProps.thumbProps}>
         {allProps.thumbProps.children}
-        <div style={{position: 'relative'}}>
-          <InvaderIcon color="secondary" style={{position: 'absolute',left: -12, bottom: -10}}/>
-          <Typography style={{ marginTop: 24, position:'absolute',left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
-            { isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
+        <div style={{ position: 'relative' }}>
+          <InvaderIcon color="secondary" style={{ position: 'absolute', left: -12, bottom: -10 }} />
+          <Typography style={{ marginTop: 24, position: 'absolute', left: isMax ? -12 : -15, bottom: -30 }} color="textPrimary" variant="caption">
+            {isMax ? 'MAX' : `${allProps.percent.toFixed(2)}%`}
           </Typography>
         </div>
       </SliderThumb>
-  )},[])
+    )
+  }, [])
 
   return <>
-    <Card background="light" className={ css.card } >
+    <Card background="light" className={css.card} >
       <CardHeader classes={{ action: css.headerAction }}
         title="Manual CRUSH Pool"
         titleTypographyProps={{ className: css.headerTitle }}
@@ -240,7 +266,7 @@ const PoolCard = (props: PoolProps) => {
         subheaderTypographyProps={{ variant: 'body2' }}
         action={
           <Avatar className={css.avatar}>
-            <InvaderIcon className={ css.avatarIcon }/>
+            <InvaderIcon className={css.avatarIcon} />
           </Avatar>
         }
       />
@@ -252,57 +278,57 @@ const PoolCard = (props: PoolProps) => {
               Staked
             </Typography>
           </Grid>
-          <Grid item xs={12}/>
+          <Grid item xs={12} />
           <Grid item>
-            <Typography color="primary" variant="body2" style={{fontWeight: 500}}>
+            <Typography color="primary" variant="body2" style={{ fontWeight: 500 }}>
               {currencyFormat(maxStaked.toFixed(18) || 0)}
             </Typography>
           </Grid>
           {!disabled && <Grid item>
             <Typography color="textSecondary" variant="body2" >
-              Your stake&nbsp;{currencyFormat(stakedPercent || 0, { decimalsToShow: 6 }) }%
+              Your stake&nbsp;{currencyFormat(stakedPercent || 0, { decimalsToShow: 6 })}%
             </Typography>
           </Grid>}
-          <Grid item xs={12}/>
+          <Grid item xs={12} />
           <Grid item>
             <Typography color="textSecondary" variant="body2" >
               APY:
             </Typography>
           </Grid>
           <Grid item>
-          {
-             disabled ? 
-             <>
-              <Typography color="primary" variant="body2" className={ css.percent }>
-                {currencyFormat(0, { decimalsToShow: 2 })}%
-              </Typography>
-             </>
-             :
-             <>
-              <ButtonBase onClick={toggleRoi}>
-                <Grid container alignItems="center">
-                  <Grid item style={{paddingRight: 8}}>
-                    { apyData?.d365?.percent 
-                      ? <Typography color="primary" variant="body2" className={ css.percent }>
-                          {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
-                        </Typography>
-                      : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
-                    }
-                  </Grid>
-                  <Grid item style={{paddingRight: 4}}>
-                    <CalculationIcon className={ css.aprAction }/>
-                  </Grid>
-                </Grid>
-              </ButtonBase>
-              <IconButton size="small" color="primary" onClick={triggerAPYHydrate} disabled={!contractAddress}>
-                { hydrateAPY ? <CircularProgress size="inherit"/>
-                  : <RefreshIcon fontSize="inherit"/>}
-              </IconButton>
-            </> 
-          }
+            {
+              disabled ?
+                <>
+                  <Typography color="primary" variant="body2" className={css.percent}>
+                    {currencyFormat(0, { decimalsToShow: 2 })}%
+                  </Typography>
+                </>
+                :
+                <>
+                  <ButtonBase onClick={toggleRoi}>
+                    <Grid container alignItems="center">
+                      <Grid item style={{ paddingRight: 8 }}>
+                        {apyData?.d365?.percent
+                          ? <Typography color="primary" variant="body2" className={css.percent}>
+                            {currencyFormat(apyData?.d365?.percent * 100, { decimalsToShow: 2 })}%
+                          </Typography>
+                          : <Skeleton className={css.percent} animation="wave" height={20} width={80} />
+                        }
+                      </Grid>
+                      <Grid item style={{ paddingRight: 4 }}>
+                        <CalculationIcon className={css.aprAction} />
+                      </Grid>
+                    </Grid>
+                  </ButtonBase>
+                  <IconButton size="small" color="primary" onClick={triggerAPYHydrate} disabled={!contractAddress}>
+                    {hydrateAPY ? <CircularProgress size="inherit" />
+                      : <RefreshIcon fontSize="inherit" />}
+                  </IconButton>
+                </>
+            }
           </Grid>
         </Grid>
-        <Grid container justifyContent="space-between" alignItems="flex-end" className={ css.earnings }>
+        <Grid container justifyContent="space-between" alignItems="flex-end" className={css.earnings}>
           <Grid item>
             <Typography variant="body2" color="textSecondary">
               {coinInfo.symbol} EARNED
@@ -315,38 +341,38 @@ const PoolCard = (props: PoolProps) => {
             </Typography>
           </Grid>
           {!disabled && <Grid item>
-            {account && <Button color="secondary" size="small" style={{fontWeight: 400}} width="96px" onClick={harvest} disabled={ pendingRewards == 0 } solidDisabledText>
+            {account && <Button color="secondary" size="small" style={{ fontWeight: 400 }} width="96px" onClick={harvest} disabled={pendingRewards == 0} solidDisabledText>
               Harvest
             </Button>}
           </Grid>}
         </Grid>
         <Button width="100%" color="primary" onClick={cardPreStake} solidDisabledText
-          disabled={ !contractAddress }
+          disabled={!contractAddress}
         >
-          { account 
-              ? (disabled 
-                ? "Withdraw"
-                : (isApproved ? `STAKE ${coinInfo.symbol}` : "Enable") )
-              : "Unlock Wallet"}
+          {account
+            ? (disabled
+              ? "Withdraw"
+              : (isApproved ? `STAKE ${coinInfo.symbol}` : "Enable"))
+            : "Unlock Wallet"}
         </Button>
       </CardContent>
       <CardActions>
         <Grid container>
           <Grid item xs={12}>
-            <Divider style={{marginBottom: 24}}/>
+            <Divider style={{ marginBottom: 24 }} />
           </Grid>
           <Grid item xs={6} container alignItems="center">
-            <SmallButton size="small" color="primary" style={{marginRight: 4}} onClick={manualCompound} hasIcon disabled={!contractAddress || disabled}>
-              <RefreshIcon fontSize="inherit" color="primary" style={{marginRight: 4}}/>Manual
+            <SmallButton size="small" color="primary" style={{ marginRight: 4 }} onClick={manualCompound} hasIcon disabled={!contractAddress || disabled}>
+              <RefreshIcon fontSize="inherit" color="primary" style={{ marginRight: 4 }} />Manual
             </SmallButton>
             <Tooltip arrow
               title={
-                <Typography className={ css.tooltip }>
+                <Typography className={css.tooltip}>
                   {infoText || ""}
                 </Typography>
               }
             >
-              <InfoOutlinedIcon color="disabled" fontSize="small"/>
+              <InfoOutlinedIcon color="disabled" fontSize="small" />
             </Tooltip>
           </Grid>
           {/* <Grid item xs={6} container alignItems="center" justifyContent="flex-end">
@@ -371,8 +397,8 @@ const PoolCard = (props: PoolProps) => {
           </Grid> */}
         </Grid>
       </CardActions>
-      { disabled && <Box sx={theme => ({
-        backgroundColor: theme.palette.grey[800],
+      {disabled && <Box sx={theme => ({
+        backgroundColor: theme.palette.grey[ 800 ],
         position: 'absolute',
         top: 20,
         left: -60,
@@ -388,149 +414,160 @@ const PoolCard = (props: PoolProps) => {
     {/* 
         STAKING FORM
     */}
-    <Dialog 
+    <Dialog
       PaperComponent={FormComponent}
       open={openStakeModal}
-      onClose={ toggleStakeModal }
+      onClose={toggleStakeModal}
     >
       <Formik
-        initialValues = {{
+        initialValues={{
           stakeAmount: 0,
           actionType: disabled || items.totalPool !== 0
         }}
-        onSubmit={ ( values, { setSubmitting } ) => {
+        onSubmit={(values, { setSubmitting }) =>
+        {
           const { stakeAmount, actionType } = values
           const maxUsed = actionType ? maxStaked : maxBalance
-          const isMax = new BigNumber( stakeAmount ).div( maxUsed ).isEqualTo( 1 )
-          console.log(stakeAmount, maxUsed, actionType ? "withdraw" : "stake", isMax, new BigNumber( stakeAmount ).div( maxUsed ).toFixed(18,1))
-          const weiAmount = toWei(`${new BigNumber(stakeAmount).toFixed(18,1)}`)
-          if(actionType){
-            ( isMax ? mainMethods?.leaveStakingCompletely() : mainMethods?.leaveStaking(weiAmount)).send({ from: account })
-              .on('transactionHash', (tx:string) =>{
-                editTransactions(tx,'pending', { description: `Withdraw CRUSH from pool`})
+          const isMax = new BigNumber(stakeAmount).div(maxUsed).isEqualTo(1)
+          console.log(stakeAmount, maxUsed, actionType ? "withdraw" : "stake", isMax, new BigNumber(stakeAmount).div(maxUsed).toFixed(18, 1))
+          const weiAmount = toWei(`${new BigNumber(stakeAmount).toFixed(18, 1)}`)
+          if (actionType) {
+            (isMax ? mainMethods?.leaveStakingCompletely() : mainMethods?.leaveStaking(weiAmount)).send({ from: account })
+              .on('transactionHash', (tx: string) =>
+              {
+                editTransactions(tx, 'pending', { description: `Withdraw CRUSH from pool` })
               })
-              .on('receipt', (rc:Receipt) => {
+              .on('receipt', (rc: Receipt) =>
+              {
                 editTransactions(rc.transactionHash, 'complete')
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
               })
-              .on('error', (error:any, receipt:Receipt) => {
-                receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+              .on('error', (error: any, receipt: Receipt) =>
+              {
+                receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
                 triggerHydrate()
                 openStakeModal && toggleStakeModal()
                 setSubmitting(false)
               })
-          }else mainMethods?.enterStaking(weiAmount).send({ from: account })
-            .on('transactionHash', (tx:string) =>{
-              editTransactions(tx,'pending', { description: "Stake Crush in pool"})
+          } else mainMethods?.enterStaking(weiAmount).send({ from: account })
+            .on('transactionHash', (tx: string) =>
+            {
+              editTransactions(tx, 'pending', { description: "Stake Crush in pool" })
             })
-            .on('receipt', (rc:Receipt) => {
+            .on('receipt', (rc: Receipt) =>
+            {
               editTransactions(rc.transactionHash, 'complete')
               triggerHydrate()
               openStakeModal && toggleStakeModal()
               setSubmitting(false)
             })
-            .on('error', (error:any, receipt:Receipt) => {
-              receipt?.transactionHash && editTransactions( receipt.transactionHash, 'error', error )
+            .on('error', (error: any, receipt: Receipt) =>
+            {
+              receipt?.transactionHash && editTransactions(receipt.transactionHash, 'error', error)
               triggerHydrate()
               openStakeModal && toggleStakeModal()
               setSubmitting(false)
             })
         }}
-        validate ={ ( values ) => {
+        validate={(values) =>
+        {
           let errors: any = {}
-          if(!values.actionType && new BigNumber(values.stakeAmount).isGreaterThan( maxBalance ) )
+          if (!values.actionType && new BigNumber(values.stakeAmount).isGreaterThan(maxBalance))
             errors.stakeAmount = "Insufficient Funds"
-          if(values.actionType && new BigNumber(values.stakeAmount).isGreaterThan( maxStaked ) )
+          if (values.actionType && new BigNumber(values.stakeAmount).isGreaterThan(maxStaked))
             errors.stakeAmount = "Insufficient Funds"
-          if(values.stakeAmount <= 0)
+          if (values.stakeAmount <= 0)
             errors.stakeAmount = "Invalid Input"
-          
+
           return errors
         }}
         validateOnChange
       >
-      { ({values, setFieldValue, isSubmitting}) =>{
-        const { actionType, stakeAmount } = values
-        const maxUsed = actionType ? maxStaked : maxBalance
-        const percent = new BigNumber( stakeAmount ).div( maxUsed ).times(100)
-        const sliderChange = (e: any, value: number | number[]) => {
-          if(Array.isArray(value)) return
-          const newValue = value === 100 ? maxUsed : new BigNumber(value).times( maxUsed ).div(100)
-          setFieldValue('stakeAmount', newValue)
-        }
-        const toggleStakeAction = (stakeActionValue: boolean) => {
-          setFieldValue('actionType', stakeActionValue )
-          setFieldValue('stakeAmount', 0 )
-        }
-        return(<Form>
-          <Grid container className={ css.stakeActionBtnContainer }>
-            <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ !actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(false)} disabled={ items.totalPool == 0 || disabled}>
-                STAKE
-              </MButton>
+        {({ values, setFieldValue, isSubmitting }) =>
+        {
+          const { actionType, stakeAmount } = values
+          const maxUsed = actionType ? maxStaked : maxBalance
+          const percent = new BigNumber(stakeAmount).div(maxUsed).times(100)
+          const sliderChange = (e: any, value: number | number[]) =>
+          {
+            if (Array.isArray(value)) return
+            const newValue = value === 100 ? maxUsed : new BigNumber(value).times(maxUsed).div(100)
+            setFieldValue('stakeAmount', newValue)
+          }
+          const toggleStakeAction = (stakeActionValue: boolean) =>
+          {
+            setFieldValue('actionType', stakeActionValue)
+            setFieldValue('stakeAmount', 0)
+          }
+          return (<Form>
+            <Grid container className={css.stakeActionBtnContainer}>
+              <Grid item>
+                <MButton className={css.stakeActionBtn} color={!actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(false)} disabled={items.totalPool == 0 || disabled}>
+                  STAKE
+                </MButton>
+              </Grid>
+              <Grid item>
+                <Divider orientation="vertical" />
+              </Grid>
+              <Grid item>
+                <MButton className={css.stakeActionBtn} color={actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(true)} disabled={userStaked <= 0}>
+                  WITHDRAW
+                </MButton>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Divider orientation="vertical"/>
-            </Grid>
-            <Grid item>
-              <MButton className={ css.stakeActionBtn } color={ actionType ? "secondary" : "info"} onClick={() => toggleStakeAction(true)} disabled={ userStaked <=0 }>
-                WITHDRAW
-              </MButton>
-            </Grid>
-          </Grid>
-          <Typography variant="body2" color="textSecondary" component="div" align="right" className={ css.currentTokenText }>
-            { actionType 
-                ? `Staked ${coinInfo.symbol}: ${currencyFormat( userStaked || 0, { isWei: true })} `
+            <Typography variant="body2" color="textSecondary" component="div" align="right" className={css.currentTokenText}>
+              {actionType
+                ? `Staked ${coinInfo.symbol}: ${currencyFormat(userStaked || 0, { isWei: true })} `
                 : `Wallet ${coinInfo.symbol}: ${currencyFormat(items?.balance || 0, { isWei: true })} `}
-          </Typography>
-          <Field
-            type="number"
-            fullWidth
-            label={actionType ? 'Withdraw Amount' : `Stake Amount`}
-            id="stakeAmount"
-            name="stakeAmount"
-            placeholder="0.00"
-            variant="outlined"
-            component={TextField}
-            InputProps={{
-              endAdornment: <MButton color="secondary" onClick={ () => setFieldValue('stakeAmount', maxUsed )}>
-                MAX
-              </MButton>,
-              className: css.textField,
-              onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
-            }}
-          />
-          <div className={ css.sliderContainer }>
-            <Slider
-              value={ isNaN(percent.toNumber()) ? 0 : percent.toNumber() }
-              onChange={sliderChange}
-              step={ 10 }
-              components={{
-                Thumb: function NewThumb (p) { return <InvaderThumb thumbProps={p} percent={percent}/>} 
+            </Typography>
+            <Field
+              type="number"
+              fullWidth
+              label={actionType ? 'Withdraw Amount' : `Stake Amount`}
+              id="stakeAmount"
+              name="stakeAmount"
+              placeholder="0.00"
+              variant="outlined"
+              component={TextField}
+              InputProps={{
+                endAdornment: <MButton color="secondary" onClick={() => setFieldValue('stakeAmount', maxUsed)}>
+                  MAX
+                </MButton>,
+                className: css.textField,
+                onFocus: (e: React.FocusEvent<HTMLInputElement>) => e.target.select()
               }}
-              // valueLabelDisplay="on"
             />
-          </div>
-          <Grid container justifyContent="space-evenly">
-            <SmallButton color="primary" onClick={() => sliderChange(null,25)}>
-              25%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,50)}>
-              50%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,75)}>
-              75%
-            </SmallButton>
-            <SmallButton color="primary" onClick={() => sliderChange(null,100)}>
-              MAX
-            </SmallButton>
-          </Grid>
-          <Button color="primary" type="submit" width="100%" className={ css.submitBtn } disabled={isSubmitting}>
-            {actionType ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
-          </Button>
-        </Form>)
+            <div className={css.sliderContainer}>
+              <Slider
+                value={isNaN(percent.toNumber()) ? 0 : percent.toNumber()}
+                onChange={sliderChange}
+                step={10}
+                components={{
+                  Thumb: function NewThumb(p) { return <InvaderThumb thumbProps={p} percent={percent} /> }
+                }}
+              // valueLabelDisplay="on"
+              />
+            </div>
+            <Grid container justifyContent="space-evenly">
+              <SmallButton color="primary" onClick={() => sliderChange(null, 25)}>
+                25%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 50)}>
+                50%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 75)}>
+                75%
+              </SmallButton>
+              <SmallButton color="primary" onClick={() => sliderChange(null, 100)}>
+                MAX
+              </SmallButton>
+            </Grid>
+            <Button color="primary" type="submit" width="100%" className={css.submitBtn} disabled={isSubmitting}>
+              {actionType ? 'WITHDRAW' : 'STAKE'} {coinInfo.symbol}
+            </Button>
+          </Form>)
         }}
       </Formik>
     </Dialog>
@@ -549,72 +586,72 @@ export default PoolCard
 type PoolProps = {
   abi: any,
   contractAddress: string, // address
-  tokenAddress : string //address
+  tokenAddress: string //address
   tokenAbi?: any,
   infoText?: string,
   disabled?: boolean,
 }
 
-const useStyles = makeStyles<Theme, PoolProps>( theme => createStyles({
-  card:{
+const useStyles = makeStyles<Theme, PoolProps>(theme => createStyles({
+  card: {
     maxWidth: 385,
     width: '100%',
     padding: theme.spacing(2),
     paddingTop: theme.spacing(1),
-    position:'relative'
+    position: 'relative'
   },
-  avatar:{
+  avatar: {
     width: theme.spacing(6),
     height: theme.spacing(6),
-    backgroundColor: props => props.disabled ? theme.palette.grey[600] : theme.palette.primary.main
+    backgroundColor: props => props.disabled ? theme.palette.grey[ 600 ] : theme.palette.primary.main
   },
-  avatarIcon:{
+  avatarIcon: {
     fontSize: 30,
     color: theme.palette.common.white
   },
-  headerTitle:{
+  headerTitle: {
     textTransform: 'uppercase',
     fontWeight: 600,
   },
-  headerAction:{
+  headerAction: {
     alignSelf: 'center'
   },
-  percent:{
+  percent: {
     fontWeight: 600
   },
-  aprAction:{
+  aprAction: {
     fontSize: theme.typography.body2.fontSize,
     color: theme.palette.primary.main
   },
-  earnings:{
+  earnings: {
     marginTop: theme.spacing(3),
     marginBottom: theme.spacing(3),
   },
-  detailsActionText:{
+  detailsActionText: {
     fontWeight: 500,
     marginRight: theme.spacing(1)
   },
-  textField:{
+  textField: {
     borderRadius: theme.spacing(4),
     paddingLeft: theme.spacing(1),
   },
-  submitBtn:{
+  submitBtn: {
     marginTop: theme.spacing(2)
   },
-  tooltips:{
+  tooltips: {
     padding: `${theme.spacing(2)}`
   },
-  stakeActionBtn:{
+  stakeActionBtn: {
     fontWeight: 600,
   },
-  stakeActionBtnContainer:{
+  stakeActionBtnContainer: {
     marginBottom: theme.spacing(0.5),
   },
-  currentTokenText:{
+  currentTokenText: {
     marginBottom: theme.spacing(1.5),
     paddingRight: theme.spacing(2)
   },
-  sliderContainer:{
+  sliderContainer: {
     padding: theme.spacing(2),
   },
 }))
